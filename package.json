@@ -10,11 +10,29 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
+    "@mui/x-charts": "^8.23.0",
+    "@mui/x-date-pickers": "^8.23.0",
+    "@tabler/icons-react": "^3.36.0",
+    "@vitejs/plugin-react-swc": "^4.2.2",
+    "dayjs": "^1.11.19",
+    "docx": "^9.5.1",
+    "file-saver": "^2.0.5",
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-fast-marquee": "^1.6.5",
+    "react-hook-form": "^7.69.0",
+    "react-i18next": "^16.5.0",
+    "react-router-dom": "^7.11.0",
+    "vite-tsconfig-paths": "^6.0.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
