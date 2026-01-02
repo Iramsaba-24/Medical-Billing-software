@@ -32,8 +32,8 @@ import CategoryIcon from '@mui/icons-material/Category';
 import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-
-import { useNavigate } from 'react-router-dom';
+import { URL_PATH } from '../../constants/UrlPath';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -110,10 +110,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// Define the Props for the Layout component
-interface LayoutProps {
-  children: React.ReactNode;
-}
 
 // Menu Items Array for ERP Billing Software
 const menuItems = [
@@ -121,7 +117,7 @@ const menuItems = [
   {
     text: 'Dashboard',
     icon: <DashboardIcon />,
-    path: '/dashboard',
+    path: URL_PATH.DASHBOARD,
   },
   
   // Sales & Invoicing Section
@@ -133,7 +129,7 @@ const menuItems = [
   {
     text: 'Sales/Billing ',
     icon: <ShoppingCartIcon />,
-    path: '/sales',
+    path: URL_PATH.SalesBilling,
   },
   {
     text: 'Quotations',
@@ -202,7 +198,7 @@ const menuItems = [
   },
 ];
 
-const MiniDrawer: React.FC<LayoutProps> = ({ children }) => {
+const MiniDrawer: React.FC = () => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true); 
 
@@ -434,7 +430,7 @@ const MiniDrawer: React.FC<LayoutProps> = ({ children }) => {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader /> 
         {/* This is where your routed pages will be rendered by AppRouter */}
-        {children} 
+        <Outlet />
       </Box>
     </Box>
   );
