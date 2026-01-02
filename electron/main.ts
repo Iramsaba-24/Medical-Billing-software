@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow , Menu} from 'electron'
 // import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -19,13 +19,19 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win: BrowserWindow | null
 
 function createWindow() {
-  win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
-    },
-  })
+ win = new BrowserWindow({
+  width: 1280,
+  height: 800,
+  minWidth: 1024,
+  minHeight: 700,
+  autoHideMenuBar: true, // extra layer
+  icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+  webPreferences: {
+    preload: path.join(__dirname, 'preload.mjs'),
+  },
+})
 
+  win.setMenuBarVisibility(false)
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
@@ -54,4 +60,8 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  Menu.setApplicationMenu(null) // ✅ removes top menu completely
+  createWindow()
+})
+

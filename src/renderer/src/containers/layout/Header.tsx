@@ -1,70 +1,69 @@
-import * as React from 'react';
-import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
+import * as React from "react";
+import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
+import Box from "@mui/material/Box";
+import MuiDrawer from "@mui/material/Drawer";
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import List from "@mui/material/List";
 import CssBaseline from '@mui/material/CssBaseline';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 
 // Material UI Icons for sidebar
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import PeopleIcon from '@mui/icons-material/People';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import SettingsIcon from '@mui/icons-material/Settings';
-import BusinessIcon from '@mui/icons-material/Business';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
-import CategoryIcon from '@mui/icons-material/Category';
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import PaymentsIcon from '@mui/icons-material/Payments';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import { URL_PATH } from '../../constants/UrlPath';
-import { Outlet, useNavigate } from 'react-router-dom';
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import ReceiptIcon from "@mui/icons-material/Receipt";
+import PeopleIcon from "@mui/icons-material/People";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import SettingsIcon from "@mui/icons-material/Settings";
+import BusinessIcon from "@mui/icons-material/Business";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import CategoryIcon from "@mui/icons-material/Category";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import PaymentsIcon from "@mui/icons-material/Payments";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { URL_PATH } from "../../constants/UrlPath";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
-  background: "#737373",
-  transition: theme.transitions.create('width', {
+  background: "#238878",
+  transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  overflowX: 'hidden',
+  overflowX: "hidden",
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
-    background:"#bdbdbd",
-  transition: theme.transitions.create('width', {
+  background: "#238878",
+  transition: theme.transitions.create("width", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  overflowX: 'hidden',
+  overflowX: "hidden",
   width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up('sm')]: {
+  [theme.breakpoints.up("sm")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
-    
   },
 });
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
 }));
@@ -74,135 +73,134 @@ interface AppBarProps extends MuiAppBarProps {
 }
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== 'open',
+  shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
-  background:"#bdbdbd",
+  background: "#238878",
   zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(['width', 'margin'], {
+  transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
+    transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
   }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-  ({ theme, open }) => ({
-    width: drawerWidth,
-    flexShrink: 0,
-    
-    whiteSpace: 'nowrap',
-    boxSizing: 'border-box',
-    ...(open && {
-      ...openedMixin(theme),
-      '& .MuiDrawer-paper': openedMixin(theme),
-    }),
-    ...(!open && {
-      ...closedMixin(theme),
-      '& .MuiDrawer-paper': closedMixin(theme),
-    }),
-  }),
-);
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
 
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
+}));
 
 // Menu Items Array for ERP Billing Software
 const menuItems = [
   // Dashboard Section
   {
-    text: 'Dashboard',
+    text: "Dashboard",
     icon: <DashboardIcon />,
     path: URL_PATH.DASHBOARD,
   },
-  
+
   // Sales & Invoicing Section
   {
-    text: 'Invoices',
+    text: "Invoices",
     icon: <ReceiptIcon />,
-    path: '/invoices',
+    path: "/invoices",
   },
   {
-    text: 'Sales/Billing ',
+    text: "Sales/Billing ",
     icon: <ShoppingCartIcon />,
     path: URL_PATH.SalesBilling,
   },
   {
-    text: 'Quotations',
+    text: "Quotations",
     icon: <AttachMoneyIcon />,
-    path: '/quotations',
+    path: "/quotations",
   },
-  
+
   // Customers Section
   {
-    text: 'Customers',
+    text: "Customers",
     icon: <PeopleIcon />,
-    path: '/customers',
+    path: "/customers",
   },
   {
-    text: 'Customer Support',
+    text: "Customer Support",
     icon: <SupportAgentIcon />,
-    path: '/support',
+    path: "/support",
   },
-  
+
   // Inventory Section
   {
-    text: 'Inventory',
+    text: "Inventory",
     icon: <InventoryIcon />,
-    path: '/inventory',
+    path: "/inventory",
   },
   {
-    text: 'Products',
+    text: "Products",
     icon: <CategoryIcon />,
-    path: '/products',
+    path: "/products",
   },
   {
-    text: 'Suppliers',
+    text: "Suppliers",
     icon: <BusinessIcon />,
-    path: '/suppliers',
+    path: "/suppliers",
   },
-  
+
   // Financial Section
   {
-    text: 'Payments',
+    text: "Payments",
     icon: <PaymentsIcon />,
-    path: '/payments',
+    path: "/payments",
   },
   {
-    text: 'Expenses',
+    text: "Expenses",
     icon: <LocalAtmIcon />,
-    path: '/expenses',
+    path: "/expenses",
   },
   {
-    text: 'Accounting',
+    text: "Accounting",
     icon: <AccountBalanceIcon />,
-    path: '/accounting',
+    path: "/accounting",
   },
-  
+
   // Reports Section
   {
-    text: 'Reports',
+    text: "Reports",
     icon: <AssessmentIcon />,
-    path: '/reports',
+    path: "/reports",
   },
-  
+
   // Settings Section
   {
-    text: 'Settings',
+    text: "Settings",
     icon: <SettingsIcon />,
-    path: '/settings',
+    path: "/settings",
   },
 ];
 
 const MiniDrawer: React.FC = () => {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true); 
+  const [open, setOpen] = React.useState(true);
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -213,9 +211,9 @@ const MiniDrawer: React.FC = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex", background: "#f0f0f0" }}>
       <CssBaseline />
-      
+
       {/* Navbar (AppBar) */}
       <AppBar position="fixed" open={open}>
         <Toolbar>
@@ -226,7 +224,7 @@ const MiniDrawer: React.FC = () => {
             edge="start"
             sx={{
               marginRight: 5,
-              ...(open && { display: 'none' }),
+              ...(open && { display: "none" }),
             }}
           >
             <MenuIcon />
@@ -236,204 +234,309 @@ const MiniDrawer: React.FC = () => {
           </Typography>
         </Toolbar>
       </AppBar>
-      
+
       {/* Sidebar (Drawer) */}
-      <Drawer variant="permanent" open={open} >
+      <Drawer
+        variant="permanent"
+        open={open}
+        sx={{
+          overflow: "hidden",
+          "& .MuiDrawer-paper": {
+            overflowY: "auto",
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+          },
+        }}
+      >
         <DrawerHeader>
-            <Typography variant="subtitle1" sx={{ mr: 2, opacity: open ? 1 : 0, color:'#ffffff' }}>
-                ERP Billing Software
-            </Typography>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          <Typography
+            variant="subtitle1"
+            sx={{ mr: 2, opacity: open ? 1 : 0, color: "#ffffff" }}
+          >
+            ERP Billing Software
+          </Typography>
+          <IconButton  onClick={handleDrawerClose}>
+            {theme.direction === "rtl" ? (
+              <ChevronRightIcon color="inherit"/>
+            ) : (
+              <ChevronLeftIcon />
+            )}
           </IconButton>
         </DrawerHeader>
         <Divider />
-        
+
         {/* Main Menu Items */}
         <List>
-          {menuItems.slice(0, 1).map((item) => ( // Dashboard
-            <ListItem key={item.text} disablePadding sx={{ display: 'block',  }}>
-              <ListItemButton
-                onClick={() => navigate(item.path)}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                  color:"#ffffff"
-                }}
+          {menuItems.slice(0, 1).map(
+            (
+              item // Dashboard
+            ) => (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: "block" }}
               >
-                <ListItemIcon
+                <ListItemButton
+                  onClick={() => navigate(item.path)}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                    color:'#ffffff'
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    color: "#ffffff",
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      color: "#ffffff",
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={{ opacity: open ? 1 : 0 , color: "#ffffff"}}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
-        
+
         <Divider />
-        <Typography variant="caption" sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0 }}>
+        <Typography
+          variant="inherit"
+          sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0 , color: "#ffffff"}}
+        >
           Sales & Invoicing
         </Typography>
         <List>
-          {menuItems.slice(1, 4).map((item) => ( // Invoices, Sales, Quotations
-            <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                onClick={() => navigate(item.path)}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
+          {menuItems.slice(1, 4).map(
+            (
+              item 
+            ) => (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: "block" }}
               >
-                <ListItemIcon
+                <ListItemButton
+                  onClick={() => navigate(item.path)}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      color:'#ffffff'
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={{ opacity: open ? 1 : 0, color:'#ffffff' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
-        
+
         <Divider />
-        <Typography variant="caption" sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0 }}>
+        <Typography
+          variant="inherit"
+          sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0, color:'#ffffff' }}
+        >
           Customers
         </Typography>
         <List>
-          {menuItems.slice(4, 6).map((item) => ( // Customers, Support
-            <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                onClick={() => navigate(item.path)}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
+          {menuItems.slice(4, 6).map(
+            (
+              item // Customers, Support
+            ) => (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: "block" }}
               >
-                <ListItemIcon
+                <ListItemButton
+                  onClick={() => navigate(item.path)}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    color:'#ffffff'
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      color:'#ffffff'
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={{ opacity: open ? 1 : 0, color:'#ffffff' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
-        
+
         <Divider />
-        <Typography variant="caption" sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0 }}>
+        <Typography
+          variant="inherit"
+          sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0 , color:'#ffffff'}}
+        >
           Inventory
         </Typography>
         <List>
-          {menuItems.slice(6, 9).map((item) => ( // Inventory, Products, Suppliers
-            <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                onClick={() => navigate(item.path)}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
+          {menuItems.slice(6, 9).map(
+            (
+              item // Inventory, Products, Suppliers
+            ) => (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: "block", color:'#ffffff' }}
               >
-                <ListItemIcon
+                <ListItemButton
+                  onClick={() => navigate(item.path)}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      color:'#ffffff'
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={{ opacity: open ? 1 : 0, color:'#ffffff' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
-        
+
         <Divider />
-        <Typography variant="caption" sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0 }}>
+        <Typography
+          variant="inherit"
+          sx={{ pl: 2, pt: 2, opacity: open ? 1 : 0 , color:'#ffffff'}}
+        >
           Financial
         </Typography>
         <List>
-          {menuItems.slice(9, 12).map((item) => ( // Payments, Expenses, Accounting
-            <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                onClick={() => navigate(item.path)}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
+          {menuItems.slice(9, 12).map(
+            (
+              item // Payments, Expenses, Accounting
+            ) => (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: "block", color:'#ffffff' }}
               >
-                <ListItemIcon
+                <ListItemButton
+                  onClick={() => navigate(item.path)}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      color:'#ffffff'
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={{ opacity: open ? 1 : 0, color:'#ffffff' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
-        
+
         <Divider />
         <List>
-          {menuItems.slice(12).map((item) => ( // Reports, Settings
-            <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                onClick={() => navigate(item.path)}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
+          {menuItems.slice(12).map(
+            (
+              item 
+            ) => (
+              <ListItem
+                key={item.text}
+                disablePadding
+                sx={{ display: "block" , color:'#ffffff'}}
               >
-                <ListItemIcon
+                <ListItemButton
+                  onClick={() => navigate(item.path)}
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
+                    color:'#ffffff'
                   }}
                 >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                      color:'#ffffff'
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.text}
+                    sx={{ opacity: open ? 1 : 0, color:'#ffffff' }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
       </Drawer>
 
       {/* Main Content Area */}
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <DrawerHeader /> 
+        <DrawerHeader />
         {/* This is where your routed pages will be rendered by AppRouter */}
         <Outlet />
       </Box>
     </Box>
   );
-}
+};
 
 export default MiniDrawer;
