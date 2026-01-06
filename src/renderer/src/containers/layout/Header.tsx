@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import {
   Box,
   Drawer,
@@ -8,19 +8,14 @@ import {
   List,
   CssBaseline,
   Typography,
-  Divider,
   IconButton,
   ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
+  Tooltip,
   InputBase,
-  useMediaQuery,
+  Button,
 } from '@mui/material';
 
 import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SearchIcon from '@mui/icons-material/Search';
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -34,12 +29,13 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
 
-
-
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
 
-const drawerWidth = 240;
+const MINI_WIDTH = 64;
+const FULL_WIDTH = 240;
+
+/* --STYLED -- */
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: '#238878',
@@ -47,31 +43,22 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 }));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: theme.spacing(0, 2),
   ...theme.mixins.toolbar,
 }));
 
-const MenuButton = styled(ListItemButton)(() => ({
-  minHeight: 48,
-  margin: '6px 10px',
-  borderRadius: 12,
-  backgroundColor: '#e0e0e0',
-  '&:hover': {
-    backgroundColor: '#f1f1f1',
-  },
-}));
-
-const SearchBox = styled(Box)(() => ({
+const SearchBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   backgroundColor: '#fff',
   borderRadius: 20,
   padding: '4px 12px',
-  width: 350,
+  width: 260,
+  [theme.breakpoints.down('sm')]: {
+    width: 160,
+  },
 }));
+
+/* -- MENU -- */
 
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: URL_PATH.DASHBOARD },
@@ -84,130 +71,118 @@ const menuItems = [
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
+/* -- SIDEBAR -- */
 
-const DrawerContent = ({ onClose }: { onClose?: () => void }) => {
-  const theme = useTheme();
+const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
-    <>
-      <DrawerHeader>
-        <Typography fontWeight={600}>ERP Billing</Typography>
-        {onClose && (
-          <IconButton onClick={onClose}>
-            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-          </IconButton>
-        )}
-      </DrawerHeader>
+    <List sx={{ px: 1 }}>
+      {menuItems.map((item) => {
+        const active = location.pathname === item.path;
 
-      <Divider />
+        return (
+          <Tooltip
+            key={item.text}
+            title={!open ? item.text : ''}
+            placement="right"
+            arrow
+          >
+            <ListItem disablePadding sx={{ mb: 2 }}>
+              <Button
+                fullWidth
+                startIcon={item.icon}
+                variant={active ? 'contained' : 'contained'}
+                onClick={() => navigate(item.path)}
+                sx={{
+                  justifyContent: open ? 'flex-start' : 'center',
+                  minHeight: 44,
+                  px: open ? 4 : 0,
+                  py: 2,
+                  borderRadius: 2,
+                  textTransform: 'none',
 
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <MenuButton
-              onClick={() => {
-                navigate(item.path);
-                onClose?.();
-              }}
-            >
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                {item.icon}
-              </ListItemIcon>
-              <ListItemText primary={item.text} />
-            </MenuButton>
-          </ListItem>
-        ))}
-      </List>
-    </>
+                  background: active
+                    ? 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)'
+                    : '#D9D9D9',
+                  color: active ? '#fff' : 'black',
+
+                  '& .MuiButton-startIcon': {
+                    margin: open ? '0 12px 0 0' : 0,
+                  },
+
+                  '&:hover': {
+                    background: 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)',
+                  },
+
+                }}
+              >
+                {open && item.text}
+              </Button>
+            </ListItem>
+          </Tooltip>
+        );
+      })}
+    </List>
   );
 };
 
+/* -- MAIN LAYOUT -- */
 
 const Header: React.FC = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
-
-  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      const match = menuItems.find(item =>
-        item.text.toLowerCase().includes(search.toLowerCase())
-      );
-
-      if (match) {
-        navigate(match.path);
-        setSearch('');
-      }
-    }
-  };
+  const [open, setOpen] = React.useState(false);
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
 
+      {/* APP BAR */}
       <StyledAppBar position="fixed">
         <Toolbar sx={{ gap: 2 }}>
-          {isMobile && (
-            <IconButton color="inherit" onClick={() => setDrawerOpen(true)}>
-              <MenuIcon />
-            </IconButton>
-          )}
+          <IconButton color="inherit" onClick={() => setOpen(!open)}>
+            <MenuIcon />
+          </IconButton>
 
-          <Typography variant="h6" sx={{ mr: 40 }}>
+          <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
             ERP Billing Software
           </Typography>
+
+          <SearchBox>
+            <SearchIcon sx={{ mr: 1, color: '#666' }} />
+            <InputBase placeholder="Search" fullWidth />
+          </SearchBox>
 
           <IconButton color="inherit" onClick={() => navigate(-1)}>
             <UndoRoundedIcon />
           </IconButton>
 
-          <IconButton color="inherit" onClick={() => navigate(1)} sx={{mr: 20}}>
+          <IconButton color="inherit" onClick={() => navigate(1)}>
             <RedoRoundedIcon />
           </IconButton>
-
-          <SearchBox>
-            <SearchIcon sx={{ mr: 1, color: '#666' }} />
-            <InputBase
-              placeholder="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={handleSearch}
-              fullWidth
-            />
-          </SearchBox>
         </Toolbar>
       </StyledAppBar>
 
-      {isMobile && (
-        <Drawer
-          variant="temporary"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          ModalProps={{ keepMounted: true }}
-          sx={{ '& .MuiDrawer-paper': { width: drawerWidth } }}
-        >
-          <DrawerContent onClose={() => setDrawerOpen(false)} />
-        </Drawer>
-      )}
-
-      {!isMobile && (
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: drawerWidth,
-            '& .MuiDrawer-paper': {
-              width: drawerWidth,
-              boxSizing: 'border-box',
-            },
-          }}
-        >
-          <DrawerContent />
-        </Drawer>
-      )}
+      {/* SIDEBAR */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: open ? FULL_WIDTH : MINI_WIDTH,
+          flexShrink: 0,
+          whiteSpace: 'nowrap',
+          transition: 'width 0.3s',
+          '& .MuiDrawer-paper': {
+            width: open ? FULL_WIDTH : MINI_WIDTH,
+            transition: 'width 0.3s',
+            boxSizing: 'border-box',
+            overflowX: 'hidden',
+          },
+        }}
+      >
+        <DrawerHeader />
+        <Sidebar open={open} />
+      </Drawer>
 
       <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
         <Outlet />
