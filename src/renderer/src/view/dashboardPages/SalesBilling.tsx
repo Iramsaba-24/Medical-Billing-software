@@ -14,7 +14,7 @@ import {
 
 import ReusableTable, {
   TableColumn
-} from "../components/uncontrolled/ReusableTable";
+} from "@/components/uncontrolled/ReusableTable";
 
 
 type Product = {

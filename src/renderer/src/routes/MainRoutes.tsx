@@ -1,8 +1,8 @@
 import { RouteObject } from 'react-router-dom';
-import Layout from '../containers/layout/Header';
-import DashboardPage from '../view/dashboardPages/DashboardPage';
-import { URL_PATH } from '../constants/UrlPath';
-import SalesBilling from '@/view/SalesBilling';
+import Layout from '@/containers/layout/Header';
+import DashboardPage from '@/view/dashboardPages/DashboardPage';
+import { URL_PATH } from '@/constants/UrlPath';
+import SalesBilling from '@/view/dashboardPages/SalesBilling';
 
 export const mainRoutes: RouteObject[] = [
   {

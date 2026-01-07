@@ -1,0 +1,560 @@
+{
+  "welcome": "Welcome to ",
+  "submit": "Submit",
+  "about": "About Us",
+  "contact": "Contact Us",
+  "V.E.I PARAMEDICAL COLLEGE SINDAGI": "V.E.I PARAMEDICAL COLLEGE SINDAGI",
+  "Affiliated by Paramedical Board Bengaluru Recognized By Govt of Karnataka": "Affiliated by Paramedical Board Bengaluru Recognized By Govt of Karnataka",
+  "Enquiry": "Enquiry",
+  "Brochere": "Brochure",
+  "Diploma in Medical Imaging Technology": "Diploma in Medical Imaging Technology",
+  "Diploma in Medical Laboratory Technology": "Diploma in Medical Laboratory Technology",
+  "Diploma in Health Inspector": "Diploma in Health Inspector",
+  "Admissions Open Now! Apply Today": "Admissions Open Now! Apply Today",
+  "Welcome to Shreedevi Ishwar Shikshana Samsthe": "Welcome to Shreedevi Ishwar Shikshana Samsthe",
+  "(SHREEDEVI ISHWAR SHIKSHANA SAMSTHE)": "(SHREEDEVI ISHWAR SHIKSHANA SAMSTHE)",
+  "Menu": "Menu",
+
+  "footer": {
+    "contactUs": "Contact Us",
+    "address": "Our Address",
+    "vei_address": "V.E.I Paramedical College\nBasaveshwar Circle,\nNear LIC Office, Sindagi,\nTq: Sindagi, Dist: Vijayapur,\nState: Karnataka – 586128.",
+    "email": "Email",
+    "phone": "Phone",
+    "branches": "Our Branch",
+    "karnataka": "Karnataka",
+    "courses": "Our Courses",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy",
+    "followUs": "Follow Us",
+    "allRights": "All Rights Reserved © {{year}}, Design & Developed By",
+    "developer": "StarSoftech"
+  },
+
+  "courses": {
+    "Diploma in Health Inspector": "Diploma in Health Inspector",
+    "Diploma in Medical Laboratory Technology": "Diploma in Medical Laboratory Technology",
+    "Diploma in Medical Imaging Technology": "Diploma in Medical Imaging Technology"
+  },
+  "socials": {
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn"
+  },
+
+  "header": {
+    "home": "Home",
+    "about": "About",
+    "courses": "Courses",
+    "achievers": "Achievers & Toppers",
+    "admissions": "Admissions",
+    "certificate": "Certificates",
+    "contact": "Contact",
+    "gallery": "Gallery"
+  },
+
+  "notifications": {
+    "title": "Notifications"
+  },
+
+  "buttons": {
+    "rightSide": [
+      { "label": "Admission Form", "key": "admissionForm", "defaultPath": "/pdf/AdmissionForm.pdf" },
+      { "label": "Examination Form", "key": "examinationForm", "defaultPath": "/pdf/ExaminationForm.pdf" },
+      { "label": "Scholarship SSP Login", "path": "/pages/ScholarshipLogin" },
+      { "label": "PMB Calendar Events", "key": "calendarEvent", "defaultPath": "/pdf/CalenderEvent.pdf" },
+      { "label": "Question Paper Code", "path": "/pages/QPCodeDetails" }
+    ],
+    "leftSide": [
+      { "label": "Results", "path": "https://pmb.campusuite.in/MarksProcessResults/StudentResults.aspx", "external": true },
+      { "label": "Revaluation Result", "path": "https://pmb.campusuite.in/MarksProcessResults/StudentResults.aspx", "external": true },
+      { "label": "Syllabus Copy", "path": "/pages/SyllabusCopy" },
+      { "label": "Previous Question Papers", "path": "/pages/previouspapers" }
+    ]
+  },
+  "admissionOpen": [
+    { "text": "Admissions Open Now!", "path": "/pages/applyNow" },
+    { "text": "Admissions Open Now!", "path": "/pages/applyNow" },
+    { "text": "Admissions Open Now!", "path": "/pages/applyNow" },
+    { "text": "Admissions Open Now!", "path": "/pages/applyNow" }
+  ],
+
+  "aboutPage": {
+    "title": "ABOUT US",
+    "descriptionParagraphs": [
+      "V.E.I Paramedical College Sindagi, under the aegis of Shreedevi Ishwar Shikshana Samsthe, is dedicated to nurturing skilled healthcare professionals who are committed to service, ethics, and excellence. Established with the vision of empowering rural and urban youth with quality paramedical education, our institution is a beacon of learning and compassion.",
+      "We offer a range of diploma and certification courses in paramedical sciences, designed to meet the growing demands of the healthcare sector. Our curriculum blends academic rigor with practical training, ensuring that students are well-prepared to meet real-world medical challenges.",
+      "Our highly qualified faculty, state-of-the-art laboratories, and strong industry collaborations provide a dynamic learning environment. At V.E.I Paramedical College, we believe in holistic development—where students grow intellectually, emotionally, and professionally.",
+      "We are proud to be shaping the next generation of healthcare heroes."
+    ],
+    "subscribeBox": {
+      "message": "Subscribe to our newsletter and stay updated on the latest news.",
+      "emailLabel": "Email",
+      "subscribeButton": "Subscribe"
+    },
+    "ourTeam": " OUR TEAM",
+    "team": [{ "name": "Dr.Rancho", "department":"DHI" }, { "name": "Dr.Lily", "department":"DMLT"  }, { "name": "Dr.Joseph", "department":"DMIT"  }]
+  },
+
+  "coursesPage": {
+    "title": "Our Courses",
+    "selectLabel": "Select a Course",
+    "courseDetails": "Course Details:",
+    "qualification": "Qualification:",
+    "courses": {
+      "DHI": {
+        "title": "DHI (Diploma in Health Inspector)",
+        "details": "Intake 20 Seats / year\n\nThe duration of the above course will be PUC Science candidates 2 years + 3 month internship\nand SSLC candidates 3 years + 3 month internship.\n\nEnglish, Physics, Chemistry and Biology of PUC standard shall be taught in the first year of\nthe course to SSLC candidates.",
+        "qualificationIntro": "Depending upon the candidate qualification.\n\nParamedical professionals hold an important place in the healthcare sector. Although the real\ndecision making lies in the hands of doctors and surgeons, paramedical professionals make sure\nthat the guidelines suggested by doctors are implemented in a proper manner.",
+        "qualifications": 
+          [
+          " The completed person can get appointed as Junior Health Worker in PHC, CHC, Taluka Hospital & District Hospitals.",
+          " They can also appointed as Health Adviser in various medical colleges and hospitals.",
+          " They can also appointed as Health Worker in Municipality or Corporation.",
+          " They can also appointed as Health Sanitary and Hygiene Inspector in various food industries."
+        ]
+      },
+      "DMIT": {
+        "title": "DMIT (Diploma in Medical Imaging Technology) {X-Ray}",
+        "details": "Intake 20 Seats / year\n\nThe duration of the above course will be PUC Science candidates 2 years + 3 month internship\nand SSLC candidates 3 years + 3 month internship.\n\nEnglish, Physics, Chemistry and Biology of PUC standard shall be taught in the first year of\nthe course to SSLC candidates.",
+        "qualificationIntro": "Depending upon the candidate qualification.\n\nDiploma in Medical Imaging technologies is a radiographic course that deals with\nelectromagnetic radiations that penetrate human body. The students after successful\ncompletion of the course have ample job opportunities. They are hired in clinics, hospitals,\ndiagnostic centers, etc.",
+        "qualifications":
+          [
+
+            " The completed person can get appointed as Imaging technician or X-Ray technician in Taluka Hospital & District Hospitals.",
+            " The completed person can get appointed as Imaging technician or X-Ray technician in various Hospitals, Medical Colleges.",
+            " They can open own X-Ray Center.",
+            " This course is approved for the Imaging technician or X-Ray technician job in Govt. and Private sectors throughout the India.",
+            " This course is also approved for the Imaging technician or X-Ray technician Job in abroad."
+        ] 
+      },
+      "DMLT": {
+        "title": "DMLT (Diploma in Medical Laboratory Technology)",
+        "details": "Intake 20 Seats / year\n\nThe duration of the above course will be PUC Science candidates 2 years + 3 month internship\nand SSLC candidates 3 years + 3 month internship.\n\nEnglish, Physics, Chemistry and Biology of PUC standard shall be taught in the first year of\nthe course to SSLC candidates.",
+        "qualificationIntro": "Depending upon the candidate qualification.\n\nDiploma in Medical Laboratory Technology - DMLT, Medical Lab Technician Diploma course.\nMedical laboratory technology is the branch of medical science responsible for performing\nlaboratory investigations relating to the diagnosis, treatment, and prevention of disease.",
+        "qualifications": 
+         [
+                          " The completed person can get appointed as Lab Technologist in PHC, CHC, Taluka Hospital & District Hospitals.",
+                          " The completed person can get appointed as Lab Technologist in various Hospitals, Pathological Laboratory, medical Colleges, Medical Research Laboratories etc.",
+                          " They can open own laboratory.",
+                          " This course is approved for the lab technologist job in Govt. and Private sectors throughout the India.",
+                          " This course is also approved for the lab technologist Job in abroad."
+         ]
+      }
+    }
+  },
+
+  "achieversPage": {
+    "bannerAlt": "Achievers banner",
+    "topStudentsTitle": "Top 10 Students of the Year 2024–25",
+    "achieversTitle": "Achievers of Year 2024-25",
+    "tableColumns": {
+      "number": "No.",
+      "name": "Student Name",
+      "department": "Department",
+      "image": "Image"
+    },
+    "topperBadge": "Topper {{number}}",
+    "closeButton": "Close",
+    "defaultStudents": [
+      {
+        "No": "01",
+        "name": "Rishab Joshi",
+        "department": "DMLT"
+      },
+      {
+        "No": "02",
+        "name": "Priya Jagtap",
+        "department": "DHI"
+      },
+      {
+        "No": "03",
+        "name": "Rahul Shrivastav",
+        "department": "DMLT"
+      },
+      {
+        "No": "04",
+        "name": "Raj Shaha",
+        "department": "DMLT"
+      },
+      {
+        "No": "05",
+        "name": "Nilam Patil",
+        "department": "DHI"
+      },
+      {
+        "No": "06",
+        "name": "Nitin Mukharji",
+        "department": "DMLT"
+      }
+    ]
+  },
+
+  "admissionPage": {
+    "bannerAlt": "Admission banner",
+    "selectCareer": "Select Your Career",
+    "courseDetails": {
+      "duration": "Duration:",
+      "eligibility": "Eligibility:",
+      "career": "Career Opportunities:"
+    },
+    "courses": {
+      "DHI": {
+        "title": "DHI (Diploma in Health Inspector)",
+        "details": "Intake 20 Seats / year\n\nThe duration of the above course will be PUC Science candidates 2 years + 3 month internship\nand SSLC candidates 3 years + 3 month internship.\n\nEnglish, Physics, Chemistry and Biology of PUC standard shall be taught in the first year of\nthe course to SSLC candidates.",
+        "qualificationIntro": "Depending upon the candidate qualification.\n\nParamedical professionals hold an important place in the healthcare sector. Although the real\ndecision making lies in the hands of doctors and surgeons, paramedical professionals make sure\nthat the guidelines suggested by doctors are implemented in a proper manner.",
+        "qualifications": 
+        [
+          " The completed person can get appointed as Junior Health Worker in PHC, CHC, Taluka Hospital & District Hospitals.",
+          " They can also appointed as Health Adviser in various medical colleges and hospitals.",
+          " They can also appointed as Health Worker in Municipality or Corporation.",
+          " They can also appointed as Health Sanitary and Hygiene Inspector in various food industries."
+        ]
+      },
+      "DMIT": {
+        "title": "DMIT (Diploma in Medical Imaging Technology) {X-Ray}",
+        "details": "Intake 20 Seats / year\n\nThe duration of the above course will be PUC Science candidates 2 years + 3 month internship\nand SSLC candidates 3 years + 3 month internship.\n\nEnglish, Physics, Chemistry and Biology of PUC standard shall be taught in the first year of\nthe course to SSLC candidates.",
+        "qualificationIntro": "Depending upon the candidate qualification.\n\nDiploma in Medical Imaging technologies is a radiographic course that deals with\nelectromagnetic radiations that penetrate human body. The students after successful\ncompletion of the course have ample job opportunities. They are hired in clinics, hospitals,\ndiagnostic centers, etc.",
+        "qualifications": 
+        [
+
+            " The completed person can get appointed as Imaging technician or X-Ray technician in Taluka Hospital & District Hospitals.",
+            " The completed person can get appointed as Imaging technician or X-Ray technician in various Hospitals, Medical Colleges.",
+            " They can open own X-Ray Center.",
+            " This course is approved for the Imaging technician or X-Ray technician job in Govt. and Private sectors throughout the India.",
+            " This course is also approved for the Imaging technician or X-Ray technician Job in abroad."
+        ]
+      },
+      "DMLT": {
+        "title": "DMLT (Diploma in Medical Laboratory Technology)",
+        "details": "Intake 20 Seats / year\n\nThe duration of the above course will be PUC Science candidates 2 years + 3 month internship\nand SSLC candidates 3 years + 3 month internship.\n\nEnglish, Physics, Chemistry and Biology of PUC standard shall be taught in the first year of\nthe course to SSLC candidates.",
+        "qualificationIntro": "Depending upon the candidate qualification.\n\nDiploma in Medical Laboratory Technology - DMLT, Medical Lab Technician Diploma course.\nMedical laboratory technology is the branch of medical science responsible for performing\nlaboratory investigations relating to the diagnosis, treatment, and prevention of disease.",
+        "qualifications":
+         [
+                          " The completed person can get appointed as Lab Technologist in PHC, CHC, Taluka Hospital & District Hospitals.",
+                          " The completed person can get appointed as Lab Technologist in various Hospitals, Pathological Laboratory, medical Colleges, Medical Research Laboratories etc.",
+                          " They can open own laboratory.",
+                          " This course is approved for the lab technologist job in Govt. and Private sectors throughout the India.",
+                          " This course is also approved for the lab technologist Job in abroad."
+         ]
+      }
+    },
+    "rulesAndRegulations": {
+      "title": "Key aspects of admission rules and regulations include:",
+      "duration": {
+        "heading": "DURATION OF THE COURSES",
+        "points": [
+          {
+            "text": "The duration of the course will be:",
+            "subpoints": ["PUC Science candidates: 2 years + 3 months internship", "SSLC candidates: 3 years + 3 months internship"]
+          },
+          "English, Physics, Chemistry, and Biology of PUC standard shall be taught in the first year of the course to SSLC candidates."
+        ]
+      },
+      "qualification": {
+        "heading": "MINIMUM QUALIFICATION PRESCRIBED FOR ADMISSION",
+        "points": [
+          "Pass in II PUC with Science subjects: PCB, PCMB, CBZ.",
+          "If sufficient PUC science candidates are not available, SSLC qualified candidates may be considered for admission."
+        ]
+      },
+      "documents": {
+        "heading": "ORIGINAL DOCUMENTS SUBMISSION FOR ADMISSION",
+        "points": [
+          {
+            "text": "All admitted students must submit original marks cards and certificates:",
+            "subpoints": [
+              "SSLC Marks Card",
+              "PUC Science Marks Card (if applicable)",
+              "Transfer Certificate (TC)",
+              "Migration Certificate (for out-of-state students)"
+            ]
+          },
+          "Admission will be rejected by the Paramedical Board if original documents are not submitted."
+        ]
+      },
+      "ageLimit": {
+        "heading": "AGE LIMIT FOR ADMISSION",
+        "points": [
+          "Minimum age: 16 years as on 31st December of the year of admission.",
+          "Upper age limit: 30 years.",
+          "English, Physics, Chemistry and Biology of PUC standard shall be taught in the first year to SSLC candidates."
+        ]
+      },
+      "dressCode": {
+        "heading": "DRESS CODE",
+        "points": [
+          "White apron with Identity badge is compulsory (common for both boys and girls).",
+          "The institute may revise the dress code from time to time."
+        ]
+      },
+      "examination": {
+        "heading": "EXAMINATION",
+        "points": ["Two examinations are conducted every year – Annual and Supplementary – by the Para Medical Board."]
+      },
+      "eligibility": {
+        "heading": "ELIGIBILITY FOR TAKING EXAMINATION",
+        "points": ["50% of Internal Assessment (IA) marks and 75% attendance are required to be eligible for exams."]
+      },
+      "transferCertificate": {
+        "heading": "ISSUE OF TRANSFER CERTIFICATE",
+        "points": [
+         " There is no provision to issue Transfer Certificate to any candidate who completes Diploma successfully unless or otherwise he / she intends to persue higher studies based on Diploma Certificate issued by this College/Board."
+
+        ]
+      },
+      "cancellationPolicy": {
+        "heading": "ADMISSION CANCELLATION AND FEE REFUND POLICY",
+        "points": [
+          "Once Admitted Candidate Any Reason  to Cancel Admission, Once Admitted Student Paid Fees Cannot be Refunded. "
+        ]
+      }
+    }
+  },
+
+  "certificatesPage": {
+    "title": "Our Certificates",
+    "tableColumns": {
+      "title": "Certificate Title",
+      "postedOn": "Posted On",
+      "preview": "Preview",
+      "action": "Action"
+    },
+    "viewingCertificate": "Viewing Certificate:",
+    "noFileAlert": "No file found for download.",
+    "closeButton": "Close"
+  },
+
+  "contactPage": {
+    "title": "Contact Us",
+    "form": {
+      "name": "Name",
+      "mobile": "Mobile",
+      "email": "Email",
+      "message": "Message",
+      "submit": "Submit",
+      "validation": {
+        "required": "{field} is required",
+        "invalidEmail": "Please enter a valid email",
+        "invalidMobile": "Please enter a valid mobile number",
+        "minLength": "Minimum {min} characters required",
+        "maxLength": "Maximum {max} characters allowed"
+      }
+    },
+    "contactInfo": {
+      "location": "V.E.I Paramedical College\nBasaveshwar Circle,\nNear LIC Office, Sindagi,\nTq: Sindagi, Dist: Vijayapur,\nState: Karnataka – 586128.",
+      "email": "veipmb2025@gmail.com",
+      "phone": "9945773003 / 7090801301",
+      "altTexts": {
+        "location": "College Location",
+        "email": "College Email",
+        "phone": "College Phone Number"
+      }
+    }
+  },
+
+  "galleryPage": {
+    "title": "Gallery",
+    "blogSection": {
+      "title": "Our Blog",
+      "indicators": {
+        "ariaLabel": "Blog post"
+      }
+    },
+    "images": {
+      "classroom1": "Classroom 1",
+      "classroom2": "Classroom 2",
+      "students": "Students",
+      "lab1": "Lab 1",
+      "lab2": "Lab 2",
+      "lab3": "Lab 3"
+    },
+    "blogPosts": {
+      "performance1": {
+        "title": "Best Performance 1",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment."
+      },
+      "performance2": {
+        "title": "Best Performance 2",
+        "description": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment."
+      },
+      "performance3": {
+        "title": "Best Performance 3",
+        "description": "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system.On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment."
+      },
+      "performance4": {
+        "title": "Best Performance 4",
+        "description": "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment."
+      },
+      "performance5": {
+        "title": "Best Performance 5",
+        "description": "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment.On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment."
+      }
+    }
+  },
+
+  "applyNowPage":{
+    "title":"Apply Now"
+  },
+
+  "loginPage":{
+    "title": "Log In",
+    "RememberMe": "Remember Me",
+    "ForgotPass": "Forgot Password?",
+    "CreateNewAcc": "Create a New Account"
+    
+  },
+
+  "scholarshipLogin":{
+    "title": "How to Apply For SSP Scholarship",
+    "subtitle": "Follow these simple steps to apply for your scholarship:",
+    "Note": "Note: Submit your application before the deadline to avoid rejection.",
+    "step1":{
+      "title":"Step 1: Register on SSP Portal",
+      "Piont":[
+      "Click on “Create Account”",
+      "Enter your Aadhaar number and verify it",
+      "Fill in the basic details and create your login credentials"
+      ]
+    },
+    "step2":{
+      "title":"Step 2: Student Login",
+      "Piont":[
+     "Go to the “Student Login” section",
+      "Enter your User ID and Password",
+      "Complete the CAPTCHA and login"
+    ]
+    },
+    "step3":{
+      "title":"Step 3: Complete Profile",
+      "Piont":[
+      "Fill in your academic, personal, and bank details",
+      "Upload documents (Aadhaar, income certificate, caste certificate, etc.)",
+      "Verify details carefully before submitting"
+      ]
+    },
+    "step4":{
+      "title":"Step 4: Select ScholarShip Scheme",
+      "Piont":[
+     "Choose your eligible scheme (e.g., Post–Matric, SC/ST, Minority)",
+      "Fill the scholarship application form"
+      ]
+    },
+    "step5":{
+      "title":"Step 5: Submit Application",
+      "Piont":[
+      "Review and finalize your application",
+      "Click Submit",
+      "Download/print the acknowledgment for future reference"
+      ]
+    }
+  },
+
+  "Syllabus":{
+    "title": "Syllabus"
+  
+  },
+
+
+  "components": {
+    "aadhaarCardField": {
+      "requiredError": "{{label}} is required",
+      "invalidError": "Invalid Aadhar number. Please enter a valid 12-digit Aadhar number."
+    },
+    "checkboxGroup": {
+      "requiredError": "{{label}} is required"
+    },
+    "dateTimeField": {
+      "requiredError": "{{label}} is required"
+    },
+    "dropdownField": {
+      "requiredError": "{{label}} is required",
+      "emptyError": "This field cannot be empty"
+    },
+    "emailField": {
+      "requiredError": "{{label}} is required",
+      "invalidFormat": "Invalid email format",
+      "invalidDomain": "Only .com, .org, or .net domains allowed"
+    },
+    "fileUpload": {
+      "requiredError": "{{label}} is required",
+      "invalidType": "Only {types} files are allowed.",
+      "sizeLimit": "File size must be ≤ {{maxSize}}KB ({{selectedSize}}KB selected)"
+    },
+    "mobileField": {
+      "requiredError": "{{label}} is required",
+      "invalidFormat": "Invalid phone number format",
+      "maxDigits": "Maximum 15 digits allowed",
+      "minDigits": "Minimum 10 digits required"
+    },
+    "numericField": {
+      "requiredError": "{{label}} is required",
+      "invalidNumber": "{{label}} must be a valid number",
+      "onlyNumbers": "{{label}} must contain only numbers",
+      "minValue": "{{label}} must be at least {{min}}",
+      "maxValue": "{{label}} must be at most {{max}}",
+      "decimalLimit": "{{label}} can have up to {{digits}} decimal places"
+    },
+    "passwordField": {
+      "requiredError": "{{label}} is required",
+      "minLength": "Minimum {{min}} characters required",
+      "maxLength": "Maximum {{max}} characters allowed",
+      "caseRequirement": "Must include both uppercase and lowercase letters",
+      "numberRequirement": "Must include at least one number",
+      "specialCharRequirement": "Must include at least one special character",
+      "mismatch": "Passwords do not match",
+      "strength": {
+        "weak": "Weak",
+        "medium": "Medium",
+        "strong": "Strong",
+        "veryStrong": "Very Strong"
+      }
+    },
+    "radioField": {
+      "requiredError": "{{label}} is required"
+    },
+    "searchField": {
+      "requiredError": "{{label}} is required"
+    },
+    "textInputField": {
+      "requiredError": "{{label}} is required",
+      "minLength": "Minimum length is {{min}}",
+      "maxLength": "Maximum length is {{max}}",
+      "validation": {
+        "alphanumeric": "Only alphanumeric characters allowed",
+        "alphabets": "Only alphabets allowed",
+        "numbers": "Only numbers allowed",
+        "email": "Invalid email format",
+        "textarea": "Invalid characters detected"
+      }
+    }
+  },
+
+  "common": {
+    "courseName":{
+      "DHI": "DHI",
+      "DMIT":"DMIT",
+      "DMLT":"DMLT"
+    },
+    "text":{
+      "SuperAdmin": "Super Admin",
+      "Admin": "Admin",
+      "User" : "User",
+      "Role" : "Role",
+      "Password" : "Password",
+      "course": "Course",
+      "AllCourses": "All Courses",
+      "year": "Year",
+      "action":"Action"
+        },
+
+    "buttons": {
+    "Apply": "Apply Now",
+    "LogIn": "Log In",
+    "SignUp": "Sign Up",
+    "Download": "Download"
+  }  
+  }
+}
