@@ -17,22 +17,21 @@ import {
 
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ReceiptIcon from '@mui/icons-material/Receipt';
 import PeopleIcon from '@mui/icons-material/People';
-import InventoryIcon from '@mui/icons-material/Inventory';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
 
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
 
-const MINI_WIDTH = 64;
+const MINI_WIDTH = 80;
 const FULL_WIDTH = 240;
 
 /* --STYLED -- */
@@ -61,12 +60,13 @@ const SearchBox = styled(Box)(({ theme }) => ({
 /* -- MENU -- */
 
 const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: URL_PATH.DASHBOARD },
+  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
-  { text: 'Sales', icon: <ShoppingCartIcon />, path: URL_PATH.SalesBilling },
-  { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
-  { text: 'Finance', icon: <AccountBalanceIcon />, path: '/accounting' },
-  { text: 'Billing', icon: <ReceiptIcon />, path: '/invoices' },
+  { text: 'Distributors', icon: <LocalShippingIcon />, path: '/salesBilling' },
+  { text: 'Inventory', icon: <Inventory2Icon />, path: '/inventory' },
+  { text: 'Sales & Purchase', icon: <AccountBalanceIcon />, path: '/accounting' },
+  { text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
+   },
   { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];

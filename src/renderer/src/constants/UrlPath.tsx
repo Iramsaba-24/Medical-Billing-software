@@ -5,4 +5,10 @@ export const URL_PATH = {
   DASHBOARD: '/',
 
   SalesBilling: '/sales-billing',
+
+  Invoices: '/invoice',
+  CreateInvoice: '/create-invoice',
+  InvoiceView: '/invoice-view'
+
+
 };

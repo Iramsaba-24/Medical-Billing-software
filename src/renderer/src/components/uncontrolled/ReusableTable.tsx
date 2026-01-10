@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import { type Theme } from '@mui/material/styles';
 import { useEffect, useState, useMemo, type ReactNode, type JSX } from 'react';
-import ExportIcons from './ExportIcons';
+import ExportIcons from '../../utils/ExportIcons';
 import { Download, Upload, Print, RestartAlt, ContentCopy } from '@mui/icons-material';
 import {
   IconCircleCheck,
