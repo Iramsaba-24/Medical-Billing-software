@@ -1,3 +1,5 @@
+
+
 export const URL_PATH = {
   LOGIN: '/login',
   REGISTER: '/register',
@@ -8,7 +10,11 @@ export const URL_PATH = {
 
   Invoices: '/invoice',
   CreateInvoice: '/create-invoice',
-  InvoiceView: '/invoice-view'
+  InvoiceView: '/invoice-view',
+
+  DistributorsTable: '/table',
+
+  AddForm: '/form'
 
 
 };
