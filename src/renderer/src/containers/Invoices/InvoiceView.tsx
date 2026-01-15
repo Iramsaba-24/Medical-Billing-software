@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { Invoice } from "@/types/invoice";
 import { useLocation, useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 
 
@@ -114,7 +115,7 @@ const InvoiceView = () => {
 
       <Box mt={4} display="flex" justifyContent="space-between">
         {/* <Button variant="outlined" onClick={onBack}> */}
-         <Button variant="outlined" onClick={() => navigate("/Billing")}
+         <Button variant="outlined" onClick={() => navigate(URL_PATH.Invoices)}
            sx={{ backgroundColor: "#fff",
                 color: "#238878",
                 border: "2px solid #238878",

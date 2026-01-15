@@ -13,7 +13,7 @@ export const mainRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Invoices />,
+        element: <Landing />,
       },
       {
         path: URL_PATH.Invoices,
