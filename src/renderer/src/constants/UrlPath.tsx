@@ -9,7 +9,12 @@ export const URL_PATH = {
 
   Invoices: '/invoice',
   CreateInvoice: '/create-invoice',
-  InvoiceView: '/invoice-view'
+  InvoiceView: '/invoice-view',
 
+  Inventory: '/inventory',
+  InventoryList: '/inventory/inventory-list',
+  MedicineGroup: '/inventory/medicine-group',
+  AddMedicineGroup: '/inventory/add-medicine-group',
+  AddInventoryItem: '/inventory/add-inventory-item',
 
 };

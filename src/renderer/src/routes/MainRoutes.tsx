@@ -4,6 +4,12 @@ import { URL_PATH } from '@/constants/UrlPath';
 import Invoices from '@/view/Invoices'
 import CreateInvoice from '@/containers/Invoices/CreateInvoice';
 import InvoiceView from '@/containers/Invoices/InvoiceView';
+import Inventory from '@/view/Inventory';
+import InventoryList from '@/containers/inventory/InvetoryList';
+import MedicineGroup from '@/containers/inventory/MedicineGroup';
+import MedicineGroupView from '@/containers/inventory/MedicineGroupView';
+import AddMedicineGroup from '@/containers/inventory/AddMedicineGroup';
+import AddInventoryItem from '@/containers/inventory/AddInventoryItem';
 import Landing from '@/containers/landing-page/LandingPage';
 
 export const mainRoutes: RouteObject[] = [
@@ -12,7 +18,7 @@ export const mainRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Landing />,
+        element: <Invoices />,
       },
       {
         path: URL_PATH.Invoices,
@@ -26,6 +32,31 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
       },
+      {
+        path: URL_PATH.Inventory,
+        element: <Inventory />
+      },
+      {
+        path: URL_PATH.InventoryList,
+        element: <InventoryList />
+      },
+      {
+        path: URL_PATH.MedicineGroup,
+        element: <MedicineGroup />
+      },
+      {
+        path: "/medicine-groups/:id",
+        element: <MedicineGroupView />,
+      },
+      {
+        path: URL_PATH.AddMedicineGroup,
+        element: <AddMedicineGroup/>
+      },
+      {
+        path: URL_PATH.AddInventoryItem,
+        element: <AddInventoryItem/>
+      }
+
     ],
   },
 ];

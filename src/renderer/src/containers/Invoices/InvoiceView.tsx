@@ -115,7 +115,11 @@ const InvoiceView = () => {
 
       <Box mt={4} display="flex" justifyContent="space-between">
         {/* <Button variant="outlined" onClick={onBack}> */}
+<<<<<<< Updated upstream
          <Button variant="outlined" onClick={() => navigate(URL_PATH.Invoices)}
+=======
+         <Button variant="outlined" onClick={() => navigate("/Invoice")}
+>>>>>>> Stashed changes
            sx={{ backgroundColor: "#fff",
                 color: "#238878",
                 border: "2px solid #238878",

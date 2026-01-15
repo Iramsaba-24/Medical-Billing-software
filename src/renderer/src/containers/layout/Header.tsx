@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import {
   Box,
   Drawer,
@@ -13,6 +13,7 @@ import {
   Tooltip,
   InputBase,
   Button,
+  useMediaQuery,
 } from '@mui/material';
 
 import MenuIcon from '@mui/icons-material/Menu';
@@ -63,10 +64,11 @@ const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Customers', icon: <PeopleIcon />, path: '/customers' },
   { text: 'Distributors', icon: <LocalShippingIcon />, path: '/salesBilling' },
-  { text: 'Inventory', icon: <Inventory2Icon />, path: '/inventory' },
+  { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
   { text: 'Sales & Purchase', icon: <AccountBalanceIcon />, path: '/accounting' },
-  { text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
-   },
+  {
+    text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
+  },
   { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
@@ -76,6 +78,8 @@ const menuItems = [
 const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
+ 
+
 
   return (
     <List sx={{ px: 1 }}>
@@ -131,6 +135,10 @@ const Sidebar = ({ open }: { open: boolean }) => {
 /* -- MAIN LAYOUT -- */
 
 const Header: React.FC = () => {
+
+   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
 
@@ -166,14 +174,16 @@ const Header: React.FC = () => {
 
       {/* SIDEBAR */}
       <Drawer
-        variant="permanent"
+        variant={isMobile ? 'temporary' : 'permanent'}
+        open={isMobile ? open : true}
+        onClose={() => setOpen(false)}
         sx={{
-          width: open ? FULL_WIDTH : MINI_WIDTH,
+          width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
           flexShrink: 0,
           whiteSpace: 'nowrap',
-          transition: 'width 0.3s',
+
           '& .MuiDrawer-paper': {
-            width: open ? FULL_WIDTH : MINI_WIDTH,
+            width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
             boxSizing: 'border-box',
             overflowX: 'hidden',
@@ -181,8 +191,9 @@ const Header: React.FC = () => {
         }}
       >
         <DrawerHeader />
-        <Sidebar open={open} />
+        <Sidebar open={isMobile ? true : open} />
       </Drawer>
+
 
       <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
         <Outlet />
