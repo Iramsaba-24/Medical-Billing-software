@@ -117,7 +117,7 @@ export default function MedicineGroupView() {
         ),
     },
     {
-      key: "actionsbuttons",
+      key: "actionbutton",
       label: "Action",
       render: (row) => (
         <Box display="flex" justifyContent="center" gap={1}>

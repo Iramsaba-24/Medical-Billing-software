@@ -140,15 +140,12 @@ const BillingTable = ({ onCreate, onView }: Props) => {
     },
   ]);
 
-
   useEffect(() => {
     if (location.state) {
       const newInvoice = location.state as Invoice;
 
       setInvoices((prev) => {
-        const exists = prev.some(
-          (inv) => inv.invoice === newInvoice.invoice
-        );
+        const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
         if (exists) return prev;
         return [newInvoice, ...prev];
       });
@@ -201,8 +198,8 @@ const BillingTable = ({ onCreate, onView }: Props) => {
       label: "Price",
       render: (row) => `₹ ${row.price.toLocaleString()}`,
     },
-    { key: "dropdown", label: "Status" },
-    { key: "actionsbuttons", label: "Action" },
+    { key: "status", label: "Status" },
+    { key: "actionbutton", label: "Action" },
   ];
 
   const statusOptions: DropdownOption[] = [
@@ -210,16 +207,6 @@ const BillingTable = ({ onCreate, onView }: Props) => {
     { value: "Pending", label: "Pending" },
     { value: "Overdue", label: "Overdue" },
   ];
-
-  const handleStatusChange = (row: Invoice, value: string) => {
-    setInvoices((prev) =>
-      prev.map((inv) =>
-        inv.invoice === row.invoice
-          ? { ...inv, status: value as InvoiceStatus }
-          : inv
-      )
-    );
-  };
 
   const methods = useForm({
     defaultValues: { filterType: "all" },
@@ -240,9 +227,7 @@ const BillingTable = ({ onCreate, onView }: Props) => {
               label="Filter"
               options={filterOptions}
               freeSolo={false}
-              onChangeCallback={(value) =>
-                setFilterType(value as FilterType)
-              }
+              onChangeCallback={(value) => setFilterType(value as FilterType)}
             />
           </Box>
 
@@ -274,9 +259,17 @@ const BillingTable = ({ onCreate, onView }: Props) => {
           enableCheckbox
           getRowId={(row) => row.invoice}
           dropdown={{
+            key: "status",
             options: statusOptions,
-            getValue: (row) => row.status,
-            onChange: handleStatusChange,
+            onChange: (row, value) => {
+              setInvoices((prev) =>
+                prev.map((inv) =>
+                  inv.invoice === row.invoice
+                    ? { ...inv, status: value as InvoiceStatus }
+                    : inv
+                )
+              );
+            },
           }}
           actions={{
             view: onView,
@@ -285,9 +278,7 @@ const BillingTable = ({ onCreate, onView }: Props) => {
           }}
           onDeleteSelected={(rows) => {
             setInvoices((prev) =>
-              prev.filter(
-                (inv) => !rows.some((r) => r.invoice === inv.invoice)
-              )
+              prev.filter((inv) => !rows.some((r) => r.invoice === inv.invoice))
             );
           }}
         />

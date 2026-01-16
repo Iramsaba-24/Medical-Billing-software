@@ -11,10 +11,10 @@ import {
   TableContainer,
   TableFooter,
   TableHead,
+  Tooltip,
   TablePagination,
   TableRow,
   TextField,
-  Tooltip,
   type TableCellProps,
   type SxProps,
 } from "@mui/material";
@@ -22,72 +22,81 @@ import { useMemo, useState, type ReactNode } from "react";
 import { IconTrashX } from "@tabler/icons-react";
 import ExportIcons from "@/utils/ExportIcons";
 import { iconMap } from "@/utils/Icons";
- 
+
+export const ACTION_KEY = "actionbutton" as const;
+
 export type Column<T> = {
-  key: keyof T | "dropdown" | "actionsbuttons";
+  key: keyof T | typeof ACTION_KEY;
   label: string;
   render?: (row: T) => ReactNode;
   exportable?: boolean;
 };
- 
-export type DropdownOption = { value: string; label: string };
+
+export type DropdownOption = {
+  value: string;
+  label: string;
+  bgColor?: string;
+  textColor?: string;
+};
+
 export type FooterRow = {
   content: Array<{ value: ReactNode; colSpan?: number }>;
 };
- 
+
 interface TableStyles {
   captionSx?: SxProps;
   headerSx?: SxProps;
   rowHoverSx?: SxProps;
   paperSx?: SxProps;
 }
- 
+
 interface UniversalTableProps<T extends Record<string, unknown>>
   extends TableStyles {
   data: readonly T[];
   columns: readonly Column<T>[];
-  caption: ReactNode; // compulsory Prop because we updated Delete Icon for checkbox selection
+  caption?: ReactNode;
   rowsPerPage?: number;
   tableSize?: "small" | "medium";
   textAlign?: TableCellProps["align"];
   showSearch?: boolean;
   showExport?: boolean;
   enableCheckbox?: boolean;
+  highlightColor?: string;
   getRowId?: (row: T, index: number) => string | number;
   onSelectionChange?: (rows: T[]) => void;
   onDeleteSelected?: (rows: T[]) => void;
- 
+
   dropdown?: {
+    key: keyof T;
     options: readonly DropdownOption[];
-    getValue: (row: T) => string;
-    onChange: (row: T, value: string) => void;
+    onChange?: (row: T, value: T[keyof T]) => void;
+    disabled?: boolean | ((row: T) => boolean);
+    width?: number;
+    sx?: SxProps;
   };
- 
+
+  autoUpdateDropdown?: boolean;
+  onDataChange?: (rows: T[]) => void;
+
   actions?: Partial<Record<keyof typeof iconMap, (row: T) => void>>;
   footerRows?: readonly FooterRow[];
 }
- 
+
 function buildExportData<T extends Record<string, unknown>>(
   rows: readonly T[],
   columns: readonly Column<T>[]
 ) {
-  return rows.map((row) => {
-    const obj: Record<string, unknown> = {};
-    columns.forEach((c) => {
-      if (
-        c.key !== "actionsbuttons" &&
-        c.key !== "dropdown" &&
-        c.exportable !== false
-      ) {
-        obj[c.label] = row[c.key];
+  return rows.map((row) =>
+    columns.reduce((acc, col) => {
+      if (col.key !== ACTION_KEY && col.exportable !== false) {
+        acc[col.label] = row[col.key];
       }
-    });
-    return obj;
-  });
+      return acc;
+    }, {} as Record<string, unknown>)
+  );
 }
- 
+
 export function UniversalTable<T extends Record<string, unknown>>({
-  //Default Values for Props
   data,
   columns,
   caption,
@@ -101,79 +110,118 @@ export function UniversalTable<T extends Record<string, unknown>>({
   onSelectionChange,
   onDeleteSelected,
   dropdown,
+  autoUpdateDropdown,
+  onDataChange,
   actions,
   footerRows = [],
   captionSx,
   headerSx,
   rowHoverSx,
   paperSx,
+  highlightColor = "#ffff00",
 }: UniversalTableProps<T>) {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string | number>>(
     new Set()
   );
- 
+
   const resolveRowId = (row: T, index: number) =>
     getRowId ? getRowId(row, index) : index;
- 
+
+  const highlightText = (text: string | number | null | undefined): ReactNode =>
+    !search || text == null
+      ? text
+      : text
+          .toString()
+          .split(new RegExp(`(${search})`, "gi"))
+          .map((part, i) =>
+            i % 2 ? (
+              <mark key={i} style={{ background: highlightColor }}>
+                {part}
+              </mark>
+            ) : (
+              part
+            )
+          );
+
+  const DEFAULT_DROPDOWN_SX: SxProps = {
+    width: 150,
+    bgcolor: "#1f2937",
+    color: "#ffffff",
+    fontWeight: 600,
+    fontSize: 13,
+    borderRadius: 2,
+    "& .MuiSelect-icon": { color: "#a9a2a2ff" },
+  };
+
   const filteredData = useMemo(() => {
     if (!search) return data;
+
     return data.filter((row) =>
-      columns.some(
-        (col) =>
-          col.key !== "actionsbuttons" &&
-          col.key !== "dropdown" &&
-          String(row[col.key as keyof T] ?? "")
-            .toLowerCase()
-            .includes(search.toLowerCase())
-      )
+      columns.some((col) => {
+        if (col.key === ACTION_KEY) return false;
+
+        const value = row[col.key];
+        return String(value ?? "")
+          .toLowerCase()
+          .includes(search.toLowerCase());
+      })
     );
   }, [data, columns, search]);
- 
+
   const paginatedData = useMemo(
     () =>
       filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [filteredData, page, rowsPerPage]
   );
- 
+
   const exportData = useMemo(
     () => buildExportData(filteredData, columns),
     [filteredData, columns]
   );
- 
+
   const exportColumns = useMemo(
     () =>
       columns
-        .filter(
-          (c) =>
-            c.key !== "actionsbuttons" &&
-            c.key !== "dropdown" &&
-            c.exportable !== false
-        )
+        .filter((c) => c.key !== ACTION_KEY && c.exportable !== false)
         .map((c) => ({ key: c.label, label: c.label })),
     [columns]
   );
- 
-  const selectedRows = data.filter((r, i) =>
-    selectedIds.has(resolveRowId(r, i))
+
+  const selectedRows = data.filter((_, i) =>
+    selectedIds.has(resolveRowId(_, i))
   );
- 
+
   const toggleRow = (row: T, index: number) => {
     const id = resolveRowId(row, index);
     const updated = new Set(selectedIds);
+
     updated.has(id) ? updated.delete(id) : updated.add(id);
+
     setSelectedIds(updated);
     onSelectionChange?.(data.filter((r, i) => updated.has(resolveRowId(r, i))));
   };
- 
+
   const toggleAll = (checked: boolean) => {
     const updated = new Set<string | number>();
     if (checked) data.forEach((r, i) => updated.add(resolveRowId(r, i)));
     setSelectedIds(updated);
     onSelectionChange?.(checked ? [...data] : []);
   };
- 
+
+  const updateRow = (row: T, patch: Partial<T>) => {
+    if (!onDataChange) return;
+
+    const targetId = resolveRowId(row, -1);
+
+    onDataChange(
+      data.map((r, i) =>
+        resolveRowId(r, i) === targetId ? { ...r, ...patch } : r
+      )
+    );
+  };
+
   return (
     <Paper sx={{ borderRadius: 3, boxShadow: 4, ...paperSx }}>
       {(showSearch || showExport) && (
@@ -202,7 +250,7 @@ export function UniversalTable<T extends Record<string, unknown>>({
               sx={{ minWidth: 220 }}
             />
           )}
- 
+
           {showExport && (
             <ExportIcons
               data={exportData}
@@ -213,24 +261,25 @@ export function UniversalTable<T extends Record<string, unknown>>({
           )}
         </Box>
       )}
+
       {caption && (
         <Box
           sx={{
-            display: "flex",
-            alignItems: "center",
             bgcolor: "#0ca678",
             color: "#fff",
             fontWeight: 700,
             fontSize: 18,
-            borderRadius: showSearch || showExport ? "" : "12px 12px 0 0",
+            borderRadius: showSearch || showExport ? "" : "6px 6px 0 0",
+            textAlign: "center",
+            py: 1,
             ...captionSx,
           }}
         >
-          <Box sx={{ flex: 1, textAlign: "center", py: 1 }}>{caption}</Box>
+          {caption}
         </Box>
       )}
- 
-      <TableContainer sx={{ position: "relative" }}>
+
+      <TableContainer>
         <Table size={tableSize}>
           <TableHead>
             <TableRow>
@@ -248,24 +297,24 @@ export function UniversalTable<T extends Record<string, unknown>>({
                   />
                 </TableCell>
               )}
- 
-              {columns.map((c) => (
+
+              {columns.map((col) => (
                 <TableCell
-                  key={String(c.key)}
+                  key={String(col.key)}
                   align={textAlign}
                   sx={{
                     fontWeight: 700,
                     bgcolor: "#444748ff",
-                    color: "#fff",
+                    color: "#ffffff",
                     ...headerSx,
                   }}
                 >
-                  {c.label}
+                  {col.label}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
- 
+
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
@@ -276,6 +325,7 @@ export function UniversalTable<T extends Record<string, unknown>>({
             ) : (
               paginatedData.map((row, index) => {
                 const rowId = resolveRowId(row, index);
+
                 return (
                   <TableRow
                     key={rowId}
@@ -290,54 +340,92 @@ export function UniversalTable<T extends Record<string, unknown>>({
                         />
                       </TableCell>
                     )}
- 
-                    {columns.map((col) => (
-                      <TableCell key={String(col.key)} align={textAlign}>
-                        {col.key === "dropdown" && dropdown ? (
-                          <Select
-                            size="small"
-                            value={dropdown.getValue(row)}
-                            onChange={(e) =>
-                              dropdown.onChange(row, e.target.value)
-                            }
-                          >
-                            {dropdown.options.map((o) => (
-                              <MenuItem key={o.value} value={o.value}>
-                                {o.label}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        ) : col.key === "actionsbuttons" && actions ? (
-                          <Box display="flex" gap={1}>
-                            {Object.entries(iconMap).map(([k, cfg]) =>
-                              actions[k as keyof typeof iconMap] ? (
-                                <Tooltip key={k} title={cfg.label}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      actions[k as keyof typeof iconMap]?.(row)
-                                    }
-                                    sx={{ color: cfg.color }}
-                                  >
-                                    {cfg.icon}
-                                  </IconButton>
-                                </Tooltip>
-                              ) : null
-                            )}
-                          </Box>
-                        ) : col.render ? (
-                          col.render(row)
-                        ) : (
-                          String(row[col.key as keyof T] ?? "")
-                        )}
-                      </TableCell>
-                    ))}
+
+                    {columns.map((col) => {
+                      /* Dropdown */
+                      if (
+                        dropdown &&
+                        col.key === dropdown.key &&
+                        col.key !== ACTION_KEY
+                      ) {
+                        return (
+                          <TableCell key={String(col.key)} align={textAlign}>
+                            <Select
+                              size="small"
+                              value={row[col.key] as string}
+                              sx={{
+                                ...DEFAULT_DROPDOWN_SX,
+                                bgcolor: DEFAULT_DROPDOWN_SX.bgcolor as string,
+                                color: DEFAULT_DROPDOWN_SX.color as string,
+                                width:
+                                  dropdown.width ??
+                                  (DEFAULT_DROPDOWN_SX.width as number),
+                                ...dropdown.sx,
+                              }}
+                              onChange={(e) => {
+                                const value = e.target.value as T[keyof T];
+                                dropdown.onChange?.(row, value);
+                                if (!dropdown.onChange && autoUpdateDropdown) {
+                                  updateRow(row, {
+                                    [dropdown.key]: value,
+                                  } as Partial<T>);
+                                }
+                              }}
+                            >
+                              {dropdown.options.map((o) => (
+                                <MenuItem key={o.value} value={o.value}>
+                                  {o.label}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </TableCell>
+                        );
+                      }
+
+                      /* Actions */
+                      if (col.key === ACTION_KEY && actions) {
+                        return (
+                          <TableCell key={ACTION_KEY}>
+                            <Box display="flex" gap={1}>
+                              {Object.entries(iconMap).map(([k, cfg]) =>
+                                actions[k as keyof typeof iconMap] ? (
+                                  <Tooltip key={k} title={cfg.label}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        actions[k as keyof typeof iconMap]?.(
+                                          row
+                                        )
+                                      }
+                                      sx={{ color: cfg.color }}
+                                    >
+                                      {cfg.icon}
+                                    </IconButton>
+                                  </Tooltip>
+                                ) : null
+                              )}
+                            </Box>
+                          </TableCell>
+                        );
+                      }
+
+                      /* Default */
+                      if (col.key === ACTION_KEY) return null;
+
+                      return (
+                        <TableCell key={String(col.key)} align={textAlign}>
+                          {col.render
+                            ? col.render(row)
+                            : highlightText(String(row[col.key] ?? ""))}
+                        </TableCell>
+                      );
+                    })}
                   </TableRow>
                 );
               })
             )}
           </TableBody>
- 
+
           {footerRows.length > 0 && (
             <TableFooter>
               {footerRows.map((f, i) => (
@@ -353,10 +441,10 @@ export function UniversalTable<T extends Record<string, unknown>>({
           )}
         </Table>
       </TableContainer>
+
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
           justifyContent:
             enableCheckbox && selectedRows.length > 0
               ? "space-between"
@@ -365,7 +453,15 @@ export function UniversalTable<T extends Record<string, unknown>>({
         }}
       >
         {enableCheckbox && selectedRows.length > 0 && onDeleteSelected && (
-          <Tooltip title={`Delete ${selectedRows.length} record(s)`}>
+          <Tooltip
+            title={
+              selectedRows.length === data.length
+                ? "Delete All Records"
+                : `Delete ${selectedRows.length} record${
+                    selectedRows.length > 1 ? "s" : ""
+                  }`
+            }
+          >
             <IconButton
               color="error"
               onClick={() => {
@@ -377,8 +473,7 @@ export function UniversalTable<T extends Record<string, unknown>>({
             </IconButton>
           </Tooltip>
         )}
- 
-        {/* PAGINATION */}
+
         <TablePagination
           component="div"
           count={filteredData.length}
@@ -391,5 +486,3 @@ export function UniversalTable<T extends Record<string, unknown>>({
     </Paper>
   );
 }
- 
- 

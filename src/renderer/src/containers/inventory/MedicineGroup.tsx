@@ -28,7 +28,7 @@ const columns: Column<MedicineGroupRow>[] = [
     ),
   },
   {
-    key: "actionsbuttons",
+    key: "actionbutton",
     label: "Action",
     render: () => null, 
   },
