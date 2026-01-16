@@ -51,6 +51,7 @@
     "react-router-dom": "^7.11.0",
     "react-toastify": "^11.0.5",
     "tailwindcss": "^4.1.18",
+    "uuid": "^13.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
