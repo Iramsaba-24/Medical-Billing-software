@@ -4,6 +4,7 @@ export const URL_PATH = {
 
   Landing: '/',
   DASHBOARD: '/dashboard',
+  Customer:'/customers',
 
   SalesBilling: '/sales-billing',
 
