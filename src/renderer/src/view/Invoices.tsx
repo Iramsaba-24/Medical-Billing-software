@@ -4,9 +4,9 @@ import BillingTable from "@/containers/Invoices/BillingTable";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Invoice } from "@/types/invoice";
 
-import revenueImg from "@/assets/TotalRevenue.png";
-import pendingImg from "@/assets/PendingAmount.png";
-import invoiceImg from "@/assets/TotalInvoices.png";
+import revenueImg from "@/assets/TotalRevenue(Paid).svg";
+import pendingImg from "@/assets/PendingAmount.svg";
+import invoiceImg from "@/assets/TotalInvoices.svg";
 
 
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
@@ -43,7 +43,6 @@ const Billing = () => {
       </Typography>
       <Divider sx={{ mb: 3 }} />
 
-      {/* SUMMARY CARDS */}
       <Box
         display="flex"
         mb={4}
@@ -162,7 +161,6 @@ const Billing = () => {
         </Box>
       </Box>
 
-      {/* TABLE */}
       <BillingTable
         onCreate={() => navigate(URL_PATH.CreateInvoice)}
         onView={(invoice: Invoice) =>

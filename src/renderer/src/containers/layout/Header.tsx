@@ -34,9 +34,9 @@ import { URL_PATH } from '../../constants/UrlPath';
  
 const MINI_WIDTH = 80;
 const FULL_WIDTH = 240;
- 
+
 /* --STYLED -- */
- 
+
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: '#238878',
   zIndex: theme.zIndex.drawer + 1,
@@ -57,9 +57,8 @@ const SearchBox = styled(Box)(({ theme }) => ({
     width: 160,
   },
 }));
- 
-/* -- MENU -- */
- 
+
+
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Customers', icon: <PeopleIcon />, path: URL_PATH.Customer },
@@ -72,9 +71,8 @@ const menuItems = [
   { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
- 
-/* -- SIDEBAR -- */
- 
+
+
 const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,9 +129,8 @@ const Sidebar = ({ open }: { open: boolean }) => {
     </List>
   );
 };
- 
-/* -- MAIN LAYOUT -- */
- 
+
+
 const Header: React.FC = () => {
  
    const theme = useTheme();
@@ -145,8 +142,7 @@ const Header: React.FC = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
- 
-      {/* APP BAR */}
+
       <StyledAppBar position="fixed">
         <Toolbar sx={{ gap: 2 }}>
           <IconButton color="inherit" onClick={() => setOpen(!open)}>
@@ -171,8 +167,7 @@ const Header: React.FC = () => {
           </IconButton>
         </Toolbar>
       </StyledAppBar>
- 
-      {/* SIDEBAR */}
+
       <Drawer
         variant={isMobile ? 'temporary' : 'permanent'}
         open={isMobile ? open : true}

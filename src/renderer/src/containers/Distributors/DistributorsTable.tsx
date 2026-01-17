@@ -1,12 +1,13 @@
 import { Box, Typography, Button, TextField, Checkbox, Select, MenuItem, Paper } from "@mui/material";
-import revenueImg from "@/assets/TotalRevenue.png";
-import pendingImg from "@/assets/PendingAmount.png";
-import invoiceImg from "@/assets/TotalInvoices.png";
 import ReusableTable, { TableColumn } from "@/components/uncontrolled/ReusableTable";
 import ReuseIcon from "@/components/controlled/ReuseIcon";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import AppToast from "@/containers/Distributors/AppToast";
+
+import TotalDistributors from "@/assets/TotalDistributers.svg";
+import TotalPurchase from "@/assets/warningsign.svg";
+import NewDistributors from "@/assets/NewDistributors.svg";
 
 /* Row Type */
 type DistributorRow = {
@@ -112,9 +113,9 @@ export default function DistributorsPage() {
         mb={3}
       >
         {[
-          { label: "Total Distributors", value: rows.length, img: revenueImg },
-          { label: "Total Purchase", value: 0, img: pendingImg },
-          { label: "New Distributors", value: `₹ ${rows.length}`, img: invoiceImg },
+          { label: "Total Distributors", value: rows.length, img: TotalDistributors },
+          { label: "Total Purchase", value: 0, img: TotalPurchase },
+          { label: "New Distributors", value: `₹ ${rows.length}`, img: NewDistributors },
         ].map((card) => (
           <Paper
             key={card.label}

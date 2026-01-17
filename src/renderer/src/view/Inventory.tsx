@@ -6,9 +6,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 
-import revenueImg from "@/assets/TotalRevenue.png";
-import pendingImg from "@/assets/PendingAmount.png";
-import invoiceImg from "@/assets/TotalInvoices.png";
+import TotalItems from "@/assets/TotalItems.svg";
+import LowStack from "@/assets/warningsign.svg";
+import TotalValue from "@/assets/TotalValue.svg";
 
 type InventoryItem = {
   id: number;
@@ -110,7 +110,6 @@ const columns: Column<InventoryItem>[] = [
   },
 ];
 
-
 export default function InventoryPage() {
   const navigate = useNavigate();
 
@@ -118,7 +117,7 @@ export default function InventoryPage() {
   const totalValue = inventoryData.reduce((sum, item) => sum + item.price, 0);
 
   return (
-    <Box p={3}>
+    <Box>
       <Typography fontSize={20} fontWeight={600} mb={2}>
         Inventory
       </Typography>
@@ -130,9 +129,9 @@ export default function InventoryPage() {
         mb={3}
       >
         {[
-          { label: "Total Items", value: totalItems, img: revenueImg },
-          { label: "Low Stock Items", value: 0, img: pendingImg },
-          { label: "Total Value", value: `₹ ${totalValue}`, img: invoiceImg },
+          { label: "Total Items", value: totalItems, img: TotalItems },
+          { label: "Low Stock Items", value: 0, img: LowStack },
+          { label: "Total Value", value: `₹ ${totalValue}`, img: TotalValue },
         ].map((card) => (
           <Paper
             key={card.label}

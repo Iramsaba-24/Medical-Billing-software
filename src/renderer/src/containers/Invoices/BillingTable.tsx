@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, Paper, Button } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import {
   UniversalTable,
@@ -11,6 +11,7 @@ import {
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
+import { URL_PATH } from "@/constants/UrlPath";
 
 type Props = {
   onCreate: () => void;
@@ -19,8 +20,9 @@ type Props = {
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ onCreate, onView }: Props) => {
+const BillingTable = ({ onCreate }: Props) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [invoices, setInvoices] = useState<Invoice[]>([
     {
@@ -30,20 +32,8 @@ const BillingTable = ({ onCreate, onView }: Props) => {
       price: 2500,
       status: "Paid",
       medicines: [
-        {
-          name: "Pantosec D",
-          batch: "14044008",
-          expiry: "10/26",
-          qty: "6xTAB",
-          amount: 91.2,
-        },
-        {
-          name: "Nucoxia PY",
-          batch: "1405019",
-          expiry: "09/26",
-          qty: "6xTAB",
-          amount: 102,
-        },
+        { name: "Pantosec D", batch: "14044008", expiry: "10/26", qty: "6xTAB", amount: 91.2 },
+        { name: "Nucoxia PY", batch: "1405019", expiry: "09/26", qty: "6xTAB", amount: 102 },
       ],
     },
     {
@@ -53,89 +43,8 @@ const BillingTable = ({ onCreate, onView }: Props) => {
       price: 5400,
       status: "Pending",
       medicines: [
-        {
-          name: "Pantosec DO",
-          batch: "14044008",
-          expiry: "10/26",
-          qty: "6xTAB",
-          amount: 91.2,
-        },
-        {
-          name: "Nucoxia P",
-          batch: "1405019",
-          expiry: "09/26",
-          qty: "6xTAB",
-          amount: 102,
-        },
-      ],
-    },
-    {
-      invoice: "INV-003",
-      patient: "Amit Verma",
-      date: "6/30/2026",
-      price: 1500,
-      status: "Paid",
-      medicines: [
-        {
-          name: "Pantosec DD",
-          batch: "14044008",
-          expiry: "10/26",
-          qty: "6xTAB",
-          amount: 91.2,
-        },
-        {
-          name: "Nucoxia P",
-          batch: "1405019",
-          expiry: "09/26",
-          qty: "6xTAB",
-          amount: 102,
-        },
-      ],
-    },
-    {
-      invoice: "INV-004",
-      patient: "Sneha Reddy",
-      date: "3/1/2027",
-      price: 8200,
-      status: "Overdue",
-      medicines: [
-        {
-          name: "Pantosec D",
-          batch: "14044008",
-          expiry: "10/26",
-          qty: "6xTAB",
-          amount: 91.2,
-        },
-        {
-          name: "Nucoxia X",
-          batch: "1405019",
-          expiry: "09/26",
-          qty: "6xTAB",
-          amount: 102,
-        },
-      ],
-    },
-    {
-      invoice: "INV-005",
-      patient: "Vikram Rao",
-      date: "1/15/2027",
-      price: 3200,
-      status: "Pending",
-      medicines: [
-        {
-          name: "Pantosec A",
-          batch: "14044008",
-          expiry: "10/26",
-          qty: "6xTAB",
-          amount: 91.2,
-        },
-        {
-          name: "Nucoxia x",
-          batch: "1405019",
-          expiry: "09/26",
-          qty: "6xTAB",
-          amount: 102,
-        },
+        { name: "Pantosec DO", batch: "14044008", expiry: "10/26", qty: "6xTAB", amount: 91.2 },
+        { name: "Nucoxia P", batch: "1405019", expiry: "09/26", qty: "6xTAB", amount: 102 },
       ],
     },
   ]);
@@ -147,12 +56,19 @@ const BillingTable = ({ onCreate, onView }: Props) => {
       setInvoices((prev) => {
         const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
         if (exists) return prev;
-        return [newInvoice, ...prev];
+
+        const safeInvoice = {
+          ...newInvoice,
+          medicines: newInvoice.medicines.map((med) => ({
+            ...med,
+            amount: Number(med.amount),
+          })),
+        };
+
+        return [safeInvoice, ...prev];
       });
     }
   }, [location.state]);
-
-  /*  FILTER  */
 
   const [filterType, setFilterType] = useState<FilterType>("all");
 
@@ -169,35 +85,18 @@ const BillingTable = ({ onCreate, onView }: Props) => {
     const invoiceDate = new Date(invoice.date);
     const today = new Date();
 
-    if (filterType === "daily") {
-      return invoiceDate.toDateString() === today.toDateString();
-    }
-
-    if (filterType === "monthly") {
-      return (
-        invoiceDate.getMonth() === today.getMonth() &&
-        invoiceDate.getFullYear() === today.getFullYear()
-      );
-    }
-
-    if (filterType === "yearly") {
-      return invoiceDate.getFullYear() === today.getFullYear();
-    }
+    if (filterType === "daily") return invoiceDate.toDateString() === today.toDateString();
+    if (filterType === "monthly") return invoiceDate.getMonth() === today.getMonth() && invoiceDate.getFullYear() === today.getFullYear();
+    if (filterType === "yearly") return invoiceDate.getFullYear() === today.getFullYear();
 
     return true;
   });
-
-  /*  TABLE  */
 
   const columns: Column<Invoice>[] = [
     { key: "invoice", label: "Invoice" },
     { key: "patient", label: "Patient" },
     { key: "date", label: "Date" },
-    {
-      key: "price",
-      label: "Price",
-      render: (row) => `₹ ${row.price.toLocaleString()}`,
-    },
+    { key: "price", label: "Price", render: (row) => `₹ ${row.price.toLocaleString()}` },
     { key: "status", label: "Status" },
     { key: "actionbutton", label: "Action" },
   ];
@@ -208,19 +107,12 @@ const BillingTable = ({ onCreate, onView }: Props) => {
     { value: "Overdue", label: "Overdue" },
   ];
 
-  const methods = useForm({
-    defaultValues: { filterType: "all" },
-  });
+  const methods = useForm({ defaultValues: { filterType: "all" } });
 
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 2 }}>
-        <Box
-          mb={2}
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-        >
+        <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
           <Box width={220}>
             <DropdownField
               name="filterType"
@@ -239,11 +131,7 @@ const BillingTable = ({ onCreate, onView }: Props) => {
               color: "#fff",
               border: "2px solid #238878",
               textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-              },
+              "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
             }}
           >
             + Create Invoice
@@ -264,23 +152,19 @@ const BillingTable = ({ onCreate, onView }: Props) => {
             onChange: (row, value) => {
               setInvoices((prev) =>
                 prev.map((inv) =>
-                  inv.invoice === row.invoice
-                    ? { ...inv, status: value as InvoiceStatus }
-                    : inv
+                  inv.invoice === row.invoice ? { ...inv, status: value as InvoiceStatus } : inv
                 )
               );
             },
           }}
           actions={{
-            view: onView,
-            print: onView,
-            download: onView,
+            view: (invoice) => navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, { state: invoice }),
+            print: (invoice) => navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, { state: invoice }),
+            download: (invoice) => navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, { state: invoice }),
           }}
-          onDeleteSelected={(rows) => {
-            setInvoices((prev) =>
-              prev.filter((inv) => !rows.some((r) => r.invoice === inv.invoice))
-            );
-          }}
+          onDeleteSelected={(rows) =>
+            setInvoices((prev) => prev.filter((inv) => !rows.some((r) => r.invoice === inv.invoice)))
+          }
         />
       </Paper>
     </FormProvider>
