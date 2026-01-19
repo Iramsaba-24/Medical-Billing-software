@@ -6,7 +6,7 @@ import { URL_PATH } from '../constants/UrlPath';
 export const authRoutes: RouteObject[] = [
   {
     path: URL_PATH.LOGIN,
-    // element: <Login />,
+    //  element: <Login />,
   },
   {
     path: URL_PATH.REGISTER,

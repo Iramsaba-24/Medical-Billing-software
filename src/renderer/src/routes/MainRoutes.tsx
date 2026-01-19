@@ -14,6 +14,7 @@ export const mainRoutes: RouteObject[] = [
         index: true,
         element: <Landing />,
       },
+      
       {
         path: URL_PATH.Invoices,
         element: <Invoices />,
