@@ -3,13 +3,22 @@ export const URL_PATH = {
   REGISTER: '/register',
 
   Landing: '/',
-  DASHBOARD: '/dashboard',
+  Dashboard: '/dashboard',
+  Customer:'/customers',
 
   SalesBilling: '/sales-billing',
 
   Invoices: '/invoice',
   CreateInvoice: '/create-invoice',
-  InvoiceView: '/invoice-view'
+  InvoiceView: '/invoice-view',
 
+  DistributorsTable: '/table',
+  AddForm: '/form',
+  
+  Inventory: '/inventory',
+  InventoryList: '/inventory/inventory-list',
+  MedicineGroup: '/inventory/medicine-group',
+  AddMedicineGroup: '/inventory/add-medicine-group',
+  AddInventoryItem: '/inventory/add-inventory-item',
 
 };
