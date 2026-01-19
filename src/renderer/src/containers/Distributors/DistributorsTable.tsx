@@ -37,7 +37,7 @@ export default function DistributorsPage() {
     localStorage.setItem("distributors", JSON.stringify(rows));
   }, [rows]);
 
-  /* Add new user (no duplicate) */
+  /* Add new user  */
   useEffect(() => {
     if (!newUser) return;
 
@@ -114,11 +114,8 @@ export default function DistributorsPage() {
         {[
           { label: "Total Distributors", value: rows.length, img: revenueImg },
           { label: "Total Purchase", value: 0, img: pendingImg },
-          { label: "New Distributors", value: `₹ ${rows.length}`, img: invoiceImg },
-        ].map((card) => (
-          <Paper
-            key={card.label}
-            sx={{
+          { label: "New Distributors", value: `₹ ${rows.length}`, img: invoiceImg }, ].map((card) => (
+          <Paper key={card.label} sx={{
               p: 3,
               display: "flex",
               justifyContent: "space-between",
@@ -167,7 +164,7 @@ export default function DistributorsPage() {
             sx={{ backgroundColor: "#238878", textTransform: "none" }}
             onClick={() => navigate("/form")}
           >
-            + Add Customer
+            + Add Distributors
           </Button>
         </Box>
 
