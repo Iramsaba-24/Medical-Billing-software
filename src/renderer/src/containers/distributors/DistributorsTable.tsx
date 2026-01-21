@@ -14,6 +14,8 @@ import ReusableTable, { TableColumn } from "@/components/uncontrolled/ReusableTa
 import ReuseIcon from "@/components/controlled/ReuseIcon";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import AppToast from '@/containers/distributors/AppToast';
+
 
 /* Card hover style */
 const cardHover = {
@@ -42,11 +44,17 @@ export default function DistributorsPage() {
   const newUser = location.state?.userData?.[0];
 
   const [rows, setRows] = useState<DistributorRow[]>([]);
+  const [toastOpen, setToastOpen] = useState(false);
+
 
   /* DELETE HANDLER */
   const handleDelete = (row: DistributorRow) => {
-    setRows((prev) => prev.filter((item) => item !== row));
-  };
+  const isConfirmed = window.confirm(`Are you sure you want to delete this data`);
+    if (isConfirmed) {
+  setRows((prev) => prev.filter((item) => item !== row));
+  setToastOpen(true);
+}
+  }
 
   /* TABLE COLUMNS */
   const distributorColumns: TableColumn<DistributorRow>[] = [
@@ -240,6 +248,13 @@ export default function DistributorsPage() {
           </Typography>
         </Box>
       </Box>
+      <AppToast
+  open={toastOpen}
+  message="Data deleted successfully"
+  severity="success"  
+  onClose={() => setToastOpen(false)}
+/>
+
     </Box>
   );
 }

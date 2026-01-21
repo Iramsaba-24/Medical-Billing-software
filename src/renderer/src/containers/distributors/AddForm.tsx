@@ -5,6 +5,8 @@ import TextInputField from '@/components/controlled/TextInputField';
 import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DateTimeField from '@/components/controlled/DateTimeField';
+import { useState } from "react";
+import AppToast from '@/containers/distributors/AppToast';
 
 const AddForm = () => {
   const methods = useForm({
@@ -17,6 +19,8 @@ const AddForm = () => {
     },
   });
   const navigate = useNavigate();
+  const [toastOpen, setToastOpen] = useState(false);
+
 
   return (
     <Box p={{ xs: 1, sm: 2  }}>
@@ -27,7 +31,12 @@ const AddForm = () => {
         noValidate
         onSubmit={methods.handleSubmit((data) => {
           console.log(data);
-          navigate('/table', { state: { userData: [data] } });
+          setToastOpen(true);
+
+setTimeout(() => {
+  navigate("/table", { state: { userData: [data] } });
+}, 2000);
+
         })}
 sx={{
   maxWidth: 900,
@@ -55,21 +64,23 @@ sx={{
        <Box
         sx={{
           height: '1px',
-          backgroundColor: 'rgba(0, 0, 0, 0.12)', // light transparent grey
+          backgroundColor: 'rgba(0, 0, 0, 0.12)', 
           mb: 3,
   }}
 />
         {/* Company Name */}
-        <TextInputField
-  name="companyName" label="Company Name" required rules={{  required: 'Company Name is required',
-    pattern: {
-      value: /^[A-Za-z0-9 ]+$/,
-      message: 'Only letters, numbers and spaces are allowed',
-    },
+       <TextInputField
+  name="companyName"
+  label="Company Name"
+  required
+  inputType="all"   
+  rules={{
+    required: 'Company Name is required',
   }}
 />
         {/* Phone + Email */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr',sm: '1fr 1fr',}, gap: 2,mt: 2, }}>
+        <Box  sx={{display: 'grid', gridTemplateColumns: {  xs: '1fr',sm: '1fr 1fr',},gap: 2,mt: 2,
+  }}>
           <MobileField name="mobile" label="Phone" required />
           <EmailField name="email" label="Email" required />
         </Box>
@@ -81,20 +92,22 @@ sx={{
 
         {/* Address */}
         <Box sx={{ mt: 2 }}>
-          <TextInputField name="address" label="Address" rules={{
-    required: 'Company Name is required',
-    pattern: {
-      value: /^[A-Za-z0-9 ]+$/,
-      message: 'Only letters, numbers and spaces are allowed',
+          <TextInputField
+            name="address"
+            label="Address"
+            inputType="all"            
+            multiline
+            rows={4}
+            rules={{
+         required: 'Address is required',
+       }}
+       sx={{
+        '& .MuiInputBase-root': {
+        height: '100px',
+      alignItems: 'flex-start',
     },
-  }} multiline rows={4}
-             sx={{
-            '& .MuiInputBase-root': {
-            height: '100px',
-            alignItems: 'flex-start'
-          }
   }}
-   />
+/>
         </Box>
       {/* Footer Buttons */}
         <Box
@@ -124,7 +137,7 @@ sx={{
     type="submit"
     variant="contained"
     sx={{ backgroundColor: '#1b7f6b', color: '#fff',
-      '&:hover': {   backgroundColor: '#fff',  color: '#1b7f6b',  border: '1px solid #1b7f6b',
+      '&:hover': { backgroundColor: '#fff',  color: '#1b7f6b',  border: '1px solid #1b7f6b',
       },
     }}
   >
@@ -133,7 +146,13 @@ sx={{
 </Box>
       </Box>     
     </FormProvider>
-    </Box>
+    <AppToast
+  open={toastOpen}
+  message="Data saved successfully"
+  severity="success"  
+  onClose={() => setToastOpen(false)}
+/>
+    </Box>  
   );
 };
 export default AddForm;

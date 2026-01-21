@@ -11,7 +11,7 @@ export const URL_PATH = {
   AddForm:'/form',
   CreateInvoice: '/create-invoice',
   InvoiceView: '/invoice-view',
-  DistributorsTable: '/table',
+  DistributorsTable:'/table',
 
 
 };
