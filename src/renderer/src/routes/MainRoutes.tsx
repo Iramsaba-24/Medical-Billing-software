@@ -12,11 +12,11 @@ import MedicineGroupView from '@/containers/inventory/MedicineGroupView';
 import AddMedicineGroup from '@/containers/inventory/AddMedicineGroup';
 import AddInventoryItem from '@/containers/inventory/AddInventoryItem';
 
-import AddForm from '@/containers/distributors/AddForm';
+
 import Landing from '@/containers/landing-page/LandingPage';
 import Dashboard from '@/view/Dashboard';
 import CustomerMaster from '@/view/CustomerMaster';
-import DistributorsTable from '@/containers/distributors/DistributorsTable';
+
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -44,14 +44,8 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
       },
-      {
-        path: URL_PATH.AddForm ,
-        element: <AddForm />,
-      },
-      {
-        path: URL_PATH.DistributorsTable,
-          element: <DistributorsTable />,
-      },
+      
+      
       {
         path: URL_PATH.Inventory,
         element: <Inventory />
