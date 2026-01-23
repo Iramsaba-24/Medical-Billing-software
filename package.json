@@ -49,7 +49,9 @@
     "react-hook-form": "^7.69.0",
     "react-i18next": "^16.5.1",
     "react-router-dom": "^7.11.0",
+    "react-toastify": "^11.0.5",
     "tailwindcss": "^4.1.18",
+    "uuid": "^13.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -65,7 +67,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "typescript": "^5.2.2",
+    "typescript": "^5.9.3",
     "vite": "^5.1.6",
     "vite-plugin-electron": "^0.28.6",
     "vite-plugin-electron-renderer": "^0.14.5"
