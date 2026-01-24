@@ -1,8 +1,8 @@
- import { Box, Typography, Button, TextField, MenuItem, Select } from "@mui/material";
+import { Box, Typography, Button, TextField, MenuItem, Select } from "@mui/material";
 import { UniversalTable, ACTION_KEY, Column } from "@/components/uncontrolled/UniversalTable"; 
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import AppToast from "./AppToast";
+import AppToast from "@/containers/Distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
 
 type DistributorRow = {
@@ -14,19 +14,21 @@ type DistributorRow = {
   status: "Active" | "Inactive";
 };
 
- function DistributorsTable() {
+function DistributorsTable() {
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [rows, setRows] = useState<DistributorRow[]>([]);
 
+  // Load data from LocalStorage
   useEffect(() => {
     const stored = localStorage.getItem("distributors");
     if (stored) setRows(JSON.parse(stored));
   }, []);
 
+  // Function to change status
   const handleStatusChange = (email: string, newStatus: "Active" | "Inactive") => {
-    const updatedRows = rows.map((row) =>
+    const updatedRows = rows.map((row) => 
       row.email === email ? { ...row, status: newStatus } : row
     );
     setRows(updatedRows);
@@ -53,19 +55,13 @@ type DistributorRow = {
     { 
       key: "status", 
       label: "Status",
-      render: (row: DistributorRow) => (
+      // Render dropdown here
+      render: (row) => (
         <Select
           size="small"
           value={row.status}
           onChange={(e) => handleStatusChange(row.email, e.target.value as "Active" | "Inactive")}
-          sx={{
-            height: 30,
-            fontSize: "0.875rem",
-            minWidth: 100,
-            color: row.status === "Active" ? "green" : "red",
-            ".MuiOutlinedInput-notchedOutline": { border: "none" },
-            "&:hover .MuiOutlinedInput-notchedOutline": { border: "1px solid #ddd" },
-          }}
+          sx={{ height: 30, fontSize: "14px" }}
         >
           <MenuItem value="Active">Active</MenuItem>
           <MenuItem value="Inactive">Inactive</MenuItem>
@@ -108,4 +104,5 @@ type DistributorRow = {
     </Box>
   );
 }
+
 export default DistributorsTable;
