@@ -62,13 +62,13 @@ const SearchBox = styled(Box)(({ theme }) => ({
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Customers', icon: <PeopleIcon />, path: URL_PATH.Customer },
-  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsTable   },
+  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage },
   { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
   { text: 'Sales & Purchase', icon: <AccountBalanceIcon />, path: '/accounting' },
   {
     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
   },
-  { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+  { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
