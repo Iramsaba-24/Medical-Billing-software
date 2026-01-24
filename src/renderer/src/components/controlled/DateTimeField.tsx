@@ -1,26 +1,28 @@
-import { type FC } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { type FC } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+
 import {
   DatePicker,
   TimePicker,
   DateTimePicker,
+  LocalizationProvider,
   type DatePickerProps,
   type TimePickerProps,
-  type DateTimePickerProps
-} from '@mui/x-date-pickers';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { type SxProps, type Theme } from '@mui/material';
-import dayjs, { Dayjs } from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import localeData from 'dayjs/plugin/localeData';
-import { getComponentTranslations } from '@/helpers/useTranslations';
-import { useTranslation } from 'react-i18next';
+  type DateTimePickerProps,
+} from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import {
+  IconButton,
+  InputAdornment,
+  type SxProps,
+  type Theme,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import dayjs, { type Dayjs } from "dayjs";
+import { useTranslation } from "react-i18next";
+import { getComponentTranslations } from "@/helpers/useTranslations";
 
-dayjs.extend(customParseFormat);
-dayjs.extend(localeData);
-
-type ViewMode = 'date' | 'time' | 'datetime' | 'month' | 'year';
+type ViewMode = "date" | "time" | "datetime" | "month" | "year" | "month-year";
 
 type DateFieldProps = {
   name: string;
@@ -33,53 +35,58 @@ type DateFieldProps = {
   Partial<TimePickerProps> &
   Partial<DateTimePickerProps>;
 
-const DateTimeField: FC<DateFieldProps> = ({ name, label, required = false, sx, viewMode = 'date', useCurrentDate, ...pickerProps }) => {
+const DateTimeField: FC<DateFieldProps> = ({
+  name,
+  label,
+  required = false,
+  sx,
+  viewMode = "date",
+  useCurrentDate = false,
+  ...pickerProps
+}) => {
   const { t } = useTranslation();
   const translations = getComponentTranslations(t);
   const {
     control,
-    formState: { errors }
+    formState: { errors },
   } = useFormContext();
 
-  const formatOutput = (date: Dayjs): string | number => {
+  const parseValue = (value: unknown): Dayjs | null => {
+    if (!value) return null;
+    if (dayjs.isDayjs(value)) return value;
+    if (value instanceof Date) return dayjs(value);
+
+    if (typeof value !== "string") return null;
+
     switch (viewMode) {
-      case 'date':
-        return date.format('DD/MM/YYYY');
-      case 'time':
-        return date.format('hh:mm A');
-      case 'datetime':
-        return date.format('DD/MM/YYYY hh:mm A');
-      case 'month':
-        return date.format('MMMM');
-      case 'year':
-        return date.year();
+      case "year":
+        return dayjs(value, "YYYY", true);
+      case "month":
+      case "month-year":
+        return dayjs(value, "YYYY-MM", true);
+      case "time":
+        return dayjs(value, "HH:mm", true);
+      case "datetime":
+        return dayjs(value);
+      case "date":
       default:
-        return date.toString();
+        return dayjs(value);
     }
   };
 
-  const parseValue = (rawValue: unknown): Dayjs | null => {
-    if (!rawValue) return null;
-    if (dayjs.isDayjs(rawValue)) return rawValue;
-    if (rawValue instanceof Date) return dayjs(rawValue);
-
+  const toStoreValue = (date: Dayjs): string => {
     switch (viewMode) {
-      case 'month': {
-        const months = dayjs().localeData().months();
-        const monthIndex = months.indexOf(String(rawValue));
-        return monthIndex >= 0 ? dayjs().month(monthIndex) : null;
-      }
-      case 'year':
-        return dayjs().year(Number(rawValue));
-      case 'time':
-        return dayjs(String(rawValue), 'hh:mm A', true);
-
-      case 'date':
-        return dayjs(String(rawValue), 'DD/MM/YYYY', true);
-      case 'datetime':
-        return dayjs(String(rawValue), 'DD/MM/YYYY hh:mm A', true);
+      case "year":
+        return date.format("YYYY");
+      case "month":
+      case "month-year":
+        return date.format("YYYY-MM");
+      case "time":
+        return date.format("HH:mm");
+      case "datetime":
+      case "date":
       default:
-        return null;
+        return date.toISOString();
     }
   };
 
@@ -89,69 +96,99 @@ const DateTimeField: FC<DateFieldProps> = ({ name, label, required = false, sx, 
         name={name}
         control={control}
         rules={{
-          required: required ? translations.dateTimeField.requiredError(label) : undefined
+          required: required
+            ? translations.dateTimeField.requiredError(label)
+            : undefined,
         }}
         render={({ field }) => {
           if (useCurrentDate && !field.value) {
-            const now = dayjs();
-            const parsedNow = viewMode === 'month' ? now.startOf('month') : viewMode === 'year' ? now.startOf('year') : now;
-
-            field.onChange(formatOutput(parsedNow));
+            field.onChange(toStoreValue(dayjs()));
           }
 
           const parsedValue = parseValue(field.value);
-
           const hasError = !!errors[name];
 
-          const commonPickerProps = {
+          const commonProps = {
             label,
             value: parsedValue,
-            onChange: (value: Dayjs | Date | null) => {
-              if (dayjs.isDayjs(value) && value.isValid()) {
-                field.onChange(formatOutput(value));
-              } else if (value instanceof Date) {
-                const parsed = dayjs(value);
-                if (parsed.isValid()) field.onChange(formatOutput(parsed));
+            onChange: (value: Dayjs | null) => {
+              if (value && value.isValid()) {
+                field.onChange(toStoreValue(value));
               } else {
                 field.onChange(null);
               }
             },
 
-            format: viewMode === 'date' ? 'DD/MM/YYYY' : viewMode === 'datetime' ? 'DD/MM/YYYY hh:mm A' : undefined,
             slotProps: {
               textField: {
                 fullWidth: true,
                 required,
                 error: hasError,
-                helperText: String(errors[name]?.message || ' '),
+                helperText: String(errors[name]?.message || " "),
                 sx: {
-                  '& .MuiInputLabel-asterisk': { color: 'error.main' },
-                  ...sx
-                }
-              }
+                  "& .MuiInputLabel-asterisk": { color: "error.main" },
+                  ...sx,
+                },
+                InputProps: {
+                  endAdornment: field.value ? (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          field.onChange(null);
+                        }}
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ) : null,
+                },
+              },
             },
-            timeSteps: { minutes: 1 },
-            enableAccessibleFieldDOMStructure: false,
-            ...pickerProps
+
+            ...pickerProps,
           };
 
-          if (viewMode === 'time') {
-            return <TimePicker {...commonPickerProps} views={['hours', 'minutes']} minutesStep={1} />;
-          }
+          switch (viewMode) {
+            case "time":
+              return <TimePicker {...commonProps} />;
 
-          if (viewMode === 'datetime') {
-            return <DateTimePicker {...commonPickerProps} />;
-          }
+            case "datetime":
+              return (
+                <DateTimePicker {...commonProps} format="DD-MM-YYYY HH:mm" />
+              );
 
-          if (viewMode === 'month') {
-            return <DatePicker {...commonPickerProps} views={['month']} />;
-          }
+            case "month":
+              return (
+                <DatePicker {...commonProps} views={["month"]} format="MMMM" />
+              );
 
-          if (viewMode === 'year') {
-            return <DatePicker {...commonPickerProps} views={['year']} />;
-          }
+            case "year":
+              return (
+                <DatePicker {...commonProps} views={["year"]} format="YYYY" />
+              );
 
-          return <DatePicker {...commonPickerProps} />;
+            case "month-year":
+              return (
+                <DatePicker
+                  {...commonProps}
+                  views={["year", "month"]}
+                  openTo="month"
+                  format="MMMM YYYY"
+                />
+              );
+
+            case "date":
+            default:
+              return (
+                <DatePicker
+                  {...commonProps}
+                  views={["year", "month", "day"]}
+                  format="DD-MM-YYYY"
+                />
+              );
+          }
         }}
       />
     </LocalizationProvider>

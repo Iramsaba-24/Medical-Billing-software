@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import enTranslations from '@/translations/en.json';
 import knTranslations from '@/translations/kn.json';
 
+
 i18n
   .use(initReactI18next)
   .init({

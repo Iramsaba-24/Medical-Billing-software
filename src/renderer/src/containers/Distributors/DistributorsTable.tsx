@@ -1,14 +1,13 @@
-import { Box, Typography, Button, TextField, Checkbox, Select, MenuItem, Paper } from "@mui/material";
-import revenueImg from "@/assets/TotalRevenue.png";
-import pendingImg from "@/assets/PendingAmount.png";
-import invoiceImg from "@/assets/TotalInvoices.png";
-import ReusableTable, { TableColumn } from "@/components/uncontrolled/ReusableTable";
-import ReuseIcon from "@/components/controlled/ReuseIcon";
+import { Box, Typography, Button, TextField, Paper } from "@mui/material";
+import { UniversalTable, ACTION_KEY, Column } from "@/components/uncontrolled/UniversalTable"; 
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import AppToast from "@/containers/Distributors/AppToast";
+import AppToast from "./AppToast";
 
-/* Row Type */
+import TotalDistributors from "@/assets/TotalDistributers.svg";
+import TotalPurchase from "@/assets/warningsign.svg";
+import NewDistributors from "@/assets/NewDistributors.svg";
+
 type DistributorRow = {
   companyName: string;
   email: string;
@@ -23,30 +22,23 @@ export default function DistributorsPage() {
   const location = useLocation();
   const newUser = location.state?.userData?.[0];
   const [toastOpen, setToastOpen] = useState(false);
-  
-  /* State */
+
   const [rows, setRows] = useState<DistributorRow[]>(() => {
     const stored = localStorage.getItem("distributors");
     return stored ? JSON.parse(stored) : [];
   });
 
   const [search, setSearch] = useState("");
-
-  /* Persist to localStorage */
+   
   useEffect(() => {
-    localStorage.setItem("distributors", JSON.stringify(rows));
-  }, [rows]);
+    localStorage.setItem("distributors", JSON.stringify(rows)); }, [rows]);
 
-  /* Add new user  */
   useEffect(() => {
     if (!newUser) return;
-
     setRows((prev) => {
       const exists = prev.some((item) => item.email === newUser.email);
       if (exists) return prev;
-
-      return [
-        ...prev,
+      return [ ...prev,
         {
           companyName: newUser.companyName,
           email: newUser.email,
@@ -58,64 +50,47 @@ export default function DistributorsPage() {
       ];
     });
   }, [newUser]);
-
-  /* Delete row */
+  
+    // Removes a distributor from the list and shows a success toast.
+   
   const handleDelete = (row: DistributorRow) => {
-  setRows((prev) => prev.filter((item) => item !== row));
-  setToastOpen(true);
-};
+    setRows((prev) => prev.filter((item) => item.email !== row.email));
+    setToastOpen(true);
+  };
 
-  /* Filtered rows for search */
+   
   const filteredRows = rows.filter((row) =>
     row.companyName.toLowerCase().includes(search.toLowerCase()) ||
     row.email.toLowerCase().includes(search.toLowerCase()) ||
     row.mobile.includes(search)
   );
 
-  /* TABLE COLUMNS */
-  const distributorColumns: TableColumn<DistributorRow>[] = [
-    { key: "checkbox", label: "", render: () => <Checkbox size="small" /> },
+  const distributorColumns: Column<DistributorRow>[] = [
     { key: "companyName", label: "Company Name" },
     { key: "email", label: "Email" },
     { key: "mobile", label: "Phone" },
     { key: "date", label: "Date" },
     { key: "address", label: "Address" },
-    { key: "status", label: "Status", render: (row) => (
-        <Select size="small" value={row.status} onChange={(e) => {
-            const newStatus = e.target.value as "Active" | "Inactive";
-            setRows((prev) => prev.map((r) => r.email === row.email ? { ...r, status: newStatus } : r ) ); }}
-            sx={{fontSize: 13, height: 28, color: row.status === "Active" ? "green" : "red", ".MuiOutlinedInput-notchedOutline": { border: "none" }, }} >
-          <MenuItem value="Active">Active</MenuItem>
-          <MenuItem value="Inactive">Inactive</MenuItem>
-        </Select>
-      ),
-    },
-    { key: "action", label: "Action",
-      render: (row) => (
-        <ReuseIcon
-          name="DeleteOutline"
-          color="error"
-          size="small"
-          onClick={() => handleDelete(row)}
-          sx={{ "&:hover": { backgroundColor: "#fdecea" }, }}
-        />
-      ),
-    },
+    { key: "status", label: "Status" },
+    { key: ACTION_KEY, label: "Action" },
   ];
+
   return (
     <Box p={2}>
-      {/* CARDS */}
       <Box
         display="grid"
-        gridTemplateColumns={{ xs: "repeat(3, 1fr)", md: "repeat(3, 1fr)" }}
+        gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }}
         gap={2}
         mb={3}
       >
         {[
-          { label: "Total Distributors", value: rows.length, img: revenueImg },
-          { label: "Total Purchase", value: 0, img: pendingImg },
-          { label: "New Distributors", value: `₹ ${rows.length}`, img: invoiceImg }, ].map((card) => (
-          <Paper key={card.label} sx={{
+          { label: "Total Distributors", value: rows.length, img: TotalDistributors },
+          { label: "Total Purchase", value: 0, img: TotalPurchase },
+          { label: "New Distributors", value: `₹ ${rows.length}`, img: NewDistributors },
+        ].map((card) => (
+          <Paper 
+            key={card.label} 
+            sx={{
               p: 3,
               display: "flex",
               justifyContent: "space-between",
@@ -123,52 +98,40 @@ export default function DistributorsPage() {
               borderRadius: 2,
               cursor: "pointer",
               transition: "0.3s",
-              "&:hover": {
-                transform: "translateY(-4px)",
-                boxShadow: 6,
-              },
+              "&:hover": { transform: "translateY(-4px)", boxShadow: 6 },
             }}
           >
             <Box>
-              <Typography fontWeight={600} fontSize={18}>
-                {card.value}
-              </Typography>
+              <Typography fontWeight={600} fontSize={18}>{card.value}</Typography>
               <Typography color="text.secondary">{card.label}</Typography>
             </Box>
- 
-            <Box
-              component="img"
-              src={card.img}
-              sx={{ width: 70, height: 70 }}
-            />
+            <Box component="img" src={card.img} sx={{ width: 70, height: 70 }} />
           </Paper>
         ))}
       </Box>
 
-      {/* TABLE */}
+     
       <Box
         sx={{
           border: "1px solid #ddd",
           borderRadius: 2,
           p: 3,
           backgroundColor: "#fff",
-          "&:hover": { border: "2px solid #1E88FF" },
-          "& .MuiTableRow-root:hover": { backgroundColor: "#E3F2FD", cursor: "pointer" },
-          "& .MuiTablePagination-root": { display: "none" },
+          "&:hover": { borderColor: "#1E88FF" }
         }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography fontWeight={600}>Distributors List</Typography>
           <Button
             variant="contained"
-            sx={{ backgroundColor: "#238878", textTransform: "none" }}
-            onClick={() => navigate("/form")}
+            sx={{ backgroundColor: "#238878", textTransform: "none", "&:hover": { bgcolor: "#1a665a" } }}
+            onClick={() => navigate("/form")} 
           >
             + Add Distributors
           </Button>
         </Box>
 
-        {/* SEARCH */}
+        {/* SEARCH & FILTERS BAR */}
         <Box display="flex" justifyContent="flex-end" gap={2.5} mb={3}>
           <TextField
             size="small"
@@ -183,22 +146,60 @@ export default function DistributorsPage() {
           </TextField>
         </Box>
 
-        {/* TABLE */}
-        <ReusableTable
+        {/* Configured for Distributor data */}
+        <UniversalTable<DistributorRow>
           data={filteredRows}
           columns={distributorColumns}
-          showSearch={false}
-          showExport={false}
           tableSize="medium"
-          textAlignment="left"
+          textAlign="left"
+          showSearch={false} 
+          showExport={true}
+          enableCheckbox={true}
+          getRowId={(row) => row.email}
           
+          // Inline Status Dropdown Allows updating the status directly from the table row 
+          dropdown={{
+            key: "status",
+            options: [
+              { value: "Active", label: "Active" },
+              { value: "Inactive", label: "Inactive" },
+            ],
+            onChange: (row, newValue) => {
+              setRows((prev) => 
+                prev.map((r) => 
+                  r.email === row.email 
+                    ? { ...r, status: newValue as DistributorRow["status"] } 
+                    : r
+                )
+              );
+            },
+            sx: {
+              width: 120,
+              bgcolor: "transparent",
+              color: "inherit",
+              "& .MuiOutlinedInput-notchedOutline": { border: "none" }
+            }
+          }}
+
+          // Single Row Actions Configuration 
+          actions={{
+            delete: (row: DistributorRow) => handleDelete(row),
+          }}
+
+          onDeleteSelected={(selectedRows: DistributorRow[]) => {
+            const emailsToDelete = selectedRows.map(r => r.email);
+            setRows(prev => prev.filter(r => !emailsToDelete.includes(r.email)));
+            setToastOpen(true);
+          }}
         />
       </Box>
+
+      {/* SUCCESS NOTIFICATION TOAST */}
       <AppToast
-  open={toastOpen}
-  message="Data deleted successfully"
-  onClose={() => setToastOpen(false)}
-/>
+        open={toastOpen}
+        message="Data deleted successfully"
+        onClose={() => setToastOpen(false)}
+      />
     </Box>
   );
 }

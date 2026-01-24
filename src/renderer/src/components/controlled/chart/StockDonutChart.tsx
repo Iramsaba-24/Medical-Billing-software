@@ -1,4 +1,10 @@
-import { Card, Typography, Box } from '@mui/material';
+import {
+  Card,
+  Typography,
+  Box,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useDrawingArea } from '@mui/x-charts/hooks';
 
@@ -11,7 +17,10 @@ function CenterLabel({ children }: { children: React.ReactNode }) {
       y={top + height / 2}
       textAnchor="middle"
       dominantBaseline="central"
-      style={{ fontSize: 16, fontWeight: 600 }}
+      style={{
+        fontSize: width < 180 ? 12 : 14, 
+        fontWeight: 600,
+      }}
     >
       {children}
     </text>
@@ -30,24 +39,47 @@ type StockDonutChartProps = {
 const StockDonutChart = ({ title, data }: StockDonutChartProps) => {
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSmallMobile = useMediaQuery('(max-width:360px)');
+
+  const chartSize = isSmallMobile ? 160 : isMobile ? 180 : 260;
+  const innerRadius = isSmallMobile ? 40 : isMobile ? 45 : 70;
+  const outerRadius = isSmallMobile ? 68 : isMobile ? 75 : 110;
+
   return (
-    <Card variant="outlined" sx={{ p: 2 }}>
+    <Card
+      variant="outlined"
+      sx={{
+        p: { xs: 1, sm: 2 },
+        overflow: 'hidden',
+      }}
+    >
       <Typography variant="h6" fontWeight={600} mb={1}>
         {title}
       </Typography>
 
-      <Box display="flex" justifyContent="center">
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        sx={{
+          width: '100%',
+          overflow: 'hidden',
+        }}
+      >
         <PieChart
+          margin={{ top: 10, bottom: 10, left: 10, right: 10 }} 
           series={[
             {
               data,
-              innerRadius: 70,
-              outerRadius: 110,
+              innerRadius,
+              outerRadius,
               paddingAngle: 2,
             },
           ]}
-          width={260}
-          height={260}
+          width={chartSize}
+          height={chartSize}
         >
           <CenterLabel>{total}%</CenterLabel>
         </PieChart>

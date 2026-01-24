@@ -1,11 +1,10 @@
-
-
 export const URL_PATH = {
   LOGIN: '/login',
   REGISTER: '/register',
 
   Landing: '/',
-  DASHBOARD: '/dashboard',
+  Dashboard: '/dashboard',
+  Customer:'/customers',
 
   SalesBilling: '/sales-billing',
 
@@ -14,8 +13,15 @@ export const URL_PATH = {
   InvoiceView: '/invoice-view',
 
   DistributorsTable: '/table',
+  AddForm: '/form',
 
-  AddForm: '/form'
-
+  ReportPage: '/report',
+  
+  
+  Inventory: '/inventory',
+  InventoryList: '/inventory/inventory-list',
+  MedicineGroup: '/inventory/medicine-group',
+  AddMedicineGroup: '/inventory/add-medicine-group',
+  AddInventoryItem: '/inventory/add-inventory-item',
 
 };
