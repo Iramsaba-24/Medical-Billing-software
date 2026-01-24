@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
-import { Box, Chip, Typography, MenuItem, Select, FormControl, Stack } from "@mui/material";
+ import { useState, useMemo } from "react";
+import { Box, Chip, Typography, MenuItem, Select, FormControl, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 
-//  Structure definition
+// Define the data structure 
 type InventoryItem = {
   id: string;
   item: string;
@@ -14,8 +14,8 @@ type InventoryItem = {
   status: string;
 };
 
+// Sample data for stock levels and expiry
 const inventoryData: InventoryItem[] = [
-  
   { id: "101", item: "Paracetamol 500mg", category: "Medicine", stock: "20 Tablets", reorder: 100, supplier: "MediSupply Co.", expiryDate: "08/15/2026", status: "Low Stock" },
   { id: "102", item: "Syringes (5ml)", category: "Supplies", stock: "150 Units", reorder: 200, supplier: "MedEquip Inc.", expiryDate: "01/15/2027", status: "Low Stock" },
   { id: "201", item: "Insulin Injection", category: "Medicine", stock: "10 Vials", reorder: 30, supplier: "MediSupply Co.", expiryDate: "01/25/2026", status: "Near Expiry" },
@@ -26,36 +26,33 @@ const inventoryData: InventoryItem[] = [
 ];
 
 function InventoryTable() {
-  // State for Filters
+  // States to track the selected Stock and Time filters
   const [stockStatus, setStockStatus] = useState("All");
   const [timeFilter, setTimeFilter] = useState("All Time");
 
-  // Filter Logic
+  // Filtering data logic
   const filteredData = useMemo(() => {
     return inventoryData.filter((item) => {
-      // Stock Status Filter logic
+      // Filter by stock status (Low/Expired etc)
       const matchesStock = stockStatus === "All" || item.status === stockStatus;
-
-      // Time/Date Filter Logic
+      
       const itemDate = new Date(item.expiryDate);
       const today = new Date();
-      
       let matchesTime = true;
+
       if (timeFilter === "This Month") {
-        // Check if Month and Year match
-        matchesTime = itemDate.getMonth() === today.getMonth() && 
-                      itemDate.getFullYear() === today.getFullYear();
+        matchesTime = itemDate.getMonth() === today.getMonth() && itemDate.getFullYear() === today.getFullYear();
       } else if (timeFilter === "6 Days") {
+        // Show items expiring in the next 6 days
         const sixDaysLater = new Date();
         sixDaysLater.setDate(today.getDate() + 6);
         matchesTime = itemDate >= today && itemDate <= sixDaysLater;
       }
-
       return matchesStock && matchesTime;
     });
   }, [stockStatus, timeFilter]);
 
-  //  Table Columns Configuration
+  // Define columns and design how cells look
   const columns: Column<InventoryItem>[] = [
     { key: "item", label: "Item",
       render: (row) => (
@@ -66,14 +63,10 @@ function InventoryTable() {
       ),
     },
     { key: "category", label: "Category",
+      // Show category as a colored badge (Chip)
       render: (row) => (
         <Chip label={row.category} size="small"
-          sx={{ 
-            bgcolor: row.category === "Medicine" ? "#d1fae5" : "#e0f2fe", 
-            color: "#065f46",
-            fontWeight: 600,
-            borderRadius: "6px",
-          }}
+          sx={{ bgcolor: row.category === "Medicine" ? "#d1fae5" : "#e0f2fe", color: "#065f46", fontWeight: 600 }}
         />
       ),
     },
@@ -81,80 +74,58 @@ function InventoryTable() {
       render: (row) => (
         <Box>
           <Typography sx={{ fontSize: "0.9rem" }}>{row.stock}</Typography>
-          <Typography sx={{ fontSize: "0.7rem", color: "#9e9e9e" }}>Reorder: {row.reorder}</Typography>
+          <Typography sx={{ fontSize: "0.7rem", color: "#9e9e9e" }}>Reorder at: {row.reorder}</Typography>
         </Box>
       ),
     },
     { key: "supplier", label: "Supplier" },
     { key: "expiryDate", label: "Expiry Date" },
     { key: "status", label: "Status",
+      // Color coding for urgency (Red for Expired, Yellow for Near Expiry)
       render: (row) => {
-        let statusColor = "#f97316"; 
-        if (row.status === "Expired") statusColor = "#ef4444"; 
-        if (row.status === "Near Expiry") statusColor = "#eab308";
-        
-        return (
-          <Typography sx={{ color: statusColor, fontWeight: 600, fontSize: "0.85rem" }}>
-            {row.status}
-          </Typography>
-        );
+        const statusColor = row.status === "Expired" ? "#ef4444" : row.status === "Near Expiry" ? "#eab308" : "#f97316"; 
+        return <Typography sx={{ color: statusColor, fontWeight: 600, fontSize: "0.85rem" }}>{row.status}</Typography>;
       },
     },
   ];
 
   return (
-    <Box sx={{ p: 4, bgcolor: "#f9fafb", minHeight: "100vh" }}>
-      <Box sx={{ bgcolor: "#fff", p: 3, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-        
-        {/* Header and Dropdowns Row */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: "600", color: "#111827" }}>
-            Inventory Stock Report
-          </Typography>
+    <Paper sx={{ p: 3, borderRadius: 2 }}>
+      <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+        Inventory Stock Report
+      </Typography>
+      <Divider sx={{ mb: 3 }} />
 
-          <Stack direction="row" spacing={2} alignItems="center">
-            {/* Stock Status Dropdown */}
-            <FormControl size="small">
-              <Select
-                value={stockStatus}
-                onChange={(e) => setStockStatus(e.target.value)}
-                sx={{ minWidth: 140, borderRadius: "8px", fontSize: "0.85rem", bgcolor: "#fff" }}
-              >
-                <MenuItem value="All">All Stock</MenuItem>
-                <MenuItem value="Low Stock">Low Stock</MenuItem>
-                <MenuItem value="Near Expiry">Near Expiry</MenuItem>
-                <MenuItem value="Expired">Expired</MenuItem>
-              </Select>
-            </FormControl>
+      {/* Dropdown Filters */}
+      <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
+        <FormControl size="small">
+          <Select value={stockStatus} onChange={(e) => setStockStatus(e.target.value)} sx={{ minWidth: 140, borderRadius: "8px" }}>
+            <MenuItem value="All">All Stock</MenuItem>
+            <MenuItem value="Low Stock">Low Stock</MenuItem>
+            <MenuItem value="Near Expiry">Near Expiry</MenuItem>
+            <MenuItem value="Expired">Expired</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small">
+          <Select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} sx={{ minWidth: 140, borderRadius: "8px" }}>
+            <MenuItem value="All Time">All Time</MenuItem>
+            <MenuItem value="6 Days">Next 6 Days</MenuItem>
+            <MenuItem value="This Month">This Month</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
 
-            {/* Time Filter Dropdown */}
-            <FormControl size="small">
-              <Select
-                value={timeFilter}
-                onChange={(e) => setTimeFilter(e.target.value)}
-                sx={{ minWidth: 140, borderRadius: "8px", fontSize: "0.85rem", bgcolor: "#fff" }}
-              >
-                <MenuItem value="All Time">All Time</MenuItem>
-                <MenuItem value="6 Days">6 Days</MenuItem>
-                <MenuItem value="This Month">This Month</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
-        </Stack>
-        
-        {/* Universal Table Component */}
-        <UniversalTable<InventoryItem>
-          data={filteredData}       
-          columns={columns}  
-          showSearch={true}        
-          showExport={true}        
-          enableCheckbox={true}     
-          rowsPerPage={5}           
-          getRowId={(row) => row.id} 
-        />
-      </Box>
-    </Box>
+      {/* reusable Table */}
+      <UniversalTable<InventoryItem> 
+        data={filteredData} 
+        columns={columns} 
+        showSearch 
+        showExport 
+        enableCheckbox 
+        rowsPerPage={5} 
+        getRowId={(row) => row.id} 
+      />
+    </Paper>
   );
 }
-
 export default InventoryTable;

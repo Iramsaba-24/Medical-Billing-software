@@ -12,11 +12,11 @@ export const URL_PATH = {
   CreateInvoice: '/create-invoice',
   InvoiceView: '/invoice-view',
 
-  DistributorsTable: '/distributorstable',
-  AddForm: '/distributorsform',
+  
 
   ReportPage: '/report',
-  
+  DistributorsPage: "/distributors",
+  DistributorsForm: "/distributors/add",
   
   Inventory: '/inventory',
   InventoryList: '/inventory/inventory-list',

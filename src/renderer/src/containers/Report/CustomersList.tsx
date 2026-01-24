@@ -1,8 +1,8 @@
  import { useState, useMemo } from "react";
-import { Box, Typography, MenuItem, Select, FormControl, Stack } from "@mui/material";
+import {  Typography, MenuItem, Select, FormControl, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 
-// Defining the Customer object
+// Define what information each Customer should have
 type Customer = {
   id: number;
   name: string;
@@ -13,7 +13,7 @@ type Customer = {
   date: string; 
 };
 
-// Dummy data
+// Dummy data for the customer list
 const customerData: Customer[] = [
   { id: 1, name: "Kishor Kedar", medicines: "Medicine Two", quantity: 1, totalPrice: 152.00, referenceFrom: "Dr. Shyam Raut", date: "Jan 05, 2026" },
   { id: 2, name: "Rohit Raut", medicines: "Paracetamol", quantity: 5, totalPrice: 57.00, referenceFrom: "Dr. Kritika Kulkarni", date: "Jan 05, 2026" },
@@ -23,77 +23,77 @@ const customerData: Customer[] = [
 ];
 
 function CustomerTable() {
-  //  Filter sathi state
+  // State to track which time range is selected (e.g., "All Time" or "This Month")
   const [timeFilter, setTimeFilter] = useState("All Time");
 
-  // Filter Logic
+  // Logic to filter the data based on the selected time range
   const filteredData = useMemo(() => {
     return customerData.filter((customer) => {
+      // If "All Time" is selected, show everything
       if (timeFilter === "All Time") return true;
 
       const itemDate = new Date(customer.date);
       const today = new Date();
 
+      // Show only customers from the current month
       if (timeFilter === "This Month") {
-        return itemDate.getMonth() === today.getMonth() && 
-               itemDate.getFullYear() === today.getFullYear();
+        return itemDate.getMonth() === today.getMonth() && itemDate.getFullYear() === today.getFullYear();
       } 
-      
+
+      // Show only customers from the last 7 days
       if (timeFilter === "Last 7 Days") {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
         return itemDate >= sevenDaysAgo && itemDate <= today;
       }
-
       return true;
     });
   }, [timeFilter]);
 
-  // Table Columns
+  // Define table headings and which data goes into which column
   const columns: Column<Customer>[] = [
     { key: "name", label: "Name" },
     { key: "medicines", label: "Medicines" },
     { key: "quantity", label: "Quantity" },
+    // Format the price to show the currency symbol (₹)
     { key: "totalPrice", label: "Total Price", render: (row) => `₹${row.totalPrice.toFixed(2)}` },
     { key: "referenceFrom", label: "Reference From" },
     { key: "date", label: "Date" },
   ];
 
   return (
-    <Box sx={{ p: 4, bgcolor: "#f9fafb", minHeight: "100vh" }}>
-      <Box sx={{ bgcolor: "#fff", p: 3, borderRadius: "12px", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-        
-        {/* Header and Dropdown Row */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ fontWeight: "600", color: "#111827" }}>
-            Customers List
-          </Typography>
+    <Paper sx={{ p: 3, borderRadius: 2 }}>
+      {/* Page Title */}
+      <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+        Customers List
+      </Typography>
+      <Divider sx={{ mb: 3 }} />
+      
+      {/* Dropdown menu for selecting time filters */}
+      <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
+        <FormControl size="small">
+          <Select
+            value={timeFilter}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            sx={{ minWidth: 160, borderRadius: "8px", fontSize: "0.85rem" }}
+          >
+            <MenuItem value="All Time">All Time</MenuItem>
+            <MenuItem value="Last 7 Days">Last 7 Days</MenuItem>
+            <MenuItem value="This Month">This Month</MenuItem>
+          </Select>
+        </FormControl>
+      </Stack>
 
-          {/* Time Filter Dropdown */}
-          <FormControl size="small">
-            <Select
-              value={timeFilter}
-              onChange={(e) => setTimeFilter(e.target.value)}
-              sx={{ minWidth: 160, borderRadius: "8px", fontSize: "0.85rem", bgcolor: "#fff" }}
-            >
-              <MenuItem value="All Time">All Time</MenuItem>
-              <MenuItem value="Last 7 Days">Last 7 Days</MenuItem>
-              <MenuItem value="This Month">This Month</MenuItem>
-            </Select>
-          </FormControl>
-        </Stack>
-        
-        {/* Table Component */}
-        <UniversalTable<Customer>
-          data={filteredData}     
-          columns={columns}          
-          enableCheckbox={true}    
-          showSearch={true}         
-          showExport={true}         
-          getRowId={(row) => row.id} 
-        />
-      </Box>
-    </Box>
+      {/* reusable table component  */}
+      <UniversalTable<Customer>
+        data={filteredData}     
+        columns={columns}          
+        enableCheckbox={true}    
+        showSearch={true}         
+        showExport={true}         
+        getRowId={(row) => row.id} 
+      />
+    </Paper>
   );
 }
 

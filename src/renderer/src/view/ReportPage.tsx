@@ -1,9 +1,9 @@
 import ReportCards from '@/containers/Report/ReportCards';
 import SalesGraph from '@/containers/Report/SalesGraph';
 import InvoiceTable from '@/containers/Report/InvoiceTable';
-import DistributorsTable from '@/containers/Distributors/DistributorsTable';
 import InventoryTable from '@/containers/Report/InventoryTable';
 import CustomerList from '@/containers/Report/CustomersList';
+import DistributorReportTable from '@/containers/Report/DistributorReportTable';
 
 const ReportPage = () => {
   return (
@@ -22,7 +22,7 @@ const ReportPage = () => {
         
         <InvoiceTable />
         <InventoryTable />
-        <DistributorsTable />
+        <DistributorReportTable />
         <CustomerList />
         
       </div>

@@ -1,34 +1,23 @@
- import { Box, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import DistributorCards from '@/containers/Distributors/DistributorsCard'; 
-import DistributorTable from '@/containers/Distributors/DistributorsTable'; 
+ import { Box } from "@mui/material";
+import DistributorCards from "@/containers/Distributors/DistributorsCard";
+import DistributorsTable from "@/containers/Distributors/DistributorsTable";
+import { useState, useEffect } from "react";
 
-const DistributorsPage = () => {
-  const navigate = useNavigate();
+export default function DistributorsPage() {
+  const [count, setCount] = useState(0);
 
+  useEffect(() => {
+    const storedData = localStorage.getItem("distributors");
+    if (storedData) {
+      const data = JSON.parse(storedData);
+      setCount(data.length); 
+    }
+  }, []);
 
   return (
-    <Box p={2}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight={600}>Distributors Management</Typography>
-
-        <Button variant="contained"
-           sx={{ backgroundColor: "#238878", textTransform: "none" }}
-                onClick={() => navigate("/form")}  >
-                + Add New Distributor
-                 </Button>
-
-      </Box>
-
-      <DistributorCards totalCount={0} />
-      <Box mt={4}>
-
-        <DistributorTable />
-      </Box>
+    <Box p={3}>
+      <DistributorCards totalCount={count} />
+      <DistributorsTable />
     </Box>
   );
-};
-
-
-
-export default DistributorsPage;
+}

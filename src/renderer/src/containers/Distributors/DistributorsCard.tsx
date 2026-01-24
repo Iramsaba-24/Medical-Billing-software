@@ -3,13 +3,11 @@ import TotalDistributors from "@/assets/TotalDistributers.svg";
 import TotalPurchase from "@/assets/warningsign.svg";
 import NewDistributors from "@/assets/NewDistributors.svg";
 
-
 interface DistributorCardsProps {
   totalCount: number;
 }
 
 export default function DistributorCards({ totalCount }: DistributorCardsProps) {
- 
   const cardData = [
     { label: "Total Distributors", value: totalCount, img: TotalDistributors },
     { label: "Total Purchase", value: 0, img: TotalPurchase },
@@ -17,47 +15,29 @@ export default function DistributorCards({ totalCount }: DistributorCardsProps) 
   ];
 
   return (
-    <Box
-      display="grid"
-      gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }}
-      gap={2}
-      mb={3}
-    >
-     {/* Mapping through cardData array to render each card dynamically  */}
+    <Box display="grid" gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }} gap={2} mb={3}>
       {cardData.map((card) => (
-        <Paper
-          key={card.label}
-          sx={{
+        <Paper 
+          key={card.label} 
+          sx={{ 
             p: 3, 
-            display: "flex",
+            display: "flex", 
             justifyContent: "space-between", 
-            alignItems: "center",
+            alignItems: "center", 
             borderRadius: 2,
             cursor: "pointer",
-            transition: "0.3s", 
-            "&:hover": { 
-              transform: "translateY(-4px)", 
-              boxShadow: 6 
-            },
+            transition: "all 0.3s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-5px)",
+              boxShadow: "0px 10px 25px rgba(0,0,0,0.15)"
+            }
           }}
         >
-          {/* Left Side */}
           <Box>
-            <Typography fontWeight={600} fontSize={18}>
-              {card.value}
-            </Typography>
-            <Typography color="text.secondary">
-              {card.label}
-            </Typography>
+            <Typography fontWeight={600} fontSize={18}>{card.value}</Typography>
+            <Typography color="text.secondary">{card.label}</Typography>
           </Box>
-
-          {/* Right Side */}
-          <Box 
-            component="img" 
-            src={card.img} 
-            alt={card.label}
-            sx={{ width: 70, height: 70 }} 
-          />
+          <Box component="img" src={card.img} sx={{ width: 60, height: 60 }} />
         </Paper>
       ))}
     </Box>

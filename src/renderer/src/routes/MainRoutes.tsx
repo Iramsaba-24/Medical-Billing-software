@@ -10,12 +10,14 @@ import MedicineGroup from '@/containers/inventory/MedicineGroup';
 import MedicineGroupView from '@/containers/inventory/MedicineGroupView';
 import AddMedicineGroup from '@/containers/inventory/AddMedicineGroup';
 import AddInventoryItem from '@/containers/inventory/AddInventoryItem';
-import DistributorsTable from '@/containers/Distributors/DistributorsTable';
-import AddForm from '@/containers/Distributors/DistributorsForm';
 import Landing from '@/containers/landing-page/LandingPage';
 import Dashboard from '@/view/Dashboard';
 import CustomerMaster from '@/view/CustomerMaster';
 import ReportPage from '@/view/ReportPage';
+import DistributorsPage from '@/view/DistributorsPage';
+import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+
+
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -67,15 +69,14 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AddInventoryItem,
         element: <AddInventoryItem/>
       },
-      {        
-        path: URL_PATH.DistributorsTable,
-        element: <DistributorsTable />,
-      },
-      {
-        path: URL_PATH.AddForm,
-        element: <AddForm />,
-      },
-     
+       { 
+  path: URL_PATH.DistributorsPage, 
+  element: <DistributorsPage /> 
+},
+{ 
+  path: URL_PATH.DistributorsForm,
+  element: <DistributorsForm /> 
+},
        {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,
