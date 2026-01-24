@@ -12,8 +12,8 @@ export const URL_PATH = {
   CreateInvoice: '/create-invoice',
   InvoiceView: '/invoice-view',
 
-  DistributorsTable: '/table',
-  AddForm: '/form',
+  DistributorsTable: '/distributorstable',
+  AddForm: '/distributorsform',
 
   ReportPage: '/report',
   
