@@ -3,12 +3,12 @@ import { Button, Box, Typography, Paper } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { v4 as uuid } from "uuid";
 import dayjs from "dayjs";
-
+ 
 import CustomerForm from "@/containers/CustomerPage/CustomerForm";
 import CustomerTable from "@/containers/CustomerPage/CustomerTable";
 import { Customer, CustomerFormData, getAmount } from "@/containers/CustomerPage/CustomerTypes";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-
+ 
 export default function CustomerMaster() {
   const [rows, setRows] = useState<Customer[]>([
     {
@@ -36,22 +36,22 @@ export default function CustomerMaster() {
       total: 12,
     },
   ]);
-
+ 
   const [editRow, setEditRow] = useState<Customer | null>(null);
   const [open, setOpen] = useState(false);
-
+ 
   const handleSave = (data: CustomerFormData, editId?: string) => {
     const total = data.items.reduce(
       (s, i) => s + getAmount(i.medicine, i.quantity),
       0
     );
-
+ 
     const payload = {
       ...data,
       date: dayjs().toISOString(),
       total,
     };
-
+ 
     if (editId) {
       setRows((p) =>
         p.map((r) => (r.id === editId ? { ...r, ...payload } : r))
@@ -64,7 +64,7 @@ export default function CustomerMaster() {
     setOpen(false);
     setEditRow(null);
   };
-
+ 
   return (
     <>
       {/* Header */}
@@ -91,7 +91,7 @@ export default function CustomerMaster() {
           >
             Customers Details
           </Typography>
-
+ 
           <Button
             variant="contained"
             sx={{ bgcolor: "#0ca678", width: 180, alignSelf: "center", my: 1 }}
@@ -104,7 +104,7 @@ export default function CustomerMaster() {
             Add Customer
           </Button>
         </Box>
-
+ 
         {/* Table */}
         <CustomerTable
           rows={rows}
@@ -115,7 +115,7 @@ export default function CustomerMaster() {
           }}
         />
       </Paper>
-
+ 
       {/* Form */}
       <CustomerForm
         open={open}
@@ -130,3 +130,4 @@ export default function CustomerMaster() {
     </>
   );
 }
+ 

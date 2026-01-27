@@ -11,11 +11,17 @@ export const URL_PATH = {
   DoctorsDetail: '/doctor-details/:id',
 
   Invoices: '/invoice',
+
+  AddForm:'/form',
   CreateInvoice: '/create-invoice',
   InvoiceView: '/invoice-view',
+  DistributorsTable:'/table',
 
-  DistributorsTable: '/table',
-  AddForm: '/form',
+  
+
+  ReportPage: '/report',
+  DistributorsPage: "/distributors",
+  DistributorsForm: "/distributors/add",
   
   Inventory: '/inventory',
   InventoryList: '/inventory/inventory-list',

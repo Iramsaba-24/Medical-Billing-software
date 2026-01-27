@@ -69,7 +69,7 @@ const menuItems = [
   {
     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
   },
-  { text: 'Reports', icon: <AssessmentIcon />, path: '/reports' },
+  { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
   { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 
