@@ -6,7 +6,9 @@ export const URL_PATH = {
   Dashboard: '/dashboard',
   Customer:'/customers',
 
-  SalesBilling: '/sales-billing',
+  Doctors: '/doctors',
+  AddDoctor: '/add-doctor',
+  DoctorsDetail: '/doctor-details/:id',
 
   Invoices: '/invoice',
   CreateInvoice: '/create-invoice',

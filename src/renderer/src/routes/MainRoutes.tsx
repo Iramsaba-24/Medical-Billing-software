@@ -15,6 +15,9 @@ import AddForm from '@/containers/Distributors/AddForm';
 import Landing from '@/containers/landing-page/LandingPage';
 import Dashboard from '@/view/Dashboard';
 import CustomerMaster from '@/view/CustomerMaster';
+import DoctorTable from '@/view/Doctors';
+import AddDoctor from '@/containers/doctors/AddDoctor';
+import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -34,6 +37,18 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.Customer,
         element: <CustomerMaster />,
+      },
+      {
+        path: URL_PATH.Doctors,
+        element: <DoctorTable />
+      },
+      {
+        path: URL_PATH.AddDoctor,
+        element: <AddDoctor />
+      },
+      {
+        path: URL_PATH.DoctorsDetail,
+        element: <DoctorsDetail />
       },
       {
         path: URL_PATH.CreateInvoice,

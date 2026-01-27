@@ -110,6 +110,7 @@ export default function CustomerTable({ rows, setRows, onEdit }: Props) {
       </FormProvider>
 
       {/* table */}
+      
       <UniversalTable
         data={filteredRows}
         enableCheckbox

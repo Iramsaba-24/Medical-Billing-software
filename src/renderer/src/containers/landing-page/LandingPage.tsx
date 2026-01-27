@@ -1,11 +1,11 @@
 import { Box, Button, Container, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg"
 
 // default data
 const User = {
     name : "Priyanka",
+    userName: "priyanka01",
     licenseNo : "MP123456789",
     licenseStatus : "Active"
 };
@@ -27,8 +27,7 @@ const getGreeting = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const username = location.state?.username || "User";
+
   const greeting = getGreeting();
 
   return (
@@ -49,7 +48,7 @@ const LandingPage = () => {
         {/* right side */}
         <Box textAlign={{ xs:"center", md:"left"}}>
             <Typography fontSize={15} sx={{ pb: {xs:0, md:1}}}
-            >User Name : {username}
+            >User Name : {User.userName}
             </Typography>
             <Typography fontSize={15} sx={{ pb: {xs:0, md:1}}}>License No. : {User.licenseNo}</Typography>
             <Typography fontSize={15}>License Status : <span style={{ color:"#166534", borderRadius:10, fontWeight:"600"}}>{User.licenseStatus}</span> </Typography>
@@ -69,7 +68,7 @@ const LandingPage = () => {
            fontWeight:600,
            py:4, 
            bgcolor:"#238878",
-           "&:hover":{bgcolor:"#FFFFFF", color: "#238878"}
+           "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
            onClick={()=> navigate("/add-customer")}>
             New Customer
@@ -84,7 +83,7 @@ const LandingPage = () => {
            fontWeight:600,
            py:4, 
            bgcolor:"#238878",
-           "&:hover":{bgcolor:"#FFFFFF", color: "#238878"}
+           "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
            onClick={()=> navigate("/add-distributor")}>
             New Distributor
@@ -99,7 +98,7 @@ const LandingPage = () => {
            fontWeight:600,
            py:4, 
            bgcolor:"#238878",
-           "&:hover":{bgcolor:"#FFFFFF", color: "#238878"}
+           "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
            onClick={()=> navigate("/new-inventory")}>
             New Inventory

@@ -73,7 +73,7 @@ export default function CustomerMaster() {
         sx={{
           borderRadius: 2,
           p: { xs: 0, sm: 2 },
-          bgcolor: "#f8f9fa",
+         
           // minHeight: "100vh",
         }}
         elevation={12}
