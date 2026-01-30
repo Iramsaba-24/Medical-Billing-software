@@ -31,6 +31,7 @@ import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
  
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
+import { Home } from '@mui/icons-material';
  
 const MINI_WIDTH = 80;
 const FULL_WIDTH = 240;
@@ -157,12 +158,18 @@ const Header: React.FC = () => {
           <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
             ERP Billing Software
           </Typography>
- 
+
+        {/* path for landing page */}
+          <Home
+            sx={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          />
+
           <SearchBox>
             <SearchIcon sx={{ mr: 1, color: '#666' }} />
             <InputBase placeholder="Search" fullWidth />
           </SearchBox>
- 
+
           <IconButton color="inherit" onClick={() => navigate(-1)}>
             <UndoRoundedIcon />
           </IconButton>
@@ -201,7 +208,7 @@ const Header: React.FC = () => {
           bgcolor: "#f8f9fa",
           py: { xs:9, md:8 },
           mt:3,
-          px:4,
+          px: { xs:2, md:4 },
           height: "100vh",
           overflowY: "auto",
         }}

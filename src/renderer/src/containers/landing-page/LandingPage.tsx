@@ -4,8 +4,8 @@ import landing_img from "@/assets/LandingPage.svg"
 
 // default data
 const User = {
-    name : "Priyanka",
-    userName: "priyanka01",
+    name : "User",
+    userName: "user01",
     licenseNo : "MP123456789",
     licenseStatus : "Active"
 };
@@ -100,7 +100,7 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/new-inventory")}>
+           onClick={()=> navigate("/inventory/add-inventory-item")}>
             New Inventory
           </Button>
          </Box>
@@ -109,7 +109,7 @@ const LandingPage = () => {
          <Box
          sx={{
           mt:4,
-          minHeight:{xs:400, md:700},
+          minHeight:{xs:400, md:800},
           backgroundImage:`url(${landing_img})`,
           backgroundSize:"cover",
           backgroundPosition:"center"

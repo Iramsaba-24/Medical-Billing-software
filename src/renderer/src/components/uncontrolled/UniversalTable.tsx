@@ -26,7 +26,7 @@ import { iconMap } from "@/utils/Icons";
 export const ACTION_KEY = "actionbutton" as const;
  
 export type Column<T> = {
-  key: keyof T | typeof ACTION_KEY;
+  key: keyof T | typeof ACTION_KEY | string;
   label: string;
   render?: (row: T) => ReactNode;
   exportable?: boolean;
