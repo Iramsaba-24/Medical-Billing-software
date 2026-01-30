@@ -4,7 +4,7 @@ import landing_img from "@/assets/LandingPage.svg"
 
 // default data
 const User = {
-    name : "Priyanka",
+    name : "Iramsaba",
     userName : "Priyanka 01",
     licenseNo : "MP123456789",
     licenseStatus : "Active"
