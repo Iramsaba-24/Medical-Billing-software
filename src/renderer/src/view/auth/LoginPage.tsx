@@ -28,15 +28,18 @@ const LoginPage = () => {
   };
       // textinput field styling
   const inputStyle = {
+    // input box -container height, border radius, background color
     '& .MuiOutlinedInput-root': {
       height: { xs: 44, sm: 48 },
       borderRadius: '6px',
       backgroundColor: '#fff',
+      // border color on focus
       '& fieldset': {
         borderColor: '#1b7f6b !important',
         borderWidth: '3px',
       },
     },
+    // label text styling
     '& .MuiOutlinedInput-input': {
       fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: { xs: '13px', sm: '14px' },
@@ -65,9 +68,11 @@ const LoginPage = () => {
             width: '100%',
             maxWidth: { xs: '100%', sm: 450 },
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'column',  //inputboxes up-down
             alignItems: 'center',
-            backgroundColor: 'transparent',
+            backgroundColor: 'transparent', //background img showing
+            p: { xs: 3, sm: 4 },
+            borderRadius: 2,
           }}>
              {/* logo img */}
           <Box mb={1}>

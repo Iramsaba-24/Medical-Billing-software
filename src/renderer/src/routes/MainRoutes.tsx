@@ -17,6 +17,9 @@ import CustomerMaster from '@/view/CustomerMaster';
 import ReportPage from '@/view/ReportPage';
 import DistributorsPage from '@/view/DistributorsPage';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+ import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
+
+
 
 
  
@@ -80,6 +83,11 @@ export const mainRoutes: RouteObject[] = [
   path: URL_PATH.DistributorsForm,
   element: <DistributorsForm /> 
 },
+{ 
+  path: URL_PATH.DistributorDetails ,
+  element: <DistributorDetails /> 
+},
+
        {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,

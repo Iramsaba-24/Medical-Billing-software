@@ -1,3 +1,5 @@
+
+
 export const URL_PATH = {
   LOGIN: '/login',
   REGISTER: '/register',
@@ -20,6 +22,8 @@ export const URL_PATH = {
   ReportPage: '/report',
   DistributorsPage: "/distributors",
   DistributorsForm: "/distributors/add",
+   DistributorDetails: "/distributor-details",  
+  
   
   Inventory: '/inventory',
   InventoryList: '/inventory/inventory-list',
