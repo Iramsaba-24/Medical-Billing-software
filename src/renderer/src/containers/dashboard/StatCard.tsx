@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Button,
   Card,
   CardContent,
 } from '@mui/material';
@@ -13,85 +12,85 @@ import Shortage from '@/assets/shortage.svg';
 
 const Dashboard: React.FC = () => {
   // Function to generate and download the report
-  const handleDownloadReport = () => {
-    // Demo data for the report
-    const reportData = {
-      reportTitle: 'Inventory Dashboard Report',
-      generatedDate: new Date().toLocaleString(),
-      statistics: [
-        { title: 'Total Revenue', value: '₹ 2,30,847' },
-        { title: 'Inventory Status', value: 'Good' },
-        { title: 'Medicines Available', value: '298' },
-        { title: 'Medicine Shortage', value: '01' },
-      ],
-      summary: {
-        totalRevenue: '₹ 2,30,847',
-        inventoryStatus: 'Good',
-        availableMedicines: '298 types',
-        criticalShortage: '1 medicine',
-      },
-    };
+//   const handleDownloadReport = () => {
+//     // Demo data for the report
+//     const reportData = {
+//       reportTitle: 'Inventory Dashboard Report',
+//       generatedDate: new Date().toLocaleString(),
+//       statistics: [
+//         { title: 'Total Revenue', value: '₹ 2,30,847' },
+//         { title: 'Inventory Status', value: 'Good' },
+//         { title: 'Medicines Available', value: '298' },
+//         { title: 'Medicine Shortage', value: '01' },
+//       ],
+//       summary: {
+//         totalRevenue: '₹ 2,30,847',
+//         inventoryStatus: 'Good',
+//         availableMedicines: '298 types',
+//         criticalShortage: '1 medicine',
+//       },
+//     };
 
-    // Create report content in text format
-    let reportContent = `
-═══════════════════════════════════════════════════
-          INVENTORY DASHBOARD REPORT
-═══════════════════════════════════════════════════
+//     // Create report content in text format
+//     let reportContent = `
+// ═══════════════════════════════════════════════════
+//           INVENTORY DASHBOARD REPORT
+// ═══════════════════════════════════════════════════
 
-Generated On: ${reportData.generatedDate}
+// Generated On: ${reportData.generatedDate}
 
-───────────────────────────────────────────────────
-                 QUICK STATISTICS
-───────────────────────────────────────────────────
+// ───────────────────────────────────────────────────
+//                  QUICK STATISTICS
+// ───────────────────────────────────────────────────
 
-- Total Revenue: ${reportData.statistics[0].value}
-- Inventory Status: ${reportData.statistics[1].value}
-- Medicines Available: ${reportData.statistics[2].value}
-- Medicine Shortage: ${reportData.statistics[3].value}
+// - Total Revenue: ${reportData.statistics[0].value}
+// - Inventory Status: ${reportData.statistics[1].value}
+// - Medicines Available: ${reportData.statistics[2].value}
+// - Medicine Shortage: ${reportData.statistics[3].value}
 
-───────────────────────────────────────────────────
-                 DETAILED SUMMARY
-───────────────────────────────────────────────────
+// ───────────────────────────────────────────────────
+//                  DETAILED SUMMARY
+// ───────────────────────────────────────────────────
 
-Total Revenue: ${reportData.summary.totalRevenue}
-Inventory Status: ${reportData.summary.inventoryStatus}
-Available Medicines: ${reportData.summary.availableMedicines}
-Critical Shortage: ${reportData.summary.criticalShortage}
+// Total Revenue: ${reportData.summary.totalRevenue}
+// Inventory Status: ${reportData.summary.inventoryStatus}
+// Available Medicines: ${reportData.summary.availableMedicines}
+// Critical Shortage: ${reportData.summary.criticalShortage}
 
-───────────────────────────────────────────────────
-                  RECOMMENDATIONS
-───────────────────────────────────────────────────
+// ───────────────────────────────────────────────────
+//                   RECOMMENDATIONS
+// ───────────────────────────────────────────────────
 
-1. Restock medicines with shortage immediately
-2. Monitor inventory levels regularly
-3. Review revenue trends weekly
-4. Update medicine database monthly
+// 1. Restock medicines with shortage immediately
+// 2. Monitor inventory levels regularly
+// 3. Review revenue trends weekly
+// 4. Update medicine database monthly
 
-═══════════════════════════════════════════════════
-              END OF REPORT
-═══════════════════════════════════════════════════
-    `.trim();
+// ═══════════════════════════════════════════════════
+//               END OF REPORT
+// ═══════════════════════════════════════════════════
+//     `.trim();
 
-    // Create a Blob from the report content
-    const blob = new Blob([reportContent], { type: 'text/plain' });
+//     // Create a Blob from the report content
+//     const blob = new Blob([reportContent], { type: 'text/plain' });
     
-    // Create a download link
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Inventory_Report_${new Date().getTime()}.txt`;
+//     // Create a download link
+//     const url = window.URL.createObjectURL(blob);
+//     const link = document.createElement('a');
+//     link.href = url;
+//     link.download = `Inventory_Report_${new Date().getTime()}.txt`;
     
-    // Trigger the download
-    document.body.appendChild(link);
-    link.click();
+//     // Trigger the download
+//     document.body.appendChild(link);
+//     link.click();
     
-    // Cleanup
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  };
+//     // Cleanup
+//     document.body.removeChild(link);
+//     window.URL.revokeObjectURL(url);
+//   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, }}>
+    <Box>
       <Box
         sx={{
           display: 'flex',
@@ -115,7 +114,6 @@ Critical Shortage: ${reportData.summary.criticalShortage}
           <Typography
             sx={{
               fontSize: '15px',
-              color: '#6B7280',
               mt: 0.5,
             }}
           >
@@ -123,23 +121,23 @@ Critical Shortage: ${reportData.summary.criticalShortage}
           </Typography>
         </Box>
 
-        <Button
+        {/* <Button
           variant="contained"
           onClick={handleDownloadReport}
-          sx={{
-            background: '#1F8A70',
-            textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
-            py: 1.2,
-            borderRadius: '10px',
-            '&:hover': {
-              background: '#18705C',
-            },
-          }}
+         sx={{
+              px:4,
+              width:"14%",          
+              textTransform:"none",
+              backgroundColor:"#1b7f6b",
+              "&:hover": {
+                backgroundColor:"#fff",
+                color:"#1b7f6b",
+                border:"2px solid #1b7f6b",
+              },
+            }}
         >
           Download Report
-        </Button>
+        </Button> */}
       </Box>
       <Box
         sx={{
@@ -199,6 +197,7 @@ const StackCard: React.FC<StackCardProps> = ({ value, title, icon }) => {
         alignItems: 'center',
         px: 2.5,
         background: '#FFFFFF',
+        
       }}
     >
       <CardContent

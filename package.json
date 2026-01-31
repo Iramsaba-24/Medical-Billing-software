@@ -33,7 +33,7 @@
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.6",
     "@mui/x-charts": "^8.23.0",
-    "@mui/x-date-pickers": "^8.25.0",
+    "@mui/x-date-pickers": "^8.26.0",
     "@tabler/icons-react": "^3.36.0",
     "@tailwindcss/vite": "^4.1.18",
     "dayjs": "^1.11.19",

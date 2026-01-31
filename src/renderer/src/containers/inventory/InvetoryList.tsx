@@ -1,183 +1,187 @@
-import { Box, Button, Chip, Typography } from "@mui/material";
-import {
-  UniversalTable,
-  Column,
-} from "@/components/uncontrolled/UniversalTable";
+import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-type InventoryItem = {
-  id: number;
-  item: string;
-  category: "Medicine" | "Supplies";
-  stock: string;
-  price: number;
-  supplier: string;
+export type InventoryItem = {
+  itemName: string;
+  itemId: string;
+  category: string;
+  stockQty: number;
+  pricePerUnit: number;
+  gst: "12%";
   expiryDate: string;
-  status: "In Stock" | "Low Stock" | "Out of Stock";
+  supplier: string;
 };
 
-const inventoryData: InventoryItem[] = [
-  {
-    id: 1,
-    item: "Paracetamol 500mg",
-    category: "Medicine",
-    stock: "450 Tablets",
-    price: 2,
-    supplier: "MediSupply Co.",
-    expiryDate: "08/15/2026",
-    status: "In Stock",
-  },
-  {
-    id: 2,
-    item: "Antibiotics (Amoxicillin)",
-    category: "Medicine",
-    stock: "120 Capsules",
-    price: 15,
-    supplier: "PharmaCare Ltd.",
-    expiryDate: "12/20/2026",
-    status: "In Stock",
-  },
-  {
-    id: 3,
-    item: "Insulin Injection",
-    category: "Medicine",
-    stock: "85 Vials",
-    price: 250,
-    supplier: "MediSupply Co.",
-    expiryDate: "06/30/2026",
-    status: "In Stock",
-  },
-  {
-    id: 4,
-    item: "Surgical Gloves",
-    category: "Supplies",
-    stock: "1500 Pairs",
-    price: 5,
-    supplier: "MedEquip Inc.",
-    expiryDate: "03/01/2027",
-    status: "In Stock",
-  },
-  {
-    id: 5,
-    item: "Syringes (5ml)",
-    category: "Supplies",
-    stock: "850 Units",
-    price: 3,
-    supplier: "MedEquip Inc.",
-    expiryDate: "01/15/2027",
-    status: "In Stock",
-  },
-];
+const InventoryList = () => {
+  const [tableData, setTableData] = useState<InventoryItem[]>([]); 
+  const [viewItem, setViewItem] = useState<InventoryItem | null>(null); 
 
-const columns: Column<InventoryItem>[] = [
-  {
-    key: "item",
-    label: "Item",
-  },
-  {
-    key: "category",
-    label: "Category",
-    render: (row) => (
-      <Chip
-        label={row.category}
-        size="small"
-        sx={{
-          bgcolor: row.category === "Medicine" ? "#d1fae5" : "#e0f2fe",
-          color: "#065f46",
-          fontWeight: 600,
-        }}
-      />
-    ),
-  },
-  {
-    key: "stock",
-    label: "Stock",
-  },
-  {
-    key: "price",
-    label: "Price",
-    render: (row) => `₹ ${row.price}`,
-  },
-  {
-    key: "supplier",
-    label: "Supplier",
-  },
-  {
-    key: "expiryDate",
-    label: "Expiry Date",
-  },
-  {
-    key: "status",
-    label: "Status",
-    render: (row) => (
-      <Typography
-        fontWeight={600}
-        sx={{
-          color:
-            row.status === "In Stock"
-              ? "success.main"
-              : row.status === "Low Stock"
-              ? "warning.main"
-              : "error.main",
-        }}
-      >
-        {row.status}
-      </Typography>
-    ),
-  },
-];
+  const navigate = useNavigate();
 
-export default function InventoryList() {
-    const navigate = useNavigate();
-    
+  useEffect(() => {
+    const stored = localStorage.getItem("inventory");
+    if (!stored) return setTableData([]);
+
+    const parsed: InventoryItem[] = JSON.parse(stored).map(
+      (item: InventoryItem) => ({
+        ...item,
+        stockQty: Number(item.stockQty), 
+      })
+    );
+    setTableData(parsed);
+  }, []);
+
+  // delete
+  const handleDelete = (item: InventoryItem) => {
+    const updated = tableData.filter((i) => i.itemId !== item.itemId);
+    setTableData(updated);
+    localStorage.setItem("inventory", JSON.stringify(updated));
+  };
+
+  // status based on quantity
+  const getStatus = (qty: number) => {
+    if (qty === 0) return "Out of Stock";
+    if (qty <= 10) return "Low Stock";
+    return "In Stock";
+  };
+
+  // status color
+  const getStatusColor = (qty: number) => {
+    if (qty === 0) return "error.main";
+    if (qty <= 10) return "warning.main";
+    return "success.main";
+  };
+  
+  const columns: Column<InventoryItem>[] = [
+    { key: "itemName", label: "Item" },
+    { key: "category", label: "Category" },
+    { key: "stockQty", label: "Stock" },
+    { key: "pricePerUnit", label: "Price",
+      render: (row) => `₹ ${row.pricePerUnit}`, 
+    },
+    { key: "supplier", label: "Supplier" },
+    { key: "expiryDate", label: "Expiry Date" },
+    { key: "status", label: "Status",
+      render: (row) => (
+        <Typography fontWeight={500} color={getStatusColor(row.stockQty)}>
+          {getStatus(row.stockQty)}
+        </Typography>
+      ),
+    },
+    { key: ACTION_KEY, label: "Action" }, 
+  ];
+
   return (
-    <Box sx={{ boxShadow: 4, padding: 4, borderRadius: 2 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-        <Typography sx={{ fontSize: 20 }}>Inventory List</Typography>
-        <Button
-          variant="contained"
-          onClick={() => navigate("/inventory/add-inventory-item")}
-          sx={{
-            px: 2.5,
-            py: 1,
-            minWidth: 100,
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            borderRadius: "10px",
-            fontWeight: 600,
-            fontSize: "0.95rem",
-            textTransform: "none",
-            boxShadow: "0 4px 12px rgba(35, 136, 120, 0.25)",
-            transition: "all 0.25s ease",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
-              border: "2px solid #238878",
-              boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-              transform: "translateY(-1px)",
-            },
-            "&:active": {
-              transform: "scale(0.98)",
-            },
+    <>
+      <Box sx={{ boxShadow: {xs:1, md:4}, p: {xs:1, md:4}, borderRadius: 2 }}>
+        <Box display="flex" justifyContent="space-between" mb={4}>
+          <Typography sx={{fontSize: { xs:"16", md:"20" }, }}>Inventory List</Typography>
+
+          {/* add inventory button */}
+          <Button
+            variant="contained"
+            sx={{
+              px: 4,
+              py: 1,
+              width: { xs:"50%", md:"18%" },             
+              textTransform: "none",
+              backgroundColor: "#1b7f6b",
+            }}
+            onClick={() => navigate("/inventory/add-inventory-item")}
+          >
+            + Add Inventory Item
+          </Button>
+        </Box>
+
+        {/* table */}
+        <UniversalTable
+          data={tableData}
+          columns={columns}
+          tableSize="small"
+          rowsPerPage={5}
+          actions={{
+            view: setViewItem, 
+            delete: handleDelete, 
           }}
-        >
-          + Add Customer 
-        </Button>
+        />
       </Box>
-      <UniversalTable<InventoryItem>
-        data={inventoryData}
-        columns={columns}
-        caption="Inventory List"
-        showSearch
-        showExport
-        enableCheckbox
-        rowsPerPage={5}
-        getRowId={(row) => row.id}
-        onDeleteSelected={(rows) => {
-          console.log("Deleted rows:", rows);
-        }}
-      />
-    </Box>
+
+      {/* view dialog box */}
+      <Dialog
+        open={!!viewItem}
+        onClose={() => setViewItem(null)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography p={2} fontSize={20} fontWeight={600}>
+            {viewItem?.itemName} 
+          </Typography>
+        </DialogTitle>
+
+        <DialogContent>
+          {/* Item details */}
+          <Box display="flex"
+            flexDirection={{ xs:"column", md:"row" }}
+            gap={{ xs:2, md:20 }}
+            mb={4}
+            px={4}>
+            <Typography><strong>Item ID</strong><br /> {viewItem?.itemId}</Typography>
+            <Typography><strong>Category</strong> <br /> {viewItem?.category}</Typography>
+            <Typography><strong>Expiry Date</strong> <br /> {viewItem?.expiryDate}</Typography>
+          </Box>
+
+          <Box display="flex"
+            flexDirection={{ xs:"column", md:"row" }}
+            gap={{ xs:2, md:20 }}
+            mb={2}
+            px={4}>
+            <Typography>
+              <strong>Quantity</strong> <br />{viewItem?.stockQty}
+            </Typography>
+            <Typography>
+              <strong>GST</strong> <br />12%
+            </Typography>
+            <Typography>
+              <strong>Supplier</strong> <br />{viewItem?.supplier}
+            </Typography>
+          </Box>
+
+          <Typography px={4}>
+            <strong>Status</strong>
+            <Typography
+              sx={{ color: getStatusColor(viewItem?.stockQty ?? 0) }}
+            >
+              {viewItem && getStatus(viewItem.stockQty)}
+            </Typography>
+          </Typography>
+        </DialogContent>
+
+        {/* Close button */}
+        <DialogActions>
+          <Button
+            sx={{
+              px: 2.5,
+              minWidth: 100,
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+              },
+            }}
+            onClick={() => setViewItem(null)}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
-}
+};
+
+export default InventoryList;

@@ -8,6 +8,7 @@ import BarChart from '@/containers/dashboard/Barchart';
 import SalesTable from '@/containers/dashboard/SalesTable';
 import DropdownField from '@/components/controlled/DropdownField';
 import Cards from '@/containers/dashboard/Cards';
+import Alerts from '@/containers/dashboard/Alerts';
 
 type FilterType = 'Today' | '6 Days' | 'This Month';
 
@@ -60,10 +61,11 @@ const Dashboard: React.FC = () => {
         // my:6
       }}
     >
-     
       <Box sx={{ mb: { xs: 2, md: 3 } }}>
         <StatCard />
       </Box>
+
+  <Alerts />
 
       <Box
         sx={{

@@ -19,12 +19,9 @@ import AddDoctor from '@/containers/doctors/AddDoctor';
 import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
- import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
 import ReportPage from '@/view/ReportPage';
-
-
-
-
+import Reorder from '@/containers/inventory/ReorderList';
+import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -76,6 +73,10 @@ export const mainRoutes: RouteObject[] = [
         element: <InventoryList />
       },
       {
+        path: URL_PATH.Reorder,
+        element: <Reorder />
+      },
+      {
         path: URL_PATH.MedicineGroup,
         element: <MedicineGroup />
       },
@@ -92,17 +93,17 @@ export const mainRoutes: RouteObject[] = [
         element: <AddInventoryItem/>
       },
        { 
-  path: URL_PATH.DistributorsPage, 
-  element: <DistributorsPage /> 
-},
-{ 
-  path: URL_PATH.DistributorsForm,
-  element: <DistributorsForm /> 
-},
-{ 
-  path: URL_PATH.DistributorDetails ,
-  element: <DistributorDetails /> 
-},
+         path: URL_PATH.DistributorsPage, 
+         element: <DistributorsPage /> 
+       },
+       { 
+         path: URL_PATH.DistributorsForm,
+         element: <DistributorsForm /> 
+       },
+       { 
+          path: URL_PATH.DistributorDetails ,
+          element: <DistributorDetails /> 
+        },
 
        {
         path: URL_PATH.ReportPage,
