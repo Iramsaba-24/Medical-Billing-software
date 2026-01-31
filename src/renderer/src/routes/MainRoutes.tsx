@@ -92,13 +92,18 @@ export const mainRoutes: RouteObject[] = [
         element: <AddInventoryItem/>
       },
        { 
-  path: URL_PATH.DistributorsPage, 
-  element: <DistributorsPage /> 
-},
-{ 
-  path: URL_PATH.DistributorsForm,
-  element: <DistributorsForm /> 
-},
+         path: URL_PATH.DistributorsPage, 
+         element: <DistributorsPage /> 
+       },
+       { 
+         path: URL_PATH.DistributorsForm,
+         element: <DistributorsForm /> 
+       },
+       { 
+          path: URL_PATH.DistributorDetails ,
+          element: <DistributorDetails /> 
+        },
+
        {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,
