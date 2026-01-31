@@ -4,7 +4,6 @@ import { URL_PATH } from '@/constants/UrlPath';
 import Invoices from '@/view/Invoices'
 import CreateInvoice from '@/containers/Invoices/CreateInvoice';
 import InvoiceView from '@/containers/Invoices/InvoiceView';
-
 import Inventory from '@/view/Inventory';
 import InventoryList from '@/containers/inventory/InvetoryList';
 import MedicineGroup from '@/containers/inventory/MedicineGroup';
