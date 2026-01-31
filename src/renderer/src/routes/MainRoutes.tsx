@@ -21,6 +21,7 @@ import DistributorsPage from '@/view/DistributorsPage';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
+import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
  
 export const mainRoutes: RouteObject[] = [
   {
