@@ -55,8 +55,9 @@ const Dashboard: React.FC = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(to bottom right, #F3F4F6, #E5E7EB)',
-        p: { xs: 1.5, sm: 3, md: 4 },
+        // background: 'linear-gradient(to bottom right, #F3F4F6, #E5E7EB)',
+        // p: { xs: 1.5, sm: 3, md: 2 },
+        // my:6
       }}
     >
      

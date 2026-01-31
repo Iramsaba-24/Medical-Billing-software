@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { type FC, type SyntheticEvent } from 'react';
 import {
   TextField,
@@ -29,6 +30,7 @@ type DropdownFieldProps = {
   onChangeCallback?: (value: string) => void;
   freeSolo?: boolean;
   placeholder?: string;
+  floatLabel?: boolean;
 };
 
 const DropdownField: FC<DropdownFieldProps> = ({ 
@@ -40,7 +42,8 @@ const DropdownField: FC<DropdownFieldProps> = ({
   sx = {}, 
   onChangeCallback,
   freeSolo = true,
-  placeholder
+  placeholder,
+  floatLabel = false
 }) => {
   const { t } = useTranslation();
   const translations = getComponentTranslations(t);
@@ -82,6 +85,8 @@ const DropdownField: FC<DropdownFieldProps> = ({
               freeSolo={freeSolo}
               options={options}
               value={selectedOption || value || null}
+              popupIcon={<KeyboardArrowDownIcon />}
+              forcePopupIcon  
               onChange={(_event: SyntheticEvent<Element, Event>, newValue: any) => {
                 let newValueStr = '';
                 
@@ -109,14 +114,10 @@ const DropdownField: FC<DropdownFieldProps> = ({
                   {...params}
                   {...field}
                   inputRef={ref}
-                  label={label}
-                  placeholder={placeholder}
+                  label={floatLabel ? label : undefined}
+                  placeholder={!floatLabel ? placeholder : undefined}
                   error={!!errors[name]}
                   required={required}
-                  InputLabelProps={{
-                    ...params.InputLabelProps,
-                    shrink: true
-                  }}
                 />
               )}
             />
@@ -131,3 +132,58 @@ const DropdownField: FC<DropdownFieldProps> = ({
 };
 
 export default DropdownField;
+
+
+// import { FC } from "react";
+// import {
+//   TextField,
+//   MenuItem,
+//   SxProps,
+//   Theme
+// } from "@mui/material";
+
+// export type DropdownOption = {
+//   label: string;
+//   value: string;
+// };
+
+// type DropdownInputProps = {
+//   placeholder?: string;
+//   value: string;
+//   options: DropdownOption[];
+//   onChange: (value: string) => void;
+//   disabled?: boolean;
+//   sx?: SxProps<Theme>;
+// };
+
+// const DropdownInput: FC<DropdownInputProps> = ({
+//   placeholder = "Select",
+//   value,
+//   options,
+//   onChange,
+//   disabled,
+//   sx
+// }) => {
+//   return (
+//     <TextField
+//       select
+//       fullWidth
+//       value={value}
+//       disabled={disabled}
+//       onChange={(e) => onChange(e.target.value)}
+//       sx={sx}
+//     >
+//       <MenuItem value="" disabled>
+//         {placeholder}
+//       </MenuItem>
+
+//       {options.map((option) => (
+//         <MenuItem key={option.value} value={option.value}>
+//           {option.label}
+//         </MenuItem>
+//       ))}
+//     </TextField>
+//   );
+// };
+
+// export default DropdownInput;
