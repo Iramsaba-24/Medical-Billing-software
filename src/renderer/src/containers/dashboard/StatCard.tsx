@@ -91,7 +91,7 @@ Critical Shortage: ${reportData.summary.criticalShortage}
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 }, background: '#F9FAFB' }}>
+    <Box sx={{ p: { xs: 2, md: 3 }, }}>
       <Box
         sx={{
           display: 'flex',
