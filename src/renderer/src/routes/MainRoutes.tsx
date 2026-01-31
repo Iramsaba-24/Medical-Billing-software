@@ -20,6 +20,7 @@ import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
  import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
+import ReportPage from '@/view/ReportPage';
 
 
 
