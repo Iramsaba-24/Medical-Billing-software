@@ -3,7 +3,7 @@ import DistributorCards from "@/containers/Distributors/DistributorsCard";
 import DistributorsTable from "@/containers/Distributors/DistributorsTable";
 import { useState, useEffect } from "react";
 
-export default function DistributorsPage() {
+  function DistributorsPage() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -21,3 +21,4 @@ export default function DistributorsPage() {
     </Box>
   );
 }
+export default DistributorsPage;

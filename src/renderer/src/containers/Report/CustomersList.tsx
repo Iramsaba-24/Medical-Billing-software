@@ -96,5 +96,4 @@ function CustomerTable() {
     </Paper>
   );
 }
-
 export default CustomerTable;

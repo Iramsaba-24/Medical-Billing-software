@@ -7,7 +7,7 @@ type AppToastProps = {
   onClose: () => void;      
 };
  
-export default function AppToast({
+  function AppToast({
   open,
   message,
   severity = "success",  
@@ -32,3 +32,4 @@ export default function AppToast({
     </Snackbar>
   );
 }
+export default AppToast;

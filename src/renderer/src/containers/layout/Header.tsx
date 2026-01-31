@@ -201,22 +201,22 @@ const Header: React.FC = () => {
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
  
- 
-      <Box
+ <Box
         component="main"
         sx={{
           flex: 1,
           bgcolor: "#f8f9fa",
           py: { xs:9, md:8 },
           mt:3,
-          px: { xs:2, md:4 },
+          px:4,
           height: "100vh",
           overflowY: "auto",
         }}
       >
         <Outlet />
       </Box>
-
+ 
+       
     </Box>
   );
 };
