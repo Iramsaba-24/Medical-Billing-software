@@ -19,7 +19,11 @@ import AddDoctor from '@/containers/doctors/AddDoctor';
 import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
-import ReportPage from '@/view/ReportPage';
+ import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
+
+
+
+
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -94,6 +98,11 @@ export const mainRoutes: RouteObject[] = [
   path: URL_PATH.DistributorsForm,
   element: <DistributorsForm /> 
 },
+{ 
+  path: URL_PATH.DistributorDetails ,
+  element: <DistributorDetails /> 
+},
+
        {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,

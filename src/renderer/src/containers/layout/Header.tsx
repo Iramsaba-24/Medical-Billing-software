@@ -193,8 +193,9 @@ const Header: React.FC = () => {
         <DrawerHeader />
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
-
-       <Box
+ 
+ 
+      <Box
         component="main"
         sx={{
           flex: 1,
@@ -208,7 +209,6 @@ const Header: React.FC = () => {
       >
         <Outlet />
       </Box>
-
 
     </Box>
   );
