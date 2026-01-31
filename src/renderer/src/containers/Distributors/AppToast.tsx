@@ -3,7 +3,7 @@
 type AppToastProps = {
   open: boolean;             
   message: string;          
-  severity?: "success" | "error" | "warning" | "info"; 
+  severity?: "success" | "error" | "warning" ; 
   onClose: () => void;      
 };
  

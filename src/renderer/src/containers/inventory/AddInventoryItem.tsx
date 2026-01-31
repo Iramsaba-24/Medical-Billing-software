@@ -6,184 +6,198 @@ import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 
-type FormValues = {
+export type InventoryFormData = {
   itemName: string;
   itemId: string;
   category: string;
   unit: string;
-  stockQty: string;
+  stockQty: number;
   medicineGroup: string;
-  pricePerUnit: string;
+  pricePerUnit: number;
   expiryDate: string;
   supplier: string;
+};
+
+export type InventoryItem = {
+  itemName: string;
+  itemId: string;
+  category: string;
+  stockQty: number;
+  pricePerUnit: number;
+  expiryDate: string;
+  supplier: string;
+  status: "In Stock" | "Low Stock" | "Out of Stock";
 };
 
 export default function AddInventoryItem() {
   const navigate = useNavigate();
 
-  const methods = useForm<FormValues>({
+  const methods = useForm<InventoryFormData>({
     defaultValues: {
       category: "medicines",
       unit: "tablets",
     },
   });
 
-  const onSubmit = (data: FormValues) => {
-    console.log("Inventory Item Data:", data);
-    // API call here
+  //  submit
+  const onSubmit = (data: InventoryFormData) => {
+    const existing: InventoryItem[] =
+      JSON.parse(localStorage.getItem("inventory") || "[]");
+
+    const status: InventoryItem["status"] =
+      data.stockQty === 0
+        ? "Out of Stock"
+        : data.stockQty < 20
+        ? "Low Stock"
+        : "In Stock";
+
+    const newItem: InventoryItem = {
+      itemName: data.itemName,
+      itemId: data.itemId,
+      category: data.category,
+      stockQty: data.stockQty,
+      pricePerUnit: data.pricePerUnit,
+      expiryDate: data.expiryDate,
+      supplier: data.supplier,
+      status,
+    };
+
+    localStorage.setItem(
+      "inventory",
+      JSON.stringify([...existing, newItem])
+    );
+
+    navigate("/inventory/inventory-list", { replace: true });
   };
 
   return (
     <FormProvider {...methods}>
-      <Box width="100%" px={3} mt={4}>
-        <Paper
-          sx={{
-            p: 3,
-            borderRadius: 2,
-            width: "100%",
-          }}
+  <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
+    <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
+      <Typography fontSize={20} fontWeight={600} mb={4}>
+        Add Inventory Item
+      </Typography>
+
+      <Box
+        component="form"
+        onSubmit={methods.handleSubmit(onSubmit)}
+        display="grid"
+        gridTemplateColumns={{
+          xs: "1fr",
+          md: "repeat(3, 1fr)",
+        }}
+        gap={2.5}
+        sx={{ px: { xs: 0, md: 4 } }}
+      >
+        <TextInputField name="itemName" label="Item Name" required inputType="all" rows={1}/>
+        <TextInputField name="itemId" label="Item ID" required />
+
+        <DropdownField
+          name="category"
+          label="Category"
+          required
+          options={[
+            { label: "Medicines", value: "medicines" },
+            { label: "Consumables", value: "consumables" },
+          ]}
+        />
+
+        <DropdownField
+          name="unit"
+          label="Unit"
+          required
+          options={[
+            { label: "Tablets", value: "tablets" },
+            { label: "Bottle", value: "bottle" },
+            { label: "Strip", value: "strip" },
+          ]}
+        />
+
+        <NumericField name="stockQty" label="Stock Quantity" required />
+
+        <DropdownField
+          name="medicineGroup"
+          label="Medicine Group"
+          required
+          options={[
+            { label: "Generic", value: "generic" },
+            { label: "Diabetes", value: "diabetes" },
+            { label: "Other", value: "other" },
+          ]}
+        />
+
+        <NumericField
+          name="pricePerUnit"
+          label="Price per Unit (₹)"
+          decimal
+          decimalDigits={2}
+          required
+        />
+
+        <DateTimeField
+          name="expiryDate"
+          label="Expiry Date"
+          viewMode="date"
+          required
+        />
+
+        <DropdownField
+          name="supplier"
+          label="Supplier"
+          required
+          options={[
+            { label: "PharmaCare Ltd.", value: "pharmaCare" },
+            { label: "MedEquip Inc.", value: "medEquip" },
+            { label: "Other", value: "other" },
+          ]}
+        />
+
+        <Box
+          gridColumn="1 / -1"
+          display="flex"
+          flexDirection={{ xs: "column", md: "row" }}
+          justifyContent={{ md: "flex-end" }}
+          gap={2}
         >
-          <Typography fontWeight={600} mb={3}>
-            Add Inventory Item
-          </Typography>
-
-          <Box
-            component="form"
-            onSubmit={methods.handleSubmit(onSubmit)}
-            display="grid"
-            gridTemplateColumns="repeat(2, 1fr)"
-            gap={2.5}
+          <Button
+            variant="outlined"
+            onClick={() => navigate(-1)}
+            sx={{
+              px: 4,
+              width: { xs: "100%", md: "14%" },
+              textTransform: "none",
+              border: "2px solid #1b7f6b",
+              color: "#1b7f6b",
+              "&:hover": {
+                backgroundColor: "#1b7f6b",
+                color: "#fff",
+              },
+            }}
           >
-            <TextInputField name="itemName" label="Item Name" required />
+            Cancel
+          </Button>
 
-            <TextInputField name="itemId" label="Item ID" required />
-
-            <DropdownField
-              name="category"
-              label="Category"
-              required
-              options={[
-                { label: "Medicines", value: "medicines" },
-                { label: "Consumables", value: "consumables" },
-              ]}
-            />
-
-            <DropdownField
-              name="unit"
-              label="Unit"
-              required
-              options={[
-                { label: "Tablets", value: "tablets" },
-                { label: "Bottle", value: "bottle" },
-                { label: "Strip", value: "strip" },
-              ]}
-            />
-
-            <NumericField
-              name="stockQty"
-              label="Stock Quantity"
-              required
-              min={0}
-              max={100000}
-            />
-
-            <DropdownField
-              name="medicineGroup"
-              label="Medicine Group"
-              required
-              options={[
-                { label: "Generic Medicines", value: "generic" },
-                { label: "Diabetes", value: "diabetes" },
-                { label: "Other", value: "other" },
-              ]}
-            />
-
-            <NumericField
-              name="pricePerUnit"
-              label="Price per Unit (₹)"
-              required
-              decimal
-              decimalDigits={2}
-              min={0}
-              max={100000}
-            />
-
-            <DateTimeField
-              name="expiryDate"
-              label="Expiry Date"
-              required
-              viewMode="date"
-            />
-
-            <Box gridColumn="1 / -1">
-              <TextInputField name="supplier" label="Supplier" />
-            </Box>
-
-            <Box
-              gridColumn="1 / -1"
-              display="flex"
-              justifyContent="flex-end"
-              gap={2}
-              mt={2}
-            >
-              <Button
-                variant="outlined"
-                onClick={() => navigate(-1)}
-                sx={{
-                  minWidth: 100,
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                  border: "2px solid #238878",
-                  borderRadius: "10px",
-                  fontWeight: 600,
-                  fontSize: "0.95rem",
-                  textTransform: "none",
-                  transition: "all 0.25s ease",
-                  "&:hover": {
-                    backgroundColor: "#238878",
-                    color: "#fff",
-                    border: "2px solid #238878",
-                    boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-                    transform: "translateY(-1px)",
-                  },
-                  "&:active": {
-                    transform: "scale(0.98)",
-                  },
-                }}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                sx={{
-                  minWidth: 100,
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                  border: "2px solid #238878",
-                  borderRadius: "10px",
-                  fontWeight: 600,
-                  fontSize: "0.95rem",
-                  textTransform: "none",
-                  transition: "all 0.25s ease",
-                  "&:hover": {
-                    backgroundColor: "#fff",
-                    color: "#238878",
-                    border: "2px solid #238878",
-                    boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-                    transform: "translateY(-1px)",
-                  },
-                  "&:active": {
-                    transform: "scale(0.98)",
-                  },
-                }}
-              >
-                Save
-              </Button>
-            </Box>
-          </Box>
-        </Paper>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              px: 4,
+              width: { xs: "100%", md: "14%" },
+              textTransform: "none",
+              backgroundColor: "#1b7f6b",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#1b7f6b",
+                border: "2px solid #1b7f6b",
+              },
+            }}
+          >
+            Save
+          </Button>
+        </Box>
       </Box>
-    </FormProvider>
-  );
+    </Paper>
+  </Box>
+</FormProvider>
+);
 }

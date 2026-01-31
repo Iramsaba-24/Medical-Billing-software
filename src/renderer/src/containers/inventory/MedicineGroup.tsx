@@ -38,7 +38,7 @@ export default function MedicineGroup() {
   const navigate = useNavigate();
 
   return (
-    <Paper sx={{ p: 2, borderRadius: 2 }}>
+    <Paper sx={{ p: 3, borderRadius: 2 }}>
       <Box
         display="flex"
         justifyContent="space-between"

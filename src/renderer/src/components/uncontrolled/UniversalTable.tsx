@@ -26,7 +26,7 @@ import { iconMap } from "@/utils/Icons";
 export const ACTION_KEY = "actionbutton" as const;
  
 export type Column<T> = {
-  key: keyof T | typeof ACTION_KEY;
+  key: keyof T | typeof ACTION_KEY | string;
   label: string;
   render?: (row: T) => ReactNode;
   exportable?: boolean;
@@ -146,11 +146,11 @@ export function UniversalTable<T extends Record<string, unknown>>({
           );
  
   const DEFAULT_DROPDOWN_SX: SxProps = {
-    width: 150,
+    width: { xs:110, md:150 }, //width
     bgcolor: "#1f2937",
     color: "#ffffff",
     fontWeight: 600,
-    fontSize: 13,
+    fontSize: {xs:11, md:13}, //font
     borderRadius: 2,
     "& .MuiSelect-icon": { color: "#a9a2a2ff" },
   };
@@ -227,13 +227,14 @@ export function UniversalTable<T extends Record<string, unknown>>({
       {(showSearch || showExport) && (
         <Box
           sx={{
-            px: 2,
+            px: { xs:1, md:2 }, //padding
             py: 2,
             display: "flex",
             justifyContent: {
               xs: "center",
               md: showSearch ? "space-between" : "flex-end",
             },
+            flexDirection: { xs:"column", md:"row" }, //layout
             flexWrap: "wrap",
             gap: 2,
           }}
@@ -247,7 +248,9 @@ export function UniversalTable<T extends Record<string, unknown>>({
                 setSearch(e.target.value);
                 setPage(0);
               }}
-              sx={{ minWidth: 220 }}
+              sx={{ 
+                minWidth: { xs:"100%", md:220} //width
+               }}
             />
           )}
  
@@ -268,7 +271,7 @@ export function UniversalTable<T extends Record<string, unknown>>({
             bgcolor: "#0ca678",
             color: "#fff",
             fontWeight: 700,
-            fontSize: 18,
+            fontSize: { xs:14, md:18 }, //text
             borderRadius: showSearch || showExport ? "" : "6px 6px 0 0",
             textAlign: "center",
             py: 1,
@@ -279,8 +282,10 @@ export function UniversalTable<T extends Record<string, unknown>>({
         </Box>
       )}
  
-      <TableContainer>
-        <Table size={tableSize}>
+      <TableContainer >
+        <Table size={tableSize}
+        sx={{overflowY: "auto"}}
+        >
           <TableHead>
             <TableRow>
               {enableCheckbox && paginatedData.length > 0 && (
@@ -307,6 +312,7 @@ export function UniversalTable<T extends Record<string, unknown>>({
                     bgcolor: "#444748ff",
                     color: "#ffffff",
                     ...headerSx,
+                    whiteSpace: "nowrap", 
                   }}
                 >
                   {col.label}
@@ -330,7 +336,9 @@ export function UniversalTable<T extends Record<string, unknown>>({
                   <TableRow
                     key={rowId}
                     hover
-                    sx={{ "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx }}
+                    sx={{ "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx, 
+                  
+                  }}
                   >
                     {enableCheckbox && (
                       <TableCell padding="checkbox">
@@ -486,5 +494,4 @@ export function UniversalTable<T extends Record<string, unknown>>({
     </Paper>
   );
 }
- 
  

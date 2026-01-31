@@ -20,9 +20,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PeopleIcon from '@mui/icons-material/People';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -31,6 +31,7 @@ import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
  
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
+import { Home } from '@mui/icons-material';
  
 const MINI_WIDTH = 80;
 const FULL_WIDTH = 240;
@@ -62,9 +63,10 @@ const SearchBox = styled(Box)(({ theme }) => ({
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Customers', icon: <PeopleIcon />, path: URL_PATH.Customer },
-  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage },
+  { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
+  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
   { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
-  { text: 'Sales & Purchase', icon: <AccountBalanceIcon />, path: '/accounting' },
+
   {
     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
   },
@@ -80,7 +82,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
  
  
   return (
-    <List sx={{ px: 1 }}>
+    <List sx={{ px: 1, mt:{ xs:2, md:1}, overflowY:"auto" }}>
       {menuItems.map((item) => {
         const active = location.pathname === item.path;
  
@@ -106,7 +108,9 @@ const Sidebar = ({ open }: { open: boolean }) => {
                   textTransform: 'none',
  
                   background: active
-                    ? 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)'
+                    // ? 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)'
+
+                    ? '#238878'
                     : '#D9D9D9',
                   color: active ? '#fff' : 'black',
  
@@ -115,7 +119,9 @@ const Sidebar = ({ open }: { open: boolean }) => {
                   },
  
                   '&:hover': {
-                    background: 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)',
+                    // background: 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)',
+
+                    background:'#1FA38A'
                   },
  
                 }}
@@ -152,12 +158,18 @@ const Header: React.FC = () => {
           <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
             ERP Billing Software
           </Typography>
- 
+
+        {/* path for landing page */}
+          <Home
+            sx={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          />
+
           <SearchBox>
             <SearchIcon sx={{ mr: 1, color: '#666' }} />
             <InputBase placeholder="Search" fullWidth />
           </SearchBox>
- 
+
           <IconButton color="inherit" onClick={() => navigate(-1)}>
             <UndoRoundedIcon />
           </IconButton>
