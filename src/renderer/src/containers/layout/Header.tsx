@@ -64,7 +64,7 @@ const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Customers', icon: <PeopleIcon />, path: URL_PATH.Customer },
   { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
-  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsTable   },
+  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
   { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
 
   {
@@ -200,8 +200,9 @@ const Header: React.FC = () => {
         <DrawerHeader />
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
-
-       <Box
+ 
+ 
+      <Box
         component="main"
         sx={{
           flex: 1,
@@ -215,7 +216,6 @@ const Header: React.FC = () => {
       >
         <Outlet />
       </Box>
-
 
     </Box>
   );
