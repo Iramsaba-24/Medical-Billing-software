@@ -37,6 +37,7 @@ jobs:
         with:
           name: MedicalBillingERP-Windows
           path: release/*.exe
+          
      
       - name: Publish Release
         uses: softprops/action-gh-release@v2
