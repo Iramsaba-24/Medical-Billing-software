@@ -32,4 +32,6 @@ export const URL_PATH = {
   AddMedicineGroup: '/inventory/add-medicine-group',
   AddInventoryItem: '/inventory/add-inventory-item',
 
+  InvoiceSetting: '/settings/invoice',
+
 };
