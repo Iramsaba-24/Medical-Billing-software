@@ -8,14 +8,14 @@ import fs from 'node:fs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 
-const isDev = !!process.env.VITE_DEV_SERVER_URL;
+
+const isDev = !app.isPackaged
 
 const RENDERER_DIST = isDev
   ? path.join(process.cwd(), 'dist')
-  : path.join(__dirname, '../app-extracted/dist'); // fallback to extracted folder
+  : path.join(process.resourcesPath, 'app.asar', 'dist')
 
-
-  const INDEX_FILE = path.join(RENDERER_DIST, 'index.html');
+const INDEX_FILE = path.join(RENDERER_DIST, 'index.html')
 
   if (!fs.existsSync(INDEX_FILE)) {
   console.error('Error: index.html not found at', INDEX_FILE)
@@ -27,29 +27,27 @@ const RENDERER_DIST = isDev
 let win: BrowserWindow | null
 
 function createWindow() {
- win = new BrowserWindow({
-  width: 1280,
-  height: 800,
-  minWidth: 1024,
-  minHeight: 700,
-  autoHideMenuBar: true, 
-  icon: path.join(app.getAppPath(), 'dist', 'electron-vite.svg'),
-  webPreferences: {
-    preload: path.join(__dirname, 'preload.mjs'),
-  },
-})
-
-  win.setMenuBarVisibility(false)
-  // Test active push message to Renderer-process.
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
+  win = new BrowserWindow({
+    width: 1280,
+    height: 800,
+    minWidth: 1024,
+    minHeight: 700,
+    autoHideMenuBar: true,
+    icon: isDev
+      ? path.join(process.cwd(), 'public', 'electron-vite.svg')
+      : path.join(process.resourcesPath, 'icon.ico'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.mjs'),
+    },
   })
 
- if (isDev) {
-  win.loadURL(process.env.VITE_DEV_SERVER_URL!)
-} else {
-  win.loadFile(INDEX_FILE)
-}
+  win.setMenuBarVisibility(false)
+
+  if (isDev) {
+    win.loadURL(process.env.VITE_DEV_SERVER_URL!)
+  } else {
+    win.loadFile(INDEX_FILE)
+  }
 }
 
 app.on('window-all-closed', () => {
