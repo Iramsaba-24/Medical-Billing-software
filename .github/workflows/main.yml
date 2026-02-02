@@ -1,45 +1,46 @@
 name: Build and Release
+
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        # Add 'macos-latest' or 'ubuntu-latest' here for cross-platform builds
-        os: [windows-latest]
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
+          cache: npm
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
-      # This runs your 'npm run build' which should compile React via Vite
-      - name: Build React and Electron
+      - name: Build App
         run: npm run build
 
-      # Packaging the app into an executable
-      - name: Package App
-        run: npm run package # Ensure this script uses electron-builder or forge
+      - name: Package Electron App
+        run: npm run package
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Artifacts
+      - name: Upload Windows EXE
         uses: actions/upload-artifact@v4
         with:
-         name: Medical-Billing-App-Windows
-         path: release/*.exe 
+          name: MedicalBillingERP-Windows
+          path: release/*.exe
+     
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
