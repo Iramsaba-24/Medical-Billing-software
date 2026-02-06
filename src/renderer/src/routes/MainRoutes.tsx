@@ -21,6 +21,7 @@ import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
+import DoctorSettings from '@/view/DoctorSettings';
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -108,6 +109,11 @@ export const mainRoutes: RouteObject[] = [
         element: <DistributorDetails />,
       },
      
+      {
+        path: URL_PATH.DoctorsSettings,
+        element: <DoctorSettings />,
+      },
+
     ],
   },
 ];
