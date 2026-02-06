@@ -21,6 +21,7 @@ import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
+
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -91,24 +92,23 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AddInventoryItem,
         element: <AddInventoryItem/>
       },
-       { 
-         path: URL_PATH.DistributorsPage, 
-         element: <DistributorsPage /> 
-       },
-       { 
-         path: URL_PATH.DistributorsForm,
-         element: <DistributorsForm /> 
-       },
-       { 
-          path: URL_PATH.DistributorDetails ,
-          element: <DistributorDetails /> 
-        },
-
-       {
+      { 
+        path: URL_PATH.DistributorsPage, 
+        element: <DistributorsPage /> 
+      },
+      { 
+        path: URL_PATH.DistributorsForm,
+        element: <DistributorsForm /> 
+      },
+      {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,
       },
-     
+       {
+        path: URL_PATH.DistributorDetails,
+        element: <DistributorDetails />,
+      },
+
     ],
   },
 ];

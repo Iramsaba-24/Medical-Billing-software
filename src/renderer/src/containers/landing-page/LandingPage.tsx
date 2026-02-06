@@ -12,7 +12,6 @@ const User = {
 
 const getGreeting = () => {
   const hour = new Date().getHours();
-
    switch (true) {
     case hour >= 5 && hour < 12:
       return "Good Morning";
@@ -27,7 +26,6 @@ const getGreeting = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-
   const greeting = getGreeting();
 
   return (
@@ -123,12 +121,10 @@ const LandingPage = () => {
             pl:{ xs:6, md:80 },
             pt:{ xs:16, md:36 }
           }}
-        
           >
             "Trusted medicines, <br /> Trusted care."
           </Typography>
          </Box>
-
    </Box>
   </>
   )

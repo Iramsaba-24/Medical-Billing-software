@@ -24,12 +24,10 @@ const Doctors = () => {
   const navigate = useNavigate();
   const searchValue = methods.watch("search");
 
-  // get doctors from localstorage
   useEffect(() => {
     setDoctors(JSON.parse(localStorage.getItem("doctors") || "[]"));
   }, []);
 
-  // set doctors to localstorage
   const saveDoctors = (updated: Doctor[]) => {
     localStorage.setItem("doctors", JSON.stringify(updated));
     setDoctors(updated);
@@ -38,7 +36,7 @@ const Doctors = () => {
   // change status
   const handleStatusChange = (id: string, status: "Active" | "Inactive") => {
     saveDoctors(
-      doctors.map((d) => (d.id === id ? { ...d, status } : d))
+      doctors.map((doctor) => (doctor.id === id ? { ...doctor, status } : doctor))
     );
   };
 
@@ -150,8 +148,6 @@ const Doctors = () => {
             setEditDoctor(null);
           }}
         />
-       
-
     </>
   );
 };

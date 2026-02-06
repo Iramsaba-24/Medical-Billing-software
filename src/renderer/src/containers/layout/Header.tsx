@@ -66,20 +66,17 @@ const menuItems = [
   { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
   { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
   { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
-
   {
     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
   },
   { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
-  { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.Setting, },
 ];
 
 
 const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
- 
- 
  
   return (
     <List sx={{ px: 1, mt:{ xs:2, md:1}, overflowY:"auto" }}>
@@ -201,8 +198,7 @@ const Header: React.FC = () => {
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
  
- 
-      <Box
+ <Box
         component="main"
         sx={{
           flex: 1,
@@ -211,14 +207,17 @@ const Header: React.FC = () => {
           mt:3,
           px: { xs:2, md:4 },
           height: "100vh",
-          overflowY: "auto",
+          overflowX: "auto",
         }}
       >
         <Outlet />
       </Box>
-
+ 
+       
     </Box>
   );
 };
  
 export default Header;
+
+ 
