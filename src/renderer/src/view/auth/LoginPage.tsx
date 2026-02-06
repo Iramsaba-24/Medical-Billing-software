@@ -3,7 +3,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { Box, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import TextInputField from '@/components/controlled/TextInputField';
-import AppToast from '@/containers/Distributors/AppToast';
+import AppToast from '@/containers/distributors/AppToast';
 import BgImage from '@/assets/bgloginpage.svg';
 import LogoImage from '@/assets/logoimg.svg';
 
