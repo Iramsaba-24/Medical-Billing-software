@@ -1,3 +1,4 @@
+import { Settings } from "@mui/icons-material";
 
 
 export const URL_PATH = {
@@ -31,5 +32,11 @@ export const URL_PATH = {
   MedicineGroup: '/inventory/medicine-group',
   AddMedicineGroup: '/inventory/add-medicine-group',
   AddInventoryItem: '/inventory/add-inventory-item',
+
+
+  InvoiceSetting: '/settings/invoice',
+  InventorySettings: '/settings/inventory',
+  Setting: '/settings',
+  GeneralSettings: '/settings/general',
 
 };
