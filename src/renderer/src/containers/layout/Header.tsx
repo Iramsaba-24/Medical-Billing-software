@@ -1,19 +1,9 @@
+ 
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import {
-  Box,
-  Drawer,
-  AppBar,
-  Toolbar,
-  List,
-  CssBaseline,
-  Typography,
-  IconButton,
-  ListItem,
-  Tooltip,
-  InputBase,
-  Button,
-  useMediaQuery,
+  Box, Drawer, AppBar, Toolbar, List, CssBaseline, Typography,
+  IconButton, ListItem, Tooltip, InputBase, Button, useMediaQuery,
 } from '@mui/material';
  
 import MenuIcon from '@mui/icons-material/Menu';
@@ -28,16 +18,15 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import SettingsIcon from '@mui/icons-material/Settings';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
+import { Home } from '@mui/icons-material';
  
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
-import { Home } from '@mui/icons-material';
+import Setting, { SettingRef } from './Setting';
  
 const MINI_WIDTH = 80;
 const FULL_WIDTH = 240;
-
-/* --STYLED -- */
-
+ 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: '#238878',
   zIndex: theme.zIndex.drawer + 1,
@@ -58,47 +47,43 @@ const SearchBox = styled(Box)(({ theme }) => ({
     width: 160,
   },
 }));
-
-
+ 
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { text: 'Customers', icon: <PeopleIcon />, path: URL_PATH.Customer },
   { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
-  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
+  { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage },
   { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
-
-  {
-    text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
-  },
+  { text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices },
   { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
-  { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.Setting },
 ];
-
-
+ 
 const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
- 
- 
+  const settingRef = React.useRef<SettingRef>(null);
  
   return (
-    <List sx={{ px: 1, mt:{ xs:2, md:1}, overflowY:"auto" }}>
+    <List sx={{ px: 1, mt: { xs: 2, md: 1 }, overflowY: "auto" }}>
       {menuItems.map((item) => {
         const active = location.pathname === item.path;
+        const isSettings = item.text === 'Settings';
  
         return (
-          <Tooltip
-            key={item.text}
-            title={!open ? item.text : ''}
-            placement="right"
-            arrow
-          >
+          <Tooltip key={item.text} title={!open ? item.text : ''} placement="right" arrow>
             <ListItem disablePadding sx={{ mb: 2 }}>
               <Button
                 fullWidth
                 startIcon={item.icon}
                 variant={active ? 'contained' : 'contained'}
-                onClick={() => navigate(item.path)}
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  if (isSettings) {
+                    settingRef.current?.openDropdown(e);
+                  } else {
+                    navigate(item.path);
+                  }
+                }}
                 sx={{
                   justifyContent: open ? 'flex-start' : 'center',
                   minHeight: 44,
@@ -106,24 +91,14 @@ const Sidebar = ({ open }: { open: boolean }) => {
                   py: 2,
                   borderRadius: 2,
                   textTransform: 'none',
- 
-                  background: active
-                    // ? 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)'
-
-                    ? '#238878'
-                    : '#D9D9D9',
+                  background: active ? '#238878' : '#D9D9D9',
                   color: active ? '#fff' : 'black',
- 
                   '& .MuiButton-startIcon': {
                     margin: open ? '0 12px 0 0' : 0,
                   },
- 
                   '&:hover': {
-                    // background: 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)',
-
-                    background:'#1FA38A'
+                    background: '#1FA38A'
                   },
- 
                 }}
               >
                 {open && item.text}
@@ -132,54 +107,41 @@ const Sidebar = ({ open }: { open: boolean }) => {
           </Tooltip>
         );
       })}
+      <Setting ref={settingRef} />
     </List>
   );
 };
-
-
+ 
 const Header: React.FC = () => {
- 
-   const theme = useTheme();
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
- 
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
  
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-
       <StyledAppBar position="fixed">
         <Toolbar sx={{ gap: 2 }}>
           <IconButton color="inherit" onClick={() => setOpen(!open)}>
             <MenuIcon />
           </IconButton>
- 
           <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
             ERP Billing Software
           </Typography>
-
-        {/* path for landing page */}
-          <Home
-            sx={{ cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          />
-
+          <Home sx={{ cursor: "pointer" }} onClick={() => navigate("/")} />
           <SearchBox>
             <SearchIcon sx={{ mr: 1, color: '#666' }} />
             <InputBase placeholder="Search" fullWidth />
           </SearchBox>
-
           <IconButton color="inherit" onClick={() => navigate(-1)}>
             <UndoRoundedIcon />
           </IconButton>
- 
           <IconButton color="inherit" onClick={() => navigate(1)}>
             <RedoRoundedIcon />
           </IconButton>
         </Toolbar>
       </StyledAppBar>
-
       <Drawer
         variant={isMobile ? 'temporary' : 'permanent'}
         open={isMobile ? open : true}
@@ -188,7 +150,6 @@ const Header: React.FC = () => {
           width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
           flexShrink: 0,
           whiteSpace: 'nowrap',
- 
           '& .MuiDrawer-paper': {
             width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
@@ -200,25 +161,12 @@ const Header: React.FC = () => {
         <DrawerHeader />
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
- 
- 
-      <Box
-        component="main"
-        sx={{
-          flex: 1,
-          bgcolor: "#f8f9fa",
-          py: { xs:9, md:8 },
-          mt:3,
-          px: { xs:2, md:4 },
-          height: "100vh",
-          overflowY: "auto",
-        }}
-      >
+      <Box component="main" sx={{ flex: 1, bgcolor: "#f8f9fa", py: { xs: 9, md: 8 }, mt: 3, px: 4, height: "100vh", overflowY: "auto" }}>
         <Outlet />
       </Box>
-
     </Box>
   );
 };
  
 export default Header;
+ 

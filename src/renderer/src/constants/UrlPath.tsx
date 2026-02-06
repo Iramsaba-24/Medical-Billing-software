@@ -1,5 +1,7 @@
 
 
+
+
 export const URL_PATH = {
   LOGIN: '/login',
   REGISTER: '/register',
@@ -18,6 +20,9 @@ export const URL_PATH = {
   CreateInvoice: '/create-invoice',
   InvoiceView: '/invoice-view',
   DistributorsTable:'/table',
+  DistributorsSetting: '/distributors-setting',
+  ReportSettings: '/report-settings',
+  
 
   ReportPage: '/report',
   DistributorsPage: "/distributors",
@@ -31,5 +36,7 @@ export const URL_PATH = {
   MedicineGroup: '/inventory/medicine-group',
   AddMedicineGroup: '/inventory/add-medicine-group',
   AddInventoryItem: '/inventory/add-inventory-item',
+  Setting: "/settings",
+ 
 
 };

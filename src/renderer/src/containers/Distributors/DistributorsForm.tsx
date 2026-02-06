@@ -51,9 +51,9 @@ const DistributorsForm = () => {
 
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
-
+//  when form is submitted
   const onSubmit = (data: DistributorFormInput) => {
-    //  get data to  local storage
+    //  get old data to  local storage
     const stored = localStorage.getItem("distributors");
     const currentData = stored ? JSON.parse(stored) : [];
       //new entry object
@@ -72,10 +72,11 @@ const DistributorsForm = () => {
   };
 
   return (
-    <Box p={3} sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+    // form  styling
+    <Box p={2} sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       <FormProvider {...methods}>
         <form noValidate onSubmit={methods.handleSubmit(onSubmit)}> 
-             {/* like card  form styling */}
+             {/* add form card   styling */}
           <Paper
             sx={{
               maxWidth: 800,
@@ -135,7 +136,7 @@ const DistributorsForm = () => {
               onClick={() => navigate(URL_PATH.DistributorsPage)}
               sx={{
                 color: "#238878",
-                border: "2px solid #238878",
+                 border: "2px solid #238878",
                 textTransform: "none",
                 "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
               }}>           
