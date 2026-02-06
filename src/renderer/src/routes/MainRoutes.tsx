@@ -17,11 +17,14 @@ import DoctorTable from '@/view/Doctors';
 import AddDoctor from '@/containers/doctors/AddDoctor';
 import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
-import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+import DistributorsForm from '@/containers/distributors/DistributorsForm';
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
-import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
-import InvoiceSetting from '@/containers/setting/invoiveSetting';
+import DistributorDetails from '@/containers/distributors/DistributorsDetails';
+import InvoiceSetting from '@/containers/setting/InvoiveSetting';
+import InventorySettings from '@/containers/setting/InventorySettings';
+import Setting from '@/containers/layout/Setting';
+
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -109,6 +112,14 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.InvoiceSetting,
         element: <InvoiceSetting />,
+      },
+      {
+        path: URL_PATH.InventorySettings,
+        element: <InventorySettings />,
+      },
+      {
+        path: URL_PATH.Setting,
+        element: <Setting />,
       }
      
     ],

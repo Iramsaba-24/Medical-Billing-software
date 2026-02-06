@@ -1,9 +1,9 @@
-import ReportCards from '@/containers/Report/ReportCards';
-import SalesGraph from '@/containers/Report/SalesGraph';
-import InvoiceTable from '@/containers/Report/InvoiceTable';
-import InventoryTable from '@/containers/Report/InventoryTable';
-import CustomerList from '@/containers/Report/CustomersList';
-import DistributorReportTable from '@/containers/Report/DistributorReportTable';
+import ReportCards from '@/containers/report/ReportCards';
+import SalesGraph from '@/containers/report/SalesGraph';
+import InvoiceTable from '@/containers/report/InvoiceTable';
+import InventoryTable from '@/containers/report/InventoryTable';
+import CustomerList from '@/containers/report/CustomersList';
+import DistributorReportTable from '@/containers/report/DistributorReportTable';
 
 const ReportPage = () => {
   return (

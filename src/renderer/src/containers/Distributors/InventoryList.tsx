@@ -143,7 +143,7 @@ const columns: Column<InventoryItem>[] = [
     key: "id",
     label: "Actions",
     render: (row) => (
-      /* FAKT ITHE SHARE ACTION CALL KARA */
+      
        <ShareMenu itemName={row.item} />
     ),
   },

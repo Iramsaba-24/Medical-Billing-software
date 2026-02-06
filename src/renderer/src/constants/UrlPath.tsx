@@ -1,5 +1,4 @@
 
-
 export const URL_PATH = {
   LOGIN: '/login',
   REGISTER: '/register',
@@ -33,5 +32,7 @@ export const URL_PATH = {
   AddInventoryItem: '/inventory/add-inventory-item',
 
   InvoiceSetting: '/settings/invoice',
+   InventorySettings: '/settings/inventory',
 
+   Setting: '/settings',
 };
