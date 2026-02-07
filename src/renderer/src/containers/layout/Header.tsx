@@ -82,7 +82,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
  
  
   return (
-    <List sx={{ px: 1, mt:{ xs:2, md:1}, overflowY:"auto" }}>
+    <List sx={{ px: 1, mt:{ xs:2, md:1} }}>
       {menuItems.map((item) => {
         const active = location.pathname === item.path;
  
@@ -210,7 +210,7 @@ const Header: React.FC = () => {
           mt:3,
           px:4,
           height: "100vh",
-          overflowY: "auto",
+          // overflowY: "auto",
         }}
       >
         <Outlet />

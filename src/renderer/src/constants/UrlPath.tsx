@@ -1,3 +1,4 @@
+import DashboardSettings from "@/containers/setting/DashboardSettings";
 
 
 export const URL_PATH = {
@@ -31,5 +32,7 @@ export const URL_PATH = {
   MedicineGroup: '/inventory/medicine-group',
   AddMedicineGroup: '/inventory/add-medicine-group',
   AddInventoryItem: '/inventory/add-inventory-item',
+
+  DashboardSettings:'/dashboardsettings'
 
 };
