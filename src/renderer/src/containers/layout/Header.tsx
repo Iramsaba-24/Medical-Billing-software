@@ -71,7 +71,7 @@ const menuItems = [
     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
   },
   { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
-  { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.CustomerSettings },
 ];
 
 
@@ -210,7 +210,7 @@ const Header: React.FC = () => {
           mt:3,
           px:4,
           height: "100vh",
-          overflowY: "auto",
+          // overflowY: "auto",
         }}
       >
         <Outlet />
