@@ -39,7 +39,7 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
   ];
 
   return (
-    <Box sx={{ p: { xs: 1, md: 3 }, bgcolor: "#f8f9fa", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#f8f9fa", minHeight: "100vh" }}>
       
       {/* Search and Add Button */}
       <Box sx={{ 

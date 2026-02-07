@@ -1,6 +1,6 @@
  import { Box, Button, Typography, Grid, TextField, MenuItem, IconButton, Divider, Paper } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
-import { ItemRow } from "./AddCustomerForm";
+import { ItemRow } from "@/containers/customer/AddCustomerForm";
 
 // Define what information this component needs from the parent
 interface ItemsSectionProps {
@@ -28,7 +28,7 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
 
   return (
     <Paper 
-      sx={{ p: { xs: 2, md: 3 }, borderRadius: "16px", border: "1px solid #e0e0e0", boxShadow: "0px 3px 6px rgba(0,0,0,0.1)" }} 
+      sx={{ p: { xs: 2, md: 3 }, borderRadius: "7px", border: "1px solid #e0e0e0", boxShadow: "0px 3px 6px rgba(0,0,0,0.1)" }} 
       elevation={0}
     >
       {/* Title and Add Button */}
