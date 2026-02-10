@@ -1,5 +1,3 @@
-import { Settings } from "@mui/icons-material";
-
 
 export const URL_PATH = {
   LOGIN: '/login',
@@ -38,5 +36,14 @@ export const URL_PATH = {
   InventorySettings: '/settings/inventory',
   Setting: '/settings',
   GeneralSettings: '/settings/general',
+
+  RetailInvoice:'/billing/retail-invoice',
+  POSMaster:'/billing/new-invoice',
+  MediPoints:'/billing/medi-points',
+  PaymentMethod:'/billing/payment-method',
+  PaymentDetails:'/billing/payment-details',
+  
+
+
 
 };

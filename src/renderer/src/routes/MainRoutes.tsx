@@ -21,8 +21,9 @@ import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
-import GeneralSettings from '@/containers/Setting/GeneralSettings';
- 
+import GeneralSettings from '@/containers/setting/GeneralSettings';
+import POSMaster from '@/containers/setting/POSMaster';
+
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
@@ -108,8 +109,16 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.DistributorDetails,
         element: <DistributorDetails />,
       },
-       
-     
+      {
+        path: URL_PATH.GeneralSettings,
+        element: <GeneralSettings />,
+      },
+      {
+        path: URL_PATH.POSMaster,
+        element: <POSMaster />,
+      },
+    
+      
     ],
   },
 ];
