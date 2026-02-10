@@ -1,133 +1,175 @@
-import { useState } from "react";
-import { Button, Box, Typography, Paper } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import { v4 as uuid } from "uuid";
-import dayjs from "dayjs";
- 
-import CustomerForm from "@/containers/CustomerPage/CustomerForm";
-import CustomerTable from "@/containers/CustomerPage/CustomerTable";
-import { Customer, CustomerFormData, getAmount } from "@/containers/CustomerPage/CustomerTypes";
-import { showToast } from "@/components/uncontrolled/ToastMessage";
- 
-export default function CustomerMaster() {
-  const [rows, setRows] = useState<Customer[]>([
-    {
-      id: "CUS-001",
-      name: "John Doe",
-      mobile: "9876543210",
-      age: 35,
-      email:'sk@gmail.com',
-      referenceFrom: "Dr. Shyam Raut",
-      address: "123 MG Road, Pune",
-      date: dayjs().subtract(2, "day").toISOString(),
-      items: [{ medicine: "Paracetamol", quantity: 5 }],
-      total: 10,
-    },
-    {
-      id: "CUS-002",
-      name: "Jane Smith",
-      mobile: "9123456789",
-      age: 28,
-      email:'om@gmail.com',
-      referenceFrom: "Dr. Aman Sheikh",
-      address: "45 Park Street, Mumbai",
-      date: dayjs().subtract(1, "day").toISOString(),
-      items: [{ medicine: "Crocin", quantity: 4 }],
-      total: 12,
-    },
-  ]);
- 
-  const [editRow, setEditRow] = useState<Customer | null>(null);
-  const [open, setOpen] = useState(false);
- 
-  const handleSave = (data: CustomerFormData, editId?: string) => {
-    const total = data.items.reduce(
-      (s, i) => s + getAmount(i.medicine, i.quantity),
-      0
-    );
- 
-    const payload = {
-      ...data,
-      date: dayjs().toISOString(),
-      total,
-    };
- 
-    if (editId) {
-      setRows((p) =>
-        p.map((r) => (r.id === editId ? { ...r, ...payload } : r))
-      );
-      showToast("success", "Customer details updated successfully!");
-    } else {
-      setRows((p) => [...p, { id: uuid(), ...payload }]);
-      showToast("success", "Customer details saved successfully!");
-    }
-    setOpen(false);
-    setEditRow(null);
+ import { useState, useEffect } from "react";
+import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import CustomerListPage from "@/containers/customer/CustomerListPage";
+import CustomerViewDetails from "@/containers/customer/CustomerViewDetails";
+
+// Structure for Purchase History 
+export interface PurchaseHistory {
+  [key: string]: string | number | boolean | undefined; 
+  id: string;
+  date: string;
+  medicines: string;
+  totalQty: number;
+  totalPrice: number;
+  doctor: string;
+}
+
+// Structure for Customer Data 
+export interface CustomerData {
+  [key: string]: string | number | boolean | PurchaseHistory[] | undefined;
+  id?: string;
+  name: string;
+  age: string;
+  mobile: string;
+  email?: string;
+  address: string;
+  doctor: string;
+  doctorAddress?: string;
+  date: string;
+  medicines?: string;
+  totalPrice?: number;
+  totalQty?: number;
+  history?: PurchaseHistory[]; 
+}
+
+const CustomerMaster = () => {
+  //  controls which screen to show (list, add form, or details)
+  const [view, setView] = useState<"list" | "add" | "view">("list");
+  
+  //  stores all customers in an array
+  const [customerList, setCustomerList] = useState<CustomerData[]>(() => {
+    // Load saved data from browser storage on start
+    const savedData = localStorage.getItem("medical_customers");
+    return savedData ? (JSON.parse(savedData) as CustomerData[]) : [];
+  });
+
+  //  holds the data of the customer currently being viewed or edited
+  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
+
+  // Auto-save data to localStorage whenever the customer list changes
+  useEffect(() => {
+    localStorage.setItem("medical_customers", JSON.stringify(customerList));
+  }, [customerList]);
+
+  //  Runs when you submit the Add/Edit form
+  const handleSave = (formData: CustomerData, total: number, meds: string, qty: number) => {
+    setCustomerList((prev) => {
+      // Check if customer already exists by mobile number
+      const existingIndex = prev.findIndex((c) => c.mobile === formData.mobile);
+      
+      // Create a new bill entry
+      const newInvoice: PurchaseHistory = {
+        id: `INV-${Date.now()}`,
+        date: formData.date,
+        medicines: meds,
+        totalQty: qty,
+        totalPrice: total,
+        doctor: formData.doctor
+      };
+
+      if (existingIndex > -1) {
+        //  add new bill to their history
+        const updatedList = [...prev];
+        const existingCust = updatedList[existingIndex];
+        updatedList[existingIndex] = {
+          ...existingCust,
+          ...formData,
+          medicines: meds,
+          totalQty: qty,
+          totalPrice: total,
+          history: [newInvoice, ...(existingCust.history || [])] 
+        };
+        return updatedList;
+      } else {
+        // Create brand new customer
+        const newCustomer: CustomerData = { 
+          ...formData, 
+          id: `CUST-${Date.now()}`, 
+          medicines: meds,
+          totalQty: qty,
+          totalPrice: total,
+          history: [newInvoice] 
+        };
+        return [...prev, newCustomer];
+      }
+    });
+    
+    setSelectedCustomer(null);
+    setView("list");
   };
- 
+
+  // Loads a specific bill's data back into the form for editing
+  const handleEditInvoice = (invoice: PurchaseHistory) => {
+    if (!selectedCustomer) return;
+    
+    const editData: CustomerData = {
+      ...selectedCustomer,
+      doctor: invoice.doctor,
+      date: invoice.date,
+      totalPrice: invoice.totalPrice,
+      totalQty: invoice.totalQty,
+      medicines: invoice.medicines,
+    };
+    
+    setSelectedCustomer(editData);
+    setView("add"); // Open the form screen
+  };
+
+  //  Removes a customer entirely from the list
+  const handleDeleteCustomer = (cust: CustomerData) => {
+    if (window.confirm("Are you sure you want to delete this customer?")) {
+      setCustomerList((prev) => prev.filter((item) => item.mobile !== cust.mobile));
+    }
+  };
+
+  //  Removes a single bill from a customer's history
+  const handleDeleteInvoice = (invoice: PurchaseHistory) => {
+    if (!selectedCustomer) return;
+    
+    if (window.confirm("Delete this bill from customer's history?")) {
+      setCustomerList((prev) => {
+        return prev.map((cust) => {
+          if (cust.mobile === selectedCustomer.mobile) {
+            const updatedHistory = cust.history?.filter((inv) => inv.id !== invoice.id) || [];
+            // Refresh the current view screen data
+            setSelectedCustomer({ ...cust, history: updatedHistory });
+            return { ...cust, history: updatedHistory };
+          }
+          return cust;
+        });
+      });
+    }
+  };
+
   return (
     <>
-      {/* Header */}
-      <Paper
-     
-        sx={{
-          borderRadius: 2,
-          p: { xs: 0, sm: 2 },
-         
-          // minHeight: "100vh",
-        }}
-        elevation={12}
-      >
-        <Box
-          display="flex"
-          flexDirection={{ xs: "column", sm: "row" }}
-          justifyContent={{ xs: "center", sm: "space-between" }}
-          mb={2}
-        >
-          <Typography
-            sx={{ fontSize: { xs: 22, sm: 25, md: 30 } }}
-            fontWeight={600}
-            alignSelf="center"
-          >
-            Customers Details
-          </Typography>
- 
-          <Button
-            variant="contained"
-            sx={{ bgcolor: "#0ca678", width: 180, alignSelf: "center", my: 1 }}
-            startIcon={<AddIcon />}
-            onClick={() => {
-              setEditRow(null);
-              setOpen(true);
-            }}
-          >
-            Add Customer
-          </Button>
-        </Box>
- 
-        {/* Table */}
-        <CustomerTable
-          rows={rows}
-          setRows={setRows}
-          onEdit={(row) => {
-            setEditRow(row);
-            setOpen(true);
-          }}
+      {/*  Shows the table of all customers */}
+      {view === "list" && (
+        <CustomerListPage 
+          data={customerList} 
+          onAdd={() => { setSelectedCustomer(null); setView("add"); }} 
+          onView={(cust) => { setSelectedCustomer(cust); setView("view"); }} 
+          onEdit={(cust) => { setSelectedCustomer(cust); setView("add"); }}
+          onDelete={handleDeleteCustomer}
         />
-      </Paper>
- 
-      {/* Form */}
-      <CustomerForm
-        open={open}
-        editRow={editRow}
-        customers={rows}
-        onClose={() => {
-          setOpen(false);
-          setEditRow(null);
-        }}
-        onSave={handleSave}
-      />
+      )}
+
+      {/*  Shows the form to enter details */}
+      {view === "add" && (
+        <AddCustomerForm  onBack={() => setView("list")}  onSave={handleSave}  initialData={selectedCustomer}  />
+      )}
+
+      {/* Shows specific customer info and their bill history */}
+      {view === "view" && selectedCustomer && (
+        <CustomerViewDetails 
+          customer={selectedCustomer} 
+          onBack={() => setView("list")} 
+          onDeleteInvoice={handleDeleteInvoice}
+          onEditInvoice={handleEditInvoice} 
+        />
+      )}
     </>
   );
-}
- 
+};
+
+export default CustomerMaster;

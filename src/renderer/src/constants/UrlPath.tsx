@@ -20,8 +20,8 @@ export const URL_PATH = {
   CreateInvoice: '/create-invoice',
   InvoiceView: '/invoice-view',
   DistributorsTable:'/table',
-  DistributorsSetting: '/distributors-setting',
-  ReportSettings: '/report-settings',
+  DistributorsSetting: '/settings/distributors-setting',
+  ReportSettings: '/settings/report-settings',
   
 
   ReportPage: '/report',
@@ -39,4 +39,8 @@ export const URL_PATH = {
   Setting: "/settings",
  
 
+  InvoiceSetting: '/settings/invoive',
+   InventorySettings: '/settings/inventory',
+
+   
 };

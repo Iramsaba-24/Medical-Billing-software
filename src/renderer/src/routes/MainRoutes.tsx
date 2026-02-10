@@ -4,7 +4,6 @@ import { URL_PATH } from '@/constants/UrlPath';
 import Invoices from '@/view/Invoices'
 import CreateInvoice from '@/containers/Invoices/CreateInvoice';
 import InvoiceView from '@/containers/Invoices/InvoiceView';
-
 import Inventory from '@/view/Inventory';
 import InventoryList from '@/containers/inventory/InvetoryList';
 import MedicineGroup from '@/containers/inventory/MedicineGroup';
@@ -18,13 +17,16 @@ import DoctorTable from '@/view/Doctors';
 import AddDoctor from '@/containers/doctors/AddDoctor';
 import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
-import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
 import DistributorsSetting from '@/containers/setting/DistributorsSetting';
 import ReportSettings from '@/containers/setting/ReportSettings';
 import Setting from '@/containers/layout/Setting';
+import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+import InventorySettings from '@/containers/setting/InventorySettings';
+import InvoiveSetting from '@/containers/setting/InvoiveSetting';
 
  
 export const mainRoutes: RouteObject[] = [
@@ -66,8 +68,6 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
       },
-      
-      
       {
         path: URL_PATH.Inventory,
         element: <Inventory />
@@ -96,20 +96,19 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AddInventoryItem,
         element: <AddInventoryItem/>
       },
-       { 
-         path: URL_PATH.DistributorsPage, 
-         element: <DistributorsPage /> 
-       },
-       { 
-         path: URL_PATH.DistributorsForm,
-         element: <DistributorsForm /> 
-       },
-       { 
-          path: URL_PATH.DistributorDetails ,
-          element: <DistributorDetails /> 
-        },
-
-       {
+      { 
+        path: URL_PATH.DistributorsPage, 
+        element: <DistributorsPage /> 
+      },
+      { 
+        path: URL_PATH.DistributorsForm,
+        element: <DistributorsForm /> 
+      },
+      { 
+        path: URL_PATH.DistributorDetails,
+        element: <DistributorDetails /> 
+      },
+      {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,
       },
@@ -120,6 +119,14 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.ReportSettings,
         element: <ReportSettings />,
+      },
+      {
+        path: URL_PATH.InventorySettings,
+        element: <InventorySettings />,
+      },
+      {
+        path: URL_PATH.InvoiceSetting,
+        element: <InvoiveSetting />,
       },
       {
         path: URL_PATH.Setting,

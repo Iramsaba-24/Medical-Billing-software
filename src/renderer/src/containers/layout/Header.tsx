@@ -32,9 +32,9 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
 }));
  
-const DrawerHeader = styled('div')(({ theme }) => ({
-  ...theme.mixins.toolbar,
-}));
+ const DrawerHeader = styled('div')(({ theme }) => ({
+   ...theme.mixins.toolbar,
+ }));
  
 const SearchBox = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -65,7 +65,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
   const settingRef = React.useRef<SettingRef>(null);
  
   return (
-    <List sx={{ px: 1, mt: { xs: 2, md: 1 }, overflowY: "auto" }}>
+    <List sx={{ px: 1, mt: { xs: 2, md: 1 } }}>
       {menuItems.map((item) => {
         const active = location.pathname === item.path;
         const isSettings = item.text === 'Settings';
@@ -154,19 +154,19 @@ const Header: React.FC = () => {
             width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
             boxSizing: 'border-box',
-            overflowX: 'hidden',
+            //  overflowX: 'hidden',
           },
         }}
       >
         <DrawerHeader />
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
-      <Box component="main" sx={{ flex: 1, bgcolor: "#f8f9fa", py: { xs: 9, md: 8 }, mt: 3, px: 4, height: "100vh", overflowY: "auto" }}>
+      <Box component="main" sx={{ flex: 1, bgcolor: "#f8f9fa", py: { xs: 9, md: 8 }, mt: 3, px: 4, height: "100vh" }}>
         <Outlet />
       </Box>
     </Box>
   );
-};
+ };
  
 export default Header;
  
