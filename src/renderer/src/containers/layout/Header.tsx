@@ -84,7 +84,7 @@ import Setting, { SettingRef } from './Setting';
  
  
    return (
-     <List sx={{ px: 1, mt:{ xs:2, md:1}, overflowY:"auto" }}>
+     <List sx={{ px: 1, mt:{ xs:2, md:1},  }}>
        {menuItems.map((item) => {
          const active = location.pathname === item.path;
             const isSettings = item.text === 'Settings';
@@ -220,7 +220,7 @@ import Setting, { SettingRef } from './Setting';
            mt:3,
            px:4,
            height: "100vh",
-           overflowY: "auto",
+          //  overflowY: "auto",
          }}
        >
          <Outlet />
