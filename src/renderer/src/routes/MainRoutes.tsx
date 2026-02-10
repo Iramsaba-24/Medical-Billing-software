@@ -22,7 +22,7 @@ import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
 import GeneralSettings from '@/containers/setting/GeneralSettings';
-import POSMaster from '@/containers/setting/POSMaster';
+import Billing from '@/view/Billing';
 
 export const mainRoutes: RouteObject[] = [
   {
@@ -63,8 +63,6 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
       },
-      
-      
       {
         path: URL_PATH.Inventory,
         element: <Inventory />
@@ -114,8 +112,8 @@ export const mainRoutes: RouteObject[] = [
         element: <GeneralSettings />,
       },
       {
-        path: URL_PATH.POSMaster,
-        element: <POSMaster />,
+        path: URL_PATH.Billing,
+        element: <Billing />,
       },
     
       

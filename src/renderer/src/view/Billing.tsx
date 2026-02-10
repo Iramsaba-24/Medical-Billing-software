@@ -5,7 +5,7 @@ import TextInputField from '@/components/controlled/TextInputField';
 import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DropdownField from '@/components/controlled/DropdownField';
-import ItemsSection from '../Customer/ItemsSection';
+import ItemsSection from '../containers/customer/ItemsSection';
 import NumericField from '@/components/controlled/NumericField';
 import { useNavigate, useLocation, useParams} from "react-router-dom";
 import { Print } from "@mui/icons-material";
@@ -115,7 +115,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
         {/* New Invoice */}
         <Button
           onClick={() => {setActiveTab("new");                                                        //active tab value new 
-            if (location.pathname !== URL_PATH.POSMaster) { navigate(URL_PATH.POSMaster);}}}                   
+            if (location.pathname !== URL_PATH.Billing) { navigate(URL_PATH.Billing);}}}                   
           sx={{
             textTransform: "none",       //capital none
             px: { xs: 2, sm: 3 },
@@ -175,7 +175,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                                   fontSize: { xs: '12px', md: '14px' },
                                 }}
                                 onClick={() => {
-                                navigate(`${URL_PATH.POSMaster}/invoice${invoiceNumber}`);}}>
+                                navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);}}>
                                
                                 Invoice {invoiceNumber}
                               </Button>

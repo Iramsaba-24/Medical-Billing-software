@@ -38,7 +38,7 @@ export const URL_PATH = {
   GeneralSettings: '/settings/general',
 
   RetailInvoice:'/billing/retail-invoice',
-  POSMaster:'/billing/new-invoice',
+  Billing:'/billing/new-invoice',
   MediPoints:'/billing/medi-points',
   PaymentMethod:'/billing/payment-method',
   PaymentDetails:'/billing/payment-details',
