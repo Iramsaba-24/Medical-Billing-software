@@ -98,7 +98,7 @@ const handlePrint = () => {
       <Box 
         component="form" 
         onSubmit={methods.handleSubmit(d => onSave(d, finalTotal, rows.map(r => r.name).join(", "), rows.length))} 
-        sx={{ p: { xs: 1.5, md: 3 }, bgcolor: "#f5f5f5", minHeight: "100vh" }}
+        sx={{  bgcolor: "#f5f5f5", minHeight: "100vh" }}
       >
 
         {/* Top Header Section */}
@@ -110,7 +110,7 @@ const handlePrint = () => {
         </Box>
 
         {/*  Search, Customer and Doctor Details */}
-        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3, borderRadius: "16px", border: "1px solid #e0e0e0" }} elevation={0}>
+        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3, borderRadius: "7px", border: "1px solid #e0e0e0" }} elevation={0}>
           <Grid container spacing={3}>
             
             {/*  To find and auto-fill existing customer data */}
@@ -170,7 +170,7 @@ const handlePrint = () => {
             Pay Now
           </Button>
           <Button variant="contained" type="submit" startIcon={<Save />} sx={btnStyle}>
-            Save Invoice
+            Save 
           </Button>
         </Box>
       </Box>
