@@ -41,7 +41,7 @@ const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
     { text: 'Distributors Settings', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DistributorsSetting },
     { text: 'Inventory Settings', icon: <InventoryIcon fontSize="small" />, path: URL_PATH.InventorySettings },
     { text: 'Invoice Settings', icon: <DescriptionIcon fontSize="small" />, path: URL_PATH.InvoiceSetting },
-    { text: 'Reports', icon: <AssessmentIcon fontSize="small" />, path: URL_PATH.ReportSettings },
+    { text: 'Report Settings', icon: <AssessmentIcon fontSize="small" />, path: URL_PATH.ReportSettings },
   ];
 
 

@@ -25,11 +25,13 @@ import DistributorsSetting from '@/containers/setting/DistributorsSetting';
 import ReportSettings from '@/containers/setting/ReportSettings';
 import Setting from '@/containers/layout/Setting';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+
+
 import InventorySettings from '@/containers/setting/InventorySettings';
+import Billing from '@/view/Invoices';
 import InvoiveSetting from '@/containers/setting/InvoiveSetting';
 // import LOGIN from '@/view/auth/LoginPage';
 
- 
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
@@ -125,11 +127,20 @@ export const mainRoutes: RouteObject[] = [
         element: <ReportSettings />,
       },
       {
+        path: URL_PATH.Billing,
+        element: <Billing />,
+      },
+      {
+        path: `${URL_PATH.Billing}/:invoiceNo`,
+        element: <Billing />,
+      },
+      
+      {
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,
       },
       {
-        path: URL_PATH.InvoiceSetting,
+        path: URL_PATH.InvoiveSetting,
         element: <InvoiveSetting />,
       },
       {

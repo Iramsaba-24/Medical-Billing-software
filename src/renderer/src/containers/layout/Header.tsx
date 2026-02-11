@@ -19,7 +19,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
 import { Home } from '@mui/icons-material';
- 
+  import PaymentsIcon from '@mui/icons-material/Payments';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
 import Setting, { SettingRef } from './Setting';
@@ -50,6 +50,7 @@ const SearchBox = styled(Box)(({ theme }) => ({
  
 const menuItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { text: 'Billing', icon: <PaymentsIcon />, path: URL_PATH.Billing },
   { text: 'Customers', icon: <PeopleIcon />, path: URL_PATH.Customer },
   { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
   { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage },
