@@ -28,7 +28,7 @@ const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice 
   const invoiceData: PurchaseHistory[] = customer.history || [];
 
   return (
-    <Box sx={{ p: { xs: 1, md: 3 }, bgcolor: "#f8f9fa", minHeight: "100vh" }}>
+    <Box sx={{  bgcolor: "#f8f9fa", minHeight: "100vh" }}>
       
       {/*  Back button to return to the list page */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>

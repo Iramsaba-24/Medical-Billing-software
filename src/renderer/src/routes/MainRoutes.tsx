@@ -17,11 +17,17 @@ import DoctorTable from '@/view/Doctors';
 import AddDoctor from '@/containers/doctors/AddDoctor';
 import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
-import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
-import PharmacyProfile from '@/containers/settings/PharmacyProfile';
+import PharmacyProfile from '@/containers/setting/PharmacyProfile';
+import Setting from '@/containers/layout/Setting';
+
+import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+import InventorySettings from '@/containers/setting/InventorySettings';
+import InvoiceSettings from '@/containers/setting/InvoiveSetting';
+import POS2 from '@/containers/setting/POS2';
 
 export const mainRoutes: RouteObject[] = [
   {
@@ -62,8 +68,6 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
       },
-      
-      
       {
         path: URL_PATH.Inventory,
         element: <Inventory />
@@ -108,11 +112,29 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.DistributorDetails,
         element: <DistributorDetails />,
       },
+      {
+        path: URL_PATH.InvoiceSetting,
+        element: <InvoiceSettings/>,
+      },
+      {
+        path: URL_PATH.InventorySettings,
+        element: <InventorySettings />,
+      },
+      {
+        path: URL_PATH.Setting,
+        element: <Setting />,
+      },
      
      {
   path: URL_PATH.PharmacyProfile,
   element: <PharmacyProfile/>,
 },
+ {
+        path: URL_PATH.POS2,
+        element: <POS2 />,
+      },
+     
+
 
     ],
   },

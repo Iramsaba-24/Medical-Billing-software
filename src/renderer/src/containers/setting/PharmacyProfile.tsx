@@ -136,7 +136,8 @@ function PharmacyProfile() {
                     placeholder="DL-KA-2023-001245"
                     required
                     maxlength={15}
-                    max={1000}
+                    max={100000000}
+                     
                   />
                 </Stack>
               </Grid>
@@ -249,6 +250,9 @@ function PharmacyProfile() {
                       sx={{ mt: 8 }}
                       required
                       maxlength={14}
+                      inputProps={{ max: Infinity }}
+                      //  max={50000000000000000000000000000000000}
+
                     />
                   </Box>
                 </Stack>
@@ -297,6 +301,9 @@ function PharmacyProfile() {
                     placeholder="12345678912"
                     required
                     maxlength={18}
+                    // inputProps={{ max: Infinity }}
+
+                    max={50000000000000000000000000000000000}
                   />
                 </Stack>
               </Grid>

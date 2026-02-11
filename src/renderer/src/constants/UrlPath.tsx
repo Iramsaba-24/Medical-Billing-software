@@ -34,6 +34,14 @@ export const URL_PATH = {
   AddInventoryItem: '/inventory/add-inventory-item',
 
 
-PharmacyProfile :'/PharmacyProfile',
+   InvoiceSetting: '/settings/invoice',
+   InventorySettings: '/settings/inventory',
+    Setting: '/settings',
+ 
+ 
+
+
+PharmacyProfile :'/settings/pharmacy-profile',
+POS2:'/settings/POS2',
 
 };
