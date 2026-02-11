@@ -67,7 +67,7 @@ function POSMaster() {
     setRows([{               // items reset
       id: Date.now(),
       name: "",
-      qty: "",
+      qty: 1,
       price: ""
     }]);
   }, [invoiceNo]);    // when url change with invoice number
@@ -94,7 +94,7 @@ function POSMaster() {
   price: number | "";
 };
 
- const [rows, setRows] = useState<ItemRow[]>([ { id: Date.now(), name: "", qty: "", price: "" }]);
+ const [rows, setRows] = useState<ItemRow[]>([ { id: Date.now(), name: "", qty: 1, price: "" }]);
     //  rows for current setrows for updated
 
 
@@ -118,7 +118,8 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
             if (location.pathname !== URL_PATH.Billing) { navigate(URL_PATH.Billing);}}}                   
           sx={{
             textTransform: "none",       //capital none
-            px: { xs: 2, sm: 3 },
+            // px: { xs: 7.5, sm: 3 },
+            width: { xs: "50%", md: "10%" },
             height: "38px",
             fontWeight: 500,
             borderRadius: "0px 18px 0px 0px",
@@ -138,7 +139,8 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
              if (location.pathname !== URL_PATH.RetailInvoice) { navigate(URL_PATH.RetailInvoice); }}}
             sx={{
               textTransform: "none",
-              px: { xs: 2, sm: 3 },
+              // px: { xs: 7.5, sm: 3 },
+              width: { xs: "50%", md: "10%" },
               height: "38px",
               fontWeight: 500,
               borderRadius: "0px 18px 0px 0px",
@@ -200,7 +202,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   <TextInputField
                     name="name"
                     label="Name"
-                    size="small"
+                    
                     required
                     inputType="alphabet"
                   />
@@ -210,7 +212,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   <NumericField
                     name="age"
                     label="Age"
-                    size="small"
+                    
                   />
                 </Box>
               </Box>
@@ -220,7 +222,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   <MobileField
                     name="mobile"
                     label="Mobile Number"
-                    size="small"
+                   
                     required
                   />
                 </Box>
@@ -229,7 +231,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   <EmailField
                     name="email"
                     label="Email"
-                    size="small"
+                   
                   />
                 </Box>
               </Box>
@@ -240,14 +242,14 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   name="addressLeft"
                   label="Address"
                   inputType="textarea"
-                  size="small"
+                  
                   rows={3}/>
               </Box>
 
             </Box>
 
             {/* right */}
-            <Box flex={1} display="flex" flexDirection="column"  gap={{ xs: 2, md: 0.5 }}>
+            <Box flex={1} display="flex" flexDirection="column"  gap={{ xs: 2, md: 1.5 }}>
               
               <Box width={{ xs: '100%', sm: '260px' }}>
                 <DropdownField
@@ -257,7 +259,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   required
                   options={doctorOptions}
                   freeSolo={false}
-                  floatLabel
+                  placeholder='Doctor'
                 />
               </Box>
 
@@ -265,7 +267,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                 <TextInputField
                   name="reference"
                   label="New Reference"
-                  size="small"
+                 
                 />
               </Box>
 
@@ -274,7 +276,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   name="addressRight"
                   label="Address"
                   inputType="textarea"
-                  size="small"
+                  
                   rows={3}
                 />
               </Box>
