@@ -28,7 +28,7 @@ import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 import DashboardSettings from '@/containers/setting/DashboardSettings';
 import InventorySettings from '@/containers/setting/InventorySettings';
 import InvoiceSettings from '@/containers/setting/InvoiveSetting';
-import MediPoints from '@/containers/setting/MediPoints';
+import MediPoints from '@/containers/billing/MediPoints';
  
  
 export const mainRoutes: RouteObject[] = [
