@@ -24,7 +24,9 @@ import CustomerSettings from '@/containers/setting/CustomerSettings';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 import InvoiceSettings from '@/containers/setting/InvoiceSetting';
 import InventorySettings from '@/containers/setting/InventorySettings';
-import PaymentMethod from '@/containers/setting/PaymentMethod';
+import PaymentMethod from '@/containers/billing/PaymentMethod';
+import MediPoints from '@/containers/billing/MediPoints';
+import Billing from '@/view/Billing';
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -34,8 +36,8 @@ export const mainRoutes: RouteObject[] = [
         index: true,
         element: <Landing />,
       },
-
-      {path: URL_PATH.Dashboard, 
+ 
+      {path: URL_PATH.Dashboard,
         element: <Dashboard />},
       {
         path: URL_PATH.Invoices,
@@ -93,13 +95,17 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AddInventoryItem,
         element: <AddInventoryItem/>
       },
-      { 
-        path: URL_PATH.DistributorsPage, 
-        element: <DistributorsPage /> 
+      {
+        path: URL_PATH.DistributorsPage,
+        element: <DistributorsPage />
       },
-      { 
+      {
         path: URL_PATH.DistributorsForm,
-        element: <DistributorsForm /> 
+        element: <DistributorsForm />
+      },
+      {
+        path: URL_PATH.DistributorDetails,
+        element: <DistributorDetails />
       },
       {
         path: URL_PATH.ReportPage,
@@ -121,12 +127,31 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,
       },
+
       {
+        path: URL_PATH.MediPoints,
+        element: <MediPoints/>,
+      },
+ 
+     {
         path: URL_PATH.Billing,
+        element: <Billing />,
+      },
+      {
+        path: `${URL_PATH.Billing}/:invoiceNo`,
+        element: <Billing />,
+      },
+           {
+        path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
-      }
+      },
+
+ 
+ 
+ 
      
     ],
   },
 ];
+ 
  

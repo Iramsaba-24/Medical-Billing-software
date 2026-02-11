@@ -29,4 +29,3 @@ const SwitchToggle = ({name}: SwitchToggleProps) => {  //which fields i have to 
 };
 
 export default SwitchToggle;
-
