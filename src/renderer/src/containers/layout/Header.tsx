@@ -215,7 +215,7 @@ import Setting, { SettingRef } from './Setting';
            bgcolor: "#f8f9fa",
            py: { xs:9, md:8 },
            mt:3,
-           px:4,
+           px:{xs:1, sm:3, md:5},
            height: "100vh",
            overflowY: "auto",
          }}

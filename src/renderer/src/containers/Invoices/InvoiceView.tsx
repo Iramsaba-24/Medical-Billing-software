@@ -54,6 +54,13 @@ const InvoiceView = () => {
     }
   }, [invoice, invoiceNo, navigate]);
   
+  const subTotal = invoice?.medicines?.reduce(
+  (sum, med) => sum + Number(med.amount), 0 ) || 0;
+
+const gstAmount = (subTotal * 12) / 100; 
+const discount = 0; 
+const netTotal = subTotal + gstAmount - discount;
+
 return (
     <>
     {/* print */}
@@ -183,7 +190,7 @@ return (
         <strong>Sub Total</strong>
       </TableCell>
       <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">
-        ₹ 193
+        ₹ {subTotal.toFixed(2)}
       </TableCell>
     </TableRow>
 
@@ -203,7 +210,7 @@ return (
           <strong>GST 12%</strong>        
       </TableCell>
       <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">
-        ₹ 193
+        ₹ {gstAmount.toFixed(2)}
       </TableCell>
     </TableRow>
 
@@ -236,7 +243,7 @@ return (
   </TableCell>
 
   <TableCell sx={{pl: {xs:1, md:2}}}>
-  <Typography fontWeight={600}>₹ 1933</Typography> 
+  <Typography fontWeight={600}>₹ {netTotal.toFixed(2)}</Typography> 
   </TableCell>
 </TableRow>
 

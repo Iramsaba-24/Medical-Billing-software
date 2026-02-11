@@ -64,6 +64,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     "&:hover": { bgcolor: "#fff", color: "#248a76", borderColor: "#248a76" } 
   };
 
+
+// print  
 const handlePrint = () => {
   const invoiceData: Invoice = {
     patient: methods.getValues("name"),

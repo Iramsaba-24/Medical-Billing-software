@@ -1,6 +1,7 @@
 import { Box, Button, Container, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg"
+import { URL_PATH } from "@/constants/UrlPath";
 
 // default data
 const User = {
@@ -68,8 +69,8 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/add-customer")}>
-            New Customer
+           onClick={()=> navigate("/new-invoice")}>
+            New Invoice
           </Button>
 
           <Button variant="contained"
@@ -83,7 +84,7 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/add-distributor")}>
+           onClick={()=> navigate(URL_PATH.DistributorsForm)}>
             New Distributor
           </Button>
 
@@ -98,7 +99,7 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/inventory/add-inventory-item")}>
+           onClick={()=> navigate(URL_PATH.AddInventoryItem)}>
             New Inventory
           </Button>
          </Box>
@@ -131,3 +132,6 @@ const LandingPage = () => {
 }
 
 export default LandingPage
+
+ 
+ 

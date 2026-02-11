@@ -20,7 +20,7 @@ export const URL_PATH = {
   ReportPage: '/report',
   DistributorsPage: "/distributors",
   DistributorsForm: "/distributors/add",
-   DistributorDetails: "/distributor-details",  
+  DistributorDetails: "/distributor-details",  
   
   
   Inventory: '/inventory',
