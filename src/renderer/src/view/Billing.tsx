@@ -47,7 +47,7 @@ const doctorOptions = [
 ];
 
 function POSMaster() {
-  const { invoiceNo } = useParams();
+  useParams();
   const navigate = useNavigate();
   const methods = useForm<NewInvoiceFormValues>({
     defaultValues: {
@@ -70,7 +70,7 @@ function POSMaster() {
       qty: 1,
       price: ""
     }]);
-  }, [invoiceNo]);    // when url change with invoice number
+  }, [methods]);    // when url change with invoice number
 
  
 
