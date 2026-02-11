@@ -1,3 +1,4 @@
+
 export const URL_PATH = {
   LOGIN: '/login',
   REGISTER: '/register',
@@ -6,7 +7,9 @@ export const URL_PATH = {
   Dashboard: '/dashboard',
   Customer:'/customers',
 
-  SalesBilling: '/sales-billing',
+  Doctors: '/doctors',
+  AddDoctor: '/add-doctor',
+  DoctorsDetail: '/doctor-details/:id',
 
   Invoices: '/invoice',
 
@@ -15,16 +18,21 @@ export const URL_PATH = {
   InvoiceView: '/invoice-view',
   DistributorsTable:'/table',
 
-  
-
   ReportPage: '/report',
   DistributorsPage: "/distributors",
   DistributorsForm: "/distributors/add",
+   DistributorDetails: "/distributor-details",  
+  
   
   Inventory: '/inventory',
   InventoryList: '/inventory/inventory-list',
+  Reorder: '/inventory/reorder',
   MedicineGroup: '/inventory/medicine-group',
   AddMedicineGroup: '/inventory/add-medicine-group',
   AddInventoryItem: '/inventory/add-inventory-item',
 
+  InvoiceSetting: '/settings/invoice',
+   InventorySettings: '/settings/inventory',
+
+   Setting: '/settings',
 };

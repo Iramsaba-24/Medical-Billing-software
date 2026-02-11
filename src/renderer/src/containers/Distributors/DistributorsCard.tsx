@@ -7,7 +7,7 @@ interface DistributorCardsProps {
   totalCount: number;
 }
 
-export default function DistributorCards({ totalCount }: DistributorCardsProps) {
+  function DistributorCards({ totalCount }: DistributorCardsProps) {
   const cardData = [
     { label: "Total Distributors", value: totalCount, img: TotalDistributors },
     { label: "Total Purchase", value: 0, img: TotalPurchase },
@@ -43,3 +43,4 @@ export default function DistributorCards({ totalCount }: DistributorCardsProps) 
     </Box>
   );
 }
+export default DistributorCards;

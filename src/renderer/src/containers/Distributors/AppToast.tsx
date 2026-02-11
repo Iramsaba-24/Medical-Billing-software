@@ -3,11 +3,11 @@
 type AppToastProps = {
   open: boolean;             
   message: string;          
-  severity?: "success" | "error" | "warning" | "info"; 
+  severity?: "success" | "error" | "warning" ; 
   onClose: () => void;      
 };
  
-export default function AppToast({
+  function AppToast({
   open,
   message,
   severity = "success",  
@@ -32,3 +32,4 @@ export default function AppToast({
     </Snackbar>
   );
 }
+export default AppToast;

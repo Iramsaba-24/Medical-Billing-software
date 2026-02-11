@@ -10,9 +10,12 @@ type SearchFieldProps = TextFieldProps & {
   name: string;
   required?: boolean;
   sx?: SxProps<Theme>;
+  placeholder?: string;
+  floatLabel?: boolean;
+
 };
 
-const SearchField: FC<SearchFieldProps> = ({ label, name, sx, required = false, ...rest }) => {
+const SearchField: FC<SearchFieldProps> = ({ label, name, sx, placeholder, floatLabel = false, required = false, ...rest }) => {
   const { t } = useTranslation();
   const trans = getComponentTranslations(t);
   const {
@@ -31,10 +34,11 @@ const SearchField: FC<SearchFieldProps> = ({ label, name, sx, required = false, 
         <TextField
           {...field}
           {...rest}
-          label={label}
+          label={floatLabel ? label : undefined}
           value={field.value || ''}
           fullWidth
           required={required}
+          placeholder={!floatLabel ? placeholder : undefined}
           error={!!errors[name]}
           helperText={String(errors[name]?.message || ' ')}
           onChange={(e) => field.onChange(e.target.value)}
@@ -53,3 +57,6 @@ const SearchField: FC<SearchFieldProps> = ({ label, name, sx, required = false, 
 };
 
 export default SearchField;
+
+
+

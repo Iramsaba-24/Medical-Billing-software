@@ -1,122 +1,32 @@
 import { Box, Paper, Typography, Button, Chip } from "@mui/material";
-import {
-  UniversalTable,
-  Column,
-} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-
 import TotalItems from "@/assets/TotalItems.svg";
-import LowStack from "@/assets/warningsign.svg";
+import LowStock from "@/assets/warningsign.svg";
 import TotalValue from "@/assets/TotalValue.svg";
-
-type InventoryItem = {
-  id: number;
-  item: string;
-  category: "Medicine" | "Supplies";
-  stock: string;
-  price: number;
-  supplier: string;
-  expiryDate: string;
-  status: "In Stock";
-};
-
-const inventoryData: InventoryItem[] = [
-  {
-    id: 1,
-    item: "Paracetamol 500mg",
-    category: "Medicine",
-    stock: "450 Tablets",
-    price: 2,
-    supplier: "MediSupply Co.",
-    expiryDate: "15/08/2026",
-    status: "In Stock",
-  },
-  {
-    id: 2,
-    item: "Amoxicillin",
-    category: "Medicine",
-    stock: "120 Capsules",
-    price: 15,
-    supplier: "PharmaCare Ltd.",
-    expiryDate: "20/12/2026",
-    status: "In Stock",
-  },
-  {
-    id: 3,
-    item: "Insulin Injection",
-    category: "Medicine",
-    stock: "85 Vials",
-    price: 250,
-    supplier: "MediSupply Co.",
-    expiryDate: "30/06/2026",
-    status: "In Stock",
-  },
-  {
-    id: 4,
-    item: "Surgical Gloves",
-    category: "Supplies",
-    stock: "1500 Pairs",
-    price: 5,
-    supplier: "MedEquip Inc.",
-    expiryDate: "01/03/2027",
-    status: "In Stock",
-  },
-  {
-    id: 5,
-    item: "Syringes (5ml)",
-    category: "Supplies",
-    stock: "850 Units",
-    price: 3,
-    supplier: "MedEquip Inc.",
-    expiryDate: "15/01/2027",
-    status: "In Stock",
-  },
-];
-
-const columns: Column<InventoryItem>[] = [
-  { key: "item", label: "Item" },
-  {
-    key: "category",
-    label: "Category",
-    render: (row) => (
-      <Chip
-        label={row.category}
-        size="small"
-        sx={{
-          bgcolor: row.category === "Medicine" ? "#DCFCE7" : "#E0F2FE",
-          color: row.category === "Medicine" ? "#166534" : "#075985",
-          fontWeight: 600,
-        }}
-      />
-    ),
-  },
-  { key: "stock", label: "Stock" },
-  {
-    key: "price",
-    label: "Price",
-    render: (row) => `₹ ${row.price}`,
-  },
-  { key: "supplier", label: "Supplier" },
-  { key: "expiryDate", label: "Expiry Date" },
-  {
-    key: "status",
-    label: "Status",
-    render: () => (
-      <Typography fontSize={13} fontWeight={600} color="success.main">
-        In Stock
-      </Typography>
-    ),
-  },
-];
+import type { InventoryItem } from "@/containers/inventory/AddInventoryItem";
+import InventoryList from "@/containers/inventory/InvetoryList";
 
 export default function InventoryPage() {
   const navigate = useNavigate();
 
-  const totalItems = inventoryData.length;
-  const totalValue = inventoryData.reduce((sum, item) => sum + item.price, 0);
+   const inventory: InventoryItem[] = JSON.parse(
+  localStorage.getItem("inventory") || "[]"
+ );
 
-  return (
+  const totalItems = inventory.length;
+
+  const lowStockItems = inventory.filter(
+  (item) => item.stockQty > 0 && item.stockQty < 10
+  ).length;
+  length;
+
+  const totalValue = inventory.reduce(
+    (sum, item) => sum + item.stockQty * item.pricePerUnit,
+    0
+  );
+
+return (
     <Box>
       <Typography fontSize={20} fontWeight={600} mb={2}>
         Inventory
@@ -130,13 +40,13 @@ export default function InventoryPage() {
       >
         {[
           { label: "Total Items", value: totalItems, img: TotalItems },
-          { label: "Low Stock Items", value: 0, img: LowStack },
+          { label: "Low Stock Items", value: lowStockItems, img: LowStock },
           { label: "Total Value", value: `₹ ${totalValue}`, img: TotalValue },
         ].map((card) => (
           <Paper
             key={card.label}
             sx={{
-              p: 3,
+              p: 2,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -153,7 +63,9 @@ export default function InventoryPage() {
               <Typography fontWeight={600} fontSize={18}>
                 {card.value}
               </Typography>
-              <Typography color="text.secondary">{card.label}</Typography>
+              <Typography color="text.secondary">
+                {card.label}
+              </Typography>
             </Box>
 
             <Box
@@ -164,7 +76,6 @@ export default function InventoryPage() {
           </Paper>
         ))}
       </Box>
-
       <Box
         display="grid"
         gridTemplateColumns={{ xs: "1fr", md: "2fr 1fr" }}
@@ -173,36 +84,29 @@ export default function InventoryPage() {
       >
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" mb={2}>
-            <Typography component="div" fontWeight={600}>
-              Medicine Groups
-              <Chip label="03" size="small" />
+            <Typography fontWeight={600}>
+              Medicine Groups <Chip label="03" size="small" />
             </Typography>
+
             <Button
               size="small"
-              variant="outlined"
-              onClick={() => navigate("/inventory/medicine-group")}
-              sx={{
+              variant="contained"
+              sx={{   
+                px: 2.5,
+                py: 1,
                 minWidth: 100,
                 backgroundColor: "#238878",
                 color: "#fff",
                 border: "2px solid #238878",
-                borderRadius: "10px",
-                fontWeight: 600,
                 fontSize: "0.95rem",
                 textTransform: "none",
-                boxShadow: "0 4px 12px rgba(35, 136, 120, 0.25)",
-                transition: "all 0.25s ease",
                 "&:hover": {
                   backgroundColor: "#fff",
                   color: "#238878",
                   border: "2px solid #238878",
-                  boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-                  transform: "translateY(-1px)",
-                },
-                "&:active": {
-                  transform: "scale(0.98)",
-                },
-              }}
+                }
+             }}
+              onClick={() => navigate("/inventory/medicine-group")}
             >
               View Details
             </Button>
@@ -230,29 +134,20 @@ export default function InventoryPage() {
           <Button
             fullWidth
             sx={{
-              px: 2.5,
-              py: 1,
-              minWidth: 100,
-              backgroundColor: "#238878",
-              color: "#fff",
+            px: 2.5,
+            py: 1,
+            minWidth: 100,
+            backgroundColor: "#238878",
+            color: "#fff",
+            border: "2px solid #238878",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
               border: "2px solid #238878",
-              borderRadius: "10px",
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              textTransform: "none",
-              boxShadow: "0 4px 12px rgba(35, 136, 120, 0.25)",
-              transition: "all 0.25s ease",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-                boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-                transform: "translateY(-1px)",
-              },
-              "&:active": {
-                transform: "scale(0.98)",
-              },
-            }}
+            }
+          }}
             onClick={() => navigate("/inventory/medicine-group")}
           >
             + Add New Medicine
@@ -261,29 +156,20 @@ export default function InventoryPage() {
           <Button
             fullWidth
             sx={{
-              px: 2.5,
-              py: 1,
-              minWidth: 100,
-              backgroundColor: "#238878",
-              color: "#fff",
+            px: 2.5,
+            py: 1,
+            minWidth: 100,
+            backgroundColor: "#238878",
+            color: "#fff",
+            border: "2px solid #238878",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
               border: "2px solid #238878",
-              borderRadius: "10px",
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              textTransform: "none",
-              boxShadow: "0 4px 12px rgba(35, 136, 120, 0.25)",
-              transition: "all 0.25s ease",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-                boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-                transform: "translateY(-1px)",
-              },
-              "&:active": {
-                transform: "scale(0.98)",
-              },
-            }}
+            }
+          }}
             onClick={() => navigate("/inventory/add-medicine-group")}
           >
             + Add New Group
@@ -291,52 +177,51 @@ export default function InventoryPage() {
 
           <Button
             fullWidth
-            sx={{
-              px: 2.5,
-              py: 1,
-              minWidth: 100,
-              backgroundColor: "#238878",
-              color: "#fff",
+           sx={{
+            px: 2.5,
+            py: 1,
+            minWidth: 100,
+            backgroundColor: "#238878",
+            color: "#fff",
+            border: "2px solid #238878",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
               border: "2px solid #238878",
-              borderRadius: "10px",
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              textTransform: "none",
-              boxShadow: "0 4px 12px rgba(35, 136, 120, 0.25)",
-              transition: "all 0.25s ease",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-                boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-                transform: "translateY(-1px)",
-              },
-              "&:active": {
-                transform: "scale(0.98)",
-              },
-            }}
+            }
+          }}
             onClick={() => navigate(URL_PATH.InventoryList)}
           >
             View Inventory List
           </Button>
+
+           <Button
+            fullWidth
+           sx={{
+            px: 2.5,
+            py: 1,
+            minWidth: 100,
+            backgroundColor: "#238878",
+            color: "#fff",
+            border: "2px solid #238878",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
+              border: "2px solid #238878",
+            }
+          }}
+            onClick={() => navigate(URL_PATH.Reorder)}
+          >
+            Reorder Medicines
+          </Button>
         </Box>
       </Box>
 
-      <Paper sx={{ p: 2 }}>
-        <Typography fontWeight={600} mb={2}>
-          Inventory List
-        </Typography>
-
-        <UniversalTable<InventoryItem>
-          data={inventoryData}
-          columns={columns}
-          enableCheckbox
-          showSearch
-          rowsPerPage={5}
-          getRowId={(row) => row.id}
-          caption={undefined}
-        />
-      </Paper>
+      <InventoryList />
     </Box>
   );
 }

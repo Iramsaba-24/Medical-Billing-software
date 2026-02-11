@@ -1,143 +1,121 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Card,
-  Typography,
-  Divider,
-} from '@mui/material';
-import { FormProvider, useForm } from 'react-hook-form';
-import DropdownField from '@/components/controlled/DropdownField';
+import React, { useState } from "react";
+import { Box, Card, Typography, Divider } from "@mui/material";
+import { FormProvider, useForm } from "react-hook-form";
+import DropdownField from "@/components/controlled/DropdownField";
 
-type FilterType = 'Today' | '6 Days' | 'This Month';
+type FilterType = "Today" | "6 Days" | "This Month";
 
 interface CardInfo {
   title: string;
-  data: Record<
-    FilterType,
-    {
-      leftValue: string;
-      leftLabel: string;
-      rightValue: string;
-      rightLabel: string;
-    }
+  data: Partial<
+    Record<
+      FilterType,
+      {
+        leftValue?: string;
+        leftLabel?: string;
+        rightValue?: string;
+        rightLabel?: string;
+      }
+    >
   >;
 }
 
 const cardsConfig: CardInfo[] = [
   {
-    title: 'Inventory',
+    title: "Inventory",
     data: {
       Today: {
-        leftValue: '290',
-        leftLabel: 'Total no of Medicines',
-        rightValue: '22',
-        rightLabel: 'Medicines Group',
+        leftValue: "290",
+        leftLabel: "Total no of Medicines",
+        rightValue: "22",
+        rightLabel: "Medicines Group",
       },
-      '6 Days': {
-        leftValue: '295',
-        leftLabel: 'Total no of Medicines',
-        rightValue: '23',
-        rightLabel: 'Medicines Group',
+      "6 Days": {
+        leftValue: "295",
+        leftLabel: "Total no of Medicines",
+        rightValue: "23",
+        rightLabel: "Medicines Group",
       },
-      'This Month': {
-        leftValue: '298',
-        leftLabel: 'Total no of Medicines',
-        rightValue: '24',
-        rightLabel: 'Medicines Group',
+      "This Month": {
+        leftValue: "298",
+        leftLabel: "Total no of Medicines",
+        rightValue: "24",
+        rightLabel: "Medicines Group",
       },
     },
   },
   {
-    title: 'Quick Report',
+    title: "Top Selling Medicine",
     data: {
       Today: {
-        leftValue: '5,200',
-        leftLabel: 'Qty of Medicines Sold',
-        rightValue: '410',
-        rightLabel: 'Invoices Generated',
+        leftValue: "Paracetamol 500mg",
+        leftLabel: "Frequently bought Item",
       },
-      '6 Days': {
-        leftValue: '32,500',
-        leftLabel: 'Qty of Medicines Sold',
-        rightValue: '2,180',
-        rightLabel: 'Invoices Generated',
+      "6 Days": {
+        leftValue: "Vitamin C",
+        leftLabel: "Frequently bought Item",
       },
-      'This Month': {
-        leftValue: '70,856',
-        leftLabel: 'Qty of Medicines Sold',
-        rightValue: '5,288',
-        rightLabel: 'Invoices Generated',
+      "This Month": {
+        leftValue: "Paracetamol 500mg",
+        leftLabel: "Frequently bought Item",
       },
     },
   },
   {
-    title: 'My Pharmacy',
+    title: "Daily Report",
     data: {
       Today: {
-        leftValue: '03',
-        leftLabel: 'Total no of Suppliers',
-        rightValue: '04',
-        rightLabel: 'Total no of Users',
+        leftValue: "₹ 3,125",
+        leftLabel: "Today's Sale",
+        rightValue: "₹ 6,123",
+        rightLabel: "Today's Purchase",
       },
-      '6 Days': {
-        leftValue: '04',
-        leftLabel: 'Total no of Suppliers',
-        rightValue: '05',
-        rightLabel: 'Total no of Users',
+      "6 Days": {
+        leftValue: "₹ 18,450",
+        leftLabel: "Sales (6 Days)",
+        rightValue: "₹ 25,300",
+        rightLabel: "Purchase (6 Days)",
       },
-      'This Month': {
-        leftValue: '04',
-        leftLabel: 'Total no of Suppliers',
-        rightValue: '05',
-        rightLabel: 'Total no of Users',
-      },
-    },
-  },
-  {
-    title: 'Customers',
-    data: {
-      Today: {
-        leftValue: '120',
-        leftLabel: 'Total no of Customers',
-        rightValue: 'Paracetamol 500mg',
-        rightLabel: 'Frequently bought Item',
-      },
-      '6 Days': {
-        leftValue: '560',
-        leftLabel: 'Total no of Customers',
-        rightValue: 'Vitamin C',
-        rightLabel: 'Frequently bought Item',
-      },
-      'This Month': {
-        leftValue: '845',
-        leftLabel: 'Total no of Customers',
-        rightValue: 'Paracetamol 500mg',
-        rightLabel: 'Frequently bought Item',
+      "This Month": {
+        leftValue: "₹ 78,560",
+        leftLabel: "Monthly Sales",
+        rightValue: "₹ 92,340",
+        rightLabel: "Monthly Purchase",
       },
     },
   },
 ];
 
 const filterOptions = [
-  { label: 'Today', value: 'Today' },
-  { label: '6 Days', value: '6 Days' },
-  { label: 'This Month', value: 'This Month' },
+  { label: "Today", value: "Today" },
+  { label: "6 Days", value: "6 Days" },
+  { label: "This Month", value: "This Month" },
 ];
+
+const getGridArea = (title: string) => {
+  switch (title) {
+    case "Inventory":
+      return "inventory";
+    case "Top Selling Medicine":
+      return "top";
+    case "Daily Report":
+      return "daily";
+    default:
+      return "auto";
+  }
+};
 
 const Cards: React.FC = () => {
   const [filters, setFilters] = useState<Record<number, FilterType>>({
-    0: 'This Month',
-    1: 'This Month',
-    2: 'This Month',
-    3: 'This Month',
+    0: "This Month",
+    1: "This Month",
+    2: "This Month",
   });
 
-  // Create separate form methods for each card with correct types
   const methodsArray = [
-    useForm<{ filter: string }>({ defaultValues: { filter: 'This Month' } }),
-    useForm<{ filter: string }>({ defaultValues: { filter: 'This Month' } }),
-    useForm<{ filter: string }>({ defaultValues: { filter: 'This Month' } }),
-    useForm<{ filter: string }>({ defaultValues: { filter: 'This Month' } }),
+    useForm({ defaultValues: { filter: "This Month" } }),
+    useForm({ defaultValues: { filter: "This Month" } }),
+    useForm({ defaultValues: { filter: "This Month" } }),
   ];
 
   const handleFilterChange = (index: number) => (value: string) => {
@@ -148,22 +126,26 @@ const Cards: React.FC = () => {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      {/* Responsive Cards Grid */}
+    <Box width="100%">
       <Box
         sx={{
-          display: 'grid',
+          display: "grid",
+          gridTemplateAreas: {
+            xs: `
+              "inventory"
+              "top"
+              "daily"
+            `,
+            md: `
+              "inventory daily"
+              "top daily"
+            `,
+          },
           gridTemplateColumns: {
-            xs: '1fr',                    // Mobile: 1 column
-            sm: 'repeat(2, 1fr)',         // Tablet: 2 columns
-            md: 'repeat(2, 1fr)',         // Laptop: 2 columns
-            lg: 'repeat(2, 1fr)',         // Desktop: 2 columns
+            xs: "1fr",
+            md: "1fr 1fr",
           },
-          gap: {
-            xs: 2,      // Mobile: smaller gap
-            sm: 2.5,    // Tablet: medium gap
-            md: 3,      // Laptop+: larger gap
-          },
+          gap: 2,
         }}
       >
         {cardsConfig.map((card, index) => {
@@ -175,220 +157,112 @@ const Cards: React.FC = () => {
             <Card
               key={index}
               sx={{
-                borderRadius: {
-                  xs: '8px',
-                  sm: '10px',
-                  md: '12px',
-                },
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                padding: {
-                  xs: '16px',     // Mobile: smaller padding
-                  sm: '18px 20px', // Tablet: medium padding
-                  md: '20px 24px', // Laptop+: larger padding
-                },
-                backgroundColor: '#fff',
-                border: '1px solid #E5E7EB',
-                transition: 'all 0.2s ease-in-out',
-                '&:hover': {
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  transform: 'translateY(-2px)',
+                gridArea: getGridArea(card.title),
+                p: 3,
+                borderRadius: 2,
+                border: "1px solid #E5E7EB",
+                transition: "0.3s",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 6,
                 },
               }}
             >
               {/* Header */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: {
-                    xs: 1.5,
-                    sm: 2,
-                  },
-                  flexWrap: {
-                    xs: 'wrap',
-                    sm: 'nowrap',
-                  },
-                  gap: 1,
-                }}
-              >
-                <Typography 
-                  sx={{
-                    fontSize: {
-                      xs: '13px',
-                      sm: '14px',
-                      md: '14px',
-                    },
-                    fontWeight: 500,
-                    color: '#111827',
-                  }}
-                >
-                  {card.title}
-                </Typography>
+              <Box display="flex" justifyContent="space-between" mb={2} gap={2}>
+                <Typography fontWeight={600}>{card.title}</Typography>
 
-                {/* Using DropdownField Component */}
                 <FormProvider {...methods}>
-                  <Box 
-                    sx={{ 
-                      minWidth: {
-                        xs: '100px',
-                        sm: '110px',
-                      },
-                    }}
-                  >
+                  <Box minWidth={120}>
                     <DropdownField
                       name="filter"
                       options={filterOptions}
                       onChangeCallback={handleFilterChange(index)}
-                      sx={{
-                        height: {
-                          xs: 30,
-                          sm: 32,
-                        },
-                        '& .MuiOutlinedInput-root': {
-                          height: {
-                            xs: 30,
-                            sm: 32,
-                          },
-                        },
-                        '& .MuiSelect-select': {
-                          fontSize: {
-                            xs: '12px',
-                            sm: '13px',
-                          },
-                          padding: {
-                            xs: '4px 28px 4px 10px',
-                            sm: '6px 32px 6px 12px',
-                          },
-                        },
-                        '& .MuiInputLabel-root': {
-                          display: 'none',
-                        },
-                        '& .MuiFormHelperText-root': {
-                          display: 'none',
-                        },
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#D1D5DB',
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#9CA3AF',
-                        },
-                      }}
                     />
                   </Box>
                 </FormProvider>
               </Box>
 
-              <Divider 
-                sx={{ 
-                  mb: {
-                    xs: 1.5,
-                    sm: 2,
-                    md: 2.5,
-                  },
-                  borderColor: '#E5E7EB',
-                }} 
-              />
+              <Divider sx={{ mb: 2 }} />
 
-              {/* Content - Responsive Layout */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: {
-                    xs: 'column',    // Mobile: stack vertically
-                    sm: 'row',       // Tablet+: side by side
-                  },
-                  justifyContent: 'space-between',
-                  alignItems: {
-                    xs: 'flex-start',
-                    sm: 'flex-start',
-                  },
-                  gap: {
-                    xs: 2,
-                    sm: 1,
-                  },
-                }}
-              >
-                {/* Left Value */}
-                <Box 
-                  sx={{ 
-                    flex: 1,
-                    minWidth: 0, // Allow text truncation if needed
-                  }}
-                >
-                  <Typography 
-                    sx={{
-                      fontSize: {
-                        xs: '20px',
-                        sm: '22px',
-                        md: '24px',
-                      },
-                      fontWeight: 700,
-                      color: '#111827',
-                      mb: 0.5,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {info.leftValue}
-                  </Typography>
-                  <Typography 
-                    sx={{
-                      fontSize: {
-                        xs: '11px',
-                        sm: '12px',
-                      },
-                      color: '#6B7280',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {info.leftLabel}
-                  </Typography>
-                </Box>
+              {/* Content */}
+              {card.title === "Daily Report" ? (
+                <Box display="flex" flexDirection="column" gap={2}>
+                  {/* Sales */}
+                  <Box>
+                    <Typography fontWeight={700}>
+                      {info?.leftValue}
+                    </Typography>
+                    <Typography fontSize={12} color="text.secondary">
+                      {info?.leftLabel}
+                    </Typography>
+                    <Box
+                      sx={{
+                        mt: 1,
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor: "#E5E7EB",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: "45%",
+                          height: "100%",
+                          borderRadius: 5,
+                          backgroundColor: "#238878",
+                        }}
+                      />
+                    </Box>
+                  </Box>
 
-                {/* Right Value */}
-                <Box 
-                  sx={{ 
-                    flex: 1,
-                    textAlign: {
-                      xs: 'left',
-                      sm: 'left',
-                    },
-                    pl: {
-                      xs: 0,
-                      sm: 2,
-                    },
-                    minWidth: 0,
-                  }}
-                >
-                  <Typography 
-                    sx={{
-                      fontSize: {
-                        xs: '20px',
-                        sm: '22px',
-                        md: '24px',
-                      },
-                      fontWeight: 700,
-                      color: '#111827',
-                      mb: 0.5,
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    {info.rightValue}
-                  </Typography>
-                  <Typography 
-                    sx={{
-                      fontSize: {
-                        xs: '11px',
-                        sm: '12px',
-                      },
-                      color: '#6B7280',
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    {info.rightLabel}
-                  </Typography>
+                  {/* Purchase */}
+                  <Box>
+                    <Typography fontWeight={700}>
+                      {info?.rightValue}
+                    </Typography>
+                    <Typography fontSize={12} color="text.secondary">
+                      {info?.rightLabel}
+                    </Typography>
+                    <Box
+                      sx={{
+                        mt: 1,
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor: "#E5E7EB",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: "60%",
+                          height: "100%",
+                          borderRadius: 5,
+                          backgroundColor: "#238878",
+                        }}
+                      />
+                    </Box>
+                  </Box>
                 </Box>
-              </Box>
+              ) : (
+                <Box display="flex" justifyContent="space-between">
+                  <Box>
+                    <Typography fontSize={24} fontWeight={700}>
+                      {info?.leftValue}
+                    </Typography>
+                    <Typography fontSize={12} color="text.secondary">
+                      {info?.leftLabel}
+                    </Typography>
+                  </Box>
+
+                  <Box>
+                    <Typography fontSize={24} fontWeight={700}>
+                      {info?.rightValue}
+                    </Typography>
+                    <Typography fontSize={12} color="text.secondary">
+                      {info?.rightLabel}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
             </Card>
           );
         })}
