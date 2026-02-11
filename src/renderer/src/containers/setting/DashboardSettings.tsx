@@ -9,7 +9,7 @@ import {
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 import SwitchToggle from "@/components/controlled/SwitchToggle";
 import DropdownField from "@/components/controlled/DropdownField";
-import TextInputField from "@/components/controlled/TextInputField";
+import NumericField from "@/components/controlled/NumericField";
 
 type DashboardSettingsForm = {
   visibleKpis: string[];
@@ -148,17 +148,17 @@ const DashboardSettings = () => {
                 Quantity Threshold
               </Typography>
 
-              <Box display="flex" alignItems="center" gap={1}>
-                <TextInputField
+              <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
+                <NumericField
                   name="quantityThreshold"
                   label=""
-                  inputType="numbers"
                   sx={{
+                    mt:2,
                     width: 80,
-                    "& .MuiInputBase-root": {
-                      height: 30,
-                    },
-                  }}
+                 "& .MuiInputBase-root": {
+                    height: 30,
+                   },
+                   }}
                 />
                 <Typography fontSize={14}>Units</Typography>
               </Box>
