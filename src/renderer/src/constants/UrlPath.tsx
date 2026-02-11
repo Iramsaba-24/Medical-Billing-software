@@ -1,8 +1,4 @@
 
-
-
-
-
  
 export const URL_PATH = {
   LOGIN: '/login',
@@ -57,6 +53,9 @@ export const URL_PATH = {
   PaymentMethod:'/billing/payment-method',
   PaymentDetails:'/billing/payment-details',
   GeneralSettings: '/settings/general',
+
+
+  PharmacyProfile:'/settings/pharmacy-profile'
 };
  
  

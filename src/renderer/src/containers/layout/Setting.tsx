@@ -33,8 +33,9 @@ const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
  
  
   const menuItems = [
-    { text: 'General', icon: <SettingsIcon fontSize="small" />, path: "/" },
-    { text: 'Pharmacy Profile', icon: <LocalPharmacyIcon fontSize="small" />, path: "/" },
+    { text: 'General', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.Setting },
+    { text: 'Pharmacy Profile', icon: <LocalPharmacyIcon fontSize="small" />, path: URL_PATH.PharmacyProfile },
+      
     { text: 'Dashboard Settings', icon: <DashboardIcon fontSize="small" />, path: "/"},
     { text: 'Customer Settings', icon: <GroupIcon fontSize="small" />, path: URL_PATH.CustomerSetting },
     { text: 'Doctors Settings', icon: <SettingsIcon fontSize="small" />, path:"/" },

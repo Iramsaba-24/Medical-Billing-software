@@ -1,3 +1,4 @@
+
  import * as React from 'react';
  import { styled, useTheme } from '@mui/material/styles';
  
@@ -71,7 +72,7 @@ import Setting, { SettingRef } from './Setting';
    { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
    { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
    { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
-
+   
   {
     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
   },
