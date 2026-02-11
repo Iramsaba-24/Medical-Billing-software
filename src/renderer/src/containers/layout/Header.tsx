@@ -1,21 +1,6 @@
  import * as React from 'react';
  import { styled, useTheme } from '@mui/material/styles';
- import {
-   Box,
-   Drawer,
-   AppBar,
-   Toolbar,
-   List,
-   CssBaseline,
-   Typography,
-   IconButton,
-   ListItem,
-   Tooltip,
-   InputBase,
-   Button,
-   useMediaQuery,
- } from '@mui/material';
- 
+ import {Box,Drawer, AppBar, Toolbar, List, CssBaseline, Typography, IconButton, ListItem,Tooltip,InputBase, Button, useMediaQuery,} from '@mui/material';
  import MenuIcon from '@mui/icons-material/Menu';
  import SearchIcon from '@mui/icons-material/Search';
  import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -28,16 +13,15 @@
  import SettingsIcon from '@mui/icons-material/Settings';
  import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
  import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
- 
  import { Outlet, useNavigate, useLocation } from 'react-router-dom';
  import { URL_PATH } from '../../constants/UrlPath';
  import { Home } from '@mui/icons-material';
-import Setting, { SettingRef } from './Setting';
+ import Setting, { SettingRef } from './Setting';
  
  const MINI_WIDTH = 80;
  const FULL_WIDTH = 240;
 
- /* --STYLED -- */
+ /* STYLED  */
 
  const StyledAppBar = styled(AppBar)(({ theme }) => ({
    backgroundColor: '#238878',
@@ -67,10 +51,7 @@ import Setting, { SettingRef } from './Setting';
    { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
    { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
    { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
-
-   {
-     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
-   },
+   { text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices},
    { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
    { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.Setting },
  ];
@@ -203,7 +184,7 @@ import Setting, { SettingRef } from './Setting';
              width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
              transition: 'width 0.3s',
              boxSizing: 'border-box',
-             overflowX: 'hidden',
+            //  overflowX: 'hidden',
            },
          }}
        >
@@ -220,7 +201,7 @@ import Setting, { SettingRef } from './Setting';
            mt:3,
            px:4,
            height: "100vh",
-           overflowY: "auto",
+          //  overflowY: "auto",
          }}
        >
          <Outlet />

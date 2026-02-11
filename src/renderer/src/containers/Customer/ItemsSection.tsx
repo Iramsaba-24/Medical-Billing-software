@@ -44,7 +44,7 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
 
       {/*  Loop through each row and create input fields */}
       {rows.map((row, i) => (
-        <Box key={row.id} sx={{ mb: 2, p: { xs: 1.5, md: 0 }, bgcolor: { xs: "#fcfcfc", md: "transparent" }, borderRadius: "8px" }}>
+        <Box key={row.id} sx={{ mb: 2, p: { xs: 1.5, md: 0 }, bgcolor: {  md: "transparent" }, borderRadius: "8px" }}>
           <Grid container spacing={2} alignItems="center">
             
             {/*  Medicine Name */}

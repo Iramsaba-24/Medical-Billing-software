@@ -18,7 +18,7 @@ const SalesGraph = () => {
 
   return (
     // Main container card for the report
-    <Paper sx={{ p: 3, borderRadius: 2 }}>
+    <Paper sx={{ p: 1, borderRadius: 2 }}>
       <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
         Sales Reports
       </Typography>
