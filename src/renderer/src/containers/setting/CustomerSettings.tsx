@@ -76,35 +76,35 @@ const labelStyle={
 const boxStyle ={
   display:"flex",
   flexDirection:{xs:"row", sm:"row", md:"row"},
-  justifyContent:"space-between", //horizontally
-  alignItems:{sm:"center"}, //vertically
+  justifyContent:"space-between", 
+  alignItems:{sm:"center"}, 
   mb:0.25
 }
 
 // inline label and component for dropdown and numeric field
 const inputFieldStyle = {
   width: { xs: "70%", sm: 180, md: 200 }, 
-  "& .MuiOutlinedInput-root": {  //input outer box
-    height: 42,         //fixed hieght
+  "& .MuiOutlinedInput-root": {  
+    height: 42,         
     fontSize: "14px",
   },
-  "& .MuiOutlinedInput-input": {  //actual text area
+  "& .MuiOutlinedInput-input": {  
     padding: "8px 12px",
   },
 }
 
 // checkbox style
 const checkboxStyle = {
-  "& .MuiCheckbox-root": {  //default (uncheck state)
+  "& .MuiCheckbox-root": {  
     color: "default.main",
-    "&.Mui-checked": {      //cheked
+    "&.Mui-checked": {      
       color: "#238878",
     },
   },
 };
 
 const CustomerSettings = () => {
-  const methods = useForm<CustomerFormFields>(  //set the default values to the fields
+  const methods = useForm<CustomerFormFields>(  
     {
       defaultValues: {
         mandatoryFields:["customer_name","mobile_number"],
@@ -121,7 +121,7 @@ const CustomerSettings = () => {
       }
     });
 
-    const onSubmit =(data:CustomerFormFields)=>{  // onSubmit function to handle form submission
+    const onSubmit =(data:CustomerFormFields)=>{  
       console.log("submmitted data: ", data);
       alert(`submitted data  ${JSON.stringify(data)}`)
       
@@ -130,10 +130,8 @@ const CustomerSettings = () => {
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-        <Paper // main paper of form which have no border and all which contails all fields and components of the page 
+        <Paper  
         sx= {{
-          
-          px:{xs:2 , sm: 3, md: 4},
           py:2,
           boxShadow:"none",
           borderRadius: 0,
@@ -155,7 +153,7 @@ const CustomerSettings = () => {
 
           {/* Mandatory Fields */}
           <Paper sx ={PaperStyle}>      
-            <Typography sx ={headingStyle}>    {/*title of the paper*/}  
+            <Typography sx ={headingStyle}>     
               Mandatory Fields
             </Typography>
             
@@ -169,9 +167,9 @@ const CustomerSettings = () => {
 
           {/* Credit Control field */}
           <Paper sx ={PaperStyle}>
-            <Typography sx ={{...headingStyle, mb: 0}}>Credit Control</Typography>
+            <Typography sx ={{...headingStyle, mb: 1}}>Credit Control</Typography>
             <Box sx={{...boxStyle,mb:-2}}>
-              <Typography sx={labelStyle}>Credit Limit</Typography>
+              <Typography sx={{...labelStyle, mt:1}}>Credit Limit</Typography>
                 <NumericField 
                   name= "creditLimit"
                   label= ""
@@ -187,7 +185,7 @@ const CustomerSettings = () => {
 
             {/* Credit Days */}
             <Box sx={{...boxStyle,mb:0.5}}>
-              <Typography sx={{...labelStyle, mb: -0.2}}> Credit Days</Typography>
+              <Typography sx={{...labelStyle, mt: 1}}> Credit Days</Typography>
                 <DropdownField 
                 name="creditDays"
                 placeholder="select"
