@@ -9,6 +9,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import PrintIcon from "@mui/icons-material/Print";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 
 // types
@@ -150,7 +151,7 @@ const MediPoints: React.FC = () => {
         onClick={() => {
           setActiveTab("new");      // Set active tab
           if (location.pathname !== "") {
-            navigate("");          
+            navigate(URL_PATH.NewInvoice);          
           }
         }}
         sx={{
@@ -187,7 +188,7 @@ const MediPoints: React.FC = () => {
         onClick={() => {
           setActiveTab("retail");
           if (location.pathname !== "") {
-            navigate("");
+            navigate(URL_PATH.RetailInvoice);
           }
         }}
         sx={{
@@ -330,6 +331,7 @@ const MediPoints: React.FC = () => {
                 bgcolor: "#1f8f7a",
                 textTransform: "none",
               }}
+              onClick={() => navigate(URL_PATH.PaymentMethod)}
             >
               PAY
             </Button>

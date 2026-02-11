@@ -1,5 +1,7 @@
  import * as React from 'react';
  import { styled, useTheme } from '@mui/material/styles';
+ 
+
  import {
    Box,
    Drawer,
@@ -69,15 +71,16 @@ import Setting, { SettingRef } from './Setting';
    { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
    { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
    { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
- 
-   {
-     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
-   },
-   { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
-   { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.Setting },
- ];
- 
- 
+
+  {
+    text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
+  },
+  { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
+  { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.CustomerSetting },
+  
+];
+
+
  const Sidebar = ({ open }: { open: boolean }) => {
    const navigate = useNavigate();
    const location = useLocation();
@@ -213,21 +216,19 @@ import Setting, { SettingRef } from './Setting';
          <Sidebar open={isMobile ? true : open} />
        </Drawer>
  
-  <Box
-         component="main"
-         sx={{
-           flex: 1,
-           bgcolor: "#f8f9fa",
-           py: { xs:9, md:8 },
-           mt:3,
-           
-           height: "100vh",
-           overflowY: "auto",
-           px:{xs:1, sm:3, md:5},
- 
-         }}
-       >
-         <Outlet />
+ <Box
+        component="main"
+        sx={{
+          flex: 1,
+          bgcolor: "#f8f9fa",
+          py: { xs:9, md:8 },
+          mt:3,
+          px:{xs:1,sm:3, md:5},
+          height: "100vh",
+          // overflowY: "auto",
+        }}
+      >
+        <Outlet />
       </Box>
  
        

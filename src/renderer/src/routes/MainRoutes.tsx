@@ -17,20 +17,16 @@ import DoctorTable from '@/view/Doctors';
 import AddDoctor from '@/containers/doctors/AddDoctor';
 import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
- 
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
-
-
-import Setting from '@/containers/layout/Setting';
+import CustomerSettings from '@/containers/setting/CustomerSettings';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
-import DashboardSettings from '@/containers/setting/DashboardSettings';
+import InvoiceSettings from '@/containers/setting/InvoiceSetting';
 import InventorySettings from '@/containers/setting/InventorySettings';
-import InvoiceSettings from '@/containers/setting/InvoiveSetting';
+import PaymentMethod from '@/containers/billing/PaymentMethod';
 import MediPoints from '@/containers/billing/MediPoints';
 import Billing from '@/view/Billing';
- 
  
 export const mainRoutes: RouteObject[] = [
   {
@@ -115,31 +111,28 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.ReportPage,
         element: <ReportPage />,
       },
-       
-      {
-        path: URL_PATH.Setting,
-        element: <Setting />,
+       {
+        path: URL_PATH.DistributorDetails,
+        element: <DistributorDetails />,
       },
-
       {
-        path: URL_PATH.DashboardSettings,
-        element: <DashboardSettings/>,
+        path: URL_PATH.CustomerSetting,
+        element: <CustomerSettings />,
+      },
+      {
+        path: URL_PATH.InvoiceSetting,
+        element: <InvoiceSettings />,
       },
       {
         path: URL_PATH.InventorySettings,
-        element: <InventorySettings/>,
-      },
-
-      {
-        path: URL_PATH.InvoiceSetting,
-        element: <InvoiceSettings/>,
+        element: <InventorySettings />,
       },
 
       {
         path: URL_PATH.MediPoints,
         element: <MediPoints/>,
       },
-
+ 
      {
         path: URL_PATH.Billing,
         element: <Billing />,
@@ -147,7 +140,14 @@ export const mainRoutes: RouteObject[] = [
       {
         path: `${URL_PATH.Billing}/:invoiceNo`,
         element: <Billing />,
-      }
+      },
+           {
+        path: URL_PATH.PaymentMethod,
+        element: <PaymentMethod />,
+      },
+
+ 
+ 
  
      
     ],
