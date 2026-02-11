@@ -27,16 +27,20 @@ import Setting from '@/containers/layout/Setting';
 import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 import InventorySettings from '@/containers/setting/InventorySettings';
 import InvoiveSetting from '@/containers/setting/InvoiveSetting';
+// import LOGIN from '@/view/auth/LoginPage';
 
  
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-      {
-        index: true,
-        element: <Landing />,
-      },
+      // {
+      //   index: true,
+      //   element: <LOGIN />,
+      // },
+       {path: URL_PATH.Landing, 
+        element: <Landing />},
+      
 
       {path: URL_PATH.Dashboard, 
         element: <Dashboard />},

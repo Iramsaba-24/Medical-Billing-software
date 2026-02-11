@@ -6,7 +6,7 @@ import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
-import AppToast from "@/containers/distributors/AppToast";
+import AppToast from '@/containers/Distributors/AppToast';
 import { URL_PATH } from '@/constants/UrlPath';
 import BankDetailsForm from './BankDetailForm';
 
@@ -104,6 +104,8 @@ const DistributorsForm = () => {
               <TextInputField
                 name="gstIn"
                 label="GSTIN"
+                inputType="all"
+                rows={1}
                 rules={{
                   pattern: {
                     value: /^[0-9]{2}[A-Z0-9]{13}$/,

@@ -161,7 +161,13 @@ const Header: React.FC = () => {
         <DrawerHeader />
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
-      <Box component="main" sx={{ flex: 1, bgcolor: "#f8f9fa", py: { xs: 9, md: 8 }, mt: 3, px: 4, height: "100vh" }}>
+      <Box component="main" sx={{
+         flex: 1, bgcolor: "#f8f9fa",
+          py: { xs: 9, md: 8 },
+           mt: 3,
+            px:{xs:1, sm:3, md:5},
+             height: "100vh"
+              }}>
         <Outlet />
       </Box>
     </Box>
