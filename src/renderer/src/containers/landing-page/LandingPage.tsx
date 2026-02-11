@@ -69,7 +69,7 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/new-invoice")}>
+           onClick={()=> navigate(URL_PATH.Billing)}>
             New Invoice
           </Button>
 

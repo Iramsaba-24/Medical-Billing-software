@@ -32,6 +32,16 @@ export const URL_PATH = {
 
   InvoiceSetting: '/settings/invoice',
   InventorySettings: '/settings/inventory',
+  Setting: '/settings',
+  GeneralSettings: '/settings/general',
 
-   Setting: '/settings',
+  RetailInvoice:'/billing/retail-invoice',
+  Billing:'/billing/new-invoice',
+  MediPoints:'/billing/medi-points',
+  PaymentMethod:'/billing/payment-method',
+  PaymentDetails:'/billing/payment-details',
+  
+
+
+
 };
