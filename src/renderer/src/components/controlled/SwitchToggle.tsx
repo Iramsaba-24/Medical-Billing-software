@@ -29,4 +29,4 @@ const SwitchToggle = ({name}: SwitchToggleProps) => {
   );
 };
 
-export default SwitchToggle;;
+export default SwitchToggle;

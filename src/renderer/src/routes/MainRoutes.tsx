@@ -29,6 +29,7 @@ import DashboardSettings from '@/containers/setting/DashboardSettings';
 import InventorySettings from '@/containers/setting/InventorySettings';
 import InvoiceSettings from '@/containers/setting/InvoiveSetting';
 import MediPoints from '@/containers/billing/MediPoints';
+import Billing from '@/view/Billing';
  
  
 export const mainRoutes: RouteObject[] = [
@@ -139,7 +140,15 @@ export const mainRoutes: RouteObject[] = [
         element: <MediPoints/>,
       },
 
-     
+     {
+        path: URL_PATH.Billing,
+        element: <Billing />,
+      },
+      {
+        path: `${URL_PATH.Billing}/:invoiceNo`,
+        element: <Billing />,
+      }
+ 
      
     ],
   },
