@@ -23,7 +23,6 @@ type DoctorSettingsState = {
   showDoctorOnPrescription: boolean;
 };
 
-/* ALL CHECKBOXES DEFAULT BLANK */
 const defaultState: DoctorSettingsState = {
   doctorName: false,
   registrationNumber: false,
@@ -50,7 +49,7 @@ const DoctorsSettings: React.FC = () => {
 
   const handleRadioChange = (
     name: keyof DoctorSettingsState,
-    value: string 
+    value: string
   ) => {
     setSettings((prev) => ({
       ...prev,
@@ -59,19 +58,20 @@ const DoctorsSettings: React.FC = () => {
   };
 
   const handleReset = () => {
-    setSettings(defaultState); //  reset = all unchecked
+    setSettings(defaultState);
   };
 
   const handleSave = () => {
     console.log("Saved Settings:", settings);
-    alert("Settings saved successfully ");
+    alert("Settings saved successfully");
   };
 
   return (
-    <Box p={3}>
+    <Box sx={{ p: { xs: 2, sm: 3 } }}>
       <Typography variant="h5" fontWeight={600}>
         Doctors Settings
       </Typography>
+
       <Typography variant="body2" color="text.secondary" mb={3}>
         Manage prescriptions, referrals, and doctor visibility
       </Typography>
@@ -82,6 +82,7 @@ const DoctorsSettings: React.FC = () => {
           <Typography variant="h6" mb={1}>
             Mandatory Doctor Details
           </Typography>
+
           <Divider sx={{ mb: 2 }} />
 
           <Stack>
@@ -149,11 +150,26 @@ const DoctorsSettings: React.FC = () => {
           <Typography variant="h6" mb={1}>
             Invoice & Prescription Settings
           </Typography>
+
           <Divider sx={{ mb: 2 }} />
 
-          <Stack spacing={3}>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography>Show doctor name on invoice</Typography>
+          <Stack spacing={2}>
+            {/* Invoice */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "14px", sm: "15px", md: "16px" },
+                  fontWeight: 500,
+                }}
+              >
+                Show doctor name on invoice
+              </Typography>
 
               <RadioGroup
                 row
@@ -166,8 +182,22 @@ const DoctorsSettings: React.FC = () => {
               </RadioGroup>
             </Box>
 
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography>Show doctor on prescription print</Typography>
+            {/* Prescription */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: "14px", sm: "15px", md: "16px" },
+                  fontWeight: 500,
+                }}
+              >
+                Show doctor on prescription print
+              </Typography>
 
               <RadioGroup
                 row
@@ -187,7 +217,15 @@ const DoctorsSettings: React.FC = () => {
       </Card>
 
       {/* Buttons */}
-      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          mt: 4,
+          flexDirection: { xs: "column", md: "row" },
+          gap: { xs: 2, md: 0 },
+        }}
+      >
         <Button
           variant="outlined"
           onClick={handleReset}
@@ -198,7 +236,6 @@ const DoctorsSettings: React.FC = () => {
             "&:hover": {
               backgroundColor: "#238878",
               color: "#fff",
-              border: "2px solid #238878",
             },
           }}
         >
@@ -216,7 +253,6 @@ const DoctorsSettings: React.FC = () => {
             "&:hover": {
               backgroundColor: "#fff",
               color: "#238878",
-              border: "2px solid #238878",
             },
           }}
         >

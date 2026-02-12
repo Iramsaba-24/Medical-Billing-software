@@ -1,7 +1,7 @@
  import { useState, useEffect } from "react";
-import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
-import CustomerListPage from "@/containers/Customer/CustomerListPage";
-import CustomerViewDetails from "@/containers/Customer/CustomerViewDetails";
+import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import CustomerListPage from "@/containers/customer/CustomerListPage";
+import CustomerViewDetails from "@/containers/customer/CustomerViewDetails";
 
 // Structure for Purchase History 
 export interface PurchaseHistory {
@@ -126,7 +126,7 @@ const CustomerMaster = () => {
   const handleDeleteInvoice = (invoice: PurchaseHistory) => {
     if (!selectedCustomer) return;
     
-    if (window.confirm("Delete this bill/invoice?")) {
+    if (window.confirm("Delete this bill from customer's history?")) {
       setCustomerList((prev) => {
         return prev.map((cust) => {
           if (cust.mobile === selectedCustomer.mobile) {
