@@ -1,19 +1,6 @@
-
-
 import { useState } from "react";
-import {
-  Box,
-  Grid,
-  Typography,
-  Paper,
-  Button,
-  TextField,
-} from "@mui/material";
-import {
-  FormProvider,
-  useForm,
-  useFieldArray,
-} from "react-hook-form";
+import { Box, Grid, Typography, Paper, Button, TextField } from "@mui/material";
+import { FormProvider, useForm, useFieldArray } from "react-hook-form";
 import PrintIcon from "@mui/icons-material/Print";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -87,7 +74,8 @@ const POS2 = () => {
       alert("Please complete all item details");
       return;
     }
-    alert("Payment Successful!");
+    navigate(URL_PATH.PaymentDetails);
+    
     console.log(data);
   };
 
@@ -100,7 +88,6 @@ const POS2 = () => {
   const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
   const navigate = useNavigate();
 
-  
   return (
     <FormProvider {...methods}>
       {/* TOP BUTTONS */}
@@ -108,7 +95,8 @@ const POS2 = () => {
         <Button
           onClick={() => {
             setActiveTab("new");
-            if (location.pathname !== "/settings/pos") navigate("/settings/pos");
+            if (location.pathname !== URL_PATH.Billing)
+              navigate(URL_PATH.Billing);
           }}
           sx={{
             textTransform: "none",
@@ -127,8 +115,8 @@ const POS2 = () => {
         <Button
           onClick={() => {
             setActiveTab("retail");
-            if (location.pathname !== "/settings/retailinvoice")
-              navigate("/settings/retailinvoice");
+            if (location.pathname !== URL_PATH.RetailInvoice)
+              navigate(URL_PATH.RetailInvoice);
           }}
           sx={{
             textTransform: "none",
@@ -190,7 +178,9 @@ const POS2 = () => {
               <Button
                 type="button"
                 startIcon={<AddIcon />}
-                onClick={() => append({ name: "", qty: 1, mrp: 0, discount: 0 })}
+                onClick={() =>
+                  append({ name: "", qty: 1, mrp: 0, discount: 0 })
+                }
                 sx={{ textTransform: "none", color: TEAL_COLOR }}
               >
                 Add Item
@@ -236,10 +226,8 @@ const POS2 = () => {
                   />
                 </Grid>
 
-             
                 <Grid size={{ xs: 12, md: 2 }}>
                   <TextField
-                    
                     fullWidth
                     label="Amount"
                     disabled
@@ -247,7 +235,10 @@ const POS2 = () => {
                   />
                 </Grid>
 
-                <Grid textAlign={{ xs: "right", md: "center" }} size={{ xs: 12, md: 1 }}>
+                <Grid
+                  textAlign={{ xs: "right", md: "center" }}
+                  size={{ xs: 12, md: 1 }}
+                >
                   <Button
                     type="button"
                     onClick={() => remove(index)}
@@ -305,8 +296,7 @@ const POS2 = () => {
               flexWrap: "wrap",
             }}
           >
-            <Button 
-            onClick={()=> navigate (URL_PATH.PaymentDetails)} 
+            <Button
               variant="contained"
               type="submit"
               sx={{
@@ -341,15 +331,3 @@ const POS2 = () => {
 };
 
 export default POS2;
-
-
-
-
-
-
-
-
-
-
-
-

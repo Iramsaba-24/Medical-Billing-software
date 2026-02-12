@@ -2,7 +2,7 @@ export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
 
-  Landing: "/",
+  Landing: "/landing",
   Dashboard: "/dashboard",
   Customer: "/customers",
 
@@ -16,8 +16,6 @@ export const URL_PATH = {
   CreateInvoice: "/create-invoice",
   InvoiceView: "/invoice-view",
   DistributorsTable: "/table",
-  DistributorsSetting: "/settings/distributors-setting",
-  ReportSettings: "/settings/report-settings",
 
   ReportPage: "/report",
   DistributorsPage: "/distributors",
@@ -30,23 +28,21 @@ export const URL_PATH = {
   MedicineGroup: "/inventory/medicine-group",
   AddMedicineGroup: "/inventory/add-medicine-group",
   AddInventoryItem: "/inventory/add-inventory-item",
-  Setting: "/settings",
 
+  Setting: "/settings",
+  DistributorsSetting: "/settings/distributors-setting",
+  ReportSettings: "/settings/report-settings",
   InvoiceSetting: "/settings/invoice",
   InventorySettings: "/settings/inventory",
+  DashboardSettings: "/settings/dashboard",
+  GeneralSettings: '/settings/general',
+  DoctorSettings: '/settings/DoctorSettings',
+  PharmacyProfile: '/settings/PharmacyProfile',
+  CustomerSettings: '/settings/Customer',
 
-  CustomerSetting: "/settings/customer",
-
-  DoctorSetting: "/settings/doctors",
-
-  NewInvoice: "/billing/newincoice",
-  RetailInvoice: "/billing/retailinvoice",
-
+  RetailInvoice: "/billing/retail-invoice",
   Billing: "/billing/new-invoice",
   MediPoints: "/billing/medi-points",
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
-  GeneralSettings: "/settings/general",
-
-  PharmacyProfile: "/settings/pharmacy-profile",
 };

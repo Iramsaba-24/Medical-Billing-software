@@ -70,7 +70,9 @@ const RetailInvoice: React.FC = () => {
 
   const onSubmit = (data: FormValues) => {
     console.log("FORM DATA:", data);
+    navigate(URL_PATH.PaymentMethod)
   };
+  
 
   return (
   <Box sx={{mx:{xs:-2, md:0.5}}}>
@@ -212,7 +214,6 @@ const RetailInvoice: React.FC = () => {
 
               <Box textAlign="center">
                 <Button 
-                onClick={()=> navigate (URL_PATH.PaymentMethod)} 
                   type="submit"
                   variant="contained"
                   sx={{
