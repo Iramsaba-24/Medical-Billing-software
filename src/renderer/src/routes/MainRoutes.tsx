@@ -144,12 +144,7 @@ export const mainRoutes: RouteObject[] = [
            {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
-      },
-
- 
- 
- 
-     
+      },     
     ],
   },
 ];
