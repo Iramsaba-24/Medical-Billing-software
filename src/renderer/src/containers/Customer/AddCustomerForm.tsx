@@ -9,8 +9,8 @@ import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import ItemsSection from "@/containers/Customer/ItemsSection";
 import { useNavigate } from "react-router-dom";
+import { Invoice } from "../Invoices/InvoiceView";
 import { URL_PATH } from "@/constants/UrlPath";
-import { Invoice } from "@/containers/Invoices/InvoiceView";
 
 // Structure for a single row in the medicine list
 export interface ItemRow { 

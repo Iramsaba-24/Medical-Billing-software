@@ -1,3 +1,5 @@
+
+ 
 export const URL_PATH = {
   LoginPage: '/login',
   REGISTER: '/register',
@@ -36,19 +38,24 @@ export const URL_PATH = {
  
  
   InvoiceSetting: '/settings/invoice',
-   InventorySettings: '/settings/inventory',
-  DashboardSettings:"/settings/dashboard",
+  InventorySettings: '/settings/inventory',
+ 
+  CustomerSetting: '/settings/customer',
   
+ 
+  
+  
+  NewInvoice: "/billing/newincoice",
+  RetailInvoice: "/billing/retailinvoice",
 
-  RetailInvoice:'/billing/retail-invoice',
   Billing:'/billing/new-invoice',
   MediPoints:'/billing/medi-points',
   PaymentMethod:'/billing/payment-method',
   PaymentDetails:'/billing/payment-details',
   GeneralSettings: '/settings/general',
- 
- 
-   
+
+
+  PharmacyProfile:'/settings/pharmacy-profile'
 };
  
  

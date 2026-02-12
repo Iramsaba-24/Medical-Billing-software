@@ -3,11 +3,10 @@ import { Switch } from "@mui/material";
 
 type SwitchToggleProps = {
   name: string;
-} ; // checked and onChange are handled internally 
+} ;  
 
-const SwitchToggle = ({name}: SwitchToggleProps) => {
-  const { control } = useFormContext(); // whole form controlled by react-hook-form(page): form provider
-  
+const SwitchToggle = ({name}: SwitchToggleProps) => {  //which fields i have to used in form eg: name, required
+  const { control } = useFormContext(); //  form controlled by react-hook-form(page): form provider  
   const { field } = useController({     // only field object controlled by react-hook-form(fields)
     name,
     control,
@@ -15,7 +14,7 @@ const SwitchToggle = ({name}: SwitchToggleProps) => {
 
   return (
     <Switch
-      checked={field.value} //current state 
+      checked={field.value} //current  
       onChange={(e) => field.onChange(e.target.checked)} // onchange state
       sx={{  "& .MuiSwitch-switchBase": {
       "&.Mui-checked": {
