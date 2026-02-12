@@ -62,8 +62,7 @@ export default function AddInventoryItem() {
       status,
     };
 
-    localStorage.setItem(
-      "inventory",
+    localStorage.setItem("inventory",
       JSON.stringify([...existing, newItem])
     );
 
@@ -71,7 +70,7 @@ export default function AddInventoryItem() {
   };
 
   return (
-    <FormProvider {...methods}>
+  <FormProvider {...methods}>
   <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
     <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
       <Typography fontSize={20} fontWeight={600} mb={4}>

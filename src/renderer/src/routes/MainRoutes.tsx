@@ -17,21 +17,48 @@ import DoctorTable from '@/view/Doctors';
 import AddDoctor from '@/containers/doctors/AddDoctor';
 import DoctorsDetail from '@/containers/doctors/DoctorsDetail';
 import DistributorsPage from '@/view/DistributorsPage';
-import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+
 import ReportPage from '@/view/ReportPage';
 import Reorder from '@/containers/inventory/ReorderList';
-import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
+import DistributorDetails from '@/containers/distributors/DistributorsDetails';
+import DistributorsSetting from '@/containers/setting/DistributorsSetting';
+import ReportSettings from '@/containers/setting/ReportSettings';
 import GeneralSettings from '@/containers/setting/GeneralSettings';
-import Billing from '@/view/Billing';
+
+
+
+
+
+// import LOGIN from '@/view/auth/LoginPage';
+
+
+
+
+import Setting from "@/containers/layout/Setting";
+
+import DistributorsForm from "@/containers/distributors/DistributorsForm";
+import InventorySettings from "@/containers/setting/InventorySettings";
+
+import MediPoints from "@/containers/billing/MediPoints";
+import Billing from "@/view/Billing";
+
+
+import InvoiceSettings from "@/containers/setting/InvoiceSetting";
+import DashboardSettings from '@/containers/setting/DashboardSettings';
+import PharmacyProfile from '@/containers/setting/PharmacyProfile';
+import CustomerSettings from '@/containers/setting/CustomerSettings';
 
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-      {
-        index: true,
-        element: <Landing />,
-      },
+      // {
+      //   index: true,
+      //   element: <LOGIN />,
+      // },
+       {path: URL_PATH.Landing, 
+        element: <Landing />},
+      
 
       {path: URL_PATH.Dashboard, 
         element: <Dashboard />},
@@ -45,15 +72,15 @@ export const mainRoutes: RouteObject[] = [
       },
       {
         path: URL_PATH.Doctors,
-        element: <DoctorTable />
+        element: <DoctorTable />,
       },
       {
         path: URL_PATH.AddDoctor,
-        element: <AddDoctor />
+        element: <AddDoctor />,
       },
       {
         path: URL_PATH.DoctorsDetail,
-        element: <DoctorsDetail />
+        element: <DoctorsDetail />,
       },
       {
         path: URL_PATH.CreateInvoice,
@@ -65,19 +92,19 @@ export const mainRoutes: RouteObject[] = [
       },
       {
         path: URL_PATH.Inventory,
-        element: <Inventory />
+        element: <Inventory />,
       },
       {
         path: URL_PATH.InventoryList,
-        element: <InventoryList />
+        element: <InventoryList />,
       },
       {
         path: URL_PATH.Reorder,
-        element: <Reorder />
+        element: <Reorder />,
       },
       {
         path: URL_PATH.MedicineGroup,
-        element: <MedicineGroup />
+        element: <MedicineGroup />,
       },
       {
         path: "/medicine-groups/:id",
@@ -85,43 +112,90 @@ export const mainRoutes: RouteObject[] = [
       },
       {
         path: URL_PATH.AddMedicineGroup,
-        element: <AddMedicineGroup/>
+        element: <AddMedicineGroup />,
       },
       {
         path: URL_PATH.AddInventoryItem,
-        element: <AddInventoryItem/>
+        element: <AddInventoryItem />,
       },
-      { 
-        path: URL_PATH.DistributorsPage, 
-        element: <DistributorsPage /> 
+      {
+        path: URL_PATH.DistributorsPage,
+        element: <DistributorsPage />,
       },
-      { 
+      {
         path: URL_PATH.DistributorsForm,
-        element: <DistributorsForm /> 
+        element: <DistributorsForm />,
+      },
+      { 
+        path: URL_PATH.DistributorDetails,
+        element: <DistributorDetails /> 
       },
       {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,
       },
        {
-        path: URL_PATH.DistributorDetails,
-        element: <DistributorDetails />,
+        path: URL_PATH.DistributorsSetting,
+        element: <DistributorsSetting />,
       },
       {
+        path: URL_PATH.ReportSettings,
+        element: <ReportSettings />,
+      },
+
+      {
+        path: URL_PATH.InvoiceSetting,
+        element: <InvoiceSettings/>,
+      },
+       {
         path: URL_PATH.GeneralSettings,
         element: <GeneralSettings />,
       },
+       {
+        path: URL_PATH.PharmacyProfile,
+        element: <PharmacyProfile />,
+      },
+      {
+        path: URL_PATH.DashboardSettings,
+        element: <DashboardSettings />,
+      },
+       {
+        path: URL_PATH.CustomerSettings,
+        element: <CustomerSettings />,
+      },
+
+      {
+        path: URL_PATH.MediPoints,
+        element: <MediPoints />,
+      },
+
       {
         path: URL_PATH.Billing,
         element: <Billing />,
       },
       {
-        path: `${URL_PATH.Billing}/:invoiceNo`, 
+        path: `${URL_PATH.Billing}/:invoiceNo`,
         element: <Billing />,
-      }
-          
+      },
       
+      {
+        path: URL_PATH.InventorySettings,
+        element: <InventorySettings />,
+      },
+      {
+        path: URL_PATH.InvoiceSetting,
+        element: <InvoiceSettings />,
+      },
+      {
+        path: URL_PATH.Setting,
+        element: <Setting />,
+      },
+      {
+        path: URL_PATH.DashboardSettings,
+        element: <DashboardSettings />,
+      },
+     
+     
     ],
   },
 ];
- 

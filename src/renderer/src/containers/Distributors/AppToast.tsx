@@ -15,16 +15,16 @@ type AppToastProps = {
 }: AppToastProps) {
   return (
     <Snackbar
-      open={open}
+      open={open}//toast show or hide based on this prop
       autoHideDuration={2000}  
-      onClose={onClose}
+      onClose={onClose} //toast close after 2 seconds or when user clicks close button
       // Position of the toast on the screen
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
     >
       
       <Alert 
-        onClose={onClose} 
-        severity={severity} 
+        onClose={onClose} // Allow users to manually close the toast
+        severity={severity} // Set the color and icon based on the severity
         sx={{ width: "100%", boxShadow: 3 }} 
       >
         {message}

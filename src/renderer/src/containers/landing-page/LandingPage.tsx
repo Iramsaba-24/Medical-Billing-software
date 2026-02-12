@@ -1,6 +1,7 @@
 import { Box, Button, Container, Typography } from "@mui/material"
 import { useNavigate } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg"
+import { URL_PATH } from "@/constants/UrlPath";
 
 // default data
 const User = {
@@ -12,7 +13,6 @@ const User = {
 
 const getGreeting = () => {
   const hour = new Date().getHours();
-
    switch (true) {
     case hour >= 5 && hour < 12:
       return "Good Morning";
@@ -27,7 +27,6 @@ const getGreeting = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-
   const greeting = getGreeting();
 
   return (
@@ -70,8 +69,8 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/add-customer")}>
-            New Customer
+           onClick={()=> navigate(URL_PATH.Billing)}>
+            New Invoice
           </Button>
 
           <Button variant="contained"
@@ -85,7 +84,7 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/add-distributor")}>
+           onClick={()=> navigate(URL_PATH.DistributorsForm)}>
             New Distributor
           </Button>
 
@@ -100,7 +99,7 @@ const LandingPage = () => {
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
-           onClick={()=> navigate("/inventory/add-inventory-item")}>
+           onClick={()=> navigate(URL_PATH.AddInventoryItem)}>
             New Inventory
           </Button>
          </Box>
@@ -123,15 +122,16 @@ const LandingPage = () => {
             pl:{ xs:6, md:80 },
             pt:{ xs:16, md:36 }
           }}
-        
           >
             "Trusted medicines, <br /> Trusted care."
           </Typography>
          </Box>
-
    </Box>
   </>
   )
 }
 
 export default LandingPage
+
+ 
+ 

@@ -9,54 +9,55 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import { URL_PATH } from '../../constants/UrlPath';
 import { useNavigate } from 'react-router-dom';
-
-
+ 
+ 
 export interface SettingRef {
   openDropdown: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
-
+ 
 interface SettingProps {
   readonly [key: string]: unknown;
 }
-  
+ 
 const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const navigate = useNavigate();
-
+ 
   useImperativeHandle(ref, () => ({
     openDropdown(event: React.MouseEvent<HTMLButtonElement>) {
       setAnchorEl(event.currentTarget);
     }
   }));
-
+ 
   const handleClose = () => setAnchorEl(null);
-
+ 
  
   const menuItems = [
-    { text: 'General', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.Setting },
-    { text: 'Pharmacy Profile', icon: <LocalPharmacyIcon fontSize="small" />, path: "/" },
-    { text: 'Dashboard Settings', icon: <DashboardIcon fontSize="small" />, path: "/"},
-    { text: 'Customers Settings', icon: <GroupIcon fontSize="small" />, path: "/" },
-    { text: 'Doctors Settings', icon: <SettingsIcon fontSize="small" />, path:"/" },
-    { text: 'Distributors Settings', icon: <SettingsIcon fontSize="small" />, path: "/" },
+    { text: 'General', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.GeneralSettings},
+    { text: 'Pharmacy Profile', icon: <LocalPharmacyIcon fontSize="small" />, path: URL_PATH.PharmacyProfile },
+      
+    { text: 'Dashboard Settings', icon: <DashboardIcon fontSize="small" />, path: URL_PATH.DashboardSettings},
+    { text: 'Customer Settings', icon: <GroupIcon fontSize="small" />, path: URL_PATH.CustomerSettings },
+    { text: 'Doctors Settings', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DoctorsSettings },
+    { text: 'Distributors Settings', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DistributorsSetting },
     { text: 'Inventory Settings', icon: <InventoryIcon fontSize="small" />, path: URL_PATH.InventorySettings },
     { text: 'Invoice Settings', icon: <DescriptionIcon fontSize="small" />, path: URL_PATH.InvoiceSetting },
-    { text: 'Reports', icon: <AssessmentIcon fontSize="small" />, path: "/" },
+    { text: 'Report Settings', icon: <AssessmentIcon fontSize="small" />, path: URL_PATH.ReportSettings },
   ];
-
-
+ 
+ 
   return (
     <Popover
       open={Boolean(anchorEl)}
       anchorEl={anchorEl}
       onClose={handleClose}
-      
+     
       anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
       transformOrigin={{ vertical: 'center', horizontal: 'left' }}
       PaperProps={{
         sx: {
-          ml: 1, 
-          width: 280, 
+          ml: 1,
+          width: 280,
           borderRadius: '12px',
           backgroundColor: '#ffffff',
           boxShadow: '0px 4px 20px rgba(0,0,0,0.1)',
@@ -64,7 +65,7 @@ const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
         },
       }}
     >
-      
+     
       <Box sx={{
         display: 'flex',
         alignItems: 'center',
@@ -78,7 +79,7 @@ const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
           Settings
         </Typography>
       </Box>
-
+ 
    
       <List sx={{ p: 0.5 }}>
         {menuItems.map((item) => (
@@ -96,12 +97,13 @@ const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
          </ListItemButton>
           ))}
        </List>
-
+ 
     </Popover>
   );
 });
-
+ 
 Setting.displayName = 'Setting';
-
+ 
 export default Setting;
+ 
  
