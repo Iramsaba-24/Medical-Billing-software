@@ -12,6 +12,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 import { useNavigate, useLocation  } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 
 // form fields
@@ -181,7 +182,7 @@ const navigate = useNavigate();
     {/* new invoice and retail invoice btn */}
     <Button
           onClick={() => {setActiveTab("new");                                                        
-            if (location.pathname !== "") { navigate("");}}}                  
+            if (location.pathname !== URL_PATH.Billing) { navigate(URL_PATH.Billing);}}}                  
           sx={{
             textTransform: "none",       
             width: { xs: "50%", md: "10%" },
@@ -201,7 +202,7 @@ const navigate = useNavigate();
         {/* Retail Invoice */}
           <Button
             onClick={() => {setActiveTab("retail");  
-             if (location.pathname !== "") { navigate(""); }}}
+             if (location.pathname !== URL_PATH.RetailInvoice) { navigate(URL_PATH.RetailInvoice); }}}
             sx={{
               textTransform: "none",
               width: { xs: "50%", md: "10%" },

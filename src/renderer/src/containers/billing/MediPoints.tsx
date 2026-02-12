@@ -151,7 +151,7 @@ const MediPoints: React.FC = () => {
         onClick={() => {
           setActiveTab("new");      // Set active tab
           if (location.pathname !== "") {
-            navigate(URL_PATH.NewInvoice);          
+            navigate(URL_PATH.Billing);          
           }
         }}
         sx={{
