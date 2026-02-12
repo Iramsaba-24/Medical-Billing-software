@@ -7,7 +7,7 @@ import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
 import ItemsSection from "@/containers/Customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
 
@@ -45,7 +45,6 @@ const doctorOptions = [
 ];
 
 function POSMaster() {
-  useParams();
   const navigate = useNavigate();
   const methods = useForm<NewInvoiceFormValues>({
     defaultValues: {
@@ -99,7 +98,7 @@ function POSMaster() {
 
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
-    0,
+    0
   ); //calculation for total total amount without gst
 
   const finalTotal = subTotal + (subTotal * gst) / 100; // calculation fot total amount with gst
@@ -116,7 +115,7 @@ function POSMaster() {
         }}
         sx={{
           textTransform: "none", //capital none
-          
+          // px: { xs: 7.5, sm: 3 },
           width: { xs: "50%", md: "10%" },
           height: "38px",
           fontWeight: 500,
@@ -138,7 +137,7 @@ function POSMaster() {
           setActiveTab("retail");
           if (location.pathname !== URL_PATH.RetailInvoice) {
             navigate(URL_PATH.RetailInvoice);
-          }
+          } 
         }}
         sx={{
           textTransform: "none",

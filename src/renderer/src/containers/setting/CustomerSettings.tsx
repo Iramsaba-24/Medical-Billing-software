@@ -263,7 +263,7 @@ const CustomerSettings = () => {
 
             
     {/* reset and save buttons */}      
-               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0 }}>
+               <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
           <Button 
             type="button" 
             variant="outlined" 

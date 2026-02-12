@@ -130,7 +130,7 @@ const Header: React.FC = () => {
           <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
             ERP Billing Software
           </Typography>
-          <Home sx={{ cursor: "pointer" }} onClick={() => navigate("/")} />
+          <Home sx={{ cursor: "pointer" }} onClick={() => navigate(URL_PATH.Landing)} />
           <SearchBox>
             <SearchIcon sx={{ mr: 1, color: '#666' }} />
             <InputBase placeholder="Search" fullWidth />

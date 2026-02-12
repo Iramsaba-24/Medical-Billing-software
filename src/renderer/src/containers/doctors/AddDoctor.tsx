@@ -30,7 +30,7 @@ const AddDoctor = () => {
 
   const navigate = useNavigate();
 
-  // function run when submitted
+  // submit
   const onSubmit = (data: AddDoctorFormValues) => {
     const existingDoctors = JSON.parse(
       localStorage.getItem("doctors") || "[]"
@@ -59,7 +59,7 @@ const AddDoctor = () => {
   <hr />
 
   <FormProvider {...methods}>
-    <form onSubmit={methods.handleSubmit(onSubmit)}>
+    <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
       <Box
         maxWidth="900px"
         mx="auto"

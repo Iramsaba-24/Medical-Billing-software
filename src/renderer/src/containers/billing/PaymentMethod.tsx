@@ -288,6 +288,10 @@ const navigate = useNavigate();
                   payment === "credit-card"
                     ? "Card Holder's Name is required"
                     : false,
+                pattern: {
+                  value: /^[A-Za-z\s]+$/,
+                  message: "Enter letters only",
+                },
               }}
             />
           </Box>

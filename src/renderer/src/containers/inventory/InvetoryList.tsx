@@ -85,7 +85,7 @@ const InventoryList = () => {
             sx={{
               px: 4,
               py: 1,
-              width: { xs:"50%", md:"18%" },             
+              width: { xs:"50%", md:"20%" },             
               textTransform: "none",
               backgroundColor: "#1b7f6b",
             }}

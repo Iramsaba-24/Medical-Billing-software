@@ -37,9 +37,9 @@ export const URL_PATH = {
   InventorySettings: "/settings/inventory",
   DashboardSettings: "/settings/dashboard",
   GeneralSettings: '/settings/general',
-  CustomerSettings: "/settings/customer",
-  
-
+  DoctorSettings: '/settings/DoctorSettings',
+  PharmacyProfile: '/settings/PharmacyProfile',
+  CustomerSettings: '/settings/Customer',
 
   RetailInvoice: "/billing/retail-invoice",
   Billing: "/billing/new-invoice",
