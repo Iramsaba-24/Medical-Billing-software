@@ -1,13 +1,25 @@
-import { useForm, FormProvider, FieldValues } from 'react-hook-form';
-import { Paper, Typography, Box, Button } from '@mui/material';
-import RadioField from '@/components/controlled/RadioField';
-import CheckboxGroup from '@/components/controlled/CheckboxGroup';
+import { useForm, FormProvider, FieldValues } from "react-hook-form";
+import { Paper, Typography, Box, Button } from "@mui/material";
+import RadioField from "@/components/controlled/RadioField";
+import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 
+<<<<<<< HEAD
  // Reusable UI component for each settings block.
  
 const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+=======
+// Reusable UI component for each settings block.
+
+const SettingSection = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
+>>>>>>> 3517e4559ed4b29a1b92c598d8f493fbaa58a07e
   <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 2, mb: 2 }}>
-    <Typography sx={{ fontWeight: 600, mb: 1, fontSize: '0.95rem' }}>
+    <Typography sx={{ fontWeight: 600, mb: 1, fontSize: "0.95rem" }}>
       {title}
     </Typography>
     {children}
@@ -23,15 +35,15 @@ const InvoiceSettings = () => {
       wholesale_series: "WHS-0001",
       gst_series: "GST-0001",
       invoice_settings: [],
-      payment_method: 'cash',
+      payment_method: "cash",
       allow_split_payment: [],
-      product_linking: [], 
-      tax_mode: 'inclusive_gst',
+      product_linking: [],
+      tax_mode: "inclusive_gst",
       tax_override: [],
-      discount_rule: 'item_level',
+      discount_rule: "item_level",
       discount_options: [],
-      date_control: [], 
-      credit_control: [], 
+      date_control: [],
+      credit_control: [],
     },
   });
 
@@ -40,25 +52,29 @@ const InvoiceSettings = () => {
 
   // Styling for form components
   const radioSx = {
-    width: '100%',
-    '& .MuiFormGroup-root': { width: '100%' },
-    '& .MuiFormControlLabel-root': {
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'space-between',
-      flexDirection: 'row-reverse',
-      ml: 0, mr: 0, mb: 0.5,
+    width: "100%",
+    "& .MuiFormGroup-root": { width: "100%" },
+    "& .MuiFormControlLabel-root": {
+      width: "100%",
+      display: "flex",
+      justifyContent: "space-between",
+      flexDirection: "row-reverse",
+      ml: 0,
+      mr: 0,
+      mb: 0.5,
     },
   };
 
   const checkboxSx = {
-    width: '100%',
-    '& .MuiFormGroup-root': { width: '100%' },
-    '& .MuiFormControlLabel-root': {
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'flex-start',
-      ml: 0, mr: 0, mb: 0.5,
+    width: "100%",
+    "& .MuiFormGroup-root": { width: "100%" },
+    "& .MuiFormControlLabel-root": {
+      width: "100%",
+      display: "flex",
+      justifyContent: "flex-start",
+      ml: 0,
+      mr: 0,
+      mb: 0.5,
     },
   };
 
@@ -67,23 +83,22 @@ const InvoiceSettings = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: '#f9f9f9', p: 2 }}>
+    <Box sx={{ backgroundColor: "#f9f9f9", p: 2 }}>
       <Typography variant="h6" mb={3} fontWeight={600}>
         Invoice Settings
       </Typography>
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          
           {/*  Invoice Types Section */}
           <SettingSection title="Invoice Types">
             <CheckboxGroup
               name="invoice_types"
               label=""
               options={[
-                { label: 'Retail', value: 'retail' },
-                { label: 'Wholesale', value: 'wholesale' },
-                { label: 'GST Invoice', value: 'gst' },
+                { label: "Retail", value: "retail" },
+                { label: "Wholesale", value: "wholesale" },
+                { label: "GST Invoice", value: "gst" },
               ]}
               sx={checkboxSx}
             />
@@ -91,28 +106,57 @@ const InvoiceSettings = () => {
 
           {/*  Numbering Series Section (with register fixed) */}
           <SettingSection title="Invoice Numbering Series">
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 1.5, mb: 2 }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <Typography fontSize="14px">Retail Series</Typography>
-                <input {...register("retail_series")} style={{ width: '120px', padding: '4px' }} />
-              </Box>
-          
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography fontSize="14px">Wholesales Series</Typography>
-                <input {...register("wholesale_series")} style={{ width: '120px', padding: '4px' }} />
+                <input
+                  {...register("retail_series")}
+                  style={{ width: "120px", padding: "4px" }}
+                />
               </Box>
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography fontSize="14px">Wholesales Series</Typography>
+                <input
+                  {...register("wholesale_series")}
+                  style={{ width: "120px", padding: "4px" }}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <Typography fontSize="14px">GST Series</Typography>
-                <input {...register("gst_series")} style={{ width: '120px', padding: '4px' }} />
+                <input
+                  {...register("gst_series")}
+                  style={{ width: "120px", padding: "4px" }}
+                />
               </Box>
             </Box>
             <CheckboxGroup
               name="invoice_settings"
               label=""
               options={[
-                { label: 'Auto-increment', value: 'auto_increment' },
-                { label: 'Lock series after first use', value: 'lock_series' },
+                { label: "Auto-increment", value: "auto_increment" },
+                { label: "Lock series after first use", value: "lock_series" },
               ]}
               sx={checkboxSx}
             />
@@ -124,8 +168,8 @@ const InvoiceSettings = () => {
               name="tax_mode"
               label=""
               options={[
-                { label: 'Inclusive of GST', value: 'inclusive_gst' },
-                { label: 'Exclusive of GST', value: 'exclusive_gst' },
+                { label: "Inclusive of GST", value: "inclusive_gst" },
+                { label: "Exclusive of GST", value: "exclusive_gst" },
               ]}
               sx={radioSx}
             />
@@ -133,7 +177,12 @@ const InvoiceSettings = () => {
               <CheckboxGroup
                 name="tax_override"
                 label=""
-                options={[{ label: 'Allow override per invoice', value: 'override_per_invoice' }]}
+                options={[
+                  {
+                    label: "Allow override per invoice",
+                    value: "override_per_invoice",
+                  },
+                ]}
               />
             </Box>
           </SettingSection>
@@ -144,8 +193,8 @@ const InvoiceSettings = () => {
               name="discount_rule"
               label=""
               options={[
-                { label: 'Item-level discount', value: 'item_level' },
-                { label: 'Bill-level discount', value: 'bill_level' },
+                { label: "Item-level discount", value: "item_level" },
+                { label: "Bill-level discount", value: "bill_level" },
               ]}
               sx={radioSx}
             />
@@ -153,7 +202,12 @@ const InvoiceSettings = () => {
               <CheckboxGroup
                 name="discount_options"
                 label=""
-                options={[{ label: 'Allow both (with priority rules)', value: 'allow_both' }]}
+                options={[
+                  {
+                    label: "Allow both (with priority rules)",
+                    value: "allow_both",
+                  },
+                ]}
               />
             </Box>
           </SettingSection>
@@ -164,9 +218,9 @@ const InvoiceSettings = () => {
               name="payment_method"
               label=""
               options={[
-                { label: 'Cash', value: 'cash' },
-                { label: 'Credit', value: 'credit' },
-                { label: 'UPI', value: 'upi' },
+                { label: "Cash", value: "cash" },
+                { label: "Credit", value: "credit" },
+                { label: "UPI", value: "upi" },
               ]}
               sx={radioSx}
             />
@@ -174,7 +228,12 @@ const InvoiceSettings = () => {
               <CheckboxGroup
                 name="allow_split_payment"
                 label=""
-                options={[{ label: 'Allow split payment (Cash + UPI)', value: 'split_payment' }]}
+                options={[
+                  {
+                    label: "Allow split payment (Cash + UPI)",
+                    value: "split_payment",
+                  },
+                ]}
               />
             </Box>
           </SettingSection>
@@ -185,10 +244,13 @@ const InvoiceSettings = () => {
               name="product_linking"
               label=""
               options={[
-                { label: 'Show logo on invoice', value: 'show_logo' },
-                { label: 'Show GST break-up', value: 'show_gst_breakup' },
-                { label: 'Show HSN code', value: 'show_hsn_code' },
-                { label: 'Print duplicate copy', value: 'print_duplicate_copy' },
+                { label: "Show logo on invoice", value: "show_logo" },
+                { label: "Show GST break-up", value: "show_gst_breakup" },
+                { label: "Show HSN code", value: "show_hsn_code" },
+                {
+                  label: "Print duplicate copy",
+                  value: "print_duplicate_copy",
+                },
               ]}
               sx={checkboxSx}
             />
@@ -199,7 +261,12 @@ const InvoiceSettings = () => {
             <CheckboxGroup
               name="date_control"
               label=""
-              options={[{ label: 'Allow back dated invoices', value: 'allow_back_dated' }]}
+              options={[
+                {
+                  label: "Allow back dated invoices",
+                  value: "allow_back_dated",
+                },
+              ]}
               sx={checkboxSx}
             />
           </SettingSection>
@@ -210,19 +277,22 @@ const InvoiceSettings = () => {
               name="credit_control"
               label=""
               options={[
-                { label: 'Allow invoice cancellation', value: 'allow_cancellation' },
-                { label: 'Allow sales return', value: 'allow_sales_return' },
+                {
+                  label: "Allow invoice cancellation",
+                  value: "allow_cancellation",
+                },
+                { label: "Allow sales return", value: "allow_sales_return" },
               ]}
               sx={checkboxSx}
             />
           </SettingSection>
 
           {/* Action Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
             <Button
               variant="outlined"
-              onClick={() => reset()} 
-              sx={{ px: 4, mr: 2, color: '#2d8b7a', borderColor: '#2d8b7a' }}
+              onClick={() => reset()}
+              sx={{ px: 4, mr: 2, color: "#2d8b7a", borderColor: "#2d8b7a" }}
             >
               Reset
             </Button>
@@ -233,7 +303,11 @@ const InvoiceSettings = () => {
                 backgroundColor: "#238878",
                 color: "#fff",
                 textTransform: "none",
-                "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
+                "&:hover": {
+                  backgroundColor: "#fff",
+                  color: "#238878",
+                  border: "2px solid #238878",
+                },
               }}
             >
               Save Settings

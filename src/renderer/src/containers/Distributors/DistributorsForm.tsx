@@ -6,7 +6,11 @@ import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
+<<<<<<< HEAD
 import AppToast from "@/containers/Distributors/AppToast";
+=======
+import AppToast from '@/containers/Distributors/AppToast';
+>>>>>>> 3517e4559ed4b29a1b92c598d8f493fbaa58a07e
 import { URL_PATH } from '@/constants/UrlPath';
 import BankDetailsForm from './BankDetailForm';
 
@@ -51,9 +55,9 @@ const DistributorsForm = () => {
 
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
-
+//  when form is submitted
   const onSubmit = (data: DistributorFormInput) => {
-    //  get data to  local storage
+    //  get old data to  local storage
     const stored = localStorage.getItem("distributors");
     const currentData = stored ? JSON.parse(stored) : [];
       //new entry object
@@ -72,10 +76,11 @@ const DistributorsForm = () => {
   };
 
   return (
-    <Box p={3} sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+    // form  styling
+    <Box p={2} sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       <FormProvider {...methods}>
         <form noValidate onSubmit={methods.handleSubmit(onSubmit)}> 
-             {/* like card  form styling */}
+             {/* add form card   styling */}
           <Paper
             sx={{
               maxWidth: 800,
@@ -103,6 +108,8 @@ const DistributorsForm = () => {
               <TextInputField
                 name="gstIn"
                 label="GSTIN"
+                inputType="all"
+                rows={1}
                 rules={{
                   pattern: {
                     value: /^[0-9]{2}[A-Z0-9]{13}$/,
@@ -135,7 +142,7 @@ const DistributorsForm = () => {
               onClick={() => navigate(URL_PATH.DistributorsPage)}
               sx={{
                 color: "#238878",
-                border: "2px solid #238878",
+                 border: "2px solid #238878",
                 textTransform: "none",
                 "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
               }}>           
