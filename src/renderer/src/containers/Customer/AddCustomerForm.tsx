@@ -7,7 +7,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
-import ItemsSection from "@/containers/customer/ItemsSection";
+import ItemsSection from "@/containers/Customer/ItemsSection";
 
 // Structure for a single row in the medicine list
 export interface ItemRow { 
@@ -15,6 +15,10 @@ export interface ItemRow {
   name: string; 
   qty: number | ""; 
   price: number | ""; 
+  errors?: {
+    qty?: string;
+    price?: string;
+  };
 }
 
 interface Props {

@@ -80,7 +80,7 @@ function GenralSettings() {
         </Typography>
 
         <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-            <Paper sx={{ p: 3, maxWidth: 850, m: "auto", mt: 4 }}>
+            <Paper sx={{ p: 4, width: { xs: "95%", sm: "90%", md: "1000px", lg: "1200px" }, m: "auto", mt: 4,}}>
 
           {/* Language  */}
           <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={3} mb={3}>

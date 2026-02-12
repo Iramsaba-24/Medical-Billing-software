@@ -5,9 +5,9 @@ import TextInputField from '@/components/controlled/TextInputField';
 import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DropdownField from '@/components/controlled/DropdownField';
-import ItemsSection from '../containers/customer/ItemsSection';
+import ItemsSection from '@/containers/Customer/ItemsSection';
 import NumericField from '@/components/controlled/NumericField';
-import { useNavigate, useLocation, useParams} from "react-router-dom";
+import { useNavigate, useLocation} from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
 
@@ -47,7 +47,7 @@ const doctorOptions = [
 ];
 
 function POSMaster() {
-  const { invoiceNo } = useParams();
+  
   const navigate = useNavigate();
   const methods = useForm<NewInvoiceFormValues>({
     defaultValues: {
@@ -70,7 +70,7 @@ function POSMaster() {
       qty: 1,
       price: ""
     }]);
-  }, [invoiceNo]);    // when url change with invoice number
+  }, [methods]);    // when url change with invoice number
 
  
 
@@ -80,11 +80,15 @@ function POSMaster() {
 
   
   const location = useLocation();
+  const match = location.pathname.match(/invoice(\d+)/);
+  const activeInvoiceNumber = match ? match[1] : null;
+
+
 
 
   const onSubmit = (data: NewInvoiceFormValues) => {
     console.log(data);
-    navigate("/medipoint")
+    navigate("/medi-point")
   };
 
   type ItemRow = {
@@ -166,15 +170,28 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                       }}>
                           {Array.from({ length: 10 }, (_, i) => {
                             const invoiceNumber = i + 1;
+                            const isActive = activeInvoiceNumber === String(invoiceNumber);
+
           
                             return (
                               <Button
                                 key={invoiceNumber}
-                                sx={{  
-                                  ...invoiceButtonSx,
+                               sx={{
                                   width: { xs: 'calc(50% - 6px)', md: 'auto' },
                                   minWidth: { xs: 'unset', md: '250px' },
                                   fontSize: { xs: '12px', md: '14px' },
+                                  textTransform: "none",
+                                  minHeight: "36px",
+                                  borderRadius: "4px",
+
+                                  backgroundColor: isActive ? "#fff" : "#238878",
+                                  color: isActive ? "#238878" : "#fff",
+                                  border: "2px solid #238878",
+
+                                  "&:hover": {
+                                    backgroundColor: "#fff",
+                                    color: "#238878",
+                                  },
                                 }}
                                 onClick={() => {
                                 navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);}}>
@@ -212,8 +229,8 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   <NumericField
                     name="age"
                     label="Age"
-                    
-                  />
+                    required
+                    max={100}/>
                 </Box>
               </Box>
 
@@ -231,6 +248,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   <EmailField
                     name="email"
                     label="Email"
+                    required
                    
                   />
                 </Box>
@@ -242,7 +260,7 @@ const finalTotal = subTotal + (subTotal * gst) / 100;               // calculati
                   name="addressLeft"
                   label="Address"
                   inputType="textarea"
-                  
+                  required
                   rows={3}/>
               </Box>
 
