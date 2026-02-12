@@ -5,7 +5,7 @@ import TextInputField from '@/components/controlled/TextInputField';
 import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DropdownField from '@/components/controlled/DropdownField';
-import ItemsSection from '@/containers/Customer/ItemsSection';
+import ItemsSection from '@/containers/Customer';
 import NumericField from '@/components/controlled/NumericField';
 import { useNavigate, useLocation} from "react-router-dom";
 import { Print } from "@mui/icons-material";

@@ -3,9 +3,11 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { Box, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import TextInputField from '@/components/controlled/TextInputField';
-import AppToast from '@/containers/distributors/AppToast';
 import BgImage from '@/assets/bgloginpage.svg';
 import LogoImage from '@/assets/logoimg.svg';
+import AppToast from '@/containers/Distributors/AppToast';
+import { URL_PATH } from '@/constants/UrlPath';
+
 
 type LoginFormInputs = {
   username: string;
@@ -24,9 +26,9 @@ const LoginPage = () => {
   const onSubmit = (data: LoginFormInputs) => {
     console.log(data);
     setToastOpen(true);
-    setTimeout(() => navigate('/'), 2000);
+    setTimeout(() => navigate(URL_PATH.Landing), 500);
   };
-      // textinput field styling
+      // textinput field styling(text box)
   const inputStyle = {
     // input box -container height, border radius, background color
     '& .MuiOutlinedInput-root': {
@@ -71,7 +73,7 @@ const LoginPage = () => {
             flexDirection: 'column',  //inputboxes up-down
             alignItems: 'center',
             backgroundColor: 'transparent', //background img showing
-            p: { xs: 3, sm: 4 },
+            p: { xs: 3, sm: 4 },// form padding (textbox and button)
             borderRadius: 2,
           }}>
              {/* logo img */}
@@ -100,8 +102,9 @@ const LoginPage = () => {
               rules={{
                 required: 'Username or Email is required',
                 validate: (value: string) => {
-                  const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-                  const usernameRegex = /^[a-zA-Z0-9_.@]{8,20}$/;
+       
+                  const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}$/i;
+                  const usernameRegex = /^[a-zA-Z0-9_.]{8,20}$/;
                   if (emailRegex.test(value) || usernameRegex.test(value)) {
                     return true;
                   }
@@ -115,7 +118,7 @@ const LoginPage = () => {
               rules={{
                 required: 'License Key is required',
                 pattern: {
-                  value: /^[A-Z0-9]{12}$/,
+                  value: /^[A-Z0-9]{11}$/,
                   message: 'Invalid License Key',
                 },
               }} />

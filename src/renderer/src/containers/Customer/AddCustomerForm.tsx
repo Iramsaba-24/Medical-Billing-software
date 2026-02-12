@@ -8,6 +8,9 @@ import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import ItemsSection from "@/containers/Customer/ItemsSection";
+import { useNavigate } from "react-router-dom";
+import { Invoice } from "../Invoices/InvoiceView";
+import { URL_PATH } from "@/constants/UrlPath";
 
 // Structure for a single row in the medicine list
 export interface ItemRow { 
@@ -33,6 +36,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const [gst, setGst] = useState(5);
   const [paymentMode, setPaymentMode] = useState("Cash");
   const [list, setList] = useState<CustomerData[]>([]);
+
+  const navigate = useNavigate();
 
   // React Hook Form setup: loads initialData if we are editing
   const methods = useForm<CustomerData>({
@@ -62,6 +67,36 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     textTransform: "none", 
     "&:hover": { bgcolor: "#fff", color: "#248a76", borderColor: "#248a76" } 
   };
+
+
+// print  
+const handlePrint = () => {
+  const invoiceData: Invoice = {
+    patient: methods.getValues("name"),
+    doctor: methods.getValues("doctor"),
+    address: methods.getValues("address"),
+    invoice: "inv",
+    date: methods.getValues("date"),
+    medicines: rows.map((r) => ({
+      name: r.name,
+      qty: r.qty === "" ? "" : String(r.qty), 
+      amount: Number(r.qty) * Number(r.price),
+      batch: "-",
+      expiry: "-",
+    })),
+    subTotal,
+    gst,
+    total: finalTotal,
+  };
+
+  // Save invoice in localStorage
+  const savedInvoices = JSON.parse(localStorage.getItem("invoices") || "[]");
+  savedInvoices.push(invoiceData);
+  localStorage.setItem("invoices", JSON.stringify(savedInvoices));
+
+  // Navigate to InvoiceView with invoiceNo in URL and pass state
+  navigate(`${URL_PATH.InvoiceView}/${invoiceData.invoice}`, { state: invoiceData });
+};
 
   return (
     <FormProvider {...methods}>
@@ -127,10 +162,16 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         />
 
         {/* Bottom Action Buttons (Print, Pay, Save) */}
+
         <Box sx={{ mt: 4, mb: 5, display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "flex-end", gap: 2 }}>
-          <Button variant="contained" startIcon={<Print />} onClick={() => window.print()} sx={btnStyle}>
+          {/* <Button variant="contained" startIcon={<Print />} onClick={() => window.print()} sx={btnStyle}>
+            Print
+          </Button> */}
+
+          <Button variant="contained" onClick={handlePrint} startIcon={<Print />} sx={btnStyle}>
             Print
           </Button>
+          
           <Button variant="contained" startIcon={<Payments />} onClick={() => alert(`Total: ₹${finalTotal}`)} sx={btnStyle}>
             Pay Now
           </Button>
