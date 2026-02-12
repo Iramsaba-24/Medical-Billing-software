@@ -16,6 +16,8 @@ export const URL_PATH = {
   CreateInvoice: "/create-invoice",
   InvoiceView: "/invoice-view",
   DistributorsTable: "/table",
+  DistributorsSetting: "/settings/distributors-setting",
+  ReportSettings: "/settings/report-settings",
 
   ReportPage: "/report",
   DistributorsPage: "/distributors",
@@ -28,13 +30,23 @@ export const URL_PATH = {
   MedicineGroup: "/inventory/medicine-group",
   AddMedicineGroup: "/inventory/add-medicine-group",
   AddInventoryItem: "/inventory/add-inventory-item",
+  Setting: "/settings",
 
   InvoiceSetting: "/settings/invoice",
   InventorySettings: "/settings/inventory",
 
-  Setting: "/settings",
+  CustomerSetting: "/settings/customer",
 
-  DoctorsSettings: "/settings/doctor",
-  PaymentDetails : "/settings/payment",
+  DoctorSetting: "/settings/doctors",
 
+  NewInvoice: "/billing/newincoice",
+  RetailInvoice: "/billing/retailinvoice",
+
+  Billing: "/billing/new-invoice",
+  MediPoints: "/billing/medi-points",
+  PaymentMethod: "/billing/payment-method",
+  PaymentDetails: "/billing/payment-details",
+  GeneralSettings: "/settings/general",
+
+  PharmacyProfile: "/settings/pharmacy-profile",
 };

@@ -1,5 +1,8 @@
+
  import * as React from 'react';
  import { styled, useTheme } from '@mui/material/styles';
+ 
+
  import {
    Box,
    Drawer,
@@ -28,6 +31,7 @@
  import SettingsIcon from '@mui/icons-material/Settings';
  import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
  import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
+ import PaymentsIcon from '@mui/icons-material/Payments';
  
  import { Outlet, useNavigate, useLocation } from 'react-router-dom';
  import { URL_PATH } from '../../constants/UrlPath';
@@ -36,9 +40,9 @@ import Setting, { SettingRef } from './Setting';
  
  const MINI_WIDTH = 80;
  const FULL_WIDTH = 240;
-
+ 
  /* --STYLED -- */
-
+ 
  const StyledAppBar = styled(AppBar)(({ theme }) => ({
    backgroundColor: '#238878',
    zIndex: theme.zIndex.drawer + 1,
@@ -59,27 +63,29 @@ import Setting, { SettingRef } from './Setting';
      width: 160,
    },
  }));
-
-
+ 
+ 
  const menuItems = [
    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+   { text: 'Billing', icon: <PaymentsIcon />, path: URL_PATH.Billing },
    { text: 'Customers', icon: <PeopleIcon />, path: URL_PATH.Customer },
    { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
    { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
    { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
-
-   {
-     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
-   },
-   { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
-   { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.Setting },
- ];
+   
+  {
+    text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
+  },
+  { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
+  { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.CustomerSetting },
+  
+];
 
 
  const Sidebar = ({ open }: { open: boolean }) => {
    const navigate = useNavigate();
    const location = useLocation();
-   const settingRef = React.useRef<SettingRef>(null); 
+   const settingRef = React.useRef<SettingRef>(null);
  
  
  
@@ -117,7 +123,7 @@ import Setting, { SettingRef } from './Setting';
  
                    background: active
                      // ? 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)'
-
+ 
                      ? '#238878'
                      : '#D9D9D9',
                    color: active ? '#fff' : 'black',
@@ -128,7 +134,7 @@ import Setting, { SettingRef } from './Setting';
  
                    '&:hover': {
                      // background: 'linear-gradient(90deg, #7FE3D3 0%, #22C7A9 50%, #1FA38A 100%)',
-
+ 
                      background:'#1FA38A'
                    },
  
@@ -138,15 +144,15 @@ import Setting, { SettingRef } from './Setting';
                </Button>
              </ListItem>
            </Tooltip>
-          
+         
          );
        })}
          <Setting ref={settingRef} />
      </List>
    );
  };
-
-
+ 
+ 
  const Header: React.FC = () => {
  
     const theme = useTheme();
@@ -158,7 +164,7 @@ import Setting, { SettingRef } from './Setting';
    return (
      <Box sx={{ display: 'flex' }}>
        <CssBaseline />
-
+ 
        <StyledAppBar position="fixed">
          <Toolbar sx={{ gap: 2 }}>
            <IconButton color="inherit" onClick={() => setOpen(!open)}>
@@ -168,18 +174,18 @@ import Setting, { SettingRef } from './Setting';
            <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
              ERP Billing Software
            </Typography>
-
+ 
          {/* path for landing page */}
            <Home
              sx={{ cursor: "pointer" }}
              onClick={() => navigate("/")}
            />
-
+ 
            <SearchBox>
              <SearchIcon sx={{ mr: 1, color: '#666' }} />
              <InputBase placeholder="Search" fullWidth />
            </SearchBox>
-
+ 
            <IconButton color="inherit" onClick={() => navigate(-1)}>
              <UndoRoundedIcon />
            </IconButton>
@@ -189,7 +195,7 @@ import Setting, { SettingRef } from './Setting';
            </IconButton>
          </Toolbar>
        </StyledAppBar>
-
+ 
        <Drawer
          variant={isMobile ? 'temporary' : 'permanent'}
          open={isMobile ? open : true}
@@ -211,19 +217,19 @@ import Setting, { SettingRef } from './Setting';
          <Sidebar open={isMobile ? true : open} />
        </Drawer>
  
-  <Box
-         component="main"
-         sx={{
-           flex: 1,
-           bgcolor: "#f8f9fa",
-           py: { xs:9, md:8 },
-           mt:3,
-           px:4,
-           height: "100vh",
-           overflowY: "auto",
-         }}
-       >
-         <Outlet />
+ <Box
+        component="main"
+        sx={{
+          flex: 1,
+          bgcolor: "#f8f9fa",
+          py: { xs:9, md:8 },
+          mt:3,
+          px:{xs:1,sm:3, md:5},
+          height: "100vh",
+          // overflowY: "auto",
+        }}
+      >
+        <Outlet />
       </Box>
  
        
@@ -232,3 +238,4 @@ import Setting, { SettingRef } from './Setting';
  };
  
  export default Header;
+ 

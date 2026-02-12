@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 /* ======================= TextField Styles ======================= */
 const inputSx = {
@@ -210,7 +211,8 @@ const RetailInvoice: React.FC = () => {
               </Box>
 
               <Box textAlign="center">
-                <Button
+                <Button 
+                onClick={()=> navigate (URL_PATH.PaymentMethod)} 
                   type="submit"
                   variant="contained"
                   sx={{
