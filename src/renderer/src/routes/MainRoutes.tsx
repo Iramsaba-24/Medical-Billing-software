@@ -45,6 +45,7 @@ import Billing from "@/view/Billing";
 
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from '@/containers/setting/DashboardSettings';
+import RetailInvoice from '@/containers/billing/RetailInvoice';
 
 export const mainRoutes: RouteObject[] = [
   {
@@ -167,7 +168,10 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.Billing}/:invoiceNo`,
         element: <Billing />,
       },
-      
+      {
+        path: URL_PATH.RetailInvoice,
+        element: <RetailInvoice />,
+      },
       {
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,

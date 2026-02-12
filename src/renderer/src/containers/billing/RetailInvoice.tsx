@@ -23,6 +23,7 @@ import MobileField from "@/components/controlled/MobileField";
 import TextInputField from "@/components/controlled/TextInputField";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 /* STYLES */
 const TEAL_COLOR = "#2D8B7A";
@@ -107,7 +108,7 @@ const POS2 = () => {
         <Button
           onClick={() => {
             setActiveTab("new");
-            if (location.pathname !== "/settings/pos") navigate("/settings/pos");
+            if (location.pathname !== URL_PATH.Billing) navigate(URL_PATH.Billing);
           }}
           sx={{
             textTransform: "none",
@@ -126,8 +127,8 @@ const POS2 = () => {
         <Button
           onClick={() => {
             setActiveTab("retail");
-            if (location.pathname !== "/settings/retailinvoice")
-              navigate("/settings/retailinvoice");
+            if (location.pathname !== URL_PATH.RetailInvoice)
+              navigate(URL_PATH.RetailInvoice);
           }}
           sx={{
             textTransform: "none",
