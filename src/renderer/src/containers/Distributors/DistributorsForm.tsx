@@ -6,11 +6,7 @@ import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
-<<<<<<< HEAD
-import AppToast from "@/containers/Distributors/AppToast";
-=======
 import AppToast from '@/containers/Distributors/AppToast';
->>>>>>> 3517e4559ed4b29a1b92c598d8f493fbaa58a07e
 import { URL_PATH } from '@/constants/UrlPath';
 import BankDetailsForm from './BankDetailForm';
 

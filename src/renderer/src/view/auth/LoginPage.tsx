@@ -3,11 +3,6 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { Box, Button, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import TextInputField from '@/components/controlled/TextInputField';
-<<<<<<< HEAD
-import AppToast from '@/containers/Distributors/AppToast';
-=======
-
->>>>>>> 3517e4559ed4b29a1b92c598d8f493fbaa58a07e
 import BgImage from '@/assets/bgloginpage.svg';
 import LogoImage from '@/assets/logoimg.svg';
 import AppToast from '@/containers/Distributors/AppToast';

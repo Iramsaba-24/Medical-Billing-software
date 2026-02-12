@@ -3,11 +3,6 @@ import { Paper, Typography, Box, Button } from "@mui/material";
 import RadioField from "@/components/controlled/RadioField";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 
-<<<<<<< HEAD
- // Reusable UI component for each settings block.
- 
-const SettingSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
-=======
 // Reusable UI component for each settings block.
 
 const SettingSection = ({
@@ -17,7 +12,6 @@ const SettingSection = ({
   title: string;
   children: React.ReactNode;
 }) => (
->>>>>>> 3517e4559ed4b29a1b92c598d8f493fbaa58a07e
   <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 2, mb: 2 }}>
     <Typography sx={{ fontWeight: 600, mb: 1, fontSize: "0.95rem" }}>
       {title}
