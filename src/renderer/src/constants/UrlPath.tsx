@@ -1,3 +1,5 @@
+import PharmacyProfile from "@/containers/setting/PharmacyProfile";
+
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
@@ -35,11 +37,14 @@ export const URL_PATH = {
   InvoiceSetting: "/settings/invoice",
   InventorySettings: "/settings/inventory",
   DashboardSettings: "/settings/dashboard",
-   GeneralSettings: '/settings/general',
+  GeneralSettings: "/settings/general",
 
   RetailInvoice: "/billing/retail-invoice",
   Billing: "/billing/new-invoice",
   MediPoints: "/billing/medi-points",
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
+  PharmacyProfile: "/settings/pharmacy-profile",
+  CustomerSettings: "/settings/customer-settings",
+  DoctorsSettings: "/settings/doctors-settings"
 };
