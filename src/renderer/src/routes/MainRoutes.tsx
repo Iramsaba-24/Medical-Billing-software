@@ -23,15 +23,23 @@ import Reorder from '@/containers/inventory/ReorderList';
 import DistributorDetails from '@/containers/Distributors/DistributorsDetails';
 import DistributorsSetting from '@/containers/setting/DistributorsSetting';
 import ReportSettings from '@/containers/setting/ReportSettings';
-import Setting from '@/containers/layout/Setting';
-import DistributorsForm from '@/containers/Distributors/DistributorsForm';
 
 
-import InventorySettings from '@/containers/setting/InventorySettings';
-import Billing from '@/view/Invoices';
-import InvoiveSetting from '@/containers/setting/InvoiveSetting';
+
+
+
 // import LOGIN from '@/view/auth/LoginPage';
 
+
+import Setting from '@/containers/layout/Setting';
+import DistributorsForm from '@/containers/Distributors/DistributorsForm';
+import DashboardSettings from '@/containers/setting/DashboardSettings';
+import InventorySettings from '@/containers/setting/InventorySettings';
+import InvoiceSettings from '@/containers/setting/InvoiveSetting';
+import MediPoints from '@/containers/billing/MediPoints';
+import Billing from '@/view/Billing';
+ 
+ 
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
@@ -102,13 +110,17 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AddInventoryItem,
         element: <AddInventoryItem/>
       },
-      { 
-        path: URL_PATH.DistributorsPage, 
-        element: <DistributorsPage /> 
+      {
+        path: URL_PATH.DistributorsPage,
+        element: <DistributorsPage />
       },
-      { 
+      {
         path: URL_PATH.DistributorsForm,
-        element: <DistributorsForm /> 
+        element: <DistributorsForm />
+      },
+      {
+        path: URL_PATH.DistributorDetails,
+        element: <DistributorDetails />
       },
       { 
         path: URL_PATH.DistributorDetails,
@@ -126,7 +138,18 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.ReportSettings,
         element: <ReportSettings />,
       },
+
       {
+        path: URL_PATH.InvoiceSetting,
+        element: <InvoiceSettings/>,
+      },
+
+      {
+        path: URL_PATH.MediPoints,
+        element: <MediPoints/>,
+      },
+
+     {
         path: URL_PATH.Billing,
         element: <Billing />,
       },
@@ -140,16 +163,21 @@ export const mainRoutes: RouteObject[] = [
         element: <InventorySettings />,
       },
       {
-        path: URL_PATH.InvoiveSetting,
-        element: <InvoiveSetting />,
+        path: URL_PATH.InvoiceSetting,
+        element: <InvoiceSettings />,
       },
       {
         path: URL_PATH.Setting,
         element: <Setting />,
+      },
+      {
+        path: URL_PATH.DashboardSettings,
+        element: <DashboardSettings />,
       },
      
      
     ],
   },
 ];
+ 
  

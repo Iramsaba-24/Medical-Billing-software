@@ -84,7 +84,7 @@ function POSMaster() {
 
   const onSubmit = (data: NewInvoiceFormValues) => {
     console.log(data);
-    navigate("/medipoint")
+    navigate(URL_PATH.MediPoints);
   };
 
   type ItemRow = {
