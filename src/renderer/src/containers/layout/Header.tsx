@@ -69,7 +69,10 @@ import Setting, { SettingRef } from './Setting';
    { text: 'Doctors', icon: <LocalHospitalIcon />, path: URL_PATH.Doctors },
    { text: 'Distributors', icon: <LocalShippingIcon />, path: URL_PATH.DistributorsPage},
    { text: 'Inventory', icon: <Inventory2Icon />, path: URL_PATH.Inventory },
-   { text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices},
+ 
+   {
+     text: 'Invoices', icon: <ReceiptLongIcon />, path: URL_PATH.Invoices
+   },
    { text: 'Reports', icon: <AssessmentIcon />, path: URL_PATH.ReportPage },
    { text: 'Settings', icon: <SettingsIcon />, path: URL_PATH.Setting },
  ];
@@ -217,9 +220,11 @@ import Setting, { SettingRef } from './Setting';
            bgcolor: "#f8f9fa",
            py: { xs:9, md:8 },
            mt:3,
-           px:{xs:1, sm:3, md:5},
+           
            height: "100vh",
            overflowY: "auto",
+           px:{xs:1, sm:3, md:5},
+ 
          }}
        >
          <Outlet />

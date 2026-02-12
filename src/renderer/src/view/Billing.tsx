@@ -72,10 +72,6 @@ function POSMaster() {
     }]);
   }, [methods]);    // when url change with invoice number
 
- 
-
-
-
   const [activeTab, setActiveTab] = useState<"new" | "retail">("new");   //in () default value of active tab
 
   
@@ -84,7 +80,7 @@ function POSMaster() {
 
   const onSubmit = (data: NewInvoiceFormValues) => {
     console.log(data);
-    navigate("/medipoint")
+    navigate(URL_PATH.MediPoints);
   };
 
   type ItemRow = {
