@@ -264,6 +264,7 @@ const POS2 = () => {
                 "&:hover": { bgcolor: "#fff", color: TEAL_COLOR },
                 px: 4,
               }}
+              onClick={() => navigate(URL_PATH.PaymentMethod)}
             >
               Pay
             </Button>
