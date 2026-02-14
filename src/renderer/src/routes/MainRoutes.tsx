@@ -84,6 +84,10 @@ export const mainRoutes: RouteObject[] = [
         element: <Inventory />,
       },
       {
+        path: URL_PATH.RetailInvoice,
+        element: <RetailInvoice />,
+      },
+      {
         path: URL_PATH.InventoryList,
         element: <InventoryList />,
       },
@@ -174,6 +178,18 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,
       },
+       {
+        path: URL_PATH.PharmacyProfile,
+        element: <PharmacyProfile />,
+      },
+       {
+        path: URL_PATH.CustomerSettings,
+        element: <CustomerSettings />,
+      },
+      // {
+      //   path: URL_PATH.DoctorsSettings,
+      //   element: <DoctorsSettings />,
+      // },
       {
         path: URL_PATH.InvoiceSetting,
         element: <InvoiceSettings />,

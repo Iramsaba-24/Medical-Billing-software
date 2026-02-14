@@ -192,10 +192,10 @@ const Header: React.FC = () => {
       <Box component="main" sx={{
          flex: 1, bgcolor: "#f8f9fa",
           py: { xs: 9, md: 8 },
-           mt: { xs: 6, md: 4 },
-            px:{xs:1, sm:3, md:4},
+           mt: 3,
+            px:{xs:1, sm:3, md:5},
             //  height: "100vh"
-            overflow: "auto",
+            overflowY: "auto"
               }}>
         <Outlet />
       </Box>
