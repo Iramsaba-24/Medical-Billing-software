@@ -37,7 +37,7 @@ const InventorySettings = () => {
   const sectionTitleStyle = { fontWeight: 600, mb: 1, fontSize: '16px' };
  
   return (
-     <Box sx={{ backgroundColor: '#f9f9f9' }}>
+     <Box sx={{  backgroundColor: '#f9f9f9' }}>
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
       Inventory Settings
       </Typography>

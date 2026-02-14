@@ -1,4 +1,4 @@
-import { useForm, FormProvider } from 'react-hook-form';
+ import { useForm, FormProvider } from 'react-hook-form';
 import { Box, Button, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import TextInputField from '@/components/controlled/TextInputField';
@@ -10,6 +10,7 @@ import AppToast from '@/containers/Distributors/AppToast';
 import { URL_PATH } from '@/constants/UrlPath';
 import BankDetailsForm from './BankDetailForm';
 
+// Define the structure of the data 
 type DistributorFormInput = {
   companyName: string;
   ownerName?: string;
@@ -29,6 +30,7 @@ type DistributorFormInput = {
 }
 
 const DistributorsForm = () => {
+  // Initialize the form with default empty values
   const methods = useForm<DistributorFormInput>({
     defaultValues: {
       companyName: '',
@@ -49,34 +51,40 @@ const DistributorsForm = () => {
     },
   });
 
-  const navigate = useNavigate();
-  const [toastOpen, setToastOpen] = useState(false);
-//  when form is submitted
+  const navigate = useNavigate(); // Hook to change pages
+  const [toastOpen, setToastOpen] = useState(false); // State to show/hide success message
+
+  // Function that runs when the form is submitted successfully
   const onSubmit = (data: DistributorFormInput) => {
-    //  get old data to  local storage
+    //  Get existing distributors from browser storage localStorage
     const stored = localStorage.getItem("distributors");
     const currentData = stored ? JSON.parse(stored) : [];
-      //new entry object
-     const newEntry = { 
+    
+    //  Prepare the new entry with a unique ID and default status
+    const newEntry = { 
       ...data, 
+      id: Date.now().toString(), 
       status: "Active" 
     };
-      // update and save local storage  
-      const updatedData = [...currentData, newEntry];
-      localStorage.setItem("distributors", JSON.stringify(updatedData));
-      
-      setToastOpen(true);
+    
+    //  Add new entry to the list and save it back to storage
+    const updatedData = [...currentData, newEntry];
+    localStorage.setItem("distributors", JSON.stringify(updatedData));
+    
+    //  Show success toast and redirect to the list page after 1.5 seconds
+    setToastOpen(true);
     setTimeout(() => {
       navigate(URL_PATH.DistributorsPage);
     }, 1500);
   };
 
   return (
-    // form  styling
     <Box p={2} sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
+      {/* Provider allows child components like BankDetailsForm to access form data */}
       <FormProvider {...methods}>
         <form noValidate onSubmit={methods.handleSubmit(onSubmit)}> 
-             {/* add form card   styling */}
+          
+          {/*  Basic Distributor Details */}
           <Paper
             sx={{
               maxWidth: 800,
@@ -88,19 +96,21 @@ const DistributorsForm = () => {
               mb: 3
             }}
           >
-            {/* Heading */}
             <Typography variant="h6" mb={3} fontWeight={600}>
               Add Distributor
             </Typography>
-              {/* Textinputfields */}
-              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
-            <TextInputField name="companyName" label="Company Name" inputType="all" rows={1} required/>
-              <TextInputField name="ownerName" label="Owner Name" inputType="all" rows={1} />  
+
+            {/* Grid layout for form input fields */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
+              <TextInputField name="companyName" label="Company Name" inputType="all" rows={1} required/>
+              <TextInputField name="ownerName" label="Owner Name" inputType="all" rows={1} />   
               <MobileField name="mobile" label="Phone" required />
               <EmailField name="email" label="Email" required />
               <DateTimeField name="date" label="Date" viewMode="date" />
               <TextInputField name="registrationNumber" label="Registration Number" required />
               <TextInputField name="website" label="Website (Optional)" inputType='all' rows={1} required={false} /> 
+              
+              {/* GSTIN field with a validation pattern (Regex) */}
               <TextInputField
                 name="gstIn"
                 label="GSTIN"
@@ -114,11 +124,13 @@ const DistributorsForm = () => {
                 }}
               /> 
             </Box>
+
             <Box sx={{ mt: 2 }}>
-              <TextInputField   name="address" label="Address"  inputType="all"  rows={3} />
+              <TextInputField name="address" label="Address" inputType="all" rows={3} />
             </Box>
           </Paper>
-            {/* bank form stling */}
+
+          {/*  Bank Details Separate Component */}
           <Paper
             sx={{
               maxWidth: 800,
@@ -131,14 +143,15 @@ const DistributorsForm = () => {
           >
             <BankDetailsForm />
           </Paper>
-              {/* button - save and cancle */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 6, mr:40}}>
+
+          {/* Form Action Buttons  */}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 6, mr: 40 }}>
             <Button 
               variant="outlined" 
-              onClick={() => navigate(URL_PATH.DistributorsPage)}
+              onClick={() => navigate(URL_PATH.DistributorsPage)} // Go back without saving
               sx={{
                 color: "#238878",
-                 border: "2px solid #238878",
+                border: "2px solid #238878",
                 textTransform: "none",
                 "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
               }}>           
@@ -160,6 +173,8 @@ const DistributorsForm = () => {
           </Box>
         </form>
       </FormProvider>    
+
+      {/* Success Notification Popup */}
       <AppToast
         open={toastOpen}
         message="Data saved successfully"
@@ -169,4 +184,5 @@ const DistributorsForm = () => {
     </Box>
   );
 };
+
 export default DistributorsForm;

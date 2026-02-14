@@ -1,6 +1,6 @@
- import { useState } from "react";
-import { Box, Typography, Paper, MenuItem, Select, Divider,  Grid } from "@mui/material";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useState } from "react";
+import {Box, Typography, Paper, MenuItem, Select, Divider, Grid,} from "@mui/material";
+import { AreaChart,  Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,} from "recharts";
 
 //  Dummy data for the graph
 const data = [
@@ -36,7 +36,9 @@ const SalesGraph = () => {
             value={range}
             onChange={(e) => setRange(e.target.value)}
           >
-          <MenuItem value="01 December 2021 - 31 December 2021">01 December 2021 - 31 December 2021</MenuItem>
+            <MenuItem value="01 December 2021 - 31 December 2021">
+              01 December 2021 - 31 December 2021
+            </MenuItem>
           </Select>
         </Grid>
 
@@ -61,31 +63,57 @@ const SalesGraph = () => {
       </Grid>
 
       {/*  Chart Section */}
-      <Box sx={{ border: "1px solid #e0e0e0", borderRadius: 2, overflow: "hidden" }}>
+      <Box
+        sx={{
+          border: "1px solid #e0e0e0",
+          borderRadius: 2,
+          overflow: "hidden",
+        }}
+      >
         {/* Graph Header */}
-        <Box sx={{ p: 2, bgcolor: "#fafafa", borderBottom: "1px solid #e0e0e0" }}>
-          <Typography variant="subtitle2" fontWeight="bold">Sales Statistics</Typography>
+        <Box
+          sx={{ p: 2, bgcolor: "#fafafa", borderBottom: "1px solid #e0e0e0" }}
+        >
+          <Typography variant="subtitle2" fontWeight="bold">
+            Sales Statistics
+          </Typography>
         </Box>
-        
+
         {/* Graph Area */}
         <Box sx={{ p: 2, height: 350, width: "100%", minWidth: 0 }}>
           {/* ResponsiveContainer makes the chart adjust to any screen size */}
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <AreaChart
+              data={data}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
               {/* Background grid lines  */}
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f0f0f0"
+              />
               {/* X-Axis for Dates and Y-Axis for Sales Numbers */}
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
               {/*  graph points */}
               <Tooltip />
               {/* The Blue colored area showing the sales trend */}
-              <Area 
-                type="monotone" 
-                dataKey="sales" 
-                stroke="#03A9F4" 
-                fill="#e1f5fe" 
-                strokeWidth={2} 
+              <Area
+                type="monotone"
+                dataKey="sales"
+                stroke="#03A9F4"
+                fill="#e1f5fe"
+                strokeWidth={2}
               />
             </AreaChart>
           </ResponsiveContainer>

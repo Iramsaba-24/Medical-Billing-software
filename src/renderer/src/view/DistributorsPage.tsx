@@ -1,6 +1,6 @@
  import { Box } from "@mui/material";
-import DistributorCards from "@/containers/Distributors/DistributorsCard";
-import DistributorsTable from "@/containers/Distributors/DistributorsTable";
+import DistributorCards from "@/containers/distributors/DistributorsCard";
+import DistributorsTable from "@/containers/distributors/DistributorsTable";
 import { useState, useEffect } from "react";
 
   function DistributorsPage() {

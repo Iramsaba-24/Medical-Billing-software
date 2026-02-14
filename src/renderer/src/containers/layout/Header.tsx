@@ -130,7 +130,7 @@ const Header: React.FC = () => {
           <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
             ERP Billing Software
           </Typography>
-          <Home sx={{ cursor: "pointer" }} onClick={() => navigate("/")} />
+          <Home sx={{ cursor: "pointer" }} onClick={() => navigate(URL_PATH.Landing)} />
           <SearchBox>
             <SearchIcon sx={{ mr: 1, color: '#666' }} />
             <InputBase placeholder="Search" fullWidth />
@@ -167,7 +167,8 @@ const Header: React.FC = () => {
           py: { xs: 9, md: 8 },
            mt: 3,
             px:{xs:1, sm:3, md:5},
-             height: "100vh"
+            //  height: "100vh"
+            overflowY: "auto"
               }}>
         <Outlet />
       </Box>
