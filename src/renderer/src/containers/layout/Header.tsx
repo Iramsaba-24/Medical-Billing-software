@@ -155,7 +155,7 @@ const Header: React.FC = () => {
             width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
             boxSizing: 'border-box',
-            //  overflowX: 'hidden',
+           
           },
         }}
       >
@@ -167,7 +167,7 @@ const Header: React.FC = () => {
           py: { xs: 9, md: 8 },
            mt: 3,
             px:{xs:1, sm:3, md:5},
-             height: "100vh"
+            
               }}>
         <Outlet />
       </Box>

@@ -4,7 +4,7 @@ import CheckboxGroup from "@/components/controlled/CheckboxGroup"
 import DropdownField from "@/components/controlled/DropdownField"
 import NumericField from "@/components/controlled/NumericField"
 import SwitchToggle from "@/components/controlled/SwitchToggle"
-
+import {showToast } from "@/components/uncontrolled/ToastMessage";
 
 //fields which used in this form
 type CustomerFormFields ={
@@ -53,8 +53,8 @@ const defaultDiscount: FielType[] =[
 const PaperStyle={
   backgroundColor: "#ffffff",
   borderRadius: "4px",
-  p:{xs: 1.5, sm: 2, md:2.5},
-  mb:2,
+  p: { xs: 1, sm: 1.5, md: 1.5 },  
+  mb: 1.5,
   py:0
 }
 
@@ -93,15 +93,7 @@ const inputFieldStyle = {
   },
 }
 
-// checkbox style
-const checkboxStyle = {
-  "& .MuiCheckbox-root": {  
-    color: "default.main",
-    "&.Mui-checked": {      
-      color: "#238878",
-    },
-  },
-};
+
 
 const CustomerSettings = () => {
   const methods = useForm<CustomerFormFields>(  
@@ -123,7 +115,7 @@ const CustomerSettings = () => {
 
     const onSubmit =(data:CustomerFormFields)=>{  
       console.log("submmitted data: ", data);
-      alert(`submitted data  ${JSON.stringify(data)}`)
+      showToast("success", "Saved");
       
     }
     const {reset, getValues}=methods;
@@ -132,11 +124,9 @@ const CustomerSettings = () => {
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
         <Paper  
         sx= {{
-          py:2,
           boxShadow:"none",
           borderRadius: 0,
-          backgroundColor: "transparent",
-          
+          backgroundColor: "transparent",         
         }}>
 
           {/* title of the form */}
@@ -161,7 +151,7 @@ const CustomerSettings = () => {
             name="mandatoryFields"
             label=""
             options={mandatoryFieldOptions} 
-            sx={checkboxStyle}        
+                  
             />               
           </Paper>
 
@@ -176,6 +166,7 @@ const CustomerSettings = () => {
                   size = "small"
                   decimal={true}
                   decimalDigits={2}
+                  maxlength={20}
                   sx={inputFieldStyle}
                   InputProps={{
                     startAdornment: <InputAdornment position="start" >₹</InputAdornment>,
@@ -191,6 +182,7 @@ const CustomerSettings = () => {
                 placeholder="select"
                 options={creditDays}
                 sx={inputFieldStyle}
+                isStatic={true}
                 />
             </Box>
 
@@ -242,6 +234,7 @@ const CustomerSettings = () => {
               placeholder="Select"
               options={defaultDiscount}
               sx={inputFieldStyle}
+              isStatic={true}
               />
             </Box>
 

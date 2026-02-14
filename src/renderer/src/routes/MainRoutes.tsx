@@ -25,7 +25,6 @@ import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 
-// import LOGIN from '@/view/auth/LoginPage';
 
 import Setting from "@/containers/layout/Setting";
 
@@ -48,10 +47,7 @@ export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-      // {
-      //   index: true,
-      //   element: <LOGIN />,
-      // },
+
       { path: URL_PATH.Landing, element: <Landing /> },
 
       { path: URL_PATH.Dashboard, element: <Dashboard /> },
