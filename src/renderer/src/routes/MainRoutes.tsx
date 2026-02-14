@@ -20,7 +20,7 @@ import DistributorsPage from "@/view/DistributorsPage";
 
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
-import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
+import DistributorDetails from "@/containers/distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
@@ -29,7 +29,7 @@ import GeneralSettings from "@/containers/setting/GeneralSettings";
 
 import Setting from "@/containers/layout/Setting";
 
-import DistributorsForm from "@/containers/Distributors/DistributorsForm";
+import DistributorsForm from "@/containers/distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 
 import MediPoints from "@/containers/billing/MediPoints";
@@ -38,7 +38,7 @@ import Billing from "@/view/Billing";
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
-  import RetailInvoice from "@/containers/billing/RetailInvoice";
+import RetailInvoice from "@/containers/billing/RetailInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
@@ -147,6 +147,18 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.GeneralSettings,
         element: <GeneralSettings />,
+      },
+      {
+        path: URL_PATH.PharmacyProfile,
+        element: <PharmacyProfile />,
+      },
+      {
+        path: URL_PATH.DashboardSettings,
+        element: <DashboardSettings />,
+      },
+      {
+        path: URL_PATH.CustomerSettings,
+        element: <CustomerSettings />,
       },
 
       {
