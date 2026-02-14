@@ -25,7 +25,6 @@ import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 
-// import LOGIN from '@/view/auth/LoginPage';
 
 import Setting from "@/containers/layout/Setting";
 
@@ -38,7 +37,7 @@ import Billing from "@/view/Billing";
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
-  import RetailInvoice from "@/containers/billing/RetailInvoice";
+import RetailInvoice from "@/containers/billing/RetailInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
@@ -48,10 +47,7 @@ export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-      // {
-      //   index: true,
-      //   element: <LOGIN />,
-      // },
+
       { path: URL_PATH.Landing, element: <Landing /> },
 
       { path: URL_PATH.Dashboard, element: <Dashboard /> },
@@ -86,6 +82,10 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.Inventory,
         element: <Inventory />,
+      },
+      {
+        path: URL_PATH.RetailInvoice,
+        element: <RetailInvoice />,
       },
       {
         path: URL_PATH.InventoryList,
@@ -148,6 +148,18 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.GeneralSettings,
         element: <GeneralSettings />,
       },
+      {
+        path: URL_PATH.PharmacyProfile,
+        element: <PharmacyProfile />,
+      },
+      {
+        path: URL_PATH.DashboardSettings,
+        element: <DashboardSettings />,
+      },
+      {
+        path: URL_PATH.CustomerSettings,
+        element: <CustomerSettings />,
+      },
 
       {
         path: URL_PATH.MediPoints,
@@ -162,7 +174,6 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.Billing}/:invoiceNo`,
         element: <Billing />,
       },
-
       {
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,
@@ -207,7 +218,7 @@ export const mainRoutes: RouteObject[] = [
 
       {
         path: URL_PATH.RetailInvoice,
-        element: <RetailInvoice />,
+        element: <Billing />,
       },
       {
         path: URL_PATH.PaymentDetails,
@@ -217,6 +228,8 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
       },
+    
+      
     ],
   },
 ];

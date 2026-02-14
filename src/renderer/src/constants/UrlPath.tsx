@@ -1,5 +1,4 @@
 
-
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",

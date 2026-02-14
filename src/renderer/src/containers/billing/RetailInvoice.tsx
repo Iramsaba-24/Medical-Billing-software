@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Box, Grid, Typography, Paper, Button, TextField } from "@mui/material";
 import { FormProvider, useForm, useFieldArray } from "react-hook-form";
 import PrintIcon from "@mui/icons-material/Print";
@@ -85,53 +84,13 @@ const POS2 = () => {
     { label: "MedPlus Ltd.", value: "MedPlus Ltd." },
   ];
 
-  const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
+  
   const navigate = useNavigate();
 
   return (
     <FormProvider {...methods}>
-      {/* TOP BUTTONS */}
-      <Box display="flex">
-        <Button
-          onClick={() => {
-            setActiveTab("new");
-            if (location.pathname !== URL_PATH.Billing)
-              navigate(URL_PATH.Billing);
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-            color: activeTab === "new" ? "#fff" : "#000",
-            border: activeTab === "new" ? "none" : "1px solid #ccc",
-          }}
-        >
-          New Invoice
-        </Button>
-
-        <Button
-          onClick={() => {
-            setActiveTab("retail");
-            if (location.pathname !== URL_PATH.RetailInvoice)
-              navigate(URL_PATH.RetailInvoice);
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-            color: activeTab === "retail" ? "#fff" : "#000",
-            border: activeTab === "retail" ? "none" : "1px solid #ccc",
-          }}
-        >
-          Retail Invoice
-        </Button>
-      </Box>
+    
+       
 
       <Paper sx={{ p: 2 }}>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -305,6 +264,7 @@ const POS2 = () => {
                 "&:hover": { bgcolor: "#fff", color: TEAL_COLOR },
                 px: 4,
               }}
+              onClick={() => navigate(URL_PATH.PaymentMethod)}
             >
               Pay
             </Button>
