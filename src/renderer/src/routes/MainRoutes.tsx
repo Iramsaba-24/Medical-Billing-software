@@ -37,7 +37,7 @@ import Billing from "@/view/Billing";
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
-  import RetailInvoice from "@/containers/billing/RetailInvoice";
+import RetailInvoice from "@/containers/billing/RetailInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
@@ -144,6 +144,18 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.GeneralSettings,
         element: <GeneralSettings />,
       },
+      {
+        path: URL_PATH.PharmacyProfile,
+        element: <PharmacyProfile />,
+      },
+      {
+        path: URL_PATH.DashboardSettings,
+        element: <DashboardSettings />,
+      },
+      {
+        path: URL_PATH.CustomerSettings,
+        element: <CustomerSettings />,
+      },
 
       {
         path: URL_PATH.MediPoints,
@@ -158,7 +170,6 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.Billing}/:invoiceNo`,
         element: <Billing />,
       },
-
       {
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,

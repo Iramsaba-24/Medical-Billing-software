@@ -77,7 +77,7 @@ const InvoiceSettings = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: "#f9f9f9", p: 2 }}>
+    <Box sx={{ backgroundColor: "#f9f9f9" }}>
       <Typography variant="h6" mb={3} fontWeight={600}>
         Invoice Settings
       </Typography>

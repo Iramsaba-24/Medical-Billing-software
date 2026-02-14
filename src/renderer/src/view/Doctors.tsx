@@ -4,8 +4,10 @@ import { Box, Typography, Paper, MenuItem, Button, Select } from "@mui/material"
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import {  showConfirmation } from "@/components/uncontrolled/ToastMessage";
+import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 import DoctorEdit from "@/containers/doctors/DoctorEdit";
+import { URL_PATH } from "@/constants/UrlPath";
+
 
 type Doctor = {
   id: string;
@@ -20,6 +22,7 @@ const Doctors = () => {
   const methods = useForm({ defaultValues: { search: "" } });
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
+
 
   const navigate = useNavigate();
   const searchValue = methods.watch("search");
@@ -103,7 +106,7 @@ const Doctors = () => {
                       sx={{ textTransform:"none", alignItems:"center", height:36, width: { xs:"100%", md:"auto" }, bgcolor:"#238878", 
                       "&:hover": { backgroundColor:"#fff", color:"#1b7f6b", border:"2px solid #1b7f6b", },
                        }}
-                       onClick={() => navigate("/add-doctor")} > +Add Doctor 
+                       onClick={() => navigate(URL_PATH.AddDoctor)} > +Add Doctor 
                 </Button>
            </Box>
      </Paper>
@@ -129,6 +132,7 @@ const Doctors = () => {
                 const ok = await showConfirmation("Delete doctor?", "Confirm");
                 if (ok) {
                   saveDoctors(doctors.filter((d) => d.id !== doctor.id));
+                  showSnackbar("success", "Doctor deleted successfully");
                 }
               },
             }}
@@ -145,9 +149,12 @@ const Doctors = () => {
                 d.id === updated.id ? updated : d
               )
             );
+            showSnackbar("info", "Doctor updated successfully");
             setEditDoctor(null);
           }}
         />
+
+  
     </>
   );
 };
