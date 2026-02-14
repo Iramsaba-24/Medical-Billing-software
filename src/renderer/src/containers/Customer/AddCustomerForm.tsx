@@ -18,6 +18,10 @@ export interface ItemRow {
   name: string; 
   qty: number | ""; 
   price: number | ""; 
+  errors?: {
+    qty?: string;
+    price?: string;
+  };
 }
 
 interface Props {

@@ -202,7 +202,7 @@ export const mainRoutes: RouteObject[] = [
 
       {
         path: URL_PATH.RetailInvoice,
-        element: <RetailInvoice />,
+        element: <Billing />,
       },
       {
         path: URL_PATH.PaymentDetails,
@@ -212,6 +212,8 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
       },
+    
+      
     ],
   },
 ];

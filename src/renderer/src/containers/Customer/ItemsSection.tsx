@@ -39,7 +39,7 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
         }
         // Validation Only allow letters and spaces in the Item Name
         if (field === "name") {
-          return { ...r, [field]: String(value).replace(/[^a-zA-Z\s]/g, "") };
+          return { ...r, [field]: String(value).replace(/[^a-zA-Z\[0-9]s]/g, "") };
         }
         return { ...r, [field]: value as ItemRow[typeof field] };
       }
@@ -73,12 +73,21 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
         >
           {/* Item Name Input */}
           <TextField
-            label="Item Name"
-            value={row.name}
-            error={row.name.trim() === ""}
-            helperText={row.name.trim() === "" ? "Item Name is Required" : " "}
-            onChange={(e) => updateRow(row.id, "name", e.target.value)}
-          />
+  label="Item Name"
+  value={row.name}
+  error={
+    row.name.trim() === "" ||
+    !/^[a-zA-Z0-9\s]+$/.test(row.name)
+  }
+  helperText={
+    row.name.trim() === ""
+      ? "alphabets and numbers allowed"
+      : !/^[a-zA-Z0-9\s]+$/.test(row.name)
+      ? " alphabets and numbers allowed"
+      : " "
+  }
+  onChange={(e) => updateRow(row.id, "name", e.target.value)}
+/>
 
           {/* Quantity Input */}
           <TextField
