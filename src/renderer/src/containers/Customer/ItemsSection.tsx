@@ -1,4 +1,244 @@
- import { Box, Button, Typography, Grid, TextField, MenuItem, IconButton, Divider, Paper } from "@mui/material";
+// import {
+//   Box,
+//   Button,
+//   Typography,
+//   Grid,
+//   TextField,
+//   Divider,
+//   Paper,
+// } from "@mui/material";
+
+// import { useFieldArray, useFormContext } from "react-hook-form";
+// import RemoveIcon from "@mui/icons-material/Remove";
+// import AddIcon from "@mui/icons-material/Add";
+// import { MenuItem } from "@mui/material";
+
+
+// const TEAL_COLOR = "#248a76";
+
+// interface ItemRow {
+//   name: string;
+//   qty: number;
+//   mrp: number | "";
+ 
+// }
+
+// interface FormValues {
+//   items: ItemRow[];
+//   gst: string;
+//   payment : string;
+// }
+
+// const ItemsSection = () => {
+//   const {
+//     control,
+//     watch,
+//     register,
+//     formState: { errors },
+//   } = useFormContext<FormValues>();
+
+//   const { fields, append, remove } = useFieldArray({
+//     control,
+//     name: "items",
+//   });
+
+//   const items: ItemRow[] = watch("items") || [];
+//   const gst = Number(watch("gst") || 0);
+
+//   const getRowAmount = (row: ItemRow) => {
+//      return Number(row.qty) * Number(row.mrp || 0);
+//   };
+
+//   const subTotal = items.reduce(
+//     (sum: number, row: ItemRow) => sum + getRowAmount(row),
+//     0
+//   );
+
+//   const gstAmount = (subTotal * gst) / 100;
+//   const finalTotal = subTotal + gstAmount;
+
+//   return (
+//     <Paper
+//       sx={{
+//         p: 3,
+//         borderRadius: "7px",
+//         border: "1px solid #e0e0e0",
+//       }}
+//     >
+//       <Box display="flex" justifyContent="space-between" mb={2}>
+//         <Typography variant="h6" fontWeight={600}>
+//           Items List
+//         </Typography>
+
+//         <Button
+//           type="button"
+//           startIcon={<AddIcon />}
+//           onClick={() =>
+//             append({ name: "", qty: 1, mrp: "" })
+//           }
+//           sx={{ color: TEAL_COLOR }}
+//         >
+//           Add Item
+//         </Button>
+//       </Box>
+
+//       <Divider sx={{ mb: 3 }} />
+
+//       {fields.map((field, index) => (
+//         <Grid container spacing={2} mb={2} key={field.id}>
+          
+//           {/* ITEM */}
+//           <Grid size={{ xs: 12, md: 4 }}>
+//             <TextField
+//               fullWidth
+//               label="Item"
+//               {...register(`items.${index}.name`, {
+//                 required: "Item name is required",
+//               })}
+//               error={!!errors?.items?.[index]?.name}
+//               helperText={
+//                 errors?.items?.[index]?.name?.message as string || ""
+//               }
+//             />
+//           </Grid>
+
+//           {/* QTY */}
+//           <Grid size={{ xs: 12, md: 2 }}>
+//             <TextField
+//               fullWidth
+//               type="number"
+//               label="Qty"
+//               {...register(`items.${index}.qty`, {
+//                 required: "Qty required",
+//                 valueAsNumber: true,
+//                 min: { value: 1, message: "Minimum 1 qty" },
+//               })}
+//               error={!!errors?.items?.[index]?.qty}
+//               helperText={
+//                 errors?.items?.[index]?.qty?.message as string || ""
+//               }
+//             />
+//           </Grid>
+
+//           {/* MRP */}
+//           <Grid size={{ xs: 12, md: 3 }}>
+//             <TextField
+//               fullWidth
+//               type="number"
+//               label="MRP"
+//               {...register(`items.${index}.mrp`, {
+//                 required: "MRP required",
+//                 valueAsNumber: true,
+//                 min: { value: 1, message: "Invalid MRP" },
+//               })}
+//               error={!!errors?.items?.[index]?.mrp}
+//               helperText={
+//                 errors?.items?.[index]?.mrp?.message as string || ""
+//               }
+//             />
+//           </Grid>
+
+//           {/* AMOUNT */}
+//           <Grid size={{ xs: 12, md: 2 }}>
+//             <TextField
+//               fullWidth
+//               disabled
+//               label="Amount"
+//               value={
+//                 items[index]
+//                   ? getRowAmount(items[index]).toFixed(2)
+//                   : "0.00"
+//               }
+//             />
+//           </Grid>
+
+//           {/* REMOVE */}
+//           <Grid size={{ xs: 12, md: 1 }}>
+//             <Button
+//               type="button"
+//               onClick={() => remove(index)}
+//               disabled={fields.length === 1}
+//               sx={{ color: TEAL_COLOR }}
+//             >
+//               <RemoveIcon />
+//             </Button>
+//           </Grid>
+//         </Grid>
+//       ))}
+
+//       {/* GST + TOTAL */}
+//       {/* Payment + GST + TOTAL */}
+// <Grid container spacing={2} mt={2} alignItems="center">
+  
+//   {/* PAYMENT */}
+//   <Grid size={{ xs: 12, md: 3 }}>
+//     <TextField
+//       select
+//       fullWidth
+//       label="Payment"
+//       defaultValue="Cash"
+//       {...register("payment", {
+//         required: "Select Payment Mode",
+//       })}
+//     >
+//       {["Cash", "UPI", "Card"].map((mode) => (
+//         <MenuItem key={mode} value={mode}>
+//           {mode}
+//         </MenuItem>
+//       ))}
+//     </TextField>
+//   </Grid>
+
+//   {/* GST */}
+//   <Grid size={{ xs: 12, md: 3 }}>
+//     <TextField
+//       select
+//       fullWidth
+//       label="GST (%)"
+//       defaultValue="5"
+//       {...register("gst", {
+//         required: "Select GST",
+//       })}
+//       error={!!errors?.gst}
+//       helperText={(errors?.gst?.message as string) || ""}
+//     >
+//       <MenuItem value="5">5%</MenuItem>
+//       <MenuItem value="12">12%</MenuItem>
+//       <MenuItem value="18">18%</MenuItem>
+//     </TextField>
+//   </Grid>
+
+//   {/* TOTAL */}
+//   <Grid size={{ xs: 12, md: 3 }}>
+//     <Box
+//       sx={{
+//         height: 56,
+//         backgroundColor: "#E6F4F1",
+//         borderRadius: "12px",
+//         display: "flex",
+//         alignItems: "center",
+//         justifyContent: "center",
+//         fontWeight: 700,
+//         color: TEAL_COLOR,
+//       }}
+//     >
+//       Total: ₹ {finalTotal.toFixed(2)}
+//     </Box>
+//   </Grid>
+
+// </Grid>
+
+//     </Paper>
+//   );
+// };
+
+// export default ItemsSection;
+
+
+
+
+
+import { Box, Button, Typography, Grid, TextField, MenuItem, IconButton, Divider, Paper } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { ItemRow } from "@/containers/customer/AddCustomerForm";
 

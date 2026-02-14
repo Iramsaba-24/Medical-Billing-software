@@ -2,6 +2,8 @@ import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
 import { Button, Paper, Typography, Box } from "@mui/material";
 import DropdownField from "@/components/controlled/DropdownField";
 import SwitchToggle from "@/components/controlled/SwitchToggle";
+import { showToast, showConfirmation, } from "@/components/uncontrolled/ToastMessage"; 
+
 
 type GeneralSettingsFormValues = {
   language: string;
@@ -62,32 +64,37 @@ function GenralSettings() {
   ];
 
   const { reset } = methods;
-  const onSubmit: SubmitHandler<GeneralSettingsFormValues> = (data) => {
-    console.log("General Settings Data:", data);
-    alert("data submited");
-  };
+  
+  const onSubmit: SubmitHandler<GeneralSettingsFormValues> = async (data) => {
+  console.log("General Settings Data:", data);
+  const confirmed = await showConfirmation("Do you want to save these settings?", "Confirm Save");
+  if (!confirmed) return;
+  // After confirmation, show a success toast
+  showToast("success", "Settings saved successfully!");
+};
 
   return (
     <FormProvider {...methods}>
-      <Typography variant="h6" mb={3} fontWeight="bold">
+      <Typography variant="h6" mb={3} sx={{ mb: { xs: 1, md: 3 },}} fontWeight="bold">
         General Settings
       </Typography>
 
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-        <Paper
-          sx={{
-            p: 4,
-            width: { xs: "95%", sm: "90%", md: "1000px", lg: "1200px" },
-            m: "auto",
-            mt: 4,
-          }}
-        >
+       <Paper
+  sx={{
+    p: { xs: 2, md: 4 },
+    mt: { xs: 1, md: 2 }, 
+    borderRadius: 0,
+    backgroundColor: "transparent",
+  }}
+>
           {/* Language  */}
           <Box
             display="flex"
             flexDirection={{ xs: "column", md: "row" }}
             gap={3}
             mb={3}
+            flexWrap="wrap" 
           >
             <Box flex={1}>
               <Typography variant="subtitle2" mb={1}>
@@ -180,10 +187,9 @@ function GenralSettings() {
               <SwitchToggle name="keyboardShortcuts" />
             </Box>
           </Box>
-        </Paper>
 
-        {/* Button: Reset & Submit*/}
-        <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+           {/* Button: Reset & Submit*/}
+        <Box  sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
           <Button
             type="button"
             variant="outlined"
@@ -217,13 +223,18 @@ function GenralSettings() {
               },
             }}
           >
-            {" "}
-            Save{" "}
+           
+            Save
           </Button>
-        </Box>
+          </Box>
+        </Paper>
+
+        
+       
       </form>
     </FormProvider>
   );
 }
 
 export default GenralSettings;
+
