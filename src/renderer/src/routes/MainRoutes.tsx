@@ -174,7 +174,6 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.Billing}/:invoiceNo`,
         element: <Billing />,
       },
-
       {
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,

@@ -35,8 +35,7 @@ const Distributors = () => {
     const savedData = localStorage.getItem("distributors");
     setDistributors(savedData ? JSON.parse(savedData) : []);
   }, []);
-
-  // Function to change status Active/Inactive and update LocalStorage
+  
   const handleStatusChange = (id: string, status: "Active" | "Inactive") => {
     const updated = distributors.map((d) => (d.id === id ? { ...d, status } : d));
     localStorage.setItem("distributors", JSON.stringify(updated));
@@ -138,24 +137,12 @@ const Distributors = () => {
           tableSize="small"
           getRowId={(row) => row.id}
           actions={{
-            //  Navigate to details page with data
-            view: (distributor) =>
-              navigate("/distributor-details", {
-                state: { distributor },
-              }),
-            
-            //   Remove from list and LocalStorage
-            delete: (distributor) => {
-              if (window.confirm("Are you sure you want to delete this distributor?")) {
-                // Remove the item from the array
-                const updatedList = distributors.filter((d) => d.id !== distributor.id);
-                // Update LocalStorage
-                localStorage.setItem("distributors", JSON.stringify(updatedList));
-                // Update screen (state)
-                setDistributors(updatedList);
-              }
-            },
-          }}
+  view: (distributor) =>
+    navigate(URL_PATH.DistributorDetails, {
+      state: { distributor },
+    }),
+  
+}}
         />
       </Paper>
     </>

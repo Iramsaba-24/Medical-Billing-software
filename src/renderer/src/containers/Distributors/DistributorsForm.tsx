@@ -39,6 +39,7 @@ const DistributorsForm = () => {
       email: '',
       date: '',
       registrationNumber: '',
+      
       website: '',
       gstIn: '',
       address: '',

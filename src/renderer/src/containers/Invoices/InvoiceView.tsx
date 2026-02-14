@@ -100,14 +100,14 @@ return (
       <TableRow>
         <TableCell colSpan={2}
           sx={{
-            borderRight: "2px solid #000",
+            border: "2px solid #000",
           }}>
           <Typography fontSize={20}>MEDIPLUS MEDICAL & GENERAL</Typography>
           <Typography>Shinoli, Tal: Ambegaon, Dist: Pune</Typography>
         </TableCell>
 
        <TableCell
-       colSpan={4}>
+       colSpan={4} sx={{border:"2px solid #000"}}>
   <Typography>
     <strong>Name:</strong> {invoice.patient}
   </Typography>
@@ -223,32 +223,32 @@ return (
       }}
         >
       {/* <TableCell colSpan={4} sx={{borderTop: "none", borderBottom: "none"}} /> */}
-      <TableCell />
-      <TableCell />
-      <TableCell />
-      <TableCell />
+      <TableCell sx={{border:"2px solid #000"}} />
+      <TableCell sx={{border:"2px solid #000"}} />
+      <TableCell sx={{border:"2px solid #000"}} />
+      <TableCell sx={{border:"2px solid #000"}} />
       <TableCell sx={{ border: "2px solid #000" }} align="center">
       <strong>Discount</strong></TableCell>
-      <TableCell align="center">  
+      <TableCell align="center" sx={{ border: "2px solid #000" }}>  
      </TableCell>
     </TableRow>
       
-      <TableRow sx={{ border: "2px solid #000" }}>
-  <TableCell colSpan={4}>
+      <TableRow sx={{borderTop:"2px solid #000"}}>
+  <TableCell colSpan={4} sx={{border:"2px solid #000"}}>
     Get Well Soon.. GSTIN ABC12345SDGFJK789
   </TableCell>
 
-  <TableCell>
+  <TableCell sx={{border:"2px solid #000"}}>
    <Typography fontWeight={600} sx={{textAlign:"right"}}>NET :</Typography> 
   </TableCell>
 
-  <TableCell sx={{pl: {xs:1, md:2}}}>
+  <TableCell sx={{pl: {xs:1, md:2, border:"2px solid #000"}}}>
   <Typography fontWeight={600}>₹ {netTotal.toFixed(2)}</Typography> 
   </TableCell>
 </TableRow>
 
- <TableRow sx={{ border: "2px solid #000" }}>
-  <TableCell colSpan={4} sx={{borderRight:"2px solid #000"}}>
+ <TableRow >
+  <TableCell colSpan={4} sx={{border:"2px solid #000"}}>
      Vat Tin No. : 
      <br />
      Drug Lic No. : MH-PZ4-115478,115479,115480
@@ -257,7 +257,7 @@ return (
      is in force on the date on the which sales of the goods specified in this tax invoice is made by me/us and
      that the transaction of the sale covered by this tax invoice has been effected by me/us and it shall be accounted for in the turnover of sales while filling of return and the due tax, if any, payble on the sales has been paid or shall be paid. </TableCell>
 
-  <TableCell colSpan={2} align="center">
+  <TableCell colSpan={2} align="center" sx={{border:"2px solid #000"}}>
     <Box
      display="flex"
     flexDirection="column"
