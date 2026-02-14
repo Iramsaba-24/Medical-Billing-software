@@ -19,7 +19,10 @@ import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
-import NumericField from "@/components/controlled/NumericField";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
+
+
+
 
 /* FORM TYPES */
 type PharmacyFormValues = {
@@ -64,7 +67,8 @@ function PharmacyProfile() {
   /* Submit Handler */
   const onSubmit: SubmitHandler<PharmacyFormValues> = (data) => {
     console.log("Form submitted with:", data);
-    window.alert("Data saved successfully!");
+    showToast("success","Data saved successfully!")
+   
     handleReset();
   };
 
@@ -130,13 +134,14 @@ function PharmacyProfile() {
                     required
                   />
 
-                  <NumericField
+                  <TextInputField
                     name="drugLicense"
                     label="Drug License No."
                     placeholder="DL-KA-2023-001245"
+                   
                     required
-                    maxlength={15}
-                    max={100000000}
+                    maxLength={50}
+                    //inputType="all"
                      
                   />
                 </Stack>
@@ -243,15 +248,15 @@ function PharmacyProfile() {
 
                   {/* FSSAI No */}
                   <Box sx={{ mt: { xs: 0, md: 12 }, width: "100%" }}>
-                    <NumericField
+                    <TextInputField
                       name="fssaiNo"
                       label="FSSAI No."
+                       type="number"
                       placeholder="12345678901234"
                       sx={{ mt: 8 }}
+                      maxLength={30}
                       required
-                      maxlength={14}
-                      inputProps={{ max: Infinity }}
-                      //  max={50000000000000000000000000000000000}
+
 
                     />
                   </Box>
@@ -295,15 +300,13 @@ function PharmacyProfile() {
                 <Stack spacing={2}>
                   <TextInputField name="bankName" label="Bank Name" required />
 
-                  <NumericField
+                  <TextInputField
                     name="acNumber"
                     label="A/C Number"
                     placeholder="12345678912"
+                     maxLength={20}
                     required
-                    maxlength={18}
-                    // inputProps={{ max: Infinity }}
-
-                    max={50000000000000000000000000000000000}
+                  
                   />
                 </Stack>
               </Grid>
@@ -314,21 +317,24 @@ function PharmacyProfile() {
                     name="branchIfsc"
                     label="Branch / IFSC"
                     placeholder="SBIN0000456"
+                     maxLength={40}
+                    type="alphnumeric"
                     required
                   />
 
                   <TextInputField
                     name="acHolderName"
                     label="A/C Holder Name"
+                    maxLength={100}
                     required
                   />
                 </Stack>
               </Grid>
             </Grid>
-          </Paper>
 
-          {/* Buttons */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+
+             {/* Buttons */}
+          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
             <Button
               variant="outlined"
               onClick={handleReset}
@@ -361,6 +367,9 @@ function PharmacyProfile() {
               Save
             </Button>
           </Box>
+          </Paper>
+
+         
         </Box>
       </form>
     </FormProvider>
