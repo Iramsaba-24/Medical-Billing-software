@@ -1,6 +1,7 @@
 import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
+import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 
 type ReorderHistoryItem = {
   itemId: string;
@@ -25,8 +26,7 @@ const ReorderList = () => {
 
   // delete
   const handleDelete = (row: ReorderHistoryItem) => {
-    const updated = data.filter(
-      (item) =>
+    const updated = data.filter((item) =>
         !(
           item.itemId === row.itemId &&
           item.purchasedAt === row.purchasedAt
@@ -35,6 +35,12 @@ const ReorderList = () => {
 
     setData(updated);
     localStorage.setItem("reorderHistory", JSON.stringify(updated));
+    showConfirmation("Delete record?", "Confirm").then((ok) => {
+      if (ok) {
+        setData(updated);
+        showSnackbar("success", "Record deleted successfully");   
+      }
+    });
   };
 
   const columns: Column<ReorderHistoryItem>[] = [

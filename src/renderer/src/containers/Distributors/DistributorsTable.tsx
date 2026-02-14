@@ -28,7 +28,7 @@ const Distributors = () => {
   useEffect(() => {
     setDistributors(JSON.parse(localStorage.getItem("distributors") || "[]"));
   }, []);
-
+  
   const handleStatusChange = (id: string, status: "Active" | "Inactive") => {
     const updated = distributors.map((d) => (d.id === id ? { ...d, status } : d));
     localStorage.setItem("distributors", JSON.stringify(updated));
@@ -127,7 +127,7 @@ const Distributors = () => {
           getRowId={(row) => row.id}
           actions={{
   view: (distributor) =>
-    navigate("/distributor-details", {
+    navigate(URL_PATH.DistributorDetails, {
       state: { distributor },
     }),
   

@@ -1,6 +1,6 @@
 // React imports
 import React, { useRef, useState } from "react";
-
+ 
 // Material UI components
 import {
   Box,
@@ -11,16 +11,16 @@ import {
   Button,
   Stack,
 } from "@mui/material";
-
+ 
 // react-hook-form
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
-
+ 
 // Custom controlled components
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
-import NumericField from "@/components/controlled/NumericField";
-
+ 
+ 
 /* FORM TYPES */
 type PharmacyFormValues = {
   pharmacyName: string;
@@ -34,7 +34,7 @@ type PharmacyFormValues = {
   acNumber: string;
   acHolderName: string;
 };
-
+ 
 function PharmacyProfile() {
   // react-hook-form setup
   const methods = useForm<PharmacyFormValues>({
@@ -52,22 +52,22 @@ function PharmacyProfile() {
       acHolderName: "",
     },
   });
-
+ 
   const { handleSubmit, reset } = methods;
-
+ 
   // File input ref
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
+ 
   // Image preview state
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
+ 
   /* Submit Handler */
   const onSubmit: SubmitHandler<PharmacyFormValues> = (data) => {
     console.log("Form submitted with:", data);
     window.alert("Data saved successfully!");
     handleReset();
   };
-
+ 
   /* Image Change Handler */
   const handleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -77,7 +77,7 @@ function PharmacyProfile() {
       setPreviewImage(URL.createObjectURL(file));
     }
   };
-
+ 
   /* Reset */
   const handleReset = (): void => {
     reset();
@@ -86,7 +86,7 @@ function PharmacyProfile() {
       fileInputRef.current.value = "";
     }
   };
-
+ 
   /* Styles */
   const cardStyle = {
     p: { xs: 2, md: 4 },
@@ -95,12 +95,12 @@ function PharmacyProfile() {
     position: { xs: "static" as const },
     mb: { xs: 4, md: 4 },
   };
-
+ 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box sx={{  width: "100%" }}>
-
+ 
           {/* CARD 1 : Pharmacy Profile */}
           <Paper sx={cardStyle}>
             <Typography
@@ -109,7 +109,7 @@ function PharmacyProfile() {
             >
               Pharmacy Profile
             </Typography>
-
+ 
             <Grid container spacing={{ xs: 3, md: 12 }}>
               {/* Left Column */}
               <Grid size={{ xs: 12, md: 6 }}>
@@ -120,7 +120,7 @@ function PharmacyProfile() {
                     placeholder="Pharmacy Name"
                     required
                   />
-
+ 
                   <TextInputField
                     name="address"
                     label="Address"
@@ -129,19 +129,19 @@ function PharmacyProfile() {
                     rows={4}
                     required
                   />
-
-                  <NumericField
+ 
+                  <TextInputField
                     name="drugLicense"
                     label="Drug License No."
                     placeholder="DL-KA-2023-001245"
                     required
-                    maxlength={15}
-                    max={100000000}
+                    //maxlength={15}
+                   // max={100000000}
                      
                   />
                 </Stack>
               </Grid>
-
+ 
               {/* Right Column (Upload Logo + FSSAI) */}
               <Grid size={{ xs: 12, md: 6}}>
                 <Stack
@@ -159,13 +159,13 @@ function PharmacyProfile() {
                     >
                       Upload Logo
                     </Typography>
-
+ 
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: { xs: "column", md: "row" },
                         gap: { xs: 2, md: 25},
-                  
+                 
                         alignItems: "center",
                         justifyContent: { xs: "center", md: "flex-start" },
                       }}
@@ -195,14 +195,14 @@ function PharmacyProfile() {
                         >
                           Upload
                         </Button>
-
+ 
                         <Typography
                           variant="caption"
                           sx={{ color: "#666", mt: 0.5, textAlign: "center" }}
                         >
                           (.JPEG or .PNG only)
                         </Typography>
-
+ 
                         <input
                           type="file"
                           ref={fileInputRef}
@@ -211,7 +211,7 @@ function PharmacyProfile() {
                           onChange={handleImageChange}
                         />
                       </Box>
-
+ 
                       <Box
                         sx={{
                           width: 140,
@@ -240,33 +240,31 @@ function PharmacyProfile() {
                       </Box>
                     </Box>
                   </Box>
-
+ 
                   {/* FSSAI No */}
                   <Box sx={{ mt: { xs: 0, md: 12 }, width: "100%" }}>
-                    <NumericField
+                    <TextInputField
                       name="fssaiNo"
                       label="FSSAI No."
                       placeholder="12345678901234"
                       sx={{ mt: 8 }}
                       required
-                      maxlength={14}
-                      inputProps={{ max: Infinity }}
-                      //  max={50000000000000000000000000000000000}
-
+ 
+ 
                     />
                   </Box>
                 </Stack>
               </Grid>
             </Grid>
           </Paper>
-
+ 
           {/* CARD 2 : Contact Details */}
           <Paper sx={cardStyle}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
               Contact Details
             </Typography>
             <Divider sx={{ my: 2 }} />
-
+ 
             <Grid container spacing={{ xs: 3, md: 9 }}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <MobileField
@@ -276,38 +274,35 @@ function PharmacyProfile() {
                   required
                 />
               </Grid>
-
+ 
               <Grid size={{ xs: 12, md: 6 }}>
                 <EmailField name="email" label="Email Address" required />
               </Grid>
             </Grid>
           </Paper>
-
+ 
           {/* CARD 3 : Bank Details */}
           <Paper sx={cardStyle}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
               Bank Details
             </Typography>
             <Divider sx={{ my: 2 }} />
-
+ 
             <Grid container spacing={{ xs: 3, md: 9 }}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={2}>
                   <TextInputField name="bankName" label="Bank Name" required />
-
-                  <NumericField
+ 
+                  <TextInputField
                     name="acNumber"
                     label="A/C Number"
                     placeholder="12345678912"
                     required
-                    maxlength={18}
-                    // inputProps={{ max: Infinity }}
-
-                    max={50000000000000000000000000000000000}
+                 
                   />
                 </Stack>
               </Grid>
-
+ 
               <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={2}>
                   <TextInputField
@@ -316,7 +311,7 @@ function PharmacyProfile() {
                     placeholder="SBIN0000456"
                     required
                   />
-
+ 
                   <TextInputField
                     name="acHolderName"
                     label="A/C Holder Name"
@@ -326,7 +321,7 @@ function PharmacyProfile() {
               </Grid>
             </Grid>
           </Paper>
-
+ 
           {/* Buttons */}
           <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
             <Button
@@ -344,7 +339,7 @@ function PharmacyProfile() {
             >
               Reset
             </Button>
-
+ 
             <Button
               type="submit"
               variant="contained"
@@ -366,17 +361,5 @@ function PharmacyProfile() {
     </FormProvider>
   );
 }
-
+ 
 export default PharmacyProfile;
-
-
-
-
-
-
-
-
-
-
-
-
