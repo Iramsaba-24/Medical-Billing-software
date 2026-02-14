@@ -182,7 +182,7 @@ const Header: React.FC = () => {
             width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
             boxSizing: 'border-box',
-            //  overflowX: 'hidden',
+           
           },
         }}
       >
