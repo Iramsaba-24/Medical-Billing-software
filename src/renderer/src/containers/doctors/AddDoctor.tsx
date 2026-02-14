@@ -36,16 +36,13 @@ const AddDoctor = () => {
       localStorage.getItem("doctors") || "[]"
     );
 
-    // create new doctor & generate unique id
-    const newDoctor = {
-      id: crypto.randomUUID(),
-      ...data,
-    };
+
+    
 
     // save doctor 
-    localStorage.setItem(
+   localStorage.setItem(
       "doctors",
-      JSON.stringify([...existingDoctors, newDoctor])
+      JSON.stringify([...existingDoctors, data])
     );
 
     navigate("/doctors");

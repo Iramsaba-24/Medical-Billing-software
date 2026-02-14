@@ -94,28 +94,39 @@ const DistributorsForm = () => {
             </Typography>
               {/* Textinputfields */}
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
-            <TextInputField name="companyName" label="Company Name" inputType="all" rows={1} required/>
-              <TextInputField name="ownerName" label="Owner Name" inputType="all" rows={1} />  
+            <TextInputField name="companyName" label="Company Name" inputType="textarea" rows={1} required/>
+              <TextInputField name="ownerName" label="Owner Name" inputType="alphabet" rows={1} />  
               <MobileField name="mobile" label="Phone" required />
               <EmailField name="email" label="Email" required />
               <DateTimeField name="date" label="Date" viewMode="date" />
-              <TextInputField name="registrationNumber" label="Registration Number" required />
-              <TextInputField name="website" label="Website (Optional)" inputType='all' rows={1} required={false} /> 
+              <TextInputField name="registrationNumber" label="Registration Number" inputType='alphanumeric' required maxLength={14} />
+              <TextInputField 
+               name="website"
+               label="Website (Optional)"
+               inputType='textarea'
+               rows={1} 
+               rules={{
+              pattern: {
+                value: /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6})(\/[\w.-]*)*\/?$/i,
+                message: 'Invalid website URL',
+              },
+            }} /> 
               <TextInputField
                 name="gstIn"
                 label="GSTIN"
-                inputType="all"
+                placeholder=' e.g 27AAAAA0000A1ZS'
+                maxLength={15}
                 rows={1}
                 rules={{
                   pattern: {
-                    value: /^[0-9]{2}[A-Z0-9]{13}$/,
+                    value: /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
                     message: 'Enter valid GSTIN',
                   },
                 }}
               /> 
             </Box>
             <Box sx={{ mt: 2 }}>
-              <TextInputField   name="address" label="Address"  inputType="all"  rows={3} />
+              <TextInputField   name="address" label="Address"  inputType="textarea"  rows={2} />
             </Box>
           </Paper>
             {/* bank form stling */}
@@ -132,7 +143,7 @@ const DistributorsForm = () => {
             <BankDetailsForm />
           </Paper>
               {/* button - save and cancle */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 6, mr:40}}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 6, }}>
             <Button 
               variant="outlined" 
               onClick={() => navigate(URL_PATH.DistributorsPage)}

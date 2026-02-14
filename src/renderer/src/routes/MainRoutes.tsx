@@ -24,7 +24,6 @@ import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
-// import DoctorsSettings from "@/containers/setting/DoctorsSettings";
 
 // import LOGIN from '@/view/auth/LoginPage';
 
@@ -38,9 +37,12 @@ import Billing from "@/view/Billing";
 
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
-import RetailInvoice from "@/containers/billing/RetailInvoice";
+import DoctorSettings from "@/containers/setting/DoctorSettings";
+  import RetailInvoice from "@/containers/billing/RetailInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
+import PaymentDetails from "@/containers/billing/PaymentDetails";
+import PaymentMethod from "@/containers/billing/PaymentMethod";
 
 export const mainRoutes: RouteObject[] = [
   {
@@ -190,8 +192,30 @@ export const mainRoutes: RouteObject[] = [
         element: <DashboardSettings />,
       },
       {
+        path: URL_PATH.DoctorSettings,
+        element: <DoctorSettings />,
+      },
+
+      {
+        path: URL_PATH.PharmacyProfile,
+        element: <PharmacyProfile />,
+      },
+      {
+        path: URL_PATH.CustomerSettings,
+        element: <CustomerSettings />,
+      },
+
+      {
         path: URL_PATH.RetailInvoice,
         element: <RetailInvoice />,
+      },
+      {
+        path: URL_PATH.PaymentDetails,
+        element: <PaymentDetails />,
+      },
+      {
+        path: URL_PATH.PaymentMethod,
+        element: <PaymentMethod />,
       },
     ],
   },
