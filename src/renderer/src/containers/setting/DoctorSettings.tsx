@@ -11,6 +11,8 @@ import {
   Stack,
   Radio,
   RadioGroup,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 
 type DoctorSettingsState = {
@@ -36,6 +38,8 @@ const defaultState: DoctorSettingsState = {
 const DoctorsSettings: React.FC = () => {
   const [settings, setSettings] =
     useState<DoctorSettingsState>(defaultState);
+
+  const [openToast, setOpenToast] = useState(false);
 
   const handleCheckboxChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -63,7 +67,15 @@ const DoctorsSettings: React.FC = () => {
 
   const handleSave = () => {
     console.log("Saved Settings:", settings);
-    alert("Settings saved successfully");
+    setOpenToast(true);
+  };
+
+  const handleCloseToast = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") return;
+    setOpenToast(false);
   };
 
   return (
@@ -154,7 +166,6 @@ const DoctorsSettings: React.FC = () => {
           <Divider sx={{ mb: 2 }} />
 
           <Stack spacing={2}>
-            {/* Invoice */}
             <Box
               sx={{
                 display: "flex",
@@ -175,14 +186,16 @@ const DoctorsSettings: React.FC = () => {
                 row
                 value={settings.showDoctorOnInvoice ? "yes" : "no"}
                 onChange={(e) =>
-                  handleRadioChange("showDoctorOnInvoice", e.target.value)
+                  handleRadioChange(
+                    "showDoctorOnInvoice",
+                    e.target.value
+                  )
                 }
               >
                 <Radio value="yes" />
               </RadioGroup>
             </Box>
 
-            {/* Prescription */}
             <Box
               sx={{
                 display: "flex",
@@ -201,7 +214,9 @@ const DoctorsSettings: React.FC = () => {
 
               <RadioGroup
                 row
-                value={settings.showDoctorOnPrescription ? "yes" : "no"}
+                value={
+                  settings.showDoctorOnPrescription ? "yes" : "no"
+                }
                 onChange={(e) =>
                   handleRadioChange(
                     "showDoctorOnPrescription",
@@ -220,10 +235,9 @@ const DoctorsSettings: React.FC = () => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "center",
           mt: 4,
-          flexDirection: { xs: "column", md: "row" },
-          gap: { xs: 2, md: 0 },
+          gap: 4,
         }}
       >
         <Button
@@ -259,6 +273,22 @@ const DoctorsSettings: React.FC = () => {
           Save
         </Button>
       </Box>
+
+      <Snackbar
+        open={openToast}
+        autoHideDuration={3000}
+        onClose={handleCloseToast}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseToast}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Settings saved successfully!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
