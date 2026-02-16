@@ -1,9 +1,13 @@
 import { type FC } from 'react';
 import { TextField, type TextFieldProps, type SxProps, type Theme } from '@mui/material';
-import { Controller, useFormContext, type RegisterOptions, get } from 'react-hook-form';
+import { Controller, useFormContext, type RegisterOptions,get } from 'react-hook-form';
+
 import { TextRegexPattern, removeEmojis, type InputType } from '@/utils/RegexPattern';
 import { useTranslation } from 'react-i18next';
 import { getComponentTranslations } from '@/helpers/useTranslations';
+
+
+
 
 type TextInputFieldProps = TextFieldProps & {
   name: string;
@@ -75,13 +79,11 @@ const TextInputField: FC<TextInputFieldProps> = ({
       control={control}
       rules={combineRules}
       render={({ field }) => {
+       
 
-const error = get(errors, name);
+        const error = get(errors, name);
         const hasError = !!error;
         const helperText = hasError ? String(error?.message) : ' ';
-
-       // const hasError = !!errors[name];
-       // const helperText = hasError ? String(errors[name]?.message) : ' ';
 
         return (
           <TextField
@@ -115,3 +117,9 @@ const error = get(errors, name);
 };
 
 export default TextInputField;
+
+
+
+
+
+

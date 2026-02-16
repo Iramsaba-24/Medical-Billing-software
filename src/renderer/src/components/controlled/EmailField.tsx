@@ -28,8 +28,10 @@ const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ..
         required: required ? translations.emailField.requiredError(label) : undefined,
         validate: (value: string) => {
           if (!value) return true;
-          if (!emailRegex.test(value)) return translations.emailField.invalidFormat;
-          if (!emailDomainRegex.test(value)) return translations.emailField.invalidDomain;
+
+           if (!emailRegex.test(value)) return "Please enter a proper email like abc@gmail.com";
+          if (!emailDomainRegex.test(value)) return "Email should be in gmail.com domain only";
+ 
           return true;
         }
       }}
@@ -54,5 +56,3 @@ const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ..
 };
  
 export default EmailField;
- 
- 
