@@ -12,6 +12,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState } from "react";
 import { useNavigate, useLocation  } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 
 // form fields
@@ -181,7 +182,7 @@ const navigate = useNavigate();
     {/* new invoice and retail invoice btn */}
     <Button
           onClick={() => {setActiveTab("new");                                                        
-            if (location.pathname !== "") { navigate("");}}}                  
+            if (location.pathname !== URL_PATH.Billing) { navigate(URL_PATH.Billing);}}}                  
           sx={{
             textTransform: "none",       
             width: { xs: "50%", md: "10%" },
@@ -201,7 +202,7 @@ const navigate = useNavigate();
         {/* Retail Invoice */}
           <Button
             onClick={() => {setActiveTab("retail");  
-             if (location.pathname !== "") { navigate(""); }}}
+             if (location.pathname !== URL_PATH.RetailInvoice) { navigate(URL_PATH.RetailInvoice); }}}
             sx={{
               textTransform: "none",
               width: { xs: "50%", md: "10%" },
@@ -246,15 +247,11 @@ const navigate = useNavigate();
               label="Card Number"
               name="CardNumber"
               disabled={payment === "upi"}
-              inputMode="numeric"
+              inputType="numbers"
               minLength={13}
               maxLength={19}
               rules={{                
                 required: payment === "credit-card" ? "Card Number is required" : false,
-                pattern: {
-                value: /^[0-9]{13,19}$/,
-                message: "Enter valid card number",
-              },
               }
             }
             />
@@ -280,6 +277,7 @@ const navigate = useNavigate();
               label="Card Holder's Name"
               name="CardHolderName"
               disabled={payment === "upi"}
+              inputType="alphabet"
               minLength={3}
               maxLength={50}
               rules={{
@@ -287,6 +285,7 @@ const navigate = useNavigate();
                   payment === "credit-card"
                     ? "Card Holder's Name is required"
                     : false,
+
               }}
             />
           </Box>
@@ -316,7 +315,6 @@ const navigate = useNavigate();
               disabled={payment === "upi"}
               decimal={false}
               maxlength={3}
-              min={0}
               max={999}
             />
           </Box>
@@ -359,8 +357,7 @@ const navigate = useNavigate();
               <TextInputField
                 label="Enter your UPI ID"
                 name="UpiId"
-                inputType="all"
-                rows={1}
+                inputType="alphanumeric"
                 disabled={payment === "credit-card"}
                 rules={{
                   required: payment === 'upi' ? 'UPI ID is required' : false,
@@ -368,8 +365,7 @@ const navigate = useNavigate();
                     value: /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ib|phonepe)$/,
                     message: 'Enter valid UPI ID'
                   }
-                }}
-                
+                }}           
               />
             </Box>
 

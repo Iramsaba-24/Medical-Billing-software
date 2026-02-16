@@ -282,7 +282,7 @@ const InvoiceSettings = () => {
           </SettingSection>
 
           {/* Action Buttons */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
+         <Box sx={{ display: 'flex', justifyContent: 'center', mt:4 , gap: 4 }}>
             <Button
               variant="outlined"
               onClick={() => reset()}
