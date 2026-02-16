@@ -118,7 +118,7 @@ const DistributorSettings = () => {
         </Paper>
 
         {/*  Buttons- save reset*/}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt:4 , gap: 4 }}>
           <Button 
             variant="outlined" 
  

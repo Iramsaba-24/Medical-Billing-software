@@ -1,4 +1,4 @@
- 
+
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import {
@@ -182,7 +182,7 @@ const Header: React.FC = () => {
             width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
             boxSizing: 'border-box',
-            //  overflowX: 'hidden',
+           
           },
         }}
       >
@@ -192,10 +192,10 @@ const Header: React.FC = () => {
       <Box component="main" sx={{
          flex: 1, bgcolor: "#f8f9fa",
           py: { xs: 9, md: 8 },
-           mt: { xs: 6, md: 4 },
-            px:{xs:1, sm:3, md:4},
+           mt: 3,
+            px:{xs:1, sm:3, md:5},
             //  height: "100vh"
-            overflow: "auto",
+            overflowY: "auto"
               }}>
         <Outlet />
       </Box>

@@ -36,9 +36,8 @@ const AddDoctor = () => {
     const existingDoctors = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
-
     // save doctor 
-    localStorage.setItem(
+   localStorage.setItem(
       "doctors",
       JSON.stringify([...existingDoctors, data])
     );

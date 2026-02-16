@@ -2,7 +2,7 @@ import { Box, Button, Container, Typography } from "@mui/material"
 import { useLocation, useNavigate } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg"
 import { URL_PATH } from "@/constants/UrlPath";
-
+ 
 // default data
 const User = {
     name : "User",
@@ -10,7 +10,7 @@ const User = {
    // licenseNo : "MP123456789",
     licenseStatus : "Active"
 };
-
+ 
 const getGreeting = () => {
   const hour = new Date().getHours();
    switch (true) {
@@ -24,20 +24,20 @@ const getGreeting = () => {
       return "Good Night";
    }
 };
-
+ 
 const LandingPage = () => {
   const navigate = useNavigate();
   const greeting = getGreeting();
   const location = useLocation();
   const { username, licenseKey } = location.state || {};  
-
+ 
   return (
   <>
    <Box sx={{minHeight: "100vh"}}>
     <Container maxWidth= {false} sx={{ bgcolor: "#D7FFFB", borderRadius:2, boxShadow:2, py:4}}>
-
+ 
     <Box display="flex" justifyContent="space-between" alignItems="center" flexDirection={{ xs:"column", md:"row" }}>
-
+ 
         {/* left side */}
         <Box mb={{ xs:2, md:0 }} textAlign={{xs:"center", md:"left"}}>
             <Typography fontSize={20} fontWeight={600} sx={{ pb: {xs:0, md:1}}}>
@@ -45,7 +45,7 @@ const LandingPage = () => {
             </Typography>
             <Typography fontWeight={500}>Experience your Comfort Zone With Us!</Typography>
         </Box>
-
+ 
         {/* right side */}
         <Box textAlign={{ xs:"center", md:"left"}}>
             <Typography fontSize={15} sx={{ pb: {xs:0, md:1}}}
@@ -56,48 +56,48 @@ const LandingPage = () => {
         </Box>
     </Box>
     </Container>
-
+ 
           {/* buttons */}
          <Box mt={2} display="flex" flexDirection={{ xs:"column", md:"row"}} gap={2}>
-          
+         
           <Button variant="contained"
-           sx={{ 
+           sx={{
            textTransform:"none",
            flex:{lg:1},
-           width:{ xs:"100%", md:"auto"}, 
+           width:{ xs:"100%", md:"auto"},
            fontSize:16,
            fontWeight:600,
-           py:4, 
+           py:4,
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
            onClick={()=> navigate(URL_PATH.Billing)}>
             New Invoice
           </Button>
-
+ 
           <Button variant="contained"
-           sx={{ 
+           sx={{
            textTransform:"none",
            flex:{lg:1},
-           width:{ xs:"100%", md: "auto"}, 
+           width:{ xs:"100%", md: "auto"},
            fontSize:16,
            fontWeight:600,
-           py:4, 
+           py:4,
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
            onClick={()=> navigate(URL_PATH.DistributorsForm)}>
             New Distributor
           </Button>
-
-          <Button variant="contained" 
-           sx={{ 
+ 
+          <Button variant="contained"
+           sx={{
            textTransform:"none",
            flex:{lg:1},
-           width:{ xs:"100%", md: "auto"}, 
+           width:{ xs:"100%", md: "auto"},
            fontSize:16,
            fontWeight:600,
-           py:4, 
+           py:4,
            bgcolor:"#238878",
            "&:hover":{bgcolor:"#FFFFFF", color: "#238878", border: "2px solid #238878"}
            }}
@@ -105,7 +105,7 @@ const LandingPage = () => {
             New Inventory
           </Button>
          </Box>
-
+ 
           {/* img */}
          <Box
          sx={{
@@ -115,7 +115,7 @@ const LandingPage = () => {
           backgroundSize:"cover",
           backgroundPosition:"center"
          }}>
-
+ 
           <Typography fontSize={{xs:20, md:36}}
           fontWeight={600}
           color="#118E91"
@@ -132,8 +132,12 @@ const LandingPage = () => {
   </>
   )
 }
-
-export default LandingPage
-
  
+export default LandingPage
+ 
+ 
+ 
+ 
+ 
+
  
