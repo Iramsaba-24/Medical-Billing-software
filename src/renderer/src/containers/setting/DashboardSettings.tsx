@@ -9,8 +9,10 @@ import {
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 import SwitchToggle from "@/components/controlled/SwitchToggle";
 import DropdownField from "@/components/controlled/DropdownField";
-import NumericField from "@/components/controlled/NumericField";
+import TextInputField from "@/components/controlled/TextInputField";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
+//type
 type DashboardSettingsForm = {
   visibleKpis: string[];
 
@@ -98,14 +100,14 @@ const DashboardSettings = () => {
 
   const onSubmit = (data: DashboardSettingsForm) => {
     console.log("Submitted", data);
-    alert("Data submitted successfully");
+    showToast("success","saved");
   };
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box sx={{ maxWidth: "100%", overflowX: "hidden" }}>
-          {/* Header */}
+          
           <Box mb={3}>
             <Typography fontSize={22} fontWeight={700}>
               Dashboard Settings
@@ -148,17 +150,18 @@ const DashboardSettings = () => {
                 Quantity Threshold
               </Typography>
 
-              <Box display="flex" alignItems="center" justifyContent="center" gap={2}>
-                <NumericField
+              <Box display="flex" alignItems="center" gap={2}>
+                <TextInputField
                   name="quantityThreshold"
                   label=""
+                  inputType="numbers"
                   sx={{
-                    mt:2,
-                    width: 80,
-                 "& .MuiInputBase-root": {
-                    height: 30,
-                   },
-                   }}
+                    mt: 2,
+                    width: 90,
+                    "& .MuiInputBase-root": {
+                      height: 40,
+                    },
+                  }}
                 />
                 <Typography fontSize={14}>Units</Typography>
               </Box>
@@ -238,7 +241,16 @@ const DashboardSettings = () => {
           </Paper>
 
           {/* Actions */}
-          <Box display="flex" justifyContent="space-between" mt={3}>
+          <Box
+            display="flex"
+            justifyContent={{
+              xs: "center",
+              md: "center",
+            }}
+            alignItems="center"
+            gap={3}
+            mt={3}
+          >
             <Button
               variant="outlined"
               onClick={() => reset()}
@@ -282,3 +294,4 @@ const DashboardSettings = () => {
 };
 
 export default DashboardSettings;
+
