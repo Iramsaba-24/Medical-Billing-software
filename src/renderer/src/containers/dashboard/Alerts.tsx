@@ -24,7 +24,7 @@ const Alerts = () => {
   }, []);
 
   const lowStock = inventory.filter(
-    (item) => item.stockQty > 0 && item.stockQty <= 10
+    (item) => item.stockQty > 10 && item.stockQty <= 20
   );
 
   const outOfStock = inventory.filter(
@@ -36,10 +36,7 @@ const Alerts = () => {
   );
 
   return (  
-    <Paper sx={{ py: 2, px: 4,  pb: 8,  mb: 4,
-            maxHeight: 300,  overflowY: "auto"
-        }}
-        >
+    <Paper sx={{ py: 2, px: 4,  pb: 8,  mb: 4, maxHeight: 300, overflowY: "auto" }}>
       <Typography
         fontSize={18}
         fontWeight={700}

@@ -1,6 +1,7 @@
 import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
+import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 
 type ReorderHistoryItem = {
   itemId: string;
@@ -19,15 +20,13 @@ const ReorderList = () => {
   const [viewItem, setViewItem] = useState<ReorderHistoryItem | null>(null);
 
   useEffect(() => {
-    const history =
-      JSON.parse(localStorage.getItem("reorderHistory") || "[]");
-    setData(history);
+    const existing = JSON.parse(localStorage.getItem("reorderHistory") || "[]");
+    setData(existing);
   }, []);
 
   // delete
   const handleDelete = (row: ReorderHistoryItem) => {
-    const updated = data.filter(
-      (item) =>
+    const updated = data.filter((item) =>
         !(
           item.itemId === row.itemId &&
           item.purchasedAt === row.purchasedAt
@@ -36,31 +35,29 @@ const ReorderList = () => {
 
     setData(updated);
     localStorage.setItem("reorderHistory", JSON.stringify(updated));
+    showConfirmation("Delete record?", "Confirm").then((ok) => {
+      if (ok) {
+        setData(updated);
+        showSnackbar("success", "Record deleted successfully");   
+      }
+    });
   };
 
   const columns: Column<ReorderHistoryItem>[] = [
     { key: "itemName", label: "Item" },
     { key: "qty", label: "Quantity" },
-    {
-      key: "pricePerUnit",
-      label: "MRP",
+    { key: "pricePerUnit", label: "MRP",
       render: (row) => `₹ ${row.pricePerUnit}`,
     },
-    {
-      key: "gst",
-      label: "GST (12%)",
+    { key: "gst", label: "GST (12%)",
       render: (row) =>
         `₹ ${(row.qty * row.pricePerUnit * 0.12).toFixed(2)}`,
     },
-    {
-      key: "totalAmount",
-      label: "Total",
+    { key: "totalAmount", label: "Total",
       render: (row) => `₹ ${row.totalAmount.toFixed(2)}`,
     },
     { key: "expiryDate", label: "Expiry Date" },
-    {
-      key: "purchasedAt",
-      label: "Purchased On",
+    { key: "purchasedAt", label: "Purchased On",
       render: (row) =>
         new Date(row.purchasedAt).toLocaleString(),
     },

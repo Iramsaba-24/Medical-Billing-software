@@ -4,14 +4,14 @@ import { useFormContext, Controller } from 'react-hook-form';
 import { emailRegex, emailDomainRegex, SanitizeEmailRegex } from '@/utils/RegexPattern';
 import { getComponentTranslations } from '@/helpers/useTranslations';
 import { useTranslation } from 'react-i18next';
-
+ 
 type EmailFieldProps = TextFieldProps & {
   label: string;
   name: string;
   required?: boolean;
   sx?: SxProps<Theme>;
 };
-
+ 
 const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ...rest }) => {
   const { t } = useTranslation();
   const translations = getComponentTranslations(t);
@@ -19,7 +19,7 @@ const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ..
     control,
     formState: { errors }
   } = useFormContext();
-
+ 
   return (
     <Controller
       name={name}
@@ -54,6 +54,5 @@ const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ..
     />
   );
 };
-
+ 
 export default EmailField;
-

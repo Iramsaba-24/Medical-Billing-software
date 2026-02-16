@@ -1,4 +1,4 @@
-import SearchField from "@/components/controlled/SearchField";
+ import SearchField from "@/components/controlled/SearchField";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Box, Typography, Paper, MenuItem, Button, Select } from "@mui/material";
@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-
+// Define the structure of a single Distributor object
 type Distributor = {
   id: string;
   companyName: string;
@@ -19,22 +19,30 @@ type Distributor = {
 };
 
 const Distributors = () => {
+  // Initialize the search form
   const methods = useForm({ defaultValues: { search: "" } });
+  
+  // State to store the list of distributors
   const [distributors, setDistributors] = useState<Distributor[]>([]);
 
   const navigate = useNavigate();
+  
+  // Watch the search input value in real-time
   const searchValue = methods.watch("search");
 
+  // Load data from LocalStorage when the page first opens
   useEffect(() => {
-    setDistributors(JSON.parse(localStorage.getItem("distributors") || "[]"));
+    const savedData = localStorage.getItem("distributors");
+    setDistributors(savedData ? JSON.parse(savedData) : []);
   }, []);
-
+  
   const handleStatusChange = (id: string, status: "Active" | "Inactive") => {
     const updated = distributors.map((d) => (d.id === id ? { ...d, status } : d));
     localStorage.setItem("distributors", JSON.stringify(updated));
     setDistributors(updated);
   };
   
+  // Define table columns
   const columns: Column<Distributor>[] = [
     { key: "companyName", label: "Company Name" },
     { key: "registrationNumber", label: "Reg. No." },
@@ -66,11 +74,10 @@ const Distributors = () => {
         </Select>
       ),
     },
-    { 
-      key: ACTION_KEY, label: "Action"
-     },
+    { key: ACTION_KEY, label: "Action" }, 
   ];
 
+  // Filter the list based on what the user types in the search box
   const filteredDistributors = distributors.filter((d) =>
     d.companyName.toLowerCase().includes(searchValue.toLowerCase()) ||
     d.registrationNumber.toLowerCase().includes(searchValue.toLowerCase())
@@ -87,6 +94,7 @@ const Distributors = () => {
             alignItems={{ md: "center" }}
             sx={{ gap: { xs: 2, md: 2 } }}
           >
+            {/* Search Input Field */}
             <SearchField
               name="search"
               label="Search"
@@ -94,6 +102,8 @@ const Distributors = () => {
               size="small"
               sx={{ width: { xs: "100%", md: 550 } }}
             />
+            
+            {/* Button to go to the Add Distributor Form */}
             <Button
               variant="contained"
               sx={{
@@ -120,6 +130,7 @@ const Distributors = () => {
           Distributors List
         </Typography>
 
+        {/* The Data Table */}
         <UniversalTable
           data={filteredDistributors}
           columns={columns}
@@ -127,7 +138,7 @@ const Distributors = () => {
           getRowId={(row) => row.id}
           actions={{
   view: (distributor) =>
-    navigate("/distributor-details", {
+    navigate(URL_PATH.DistributorDetails, {
       state: { distributor },
     }),
   

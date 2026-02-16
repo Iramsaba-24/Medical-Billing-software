@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import {
   Box,
   Grid,
@@ -12,6 +11,7 @@ import {
   FormProvider,
   useForm,
   useFieldArray,
+  FieldErrors,
 } from "react-hook-form";
 import PrintIcon from "@mui/icons-material/Print";
 import AddIcon from "@mui/icons-material/Add";
@@ -23,6 +23,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
+import { URL_PATH } from "@/constants/UrlPath";
 
 /* STYLES */
 const TEAL_COLOR = "#2D8B7A";
@@ -53,16 +54,23 @@ type FormData = {
   items: ItemRow[];
 };
 
-const POS2 = () => {
+const RetailInvoice = () => {
+  const navigate = useNavigate();
+
   const methods = useForm<FormData>({
-    mode: "onChange",
+    mode: "onSubmit",
+    shouldUnregister: false,
     defaultValues: {
       gst: "5",
-      items: [{ name: "", qty: 1, mrp: 0, discount: 0 }], //  fixed default values
+      items: [{ name: "", qty: 1, mrp: 0, discount: 0 }],
     },
   });
 
-  const { handleSubmit, watch, control } = methods;
+  const {
+    handleSubmit,
+    watch,
+    control,
+  } = methods;
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -72,20 +80,36 @@ const POS2 = () => {
   const items = watch("items") || [];
   const gst = Number(watch("gst") || 0);
 
-  /* CALCULATIONS */
   const getRowAmount = (row: ItemRow) => {
-    const priceAfterDiscount = row.mrp - row.discount;
+    const qty = Number(row.qty || 0);
+    const mrp = Number(row.mrp || 0);
+    const discount = Number(row.discount || 0);
+
+    const priceAfterDiscount = mrp - discount;
     if (priceAfterDiscount <= 0) return 0;
-    return row.qty * priceAfterDiscount;
+
+    return qty * priceAfterDiscount;
   };
 
-  const subTotal = items.reduce((sum, row) => sum + getRowAmount(row), 0);
+  const subTotal = items.reduce(
+    (sum, row) => sum + getRowAmount(row),
+    0
+  );
+
   const gstAmount = (subTotal * gst) / 100;
   const finalTotal = subTotal + gstAmount;
 
   const onSubmit = (data: FormData) => {
-    showToast("success","Data saved successfully!")
-    console.log(data);
+    console.log("FORM SUBMITTED:", data);
+    showToast("success", "Data saved successfully!");
+     navigate(URL_PATH.PaymentDetails );
+    // navigate(URL_PATH.PaymentDetails || "/payment-details");
+
+  };
+
+  const onError = (formErrors: FieldErrors<FormData>) => {
+    console.log("FORM ERRORS:", formErrors);
+    showToast("error", "Please fill all required fields");
   };
 
   const companyOptions = [
@@ -94,64 +118,19 @@ const POS2 = () => {
     { label: "MedPlus Ltd.", value: "MedPlus Ltd." },
   ];
 
-  const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
-  const navigate = useNavigate();
-
   return (
     <FormProvider {...methods}>
-      {/* TOP BUTTONS */}
-      <Box display="flex">
-        <Button
-          onClick={() => {
-            setActiveTab("new");
-            if (location.pathname !== "/settings/pos")
-              navigate("/settings/pos");
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-            color: activeTab === "new" ? "#fff" : "#000",
-            border: activeTab === "new" ? "none" : "1px solid #ccc",
-          }}
-        >
-          New Invoice
-        </Button>
-
-        <Button
-          onClick={() => {
-            setActiveTab("retail");
-            if (location.pathname !== "/settings/retailinvoice")
-              navigate("/settings/retailinvoice");
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-            color: activeTab === "retail" ? "#fff" : "#000",
-            border: activeTab === "retail" ? "none" : "1px solid #ccc",
-          }}
-        >
-          Retail Invoice
-        </Button>
-      </Box>
-
       <Paper sx={{ p: 2 }}>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          {/* TOP FORM */}
+        <form
+          onSubmit={handleSubmit(onSubmit, onError)}
+          noValidate
+        >
           <Box sx={containerStyle}>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <DropdownField
                   name="company"
                   label="Company"
-                  placeholder="Company"
                   required
                   options={companyOptions}
                 />
@@ -162,16 +141,23 @@ const POS2 = () => {
                   name="supplier"
                   label="Supplier"
                   required
-                  maxLength={50}
                 />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <MobileField name="mobile" label="Mobile Number" required />
+                <MobileField
+                  name="mobile"
+                  label="Mobile Number"
+                  required
+                />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <EmailField name="email" label="Email Address" required />
+                <EmailField
+                  name="email"
+                  label="Email Address"
+                  required
+                />
               </Grid>
 
               <Grid size={{ xs: 12 }}>
@@ -189,11 +175,17 @@ const POS2 = () => {
           <Box sx={containerStyle}>
             <Box display="flex" justifyContent="space-between" mb={3}>
               <Typography variant="h6">Item Name</Typography>
+
               <Button
                 type="button"
                 startIcon={<AddIcon />}
                 onClick={() =>
-                  append({ name: "", qty: 1, mrp: 0, discount: 0 })
+                  append({
+                    name: "",
+                    qty: 1,
+                    mrp: 0,
+                    discount: 0,
+                  })
                 }
                 sx={{ textTransform: "none", color: TEAL_COLOR }}
               >
@@ -203,67 +195,40 @@ const POS2 = () => {
 
             {fields.map((field, index) => (
               <Grid container spacing={2} mb={2} key={field.id}>
-                {/* ITEM NAME */}
                 <Grid size={{ xs: 12, md: 3 }}>
                   <TextInputField
                     name={`items.${index}.name`}
                     label="Item"
-                    type="text"
-                    maxLength={50}
                     required
                   />
                 </Grid>
 
+                <Grid size={{ xs: 12, md: 2 }}>
+                  <TextInputField
+                    name={`items.${index}.qty`}
+                    label="QTY"
+                    type="number"
+                    required
+                  />
+                </Grid>
 
+                <Grid size={{ xs: 12, md: 2 }}>
+                  <TextInputField
+                    name={`items.${index}.mrp`}
+                    label="MRP"
+                    type="number"
+                    required
+                  />
+                </Grid>
 
-                {/* QTY */}
-<Grid size={{ xs: 12, md: 2 }}>
-  <TextInputField
-    name={`items.${index}.qty`}
-    label="QTY"
-    type="number"
-    required
-    inputProps={{ min: 1, step: 1 }}
-    rules={{
-      min: { value: 1, message: "Quantity must be at least 1" },
-    }}
-  />
-</Grid>
+                <Grid size={{ xs: 12, md: 2 }}>
+                  <TextInputField
+                    name={`items.${index}.discount`}
+                    label="DISCOUNT"
+                    type="number"
+                  />
+                </Grid>
 
-{/* MRP */}
-<Grid size={{ xs: 12, md: 2 }}>
-  <TextInputField
-    name={`items.${index}.mrp`}
-    label="MRP"
-    type="number"
-    required
-    inputProps={{ min: 1, step: 1 }} // step = 1 like qty
-    rules={{
-      min: { value: 1, message: "MRP must be at least 1" },
-    }}
-  />
-</Grid>
-
-{/* DISCOUNT */}
-<Grid size={{ xs: 12, md: 2 }}>
-  <TextInputField
-    name={`items.${index}.discount`}
-    label="DISCOUNT %"
-    type="number"
-    inputProps={{ min: 0, step: 1 }} // step = 1 like qty
-    rules={{
-      min: { value: 0, message: "Discount cannot be negative" },
-      validate: (value) => {
-        const mrp = Number(items[index]?.mrp || 0);
-        if (Number(value) > mrp) return "Discount cannot exceed MRP";
-        return true;
-      },
-    }}
-  />
-</Grid>
-
-
-                {/* AMOUNT */}
                 <Grid size={{ xs: 12, md: 2 }}>
                   <TextField
                     fullWidth
@@ -273,12 +238,11 @@ const POS2 = () => {
                   />
                 </Grid>
 
-                {/* REMOVE BUTTON */}
-                <Grid textAlign={{ xs: "right", md: "center" }} size={{ xs: 12, md: 1 }}>
+                {/* <Grid size={{ xs: 12, md: 1 }}> */}
+                  <Grid textAlign={{ xs: "right", md: "center" }} size={{ xs: 12, md: 1 }}>
                   <Button
                     type="button"
                     onClick={() => remove(index)}
-                    sx={{ minWidth: 0, color: TEAL_COLOR }}
                     disabled={fields.length === 1}
                   >
                     <RemoveIcon />
@@ -287,13 +251,11 @@ const POS2 = () => {
               </Grid>
             ))}
 
-            {/* GST + TOTAL */}
             <Grid container spacing={2}>
               <Grid size={{ xs: 12, md: 3 }}>
                 <DropdownField
                   name="gst"
                   label="GST (%)"
-                  placeholder="GST (%)"
                   options={[
                     { label: "5%", value: "5" },
                     { label: "12%", value: "12" },
@@ -322,7 +284,6 @@ const POS2 = () => {
             </Grid>
           </Box>
 
-          {/* ACTIONS */}
           <Box
             display="flex"
             gap={2}
@@ -335,6 +296,7 @@ const POS2 = () => {
             <Button
               variant="contained"
               type="submit"
+              
               sx={{
                 bgcolor: TEAL_COLOR,
                 color: "#fff",
@@ -359,16 +321,34 @@ const POS2 = () => {
             >
               Print
             </Button>
-          </Box>
+            </Box>
+
+          {/* <Box display="flex" gap={2} mt={3}>
+            <Button
+              variant="contained"
+              type="submit"
+              sx={{ bgcolor: TEAL_COLOR }}
+            >
+              Save And Submit
+            </Button>
+
+            <Button
+              variant="contained"
+              startIcon={<PrintIcon />}
+              type="button"
+              onClick={() => window.print()}
+              sx={{ bgcolor: TEAL_COLOR }}
+            >
+              Print
+            </Button>
+          </Box> */}
         </form>
       </Paper>
     </FormProvider>
   );
 };
 
-export default POS2;
-
-
+export default RetailInvoice;
 
 
 

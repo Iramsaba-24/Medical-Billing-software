@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
   }, []);
 
   return (
-    <Box p={3}>
+    <Box >
       <DistributorCards totalCount={count} />
       <DistributorsTable />
     </Box>

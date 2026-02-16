@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-} from "@mui/material";
+import { Box, Paper, Typography, Button } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import PrintIcon from "@mui/icons-material/Print";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 
-
 // types
 type MediPointsForm = {
-  totalAmount: string;       
-  mediPoints: string;         
-  discountedAmount: string;   
+  totalAmount: string;
+  mediPoints: string;
+  discountedAmount: string;
 };
 
 // Reusable form field props
@@ -35,16 +29,14 @@ type InfoRowProps = {
 };
 
 const MediPoints: React.FC = () => {
-
   //state
 
-  const [earned, setEarned] = useState(0);   // Points earned from current bill
-  const [used, setUsed] = useState(0);       // Points used
+  const [earned, setEarned] = useState(0); // Points earned from current bill
+  const [used, setUsed] = useState(0); // Points used
   const [remains, setRemains] = useState(0); // Remaining points
 
   // Active tab (New / Retail)
-  const [activeTab, setActiveTab] =
-    useState<"new" | "retail">("new");
+  const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
 
   //react hook setup
   const methods = useForm<MediPointsForm>({
@@ -60,35 +52,24 @@ const MediPoints: React.FC = () => {
   const usedNow = Number(methods.watch("mediPoints")) || 0;
 
   useEffect(() => {
-    const basePoints = 5; 
+    const basePoints = 5;
 
     // Earn 5 points for every ₹200
-    const earnedNow =
-      basePoints + Math.floor(total / 200) * 5;
+    const earnedNow = basePoints + Math.floor(total / 200) * 5;
 
-   
-    const validUsed = Math.min(
-      usedNow,
-      earnedNow
-    );
+    const validUsed = Math.min(usedNow, earnedNow);
 
     // Update states
     setEarned(earnedNow);
     setUsed(validUsed);
     setRemains(earnedNow - validUsed);
 
-    
-    const finalAmount =
-      Math.max(total - validUsed, 0);
+    const finalAmount = Math.max(total - validUsed, 0);
 
-    methods.setValue(
-      "discountedAmount",
-      finalAmount.toFixed(2)
-    );
+    methods.setValue("discountedAmount", finalAmount.toFixed(2));
   }, [total, usedNow, methods]);
 
- 
-     //Reusable Component
+  //Reusable Component
   // Form input field
   const FormField: React.FC<FormFieldProps> = ({
     title,
@@ -116,11 +97,7 @@ const MediPoints: React.FC = () => {
   );
 
   // Earned / Used / Remains row
-  const InfoRow: React.FC<InfoRowProps> = ({
-    label,
-    value,
-    color,
-  }) => (
+  const InfoRow: React.FC<InfoRowProps> = ({ label, value, color }) => (
     <Box
       sx={{
         display: "flex",
@@ -131,27 +108,25 @@ const MediPoints: React.FC = () => {
       <Typography fontSize={15} fontWeight={700}>
         {label}
       </Typography>
-      <Typography
-        fontSize={15}
-        fontWeight={700}
-        sx={{ color }}
-      >
+      <Typography fontSize={15} fontWeight={700} sx={{ color }}>
         {value}
       </Typography>
     </Box>
   );
-
+  const onSubmit = (data: MediPointsForm) => {
+    console.log("FORM DATA:", data);
+    navigate(URL_PATH.PaymentMethod);
+  };
   const navigate = useNavigate();
   return (
     <FormProvider {...methods}>
-
       {/* New Invoice Button */}
       <Button
         fullWidth
         onClick={() => {
-          setActiveTab("new");      // Set active tab
-          if (location.pathname !== "") {
-            navigate(URL_PATH.NewInvoice);          
+          setActiveTab("new"); // Set active tab
+          if (location.pathname !== URL_PATH.Billing) {
+            navigate(URL_PATH.Billing);
           }
         }}
         sx={{
@@ -160,23 +135,11 @@ const MediPoints: React.FC = () => {
           height: "38px",
           fontWeight: 500,
           borderRadius: "0px 18px 0px 0px",
-          backgroundColor:
-            activeTab === "new"
-              ? "#238878"
-              : "#fff",
-          color:
-            activeTab === "new"
-              ? "#fff"
-              : "#000",
-          border:
-            activeTab === "new"
-              ? "none"
-              : "1px solid #ccc",
+          backgroundColor: activeTab === "new" ? "#238878" : "#fff",
+          color: activeTab === "new" ? "#fff" : "#000",
+          border: activeTab === "new" ? "none" : "1px solid #ccc",
           "&:hover": {
-            backgroundColor:
-              activeTab === "new"
-                ? "#238878"
-                : "#f5f5f5",
+            backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
           },
         }}
       >
@@ -197,158 +160,136 @@ const MediPoints: React.FC = () => {
           height: "38px",
           fontWeight: 500,
           borderRadius: "0px 18px 0px 0px",
-          backgroundColor:
-            activeTab === "retail"
-              ? "#238878"
-              : "#fff",
-          color:
-            activeTab === "retail"
-              ? "#fff"
-              : "#000",
-          border:
-            activeTab === "retail"
-              ? "none"
-              : "1px solid #ccc",
+          backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
+          color: activeTab === "retail" ? "#fff" : "#000",
+          border: activeTab === "retail" ? "none" : "1px solid #ccc",
           "&:hover": {
-            backgroundColor:
-              activeTab === "retail"
-                ? "#238878"
-                : "#f5f5f5",
+            backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
           },
         }}
       >
         Retail Invoice
       </Button>
+      <form onSubmit={methods.handleSubmit(onSubmit)}noValidate>
+        {/* ------ Main Card -------*/}
 
-      {/* ------ Main Card -------*/}
-
-      <Box>
-        <Paper
-          elevation={1}
-          sx={{
-            p: 3,
-            bgcolor: "#ffffff",
-            border: "1px solid #e0e0e0",
-          }}
-        >
-          <Typography fontWeight={600}>
-            Medi Points
-          </Typography>
-
-          {/* Two Column Layout */}
-          <Box
+        <Box>
+          <Paper
+            elevation={1}
             sx={{
-              display: "flex",
-              flexDirection: {
-                xs: "column",
-                md: "row",
-              },
-              gap: 4,
+              p: 3,
+              bgcolor: "#ffffff",
+              border: "1px solid #e0e0e0",
             }}
           >
+            <Typography fontWeight={600}>Medi Points</Typography>
 
-            {/* Left Section - Points Info */}
-            <Paper
-              elevation={0}
+            {/* Two Column Layout */}
+            <Box
               sx={{
-                flex: 1,
-                p: 2,
-                border: "1px solid #bdbdbd",
+                display: "flex",
+                flexDirection: {
+                  xs: "column",
+                  md: "row",
+                },
+                gap: 4,
               }}
             >
-              <InfoRow
-                label="Earned:"
-                value={`${earned} Pts.`}
-                color="#1f8f7a"
-              />
-              <InfoRow
-                label="Used:"
-                value={`${used} Pts.`}
-              />
-              <InfoRow
-                label="Remains:"
-                value={`${remains} Pts.`}
-                color="red"
-              />
-
-              <Typography
-                variant="body2"
-                fontWeight={700}
-                mt={2}
+              {/* Left Section - Points Info */}
+              <Paper
+                elevation={0}
+                sx={{
+                  flex: 1,
+                  p: 2,
+                  border: "1px solid #bdbdbd",
+                }}
               >
-                Description
-              </Typography>
+                <InfoRow
+                  label="Earned:"
+                  value={`${earned} Pts.`}
+                  color="#1f8f7a"
+                />
+                <InfoRow label="Used:" value={`${used} Pts.`} />
+                <InfoRow
+                  label="Remains:"
+                  value={`${remains} Pts.`}
+                  color="red"
+                />
 
-              <Box component="ul" sx={{ pl: 2 }}>
-                <Typography component="li" sx={{ mb: 0.5 }}>
-                  Medi Points is a smart reward system designed to thank customers for their loyalty.
+                <Typography variant="body2" fontWeight={700} mt={2}>
+                  Description
                 </Typography>
-                <Typography component="li" sx={{ mb: 0.5 }}>
-                  For every ₹200 purchase, customers earn 5 Medi Points.
-                </Typography>
-                <Typography component="li" sx={{ mb: 0.5 }}>
-                  Points can be redeemed during billing.
-                </Typography>
+
+                <Box component="ul" sx={{ pl: 2 }}>
+                  <Typography component="li" sx={{ mb: 0.5 }}>
+                    Medi Points is a smart reward system designed to thank
+                    customers for their loyalty.
+                  </Typography>
+                  <Typography component="li" sx={{ mb: 0.5 }}>
+                    For every ₹200 purchase, customers earn 5 Medi Points.
+                  </Typography>
+                  <Typography component="li" sx={{ mb: 0.5 }}>
+                    Points can be redeemed during billing.
+                  </Typography>
+                </Box>
+              </Paper>
+
+              {/* Right Section - Form Inputs */}
+              <Box sx={{ flex: 1 }}>
+                <FormField
+                  title="Total (GST included)"
+                  name="totalAmount"
+                  required
+                  decimal
+                />
+                <FormField title="Add Medi Points" name="mediPoints" />
+                <FormField
+                  title="Total Amount (with discount)"
+                  name="discountedAmount"
+                  required
+                  decimal
+                />
               </Box>
-            </Paper>
-
-            {/* Right Section - Form Inputs */}
-            <Box sx={{ flex: 1 }}>
-              <FormField
-                title="Total (GST included)"
-                name="totalAmount"
-                required
-                decimal
-              />
-              <FormField
-                title="Add Medi Points"
-                name="mediPoints"
-              />
-              <FormField
-                title="Total Amount (with discount)"
-                name="discountedAmount"
-                decimal
-              />
             </Box>
-          </Box>
 
-          {/* Bottom Buttons */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: {
-                xs: "center",
-                md: "flex-end",
-              },
-              gap: 2,
-              mt: 3,
-              flexWrap: "wrap",
-            }}
-          >
-            <Button
-              variant="contained"
+            {/* Bottom Buttons */}
+            <Box
               sx={{
-                bgcolor: "#1f8f7a",
-                textTransform: "none",
-              }}
-              onClick={() => navigate(URL_PATH.PaymentMethod)}
-            >
-              PAY
-            </Button>
-
-            <Button
-              startIcon={<PrintIcon />}
-              variant="contained"
-              sx={{
-                bgcolor: "#1f8f7a",
-                textTransform: "none",
+                display: "flex",
+                justifyContent: {
+                  xs: "center",
+                  md: "flex-end",
+                },
+                gap: 2,
+                mt: 3,
+                flexWrap: "wrap",
               }}
             >
-              PRINT
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
+              <Button 
+                type="submit"
+                variant="contained"
+                sx={{
+                  bgcolor: "#1f8f7a",
+                  textTransform: "none",
+                }}
+              >
+                PAY
+              </Button>
+
+              <Button
+                startIcon={<PrintIcon />}
+                variant="contained"
+                sx={{
+                  bgcolor: "#1f8f7a",
+                  textTransform: "none",
+                }}
+              >
+                PRINT
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
+      </form>
     </FormProvider>
   );
 };

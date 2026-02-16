@@ -1,8 +1,8 @@
 import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
-import { Button, Paper, Typography, Box} from "@mui/material";
+import { Button, Paper, Typography, Box } from "@mui/material";
 import DropdownField from "@/components/controlled/DropdownField";
 import SwitchToggle from "@/components/controlled/SwitchToggle";
-
+import { showToast, showConfirmation, } from "@/components/uncontrolled/ToastMessage"; 
 
 
 type GeneralSettingsFormValues = {
@@ -31,8 +31,8 @@ function GenralSettings() {
     },
     mode: "onSubmit",
   });
-  
-//  For Drop down Options
+
+  //  For Drop down Options
   const languageOptions = [
     { value: "en", label: "English" },
     { value: "hi", label: "Hindi" },
@@ -63,27 +63,39 @@ function GenralSettings() {
     { value: "EUR", label: "€ EUR" },
   ];
 
-  const {handleSubmit, reset}=methods;
-  const onSubmit: SubmitHandler<GeneralSettingsFormValues> = (data) => {
-    console.log("General Settings Data:", data); 
-    alert("data submited");
-  //  reset();
-
+  const { reset } = methods;
+  
+  const onSubmit: SubmitHandler<GeneralSettingsFormValues> = async (data) => {
+  console.log("General Settings Data:", data);
+  const confirmed = await showConfirmation("Do you want to save these settings?", "Confirm Save");
+  if (!confirmed) return;
+  // After confirmation, show a success toast
+  showToast("success", "Settings saved successfully!");
 };
-
 
   return (
     <FormProvider {...methods}>
-    
-     <Typography variant="h6" mb={3} fontWeight="bold">
-          General Settings
-        </Typography>
+      <Typography variant="h6" mb={3} sx={{ mb: { xs: 1, md: 3 },}} fontWeight="bold">
+        General Settings
+      </Typography>
 
-        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-            <Paper sx={{ p: 3, maxWidth: 850, m: "auto", mt: 4 }}>
-
+      <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+       <Paper
+  sx={{
+    p: { xs: 2, md: 4 },
+    mt: { xs: 1, md: 2 }, 
+    borderRadius: 0,
+    backgroundColor: "transparent",
+  }}
+>
           {/* Language  */}
-          <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={3} mb={3}>
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", md: "row" }}
+            gap={3}
+            mb={3}
+            flexWrap="wrap" 
+          >
             <Box flex={1}>
               <Typography variant="subtitle2" mb={1}>
                 Language
@@ -91,10 +103,11 @@ function GenralSettings() {
               <DropdownField
                 name="language"
                 options={languageOptions}
-                required/>
+                required
+              />
             </Box>
-            
-          {/* Time Zone  */}
+
+            {/* Time Zone  */}
             <Box flex={1}>
               <Typography variant="subtitle2" mb={1}>
                 Time Zone
@@ -102,12 +115,18 @@ function GenralSettings() {
               <DropdownField
                 name="timeZone"
                 options={timeZoneOptions}
-                required />
+                required
+              />
             </Box>
           </Box>
 
           {/*  Date Format & Currency */}
-          <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={3} mb={3}>
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", md: "row" }}
+            gap={3}
+            mb={3}
+          >
             <Box flex={1}>
               <Typography variant="subtitle2" mb={1}>
                 Date Format
@@ -115,7 +134,8 @@ function GenralSettings() {
               <DropdownField
                 name="dateFormat"
                 options={dateFormatOptions}
-                required/>
+                required
+              />
             </Box>
 
             <Box flex={1}>
@@ -125,12 +145,18 @@ function GenralSettings() {
               <DropdownField
                 name="currency"
                 options={currencyOptions}
-                required/>
+                required
+              />
             </Box>
           </Box>
 
           {/* Financial Year */}
-          <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={3} mb={4}>
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", md: "row" }}
+            gap={3}
+            mb={4}
+          >
             <Box flex={1}>
               <Typography variant="subtitle2" mb={1}>
                 Financial Year
@@ -138,7 +164,8 @@ function GenralSettings() {
               <DropdownField
                 name="financialYear"
                 options={financialYearOptions}
-                required/>
+                required
+              />
             </Box>
             <Box flex={1} />
           </Box>
@@ -161,37 +188,53 @@ function GenralSettings() {
             </Box>
           </Box>
 
-          </Paper>
-
-        {/* Button: Reset & Submit*/}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-          <Button 
-            type="button" 
-            variant="outlined" 
-            onClick={() => reset()}                      
+           {/* Button: Reset & Submit*/}
+        <Box  sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => reset()}
             sx={{
-            color: "#238878",
-            border: "2px solid #238878",
-            textTransform: "none",
-          "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
-          }}>
-            Reset
-          </Button>
-
-          <Button 
-              type="submit" 
-              variant="contained" 
-              sx={{
+              color: "#238878",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
                 backgroundColor: "#238878",
                 color: "#fff",
                 border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
-              }}> Save </Button>
-        </Box>
-        </form>  
+              },
+            }}
+          >
+            Reset
+          </Button>
+
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
+          >
+           
+            Save
+          </Button>
+          </Box>
+        </Paper>
+
+        
+       
+      </form>
     </FormProvider>
   );
 }
 
 export default GenralSettings;
+
