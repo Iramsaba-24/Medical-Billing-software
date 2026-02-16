@@ -33,15 +33,16 @@ const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
  
  
   const menuItems = [
-    { text: 'General', icon: <SettingsIcon fontSize="small" />, path: "/" },
-    { text: 'Pharmacy Profile', icon: <LocalPharmacyIcon fontSize="small" />, path: "/" },
-    { text: 'Dashboard Settings', icon: <DashboardIcon fontSize="small" />, path: URL_PATH.DashboardSettings},
-    { text: 'Customers Settings', icon: <GroupIcon fontSize="small" />, path: "/" },
-    { text: 'Doctors Settings', icon: <SettingsIcon fontSize="small" />, path:"/" },
-    { text: 'Distributors Settings', icon: <SettingsIcon fontSize="small" />, path: "/" },
+    { text: 'General', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.GeneralSettings},
+    { text: 'Pharmacy Profile', icon: <LocalPharmacyIcon fontSize="small" />, path: URL_PATH.PharmacyProfile },
+      
+    { text: 'Dashboard Settings', icon: <DashboardIcon fontSize="small" />, path: URL_PATH. DashboardSettings},
+    { text: 'Customer Settings', icon: <GroupIcon fontSize="small" />, path: URL_PATH.CustomerSettings},
+    { text: 'Doctors Settings', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DoctorSettings },
+    { text: 'Distributors Settings', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DistributorsSetting },
     { text: 'Inventory Settings', icon: <InventoryIcon fontSize="small" />, path: URL_PATH.InventorySettings },
     { text: 'Invoice Settings', icon: <DescriptionIcon fontSize="small" />, path: URL_PATH.InvoiceSetting },
-    { text: 'Reports', icon: <AssessmentIcon fontSize="small" />, path: "/" },
+    { text: 'Report Settings', icon: <AssessmentIcon fontSize="small" />, path: URL_PATH.ReportSettings },
   ];
  
  

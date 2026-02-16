@@ -281,7 +281,7 @@ const MediPoints: React.FC = () => {
                 
               }}
             >
-              PAY
+              Save & Continue
             </Button>
 
             <Button

@@ -30,22 +30,19 @@ const AddDoctor = () => {
 
   const navigate = useNavigate();
 
-  // function run when submitted
+  // submit
   const onSubmit = (data: AddDoctorFormValues) => {
     const existingDoctors = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
 
-    // create new doctor & generate unique id
-    const newDoctor = {
-      id: crypto.randomUUID(),
-      ...data,
-    };
+
+    
 
     // save doctor 
-    localStorage.setItem(
+   localStorage.setItem(
       "doctors",
-      JSON.stringify([...existingDoctors, newDoctor])
+      JSON.stringify([...existingDoctors, data])
     );
 
     navigate("/doctors");
@@ -59,7 +56,7 @@ const AddDoctor = () => {
   <hr />
 
   <FormProvider {...methods}>
-    <form onSubmit={methods.handleSubmit(onSubmit)}>
+    <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
       <Box
         maxWidth="900px"
         mx="auto"

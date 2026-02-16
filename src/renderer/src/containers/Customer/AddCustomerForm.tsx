@@ -8,6 +8,9 @@ import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import ItemsSection from "@/containers/customer/ItemsSection";
+import { useNavigate } from "react-router-dom";
+import { Invoice } from "../Invoices/InvoiceView";
+import { URL_PATH } from "@/constants/UrlPath";
 
 // Structure for a single row in the medicine list
 export interface ItemRow { 
@@ -15,6 +18,10 @@ export interface ItemRow {
   name: string; 
   qty: number | ""; 
   price: number | ""; 
+  errors?: {
+    qty?: string;
+    price?: string;
+  };
 }
 
 interface Props {
@@ -29,6 +36,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const [gst, setGst] = useState(5);
   const [paymentMode, setPaymentMode] = useState("Cash");
   const [list, setList] = useState<CustomerData[]>([]);
+
+  const navigate = useNavigate();
 
   // React Hook Form setup: loads initialData if we are editing
   const methods = useForm<CustomerData>({
@@ -53,17 +62,49 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const btnStyle = { 
     bgcolor: "#248a76", 
     color: "#fff", 
-    width: { xs: "100%", sm: "auto" }, 
+    width: { xs: "auto", sm: "auto" }, 
+    minWidth: { xs: "140px", sm: "auto" },
     fontWeight: "bold", 
     textTransform: "none", 
     "&:hover": { bgcolor: "#fff", color: "#248a76", borderColor: "#248a76" } 
   };
+
+
+// print  
+const handlePrint = () => {
+  const invoiceData: Invoice = {
+    patient: methods.getValues("name"),
+    doctor: methods.getValues("doctor"),
+    address: methods.getValues("address"),
+    invoice: "inv",
+    date: methods.getValues("date"),
+    medicines: rows.map((r) => ({
+      name: r.name,
+      qty: r.qty === "" ? "" : String(r.qty), 
+      amount: Number(r.qty) * Number(r.price),
+      batch: "-",
+      expiry: "-",
+    })),
+    subTotal,
+    gst,
+    total: finalTotal,
+  };
+
+  // Save invoice in localStorage
+  const savedInvoices = JSON.parse(localStorage.getItem("invoices") || "[]");
+  savedInvoices.push(invoiceData);
+  localStorage.setItem("invoices", JSON.stringify(savedInvoices));
+
+  // Navigate to InvoiceView with invoiceNo in URL and pass state
+  navigate(`${URL_PATH.InvoiceView}/${invoiceData.invoice}`, { state: invoiceData });
+};
 
   return (
     <FormProvider {...methods}>
       {/* Main Form Container */}
       <Box 
         component="form" 
+        noValidate
         onSubmit={methods.handleSubmit(d => onSave(d, finalTotal, rows.map(r => r.name).join(", "), rows.length))} 
         sx={{  bgcolor: "#f5f5f5", minHeight: "100vh" }}
       >
@@ -94,12 +135,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             <Grid size={{ xs: 12, md: 7 }}>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>Customer Details</Typography>
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 6 }}><TextInputField name="name" label="Customer Name" required /></Grid>
+                <Grid size={{ xs: 12, md: 6 }}><TextInputField name="name"  label="Customer Name" inputType="alphabet" required /></Grid>
                 <Grid size={{ xs: 12, md: 6 }}><DateTimeField name="date" label="Date" required /></Grid>
-                <Grid size={{ xs: 12, md: 6 }}><TextInputField name="age" label="Age" required /></Grid>
+                <Grid size={{ xs: 12, md: 6 }}><TextInputField name="age" label="Age" maxLength={3} required /></Grid>
                 <Grid size={{ xs: 12, md: 6 }}><MobileField name="mobile" label="Mobile" required /></Grid>
-                <Grid size={{ xs: 12, md: 6 }}><EmailField name="email" label="Email" /></Grid>
-                <Grid size={{ xs: 12, md: 6 }}><TextInputField name="address" label="Address" required /></Grid>
+                <Grid size={{ xs: 12, md: 6 }}><EmailField name="email" label="Email" required /></Grid>
+                <Grid size={{ xs: 12, md: 6 }}><TextInputField name="address" label="Address" inputType="textarea" rows={1} required /></Grid>
               </Grid>
             </Grid>
 
@@ -107,8 +148,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             <Grid size={{ xs: 12, md: 5 }}>
               <Typography variant="subtitle1" fontWeight="bold" mb={2} mt={{ xs: 2, md: 0 }}>Doctor Information</Typography>
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12 }}><TextInputField name="doctor" label="Doctor Name" required /></Grid>
-                <Grid size={{ xs: 12 }}><TextInputField name="doctorAddress" label="Doctor Address/Clinic" /></Grid>
+                <Grid size={{ xs: 12 }}><TextInputField name="doctor" label="Doctor Name" inputType="alphabet" required /></Grid>
+                <Grid size={{ xs: 12 }}><TextInputField name="doctorAddress" label="Doctor Address/Clinic" inputType="textarea" rows={1}  /></Grid>
               </Grid>
             </Grid>
           </Grid>
@@ -123,10 +164,13 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         />
 
         {/* Bottom Action Buttons (Print, Pay, Save) */}
-        <Box sx={{ mt: 4, mb: 5, display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "flex-end", gap: 2 }}>
-          <Button variant="contained" startIcon={<Print />} onClick={() => window.print()} sx={btnStyle}>
+
+        <Box sx={{ mt: 4, mb: 5, display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: { xs: "center", sm: "flex-end" },alignItems: "center", gap: 2 }}>
+      
+          <Button variant="contained" onClick={handlePrint} startIcon={<Print />} sx={btnStyle}>
             Print
           </Button>
+          
           <Button variant="contained" startIcon={<Payments />} onClick={() => alert(`Total: ₹${finalTotal}`)} sx={btnStyle}>
             Pay Now
           </Button>

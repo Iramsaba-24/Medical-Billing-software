@@ -37,7 +37,7 @@ const InventorySettings = () => {
   const sectionTitleStyle = { fontWeight: 600, mb: 1, fontSize: '16px' };
  
   return (
-     <Box sx={{ backgroundColor: '#f9f9f9' }}>
+     <Box sx={{  backgroundColor: '#f9f9f9' }}>
       <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
       Inventory Settings
       </Typography>
@@ -137,7 +137,7 @@ const InventorySettings = () => {
               />
             </Paper>
       {/*  Buttons- save reset*/}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt:4 , gap: 4 }}>
           <Button 
             variant="outlined" 
             onClick={() => reset()}                       
