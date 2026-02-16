@@ -9,24 +9,16 @@ import { useForm, FormProvider } from "react-hook-form";
 import PrintIcon from "@mui/icons-material/Print";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate } from "react-router-dom";
-
+import { URL_PATH } from "@/constants/UrlPath";
+import TextInputField from "@/components/controlled/TextInputField";
 
 // types
 type MediPointsForm = {
-  totalAmount: string;       
-  mediPoints: string;         
-  discountedAmount: string;   
+  totalAmount: string;
+  mediPoints: string;
+  discountedAmount: string;
 };
 
-// Reusable form field props
-type FormFieldProps = {
-  title: string;
-  name: keyof MediPointsForm;
-  required?: boolean;
-  decimal?: boolean;
-};
-
-// Earned / Used / Remains row props
 type InfoRowProps = {
   label: string;
   value: string;
@@ -34,18 +26,15 @@ type InfoRowProps = {
 };
 
 const MediPoints: React.FC = () => {
+  
+  const [earned] = useState(5);
 
-  //state
+  const [used, setUsed] = useState(0);
+  const [remains, setRemains] = useState(5);
 
-  const [earned, setEarned] = useState(0);   // Points earned from current bill
-  const [used, setUsed] = useState(0);       // Points used
-  const [remains, setRemains] = useState(0); // Remaining points
-
-  // Active tab (New / Retail)
   const [activeTab, setActiveTab] =
     useState<"new" | "retail">("new");
 
-  //react hook setup
   const methods = useForm<MediPointsForm>({
     defaultValues: {
       totalAmount: "",
@@ -54,67 +43,33 @@ const MediPoints: React.FC = () => {
     },
   });
 
-  // Watch form values
   const total = Number(methods.watch("totalAmount")) || 0;
   const usedNow = Number(methods.watch("mediPoints")) || 0;
 
   useEffect(() => {
-    const basePoints = 5; 
+   
+    const validUsed =
+      usedNow > earned
+        ? earned
+        : usedNow < 0
+        ? 0
+        : usedNow;
 
-    // Earn 5 points for every ₹200
-    const earnedNow =
-      basePoints + Math.floor(total / 200) * 5;
+    setUsed(validUsed);
 
    
-    const validUsed = Math.min(
-      usedNow,
-      earnedNow
-    );
+    setRemains(earned - validUsed);
 
-    // Update states
-    setEarned(earnedNow);
-    setUsed(validUsed);
-    setRemains(earnedNow - validUsed);
-
-    
+    // Discount calculation
     const finalAmount =
       Math.max(total - validUsed, 0);
 
     methods.setValue(
       "discountedAmount",
-      finalAmount.toFixed(2)
+      finalAmount.toFixed()
     );
-  }, [total, usedNow, methods]);
+  }, [usedNow, total, earned, methods]);
 
- 
-     //Reusable Component
-  // Form input field
-  const FormField: React.FC<FormFieldProps> = ({
-    title,
-    name,
-    required,
-    decimal,
-  }) => (
-    <Box mb={2}>
-      <Typography fontWeight={500} mb={0.5}>
-        {title}
-      </Typography>
-      <NumericField
-        name={name}
-        label=""
-        required={required}
-        decimal={decimal}
-        sx={{
-          width: "100%",
-          "& .MuiOutlinedInput-root": {
-            backgroundColor: "#fff",
-          },
-        }}
-      />
-    </Box>
-  );
-
-  // Earned / Used / Remains row
   const InfoRow: React.FC<InfoRowProps> = ({
     label,
     value,
@@ -139,88 +94,67 @@ const MediPoints: React.FC = () => {
       </Typography>
     </Box>
   );
-
   const navigate = useNavigate();
+   const onSubmit = (data:  MediPointsForm) => {
+    console.log(data);
+    navigate(URL_PATH.PaymentMethod);
+  };
   return (
     <FormProvider {...methods}>
-
-      {/* New Invoice Button */}
-      <Button
-        fullWidth
-        onClick={() => {
-          setActiveTab("new");      // Set active tab
-          if (location.pathname !== "") {
-            navigate("");          
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor:
-            activeTab === "new"
-              ? "#238878"
-              : "#fff",
-          color:
-            activeTab === "new"
-              ? "#fff"
-              : "#000",
-          border:
-            activeTab === "new"
-              ? "none"
-              : "1px solid #ccc",
-          "&:hover": {
+    
+      {/* Tabs */}
+      <Box sx={{ display: "flex" }}>
+        <Button
+          onClick={() => setActiveTab("new")}
+          sx={{
+            textTransform: "none",
+            width: { xs: "50%", md: "10%" },
+            height: "38px",
+            fontWeight: 500,
+            borderRadius: "0px 18px 0px 0px",
             backgroundColor:
               activeTab === "new"
                 ? "#238878"
-                : "#f5f5f5",
-          },
-        }}
-      >
-        New Invoice
-      </Button>
-
-      {/* Retail Invoice Button */}
-      <Button
-        onClick={() => {
-          setActiveTab("retail");
-          if (location.pathname !== "") {
-            navigate("");
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor:
-            activeTab === "retail"
-              ? "#238878"
-              : "#fff",
-          color:
-            activeTab === "retail"
-              ? "#fff"
-              : "#000",
-          border:
-            activeTab === "retail"
-              ? "none"
-              : "1px solid #ccc",
-          "&:hover": {
+                : "#fff",
+            color:
+              activeTab === "new"
+                ? "#fff"
+                : "#000",
+            border:
+              activeTab === "new"
+                ? "none"
+                : "1px solid #ccc",
+          }}
+        >
+          New Invoice
+        </Button>
+        <Button
+          onClick={() => setActiveTab("retail")}
+          sx={{
+            textTransform: "none",
+            width: { xs: "50%", md: "10%" },
+            height: "38px",
+            fontWeight: 500,
+            borderRadius: "0px 18px 0px 0px",
             backgroundColor:
               activeTab === "retail"
                 ? "#238878"
-                : "#f5f5f5",
-          },
-        }}
-      >
-        Retail Invoice
-      </Button>
-
-      {/* ------ Main Card -------*/}
-
+                : "#fff",
+            color:
+              activeTab === "retail"
+                ? "#fff"
+                : "#000",
+            border:
+              activeTab === "retail"
+                ? "none"
+                : "1px solid #ccc",
+          }}
+        >
+          Retail Invoice
+        </Button>
+      </Box>
+      <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
+      {/* Main Card */}
       <Box>
         <Paper
           elevation={1}
@@ -230,11 +164,10 @@ const MediPoints: React.FC = () => {
             border: "1px solid #e0e0e0",
           }}
         >
-          <Typography fontWeight={600}>
+          <Typography fontWeight={600} mb={2}>
             Medi Points
           </Typography>
 
-          {/* Two Column Layout */}
           <Box
             sx={{
               display: "flex",
@@ -245,10 +178,8 @@ const MediPoints: React.FC = () => {
               gap: 4,
             }}
           >
-
-            {/* Left Section - Points Info */}
+            {/* LEFT SECTION */}
             <Paper
-              elevation={0}
               sx={{
                 flex: 1,
                 p: 2,
@@ -270,11 +201,7 @@ const MediPoints: React.FC = () => {
                 color="red"
               />
 
-              <Typography
-                variant="body2"
-                fontWeight={700}
-                mt={2}
-              >
+              <Typography fontWeight={700} mt={2}>
                 Description
               </Typography>
 
@@ -283,31 +210,52 @@ const MediPoints: React.FC = () => {
                   Medi Points is a smart reward system designed to thank customers for their loyalty.
                 </Typography>
                 <Typography component="li" sx={{ mb: 0.5 }}>
+                  Points can be redeemed during billing.
+                </Typography>
+                <Typography component="li" sx={{ mb: 0.5 }}>
                   For every ₹200 purchase, customers earn 5 Medi Points.
                 </Typography>
                 <Typography component="li" sx={{ mb: 0.5 }}>
-                  Points can be redeemed during billing.
+                  Medi Points is a smart reward system designed to thank customers for their loyalty.
                 </Typography>
+
               </Box>
             </Paper>
 
-            {/* Right Section - Form Inputs */}
+            {/* RIGHT SECTION */}
             <Box sx={{ flex: 1 }}>
-              <FormField
-                title="Total (GST included)"
-                name="totalAmount"
-                required
-                decimal
-              />
-              <FormField
-                title="Add Medi Points"
-                name="mediPoints"
-              />
-              <FormField
-                title="Total Amount (with discount)"
-                name="discountedAmount"
-                decimal
-              />
+              <Box mb={2}>
+                <Typography fontWeight={500} mb={0.5}>
+                  Total (GST included)
+                </Typography>
+                <TextInputField
+                  name="totalAmount"
+                  label=""
+                  inputType="numbers"
+                 
+                />
+              </Box>
+
+              <Box mb={2}>
+                <Typography fontWeight={500} mb={0.5}>
+                  Add Medi Points
+                </Typography>
+                <NumericField
+                  name="mediPoints"
+                  label=""
+                
+                />
+              </Box>
+
+              <Box mb={2}>
+                <Typography fontWeight={500} mb={0.5}>
+                  Total Amount (with discount)
+                </Typography>
+                <TextInputField
+                  name="discountedAmount"
+                  label="" 
+                />
+              </Box>
             </Box>
           </Box>
 
@@ -326,9 +274,11 @@ const MediPoints: React.FC = () => {
           >
             <Button
               variant="contained"
+              type="submit"
               sx={{
                 bgcolor: "#1f8f7a",
                 textTransform: "none",
+                
               }}
             >
               PAY
@@ -347,6 +297,7 @@ const MediPoints: React.FC = () => {
           </Box>
         </Paper>
       </Box>
+      </form>
     </FormProvider>
   );
 };
