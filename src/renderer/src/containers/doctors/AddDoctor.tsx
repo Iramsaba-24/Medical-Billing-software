@@ -1,6 +1,7 @@
 import EmailField from "@/components/controlled/EmailField";
 import MobileField from "@/components/controlled/MobileField";
 import TextInputField from "@/components/controlled/TextInputField";
+import { URL_PATH } from "@/constants/UrlPath";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -36,19 +37,13 @@ const AddDoctor = () => {
       localStorage.getItem("doctors") || "[]"
     );
 
-    // create new doctor & generate unique id
-    const newDoctor = {
-      id: crypto.randomUUID(),
-      ...data,
-    };
-
     // save doctor 
     localStorage.setItem(
       "doctors",
-      JSON.stringify([...existingDoctors, newDoctor])
+      JSON.stringify([...existingDoctors, data])
     );
 
-    navigate("/doctors");
+    navigate(URL_PATH.Doctors);
   };
 
   return (

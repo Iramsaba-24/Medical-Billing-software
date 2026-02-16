@@ -1,13 +1,13 @@
 import { Box, Button, Container, Typography } from "@mui/material"
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg"
 import { URL_PATH } from "@/constants/UrlPath";
 
 // default data
 const User = {
     name : "User",
-    userName: "user01",
-    licenseNo : "MP123456789",
+   // userName: "user01",
+   // licenseNo : "MP123456789",
     licenseStatus : "Active"
 };
 
@@ -28,6 +28,8 @@ const getGreeting = () => {
 const LandingPage = () => {
   const navigate = useNavigate();
   const greeting = getGreeting();
+  const location = useLocation();
+  const { username, licenseKey } = location.state || {};  
 
   return (
   <>
@@ -47,9 +49,9 @@ const LandingPage = () => {
         {/* right side */}
         <Box textAlign={{ xs:"center", md:"left"}}>
             <Typography fontSize={15} sx={{ pb: {xs:0, md:1}}}
-            >User Name : {User.userName}
+            >User Name : {username}
             </Typography>
-            <Typography fontSize={15} sx={{ pb: {xs:0, md:1}}}>License No. : {User.licenseNo}</Typography>
+            <Typography fontSize={15} sx={{ pb: {xs:0, md:1}}}>License No. : {licenseKey}</Typography>
             <Typography fontSize={15}>License Status : <span style={{ color:"#166534", borderRadius:10, fontWeight:"600"}}>{User.licenseStatus}</span> </Typography>
         </Box>
     </Box>

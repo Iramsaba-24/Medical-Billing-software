@@ -26,7 +26,12 @@ const LoginPage = () => {
   const onSubmit = (data: LoginFormInputs) => {
     console.log(data);
     setToastOpen(true);
-    setTimeout(() => navigate(URL_PATH.Landing), 500);
+     navigate(URL_PATH.Landing, {
+      state: {
+         username: data.username,
+         licenseKey: data.licenseKey,
+       }
+    });
   };
       // textinput field styling(text box)
   const inputStyle = {
