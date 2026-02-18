@@ -28,6 +28,7 @@ const BillingTable = ({ onCreate }: Props) => {
     {
       invoice: "INV-001",
       patient: "Rajesh Kumar",
+
       date: "8/15/2026",
       price: 2500,
       status: "Paid",

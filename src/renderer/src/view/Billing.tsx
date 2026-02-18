@@ -312,14 +312,13 @@ function POSMaster() {
  
             <Box mt={3}>
               <ItemsSection
-                rows={rows}
-                setRows={setRows}
-                gst={gst}
-                setGst={setGst}
-                paymentMode={paymentMode}
-                setPaymentMode={setPaymentMode}
-                finalTotal={finalTotal}
-              />
+                  rows={rows}
+                  setRows={setRows}
+                  gst={gst}
+                  setGst={setGst}
+                  paymentMode={paymentMode}
+                  setPaymentMode={setPaymentMode}
+                  finalTotal={finalTotal} isSubmitted={false}              />
             </Box>
            
             {/* Bottom pay print button */}

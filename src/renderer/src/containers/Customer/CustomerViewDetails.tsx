@@ -3,17 +3,17 @@ import { CustomerData, PurchaseHistory } from "@/view/CustomerMaster";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-// Define the properties expected by this component
+// Interface to define what data this component needs to work
 interface ViewProps {
   customer: CustomerData;
-  onBack: () => void;
-  onDeleteInvoice: (invoice: PurchaseHistory) => void;
-  onEditInvoice: (invoice: PurchaseHistory) => void;
+  onBack: () => void; // Function to go back to the previous screen
+  onDeleteInvoice: (invoice: PurchaseHistory) => void; // Function to delete an invoice
+  onEditInvoice: (invoice: PurchaseHistory) => void; // Function to edit an invoice
 }
 
 const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice }: ViewProps) => {
   
-  // Define columns for the Purchase History table
+  //  table columns Headings and matching data keys
   const invoiceColumns: readonly Column<PurchaseHistory>[] = [
     { label: "Inv. No.", key: "id" },
     { label: "Medicines", key: "medicines" },
@@ -21,27 +21,27 @@ const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice 
     { label: "Total Price", key: "totalPrice" },
     { label: "Doctor", key: "doctor" }, 
     { label: "Date", key: "date" },
-    { label: "Actions", key: "actionbutton" as keyof PurchaseHistory }
+    { label: "Actions", key: "actionbutton" as keyof PurchaseHistory } // Placeholder for Edit/Delete buttons
   ];
 
-  // Get invoice list from customer data or show empty array if none
+  // Get the list of purchases from customer data if empty, use an empty array
   const invoiceData: PurchaseHistory[] = customer.history || [];
 
   return (
     <Box sx={{  bgcolor: "#f8f9fa", minHeight: "100vh" }}>
       
-      {/*  Back button to return to the list page */}
+      {/* T Back button to navigate away from details view */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Button onClick={onBack} variant="outlined" startIcon={<ArrowBackIcon />} sx={{ color: "#248a76", borderColor: "#248a76" }}>
           Back to List
         </Button>
       </Box>
 
-      {/*  Shows Customer and Doctor details */}
+      {/*  Displays basic Customer Information and Doctor details */}
       <Paper sx={{ p: 4, mb: 4, borderRadius: "16px", border: "1px solid #e0e0e0" }} elevation={0}>
         <Grid container spacing={4}>
           
-          {/* Display Customer Information */}
+          {/*  Customer's personal data Name, Mobile, Age, Address */}
           <Grid size={{ xs: 12, md: 4 }}>
             <Grid container spacing={2}>
               <Grid size= {{ xs: 12, sm: 4 }}>
@@ -63,7 +63,7 @@ const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice 
             </Grid>
           </Grid>
 
-          {/*  Display Doctor Information */}
+          {/*  Consulting Doctor information */}
           <Grid size={{ xs: 12, md: 6 }}>
             <Grid container spacing={2}>
               <Grid size={{ xs: 12 }}>
@@ -80,17 +80,18 @@ const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice 
         </Grid>
       </Paper>
 
-      {/*  Shows the table of previous purchases */}
+      {/*  Displays the history of all invoices for this customer */}
       <Paper sx={{ p: 3, borderRadius: "16px", border: "1px solid #e0e0e0" }} elevation={0}>
         <Typography variant="h6" fontWeight="bold" mb={2}>Purchase History</Typography>
         <Box sx={{ width: "100%", overflowX: "auto" }}>
-          {/* Table displaying the invoice list with Edit and Delete buttons */}
+          
+          {/* Reusable table component to list all previous invoices */}
           <UniversalTable<PurchaseHistory>
             columns={invoiceColumns} 
             data={invoiceData}
             actions={{
               edit: (row) => onEditInvoice(row),
-              delete: (row) => onDeleteInvoice(row),
+              delete: (invoice: PurchaseHistory) => onDeleteInvoice(invoice),
             }}
           />
         </Box>

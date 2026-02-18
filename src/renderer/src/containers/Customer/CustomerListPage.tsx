@@ -1,10 +1,11 @@
-  import { useState, useMemo } from "react";
+ import { useState, useMemo } from "react";
 import { CustomerData } from "@/view/CustomerMaster";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 import { Box, Button, TextField, InputAdornment, Typography, Divider } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
- 
+
+// Define the properties required by the Customer List page
 interface CustomerListProps {
   data: CustomerData[];
   onAdd: () => void;
@@ -12,21 +13,22 @@ interface CustomerListProps {
   onEdit: (data: CustomerData) => void;
   onDelete: (data: CustomerData) => void;
 }
- 
+
 export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: CustomerListProps) => {
+  // State to store what the user types in the search box
   const [searchTerm, setSearchTerm] = useState("");
- 
-  // Filter data based on search term
+
+  // Logic to filter the customer list based on Name or Mobile number
   const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
+    if (!searchTerm) return data; 
     const lowerSearch = searchTerm.toLowerCase();
     return data.filter((item) =>
       item.name?.toLowerCase().includes(lowerSearch) ||
       item.mobile?.toLowerCase().includes(lowerSearch)
     );
-  }, [data, searchTerm]);
- 
-  // Table column configuration
+  }, [data, searchTerm]); 
+
+  //  Setting up labels and data keys
   const columns: readonly Column<CustomerData>[] = [
     { label: "Name", key: "name" },
     { label: "Mobile", key: "mobile" },
@@ -35,29 +37,16 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
     { label: "Total", key: "totalPrice" },
     { label: "Doctor", key: "doctor" },
     { label: "Date", key: "date" },
-    { label: "Actions", key: "actionbutton" }
+    { label: "Actions", key: "actionbutton" } 
   ];
- 
+
   return (
-    <Box sx={{ bgcolor: "#f8f9fa",}}>
-      <Box>
-        <Typography
-          sx={{
-            fontSize: { xs: 20, sm: 24, md: 28 },  
-            fontWeight: 700,
-            color: '#111827',
-            mt: {xs:1 , md:0.5},
-            mb: 0.5,
-          }}
-        >
-          Customers 
-        </Typography>
-        </Box>
-     
-      {/* Search and Add Button */}
+    <Box sx={{ bgcolor: "#f8f9fa" }}>
+      
+      {/* Search Bar and Add Customer Button Section */}
       <Box sx={{
         display: "flex",
-        flexDirection: { xs: "column", sm: "row" },
+        flexDirection: { xs: "column", sm: "row" }, 
         justifyContent: "space-between",
         gap: 2,
         mb: 3,
@@ -66,6 +55,7 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
         borderRadius: "12px",
         border: "1px solid #e0e0e0"
       }}>
+        {/* Search Input Field with Search Icon */}
         <TextField
           placeholder="Search name or mobile..."
           size="small"
@@ -76,6 +66,8 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
             startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
           }}
         />
+        
+        {/* Add Customer Button */}
         <Button
           variant="contained"
           onClick={onAdd}
@@ -115,6 +107,5 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
     </Box>
   );
 };
- 
+
 export default CustomerListPage;
- 

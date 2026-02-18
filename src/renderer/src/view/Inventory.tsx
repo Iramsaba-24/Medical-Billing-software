@@ -1,4 +1,4 @@
-import { Box, Paper, Typography, Button, Chip } from "@mui/material";
+import { Box, Paper, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import TotalItems from "@/assets/TotalItems.svg";
@@ -6,6 +6,7 @@ import LowStock from "@/assets/warningsign.svg";
 import TotalValue from "@/assets/TotalValue.svg";
 import type { InventoryItem } from "@/containers/inventory/AddInventoryItem";
 import InventoryList from "@/containers/inventory/InvetoryList";
+import GroupSummary from "@/containers/inventory/GroupSummary";
 
 export default function InventoryPage() {
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ return (
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" mb={2}>
             <Typography fontWeight={600}>
-              Medicine Groups <Chip label="03" size="small" />
+              Medicine Groups 
             </Typography>
 
             <Button
@@ -116,28 +117,14 @@ return (
                   border: "2px solid #238878",
                 }
              }}
-              onClick={() => navigate("/inventory/medicine-group")}
+              onClick={() => navigate(URL_PATH.MedicineGroup)}
             >
               View Details
             </Button>
           </Box>
 
-          {[
-            ["Generic Medicines", "02"],
-            ["Diabetes", "32"],
-            ["Other", "01"],
-          ].map(([name, count]) => (
-            <Box
-              key={name}
-              display="flex"
-              justifyContent="space-between"
-              py={1}
-              borderBottom="1px solid #eee"
-            >
-              <Typography fontSize={14}>{name}</Typography>
-              <Typography fontSize={14}>{count}</Typography>
-            </Box>
-          ))}
+             <GroupSummary />
+
         </Paper>
 
         <Box display="flex" flexDirection="column" gap={2}>
@@ -158,7 +145,7 @@ return (
               border: "2px solid #238878",
             }
           }}
-            onClick={() => navigate("/inventory/medicine-group")}
+            onClick={() => navigate(URL_PATH.AddInventoryItem)}
           >
             + Add New Medicine
           </Button>
@@ -180,7 +167,7 @@ return (
               border: "2px solid #238878",
             }
           }}
-            onClick={() => navigate("/inventory/add-medicine-group")}
+            onClick={() => navigate(URL_PATH.AddMedicineGroup)}
           >
             + Add New Group
           </Button>
