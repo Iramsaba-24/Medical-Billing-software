@@ -4,7 +4,7 @@ import { useState } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/customer/ItemsSection";
+import ItemsSection from "@/containers/Customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Print } from "@mui/icons-material";
@@ -312,14 +312,13 @@ function POSMaster() {
  
             <Box mt={3}>
               <ItemsSection
-                rows={rows}
-                setRows={setRows}
-                gst={gst}
-                setGst={setGst}
-                paymentMode={paymentMode}
-                setPaymentMode={setPaymentMode}
-                finalTotal={finalTotal}
-              />
+                  rows={rows}
+                  setRows={setRows}
+                  gst={gst}
+                  setGst={setGst}
+                  paymentMode={paymentMode}
+                  setPaymentMode={setPaymentMode}
+                  finalTotal={finalTotal} isSubmitted={false}              />
             </Box>
            
             {/* Bottom pay print button */}
