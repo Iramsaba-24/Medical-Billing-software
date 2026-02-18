@@ -82,10 +82,12 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
       </Box>
  
       {/*  Horizontal scroll enabled for mobile */}
-      <Box sx={{ bgcolor: "#fff", p: { xs: 1, md: 2 }, borderRadius: "12px", border: "1px solid #e0e0e0" }}>
+      <Box
+       sx={{ bgcolor: "#fff", p: { xs: 1, md: 2 }, borderRadius: "12px", border: "1px solid #e0e0e0" }}
+       >
         <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>Customers List</Typography>
        
-        <Box sx={{ width: "100%", overflowX: "auto" }}>
+        <Box>
           <UniversalTable<CustomerData & Record<string, unknown>>
             columns={columns}
             data={filteredData}

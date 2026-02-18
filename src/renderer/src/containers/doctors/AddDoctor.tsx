@@ -36,10 +36,15 @@ const AddDoctor = () => {
     const existingDoctors = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
-    // save doctor 
+
+    const newDoctor = {
+      id: Date.now(),
+      ...data,
+    };
+    
    localStorage.setItem(
       "doctors",
-      JSON.stringify([...existingDoctors, data])
+      JSON.stringify([...existingDoctors, newDoctor])
     );
 
     navigate(URL_PATH.Doctors);

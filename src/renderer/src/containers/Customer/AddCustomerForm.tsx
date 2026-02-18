@@ -11,6 +11,7 @@ import ItemsSection from "@/containers/customer/ItemsSection";
 import { useNavigate } from "react-router-dom";
 import { Invoice } from "../Invoices/InvoiceView";
 import { URL_PATH } from "@/constants/UrlPath";
+import DropdownField from "@/components/controlled/DropdownField";
 
 // Structure for a single row in the medicine list
 export interface ItemRow { 
@@ -47,6 +48,17 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       date: new Date().toISOString().split("T")[0] 
     }
   });
+
+  const [doctorOptions, setDoctorOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    const storedDoctors = JSON.parse(localStorage.getItem("doctors") || "[]");
+    const options = storedDoctors.map((doc: { doctorName: string }) => ({
+      label: doc.doctorName,
+      value: doc.doctorName,
+    }));
+    setDoctorOptions(options);
+  }, []);
 
   // Load existing customers from LocalStorage for the search dropdown
   useEffect(() => {
@@ -148,7 +160,17 @@ const handlePrint = () => {
             <Grid size={{ xs: 12, md: 5 }}>
               <Typography variant="subtitle1" fontWeight="bold" mb={2} mt={{ xs: 2, md: 0 }}>Doctor Information</Typography>
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12 }}><TextInputField name="doctor" label="Doctor Name" inputType="alphabet" required /></Grid>
+                <Grid size={{ xs: 12 }}>
+                  {/* <TextInputField name="doctor" label="Doctor Name" inputType="alphabet" required /> */}
+
+                  <DropdownField
+                  name="doctorName"
+                  label="Doctor Name"
+                  placeholder="Doctor Name"
+                  required
+                  options={doctorOptions}
+                />
+                  </Grid>
                 <Grid size={{ xs: 12 }}><TextInputField name="doctorAddress" label="Doctor Address/Clinic" inputType="textarea" rows={1}  /></Grid>
               </Grid>
             </Grid>

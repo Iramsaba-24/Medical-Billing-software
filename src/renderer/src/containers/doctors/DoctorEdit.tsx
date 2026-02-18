@@ -6,6 +6,8 @@ type Doctor = {
   doctorName: string;
   degree: string;
   phone: string;
+  email: string;
+  registrationNo: string;
   address: string;
   status: "Active" | "Inactive";
 };
