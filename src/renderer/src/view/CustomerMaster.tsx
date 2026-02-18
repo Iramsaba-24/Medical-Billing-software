@@ -1,22 +1,23 @@
  import { useState, useEffect } from "react";
-import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import AddCustomerForm, { ItemRow } from "@/containers/customer/AddCustomerForm"; 
 import CustomerListPage from "@/containers/customer/CustomerListPage";
 import CustomerViewDetails from "@/containers/customer/CustomerViewDetails";
+import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage"
 
-// Structure for Purchase History 
+// Structure for a single purchase invoice record
 export interface PurchaseHistory {
-  [key: string]: string | number | boolean | undefined; 
   id: string;
   date: string;
   medicines: string;
   totalQty: number;
   totalPrice: number;
   doctor: string;
+  itemsList: ItemRow[];
+  [key: string]: string | number | ItemRow[] | undefined;
 }
 
-// Structure for Customer Data 
+// Main Customer data structure including their history
 export interface CustomerData {
-  [key: string]: string | number | boolean | PurchaseHistory[] | undefined;
   id?: string;
   name: string;
   age: string;
@@ -29,46 +30,50 @@ export interface CustomerData {
   medicines?: string;
   totalPrice?: number;
   totalQty?: number;
-  history?: PurchaseHistory[]; 
+  itemsList?: ItemRow[];
+  history?: PurchaseHistory[];
+  [key: string]: string | number | boolean | ItemRow[] | PurchaseHistory[] | undefined;
 }
 
 const CustomerMaster = () => {
-  //  controls which screen to show (list, add form, or details)
+  // State to manage which screen to  'list', 'add', or 'view'
   const [view, setView] = useState<"list" | "add" | "view">("list");
-  
-  //  stores all customers in an array
+
+  // Load customer list from LocalStorage when the app starts
   const [customerList, setCustomerList] = useState<CustomerData[]>(() => {
-    // Load saved data from browser storage on start
     const savedData = localStorage.getItem("medical_customers");
-    return savedData ? (JSON.parse(savedData) as CustomerData[]) : [];
+    return savedData ? JSON.parse(savedData) : [];
   });
 
-  //  holds the data of the customer currently being viewed or edited
+  // State to hold the data of the customer currently being edited or viewed
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
 
-  // Auto-save data to localStorage whenever the customer list changes
+  // Automatically save the customer list to LocalStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("medical_customers", JSON.stringify(customerList));
   }, [customerList]);
 
-  //  Runs when you submit the Add/Edit form
-  const handleSave = (formData: CustomerData, total: number, meds: string, qty: number) => {
+  // Function to save or update customer and invoice data
+  const handleSave = (formData: CustomerData, total: number, meds: string, qty: number, actualItems: ItemRow[]) => {
     setCustomerList((prev) => {
-      // Check if customer already exists by mobile number
-      const existingIndex = prev.findIndex((c) => c.mobile === formData.mobile);
+      // Check if the customer already exists by comparing names
+      const existingIndex = prev.findIndex(
+        (c) => c.name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+      );
       
-      // Create a new bill entry
+      // Create a new invoice object for this transaction
       const newInvoice: PurchaseHistory = {
         id: `INV-${Date.now()}`,
         date: formData.date,
         medicines: meds,
         totalQty: qty,
         totalPrice: total,
-        doctor: formData.doctor
+        doctor: formData.doctor,
+        itemsList: actualItems,
       };
 
       if (existingIndex > -1) {
-        //  add new bill to their history
+        // If customer exists, update their details and add new invoice to their history
         const updatedList = [...prev];
         const existingCust = updatedList[existingIndex];
         updatedList[existingIndex] = {
@@ -77,31 +82,35 @@ const CustomerMaster = () => {
           medicines: meds,
           totalQty: qty,
           totalPrice: total,
+          itemsList: actualItems,
           history: [newInvoice, ...(existingCust.history || [])] 
         };
+        showToast("success", "Invoice updated successfully!");
         return updatedList;
       } else {
-        // Create brand new customer
+        //  create a new record and set their first invoice
         const newCustomer: CustomerData = { 
           ...formData, 
           id: `CUST-${Date.now()}`, 
           medicines: meds,
           totalQty: qty,
           totalPrice: total,
+          itemsList: actualItems,
           history: [newInvoice] 
         };
+        showToast("success", "New Customer and Invoice saved!");
         return [...prev, newCustomer];
       }
     });
     
+    // Reset and go back to the list view after saving
     setSelectedCustomer(null);
     setView("list");
   };
 
-  // Loads a specific bill's data back into the form for editing
+  // Function to load existing invoice data into the form for editing
   const handleEditInvoice = (invoice: PurchaseHistory) => {
     if (!selectedCustomer) return;
-    
     const editData: CustomerData = {
       ...selectedCustomer,
       doctor: invoice.doctor,
@@ -109,41 +118,55 @@ const CustomerMaster = () => {
       totalPrice: invoice.totalPrice,
       totalQty: invoice.totalQty,
       medicines: invoice.medicines,
+      itemsList: invoice.itemsList,
     };
-    
     setSelectedCustomer(editData);
-    setView("add"); // Open the form screen
+    setView("add"); 
   };
 
-  //  Removes a customer entirely from the list
-  const handleDeleteCustomer = (cust: CustomerData) => {
-    if (window.confirm("Are you sure you want to delete this customer?")) {
-      setCustomerList((prev) => prev.filter((item) => item.mobile !== cust.mobile));
+  // Function to delete a customer entirely
+  const handleDeleteCustomer = async (cust: CustomerData) => {
+    const confirmed = await showConfirmation(
+      `Are you sure you want to delete ${cust.name}?`,
+      "Confirm Delete"
+    );
+
+    if (confirmed) {
+      setCustomerList((prev) => prev.filter((item) => item.name !== cust.name));
+      showToast("success", "Customer deleted successfully!");
     }
   };
 
-  //  Removes a single bill from a customer's history
-  const handleDeleteInvoice = (invoice: PurchaseHistory) => {
+  // Function to delete only one specific invoice from a customer's history
+  const handleDeleteInvoice = async (invoice: PurchaseHistory) => {
     if (!selectedCustomer) return;
-    
-    if (window.confirm("Delete this bill from customer's history?")) {
+
+    const confirmed = await showConfirmation(
+      "Are you sure you want to delete this invoice from history?",
+      "Confirm Delete Invoice"
+    );
+
+    if (confirmed) {
       setCustomerList((prev) => {
-        return prev.map((cust) => {
-          if (cust.mobile === selectedCustomer.mobile) {
-            const updatedHistory = cust.history?.filter((inv) => inv.id !== invoice.id) || [];
-            // Refresh the current view screen data
-            setSelectedCustomer({ ...cust, history: updatedHistory });
-            return { ...cust, history: updatedHistory };
+        const updatedList = prev.map((cust) => {
+          // Find the customer and filter out the specific invoice ID
+          if (cust.name.toLowerCase().trim() === selectedCustomer.name.toLowerCase().trim()) {
+            const updatedHistory = (cust.history || []).filter((inv) => inv.id !== invoice.id);
+            const updatedCust = { ...cust, history: updatedHistory };
+            setSelectedCustomer(updatedCust); 
+            return updatedCust;
           }
           return cust;
         });
+        return updatedList;
       });
+      showToast("success", "Invoice deleted from history!");
     }
   };
 
   return (
     <>
-      {/*  Shows the table of all customers */}
+      {/* Conditionally render screens based on the 'view' state */}
       {view === "list" && (
         <CustomerListPage 
           data={customerList} 
@@ -153,18 +176,16 @@ const CustomerMaster = () => {
           onDelete={handleDeleteCustomer}
         />
       )}
-
-      {/*  Shows the form to enter details */}
+      
       {view === "add" && (
-        <AddCustomerForm  onBack={() => setView("list")}  onSave={handleSave}  initialData={selectedCustomer}  />
+        <AddCustomerForm onBack={() => setView("list")} onSave={handleSave} initialData={selectedCustomer} />
       )}
-
-      {/* Shows specific customer info and their bill history */}
+      
       {view === "view" && selectedCustomer && (
         <CustomerViewDetails 
           customer={selectedCustomer} 
           onBack={() => setView("list")} 
-          onDeleteInvoice={handleDeleteInvoice}
+          onDeleteInvoice={handleDeleteInvoice}  
           onEditInvoice={handleEditInvoice} 
         />
       )}
