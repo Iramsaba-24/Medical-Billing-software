@@ -1,4 +1,4 @@
- import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import AddCustomerForm, { ItemRow } from "@/containers/customer/AddCustomerForm"; 
 import CustomerListPage from "@/containers/customer/CustomerListPage";
 import CustomerViewDetails from "@/containers/customer/CustomerViewDetails";
