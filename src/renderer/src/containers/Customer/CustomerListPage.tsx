@@ -1,10 +1,11 @@
-  import { useState, useMemo } from "react";
+ import { useState, useMemo } from "react";
 import { CustomerData } from "@/view/CustomerMaster";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 import { Box, Button, TextField, InputAdornment, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
- 
+
+// Define the properties required by the Customer List page
 interface CustomerListProps {
   data: CustomerData[];
   onAdd: () => void;
@@ -12,21 +13,22 @@ interface CustomerListProps {
   onEdit: (data: CustomerData) => void;
   onDelete: (data: CustomerData) => void;
 }
- 
+
 export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: CustomerListProps) => {
+  // State to store what the user types in the search box
   const [searchTerm, setSearchTerm] = useState("");
- 
-  // Filter data based on search term
+
+  // Logic to filter the customer list based on Name or Mobile number
   const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
+    if (!searchTerm) return data; 
     const lowerSearch = searchTerm.toLowerCase();
     return data.filter((item) =>
       item.name?.toLowerCase().includes(lowerSearch) ||
       item.mobile?.toLowerCase().includes(lowerSearch)
     );
-  }, [data, searchTerm]);
- 
-  // Table column configuration
+  }, [data, searchTerm]); 
+
+  //  Setting up labels and data keys
   const columns: readonly Column<CustomerData>[] = [
     { label: "Name", key: "name" },
     { label: "Mobile", key: "mobile" },
@@ -35,18 +37,16 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
     { label: "Total", key: "totalPrice" },
     { label: "Doctor", key: "doctor" },
     { label: "Date", key: "date" },
-    { label: "Actions", key: "actionbutton" }
+    { label: "Actions", key: "actionbutton" } 
   ];
- 
+
   return (
-    <Box sx={{ bgcolor: "#f8f9fa",
-     
-      }}>
-     
-      {/* Search and Add Button */}
+    <Box sx={{ bgcolor: "#f8f9fa" }}>
+      
+      {/* Search Bar and Add Customer Button Section */}
       <Box sx={{
         display: "flex",
-        flexDirection: { xs: "column", sm: "row" },
+        flexDirection: { xs: "column", sm: "row" }, 
         justifyContent: "space-between",
         gap: 2,
         mb: 3,
@@ -55,6 +55,7 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
         borderRadius: "12px",
         border: "1px solid #e0e0e0"
       }}>
+        {/* Search Input Field with Search Icon */}
         <TextField
           placeholder="Search name or mobile..."
           size="small"
@@ -65,6 +66,8 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
             startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
           }}
         />
+        
+        {/* Add Customer Button */}
         <Button
           variant="contained"
           onClick={onAdd}
@@ -80,28 +83,26 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
           Add Customer
         </Button>
       </Box>
- 
-      {/*  Horizontal scroll enabled for mobile */}
-      <Box
-       sx={{ bgcolor: "#fff", p: { xs: 1, md: 2 }, borderRadius: "12px", border: "1px solid #e0e0e0" }}
-       >
+
+      {/* Main Container for the Customer Table */}
+      <Box sx={{ bgcolor: "#fff", p: { xs: 1, md: 2 }, borderRadius: "8px", border: "1px solid #e0e0e0" }}>
         <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>Customers List</Typography>
-       
-        <Box>
-          <UniversalTable<CustomerData & Record<string, unknown>>
-            columns={columns}
-            data={filteredData}
-            actions={{
-              view: onView,
-              edit: onEdit,
-              delete: onDelete
-            }}
-          />
+        
+        {/* Box with overflowX "auto"  */}
+        <Box sx={{ width: "100%", overflowX: "auto" }}>
+           <UniversalTable<CustomerData>
+             columns={columns as unknown as Column<CustomerData>[]}
+             data={filteredData}  
+             actions={{
+               view: onView,
+               edit: onEdit,
+               delete: onDelete
+             }}
+           />
         </Box>
       </Box>
     </Box>
   );
 };
- 
+
 export default CustomerListPage;
- 
