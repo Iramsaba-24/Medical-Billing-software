@@ -52,6 +52,7 @@ const Billing = () => {
 
         <Box
           p={{ xs: 2, md: 5 }}
+          
           bgcolor="#fff"
           borderRadius={2}
           boxShadow={1}
@@ -63,10 +64,11 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
+            height: {  md: 105}
           }}
         >
 
-          <Box>
+          <Box  >
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
               ₹ 4,000
             </Typography>
@@ -100,6 +102,7 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
+             height: {  md: 105}
           }}
         >
 
@@ -137,6 +140,7 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
+             height: {  md: 105}
           }}
         >
 

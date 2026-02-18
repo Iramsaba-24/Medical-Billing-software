@@ -115,13 +115,14 @@ const BillingTable = ({ onCreate }: Props) => {
         <Box mb={2} display="flex" 
         flexDirection={{xs:"column", md:"row"}}
         justifyContent="space-between" alignItems="center">
-          <Box width={220}>
+          <Box width={160}>
             <DropdownField
               name="filterType"
               label="Filter"
               options={filterOptions}
               freeSolo={false}
               onChangeCallback={(value) => setFilterType(value as FilterType)}
+              isStatic={true}
             />
           </Box>
 

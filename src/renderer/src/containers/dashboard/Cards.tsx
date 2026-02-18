@@ -156,6 +156,7 @@ const Cards: React.FC = () => {
           return (
             <Card
               key={index}
+              
               sx={{
                 gridArea: getGridArea(card.title),
                 p: 3,
@@ -164,7 +165,8 @@ const Cards: React.FC = () => {
                 transition: "0.3s",
                 "&:hover": {
                   transform: "translateY(-4px)",
-                  boxShadow: 6,
+                  //boxShadow: 6,
+                   boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
                 },
               }}
             >
@@ -173,10 +175,11 @@ const Cards: React.FC = () => {
                 <Typography fontWeight={600}>{card.title}</Typography>
 
                 <FormProvider {...methods}>
-                  <Box minWidth={120}>
+                  <Box minWidth={150}>
                     <DropdownField
                       name="filter"
                       options={filterOptions}
+                      //isStatic={true}
                       onChangeCallback={handleFilterChange(index)}
                     />
                   </Box>

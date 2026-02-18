@@ -129,6 +129,7 @@ const CreateInvoice = () => {
               <TextInputField
                 name={`items.${index}.item`}
                 label="Item"
+                placeholder="Item Name"
                 fullWidth
               />
               <NumericField

@@ -103,8 +103,7 @@ const RetailInvoice = () => {
     console.log("FORM SUBMITTED:", data);
     showToast("success", "Data saved successfully!");
      navigate(URL_PATH.PaymentDetails );
-    // navigate(URL_PATH.PaymentDetails || "/payment-details");
-
+    
   };
 
   const onError = (formErrors: FieldErrors<FormData>) => {
@@ -323,25 +322,6 @@ const RetailInvoice = () => {
             </Button>
             </Box>
 
-          {/* <Box display="flex" gap={2} mt={3}>
-            <Button
-              variant="contained"
-              type="submit"
-              sx={{ bgcolor: TEAL_COLOR }}
-            >
-              Save And Submit
-            </Button>
-
-            <Button
-              variant="contained"
-              startIcon={<PrintIcon />}
-              type="button"
-              onClick={() => window.print()}
-              sx={{ bgcolor: TEAL_COLOR }}
-            >
-              Print
-            </Button>
-          </Box> */}
         </form>
       </Paper>
     </FormProvider>
