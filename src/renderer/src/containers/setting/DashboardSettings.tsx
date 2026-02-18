@@ -11,7 +11,6 @@ import SwitchToggle from "@/components/controlled/SwitchToggle";
 import DropdownField from "@/components/controlled/DropdownField";
 import TextInputField from "@/components/controlled/TextInputField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
- 
 //type
 type DashboardSettingsForm = {
   visibleKpis: string[];
@@ -107,7 +106,7 @@ const DashboardSettings = () => {
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box sx={{ maxWidth: "100%", overflowX: "hidden" }}>
-         
+          
           <Box mb={3}>
             <Typography fontSize={22} fontWeight={700}>
               Dashboard Settings
@@ -149,7 +148,6 @@ const DashboardSettings = () => {
               <Typography fontSize={16} fontWeight={500}>
                 Quantity Threshold
               </Typography>
- 
               <Box display="flex" alignItems="center" gap={2}>
                 <TextInputField
                   name="quantityThreshold"
@@ -294,6 +292,3 @@ const DashboardSettings = () => {
 };
  
 export default DashboardSettings;
- 
- 
- 
