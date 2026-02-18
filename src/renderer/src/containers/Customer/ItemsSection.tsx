@@ -39,7 +39,7 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
         }
         // Validation Only allow letters and spaces in the Item Name
         if (field === "name") {
-          return { ...r, [field]: String(value).replace(/[^a-zA-Z\[0-9]s]/g, "") };
+          return { ...r, [field]: String(value).replace(/[^a-zA-Z\[0-9]s-]/g, "") };
         }
         return { ...r, [field]: value as ItemRow[typeof field] };
       }
@@ -82,7 +82,7 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
   helperText={
     row.name.trim() === ""
       ? "alphabets and numbers allowed"
-      : !/^[a-zA-Z0-9\s]+$/.test(row.name)
+      :!/^(?=.*[A-Za-z])[A-Za-z0-9\s-]{3,}$/.test(row.name)
       ? " alphabets and numbers allowed"
       : " "
   }

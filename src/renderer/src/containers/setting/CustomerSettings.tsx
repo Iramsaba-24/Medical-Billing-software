@@ -50,13 +50,13 @@ const defaultDiscount: FielType[] =[
 ]
 
 // Paper Styles of each field
-const PaperStyle={
-  backgroundColor: "#ffffff",
-  borderRadius: "4px",
-  p: { xs: 1, sm: 1.5, md: 1.5 },  
-  mb: 1.5,
-  py:0
-}
+const PaperStyle = {
+  p: { xs: 2, md: 4 },
+  borderRadius: "5px",
+  boxShadow: 3,
+  mb: 1,
+};
+
 
 // heading style 
 const headingStyle ={
@@ -80,19 +80,6 @@ const boxStyle ={
   alignItems:{sm:"center"}, 
   mb:0.25
 }
-
-// inline label and component for dropdown and numeric field
-const inputFieldStyle = {
-  width: { xs: "70%", sm: 180, md: 200 }, 
-  "& .MuiOutlinedInput-root": {  
-    height: 42,         
-    fontSize: "14px",
-  },
-  "& .MuiOutlinedInput-input": {  
-    padding: "8px 12px",
-  },
-}
-
 
 
 const CustomerSettings = () => {
@@ -118,7 +105,7 @@ const CustomerSettings = () => {
       showToast("success", "Saved");
       
     }
-    const {reset, getValues}=methods;
+    const {reset}=methods;
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
@@ -167,7 +154,7 @@ const CustomerSettings = () => {
                   decimal={true}
                   decimalDigits={2}
                   maxlength={20}
-                  sx={inputFieldStyle}
+                  sx={{ width: 150, minWidth: 150 }}
                   InputProps={{
                     startAdornment: <InputAdornment position="start" >₹</InputAdornment>,
                   }}
@@ -181,7 +168,7 @@ const CustomerSettings = () => {
                 name="creditDays"
                 placeholder="select"
                 options={creditDays}
-                sx={inputFieldStyle}
+                sx={{ width: 150, minWidth: 150 }}
                 isStatic={true}
                 />
             </Box>
@@ -233,7 +220,7 @@ const CustomerSettings = () => {
               name ="defaultDiscount"
               placeholder="Select"
               options={defaultDiscount}
-              sx={inputFieldStyle}
+              sx={{ width: 150, minWidth: 150 }}
               isStatic={true}
               />
             </Box>
@@ -257,42 +244,40 @@ const CustomerSettings = () => {
             
     {/* reset and save buttons */}      
                <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
-          <Button 
-            type="button" 
-            variant="outlined" 
-            onClick={() => {
-              reset();
-              console.log("afer reset: " ,getValues())
-            }}                      
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => reset()}
             sx={{
               color: "#238878",
-              borderColor: "#238878",
-              borderWidth: "2px",
+              border: "2px solid #238878",
               textTransform: "none",
-              "&:hover": { 
-                backgroundColor: "#238878", 
-                color: "#fff", 
-                borderColor: "#238878",
-                borderWidth: "2px"
+              "&:hover": {
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
               },
-            }}>
+            }}
+          >
             Reset
           </Button>
 
-          <Button 
-            type="submit" 
-            variant="contained" 
+          <Button
+            type="submit"
+            variant="contained"
             sx={{
               backgroundColor: "#238878",
               color: "#fff",
+              border: "2px solid #238878",
               textTransform: "none",
-              "&:hover": { 
-                backgroundColor: "#fff", 
-                color: "#238878", 
-                borderColor: "#238878",
-                borderWidth: "2px"
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
               },
-            }}>
+            }}
+          >
+           
             Save
           </Button>
         </Box>

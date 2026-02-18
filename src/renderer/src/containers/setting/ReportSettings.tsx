@@ -14,6 +14,15 @@ const ReportSettings = () => {
       price_visibility: [],
     }
   });
+  
+  const headingStyle = {
+  fontWeight: 700,
+  fontSize: "18px",
+  color: "#212529",
+  mb: 1,
+};
+
+
   const { handleSubmit, reset } = methods;
   const onSubmit = (data: ReportFormValues) => {
     console.log(" Data:", data);
@@ -27,8 +36,8 @@ const ReportSettings = () => {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
         {/*  Exports format */}
-        <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
-          <Typography sx={{ fontWeight: 600, mb: 1, fontSize: '16px' }}>Exports Format</Typography>
+        <Paper sx={{p: { xs: 2, md: 4 }, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
+          <Typography sx={headingStyle}>Exports Format</Typography>
           <CheckboxGroup
             name="export_format"
             label=""
@@ -41,7 +50,7 @@ const ReportSettings = () => {
         </Paper>
         {/* price Visibility Control */}
         <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
-          <Typography sx={{ fontWeight: 600, mb: 1, fontSize: '16px' }}>Price Visibility Control</Typography>
+          <Typography sx={headingStyle}>Price Visibility Control</Typography>
           <CheckboxGroup
             name="price_visibility"
             label=""
@@ -53,32 +62,44 @@ const ReportSettings = () => {
           />
         </Paper>
         {/*  Buttons- save reset*/}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-          <Button 
-            variant="outlined" 
-            onClick={() => reset()}                       
-           sx={{
-           color: "#238878",
-           border: "2px solid #238878",
-           textTransform: "none",
-          "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
-          }}>           
-        Reset
-          </Button>
-          <Button 
-              type="submit" 
-              variant="contained" 
-              sx={{
-                backgroundColor: "#238878",
-                color: "#fff",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
-              }}
-            >
-              Save
-            </Button>
-        </Box>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+              <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => reset()}
+                  sx={{
+                    color: "#238878",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#238878",
+                      color: "#fff",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                  Reset
+                </Button>
+      
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#238878",
+                    color: "#fff",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#fff",
+                      color: "#238878",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                 
+                  Save
+                </Button>
+            </Box>
         </form>
       </FormProvider>
     </Box>

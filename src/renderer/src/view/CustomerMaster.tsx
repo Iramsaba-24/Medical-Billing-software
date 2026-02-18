@@ -1,7 +1,7 @@
  import { useState, useEffect } from "react";
-import AddCustomerForm from "@/containers/customer/AddCustomerForm";
-import CustomerListPage from "@/containers/customer/CustomerListPage";
-import CustomerViewDetails from "@/containers/customer/CustomerViewDetails";
+import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
+import CustomerListPage from "@/containers/Customer/CustomerListPage";
+import CustomerViewDetails from "@/containers/Customer/CustomerViewDetails";
 
 // Structure for Purchase History 
 export interface PurchaseHistory {

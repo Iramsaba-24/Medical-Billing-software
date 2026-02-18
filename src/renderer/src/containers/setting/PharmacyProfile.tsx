@@ -1,27 +1,11 @@
-// React imports
 import React, { useRef, useState } from "react";
- 
-// Material UI components
-import {
-  Box,
-  Paper,
-  Typography,
-  Divider,
-  Grid,
-  Button,
-  Stack,
-} from "@mui/material";
- 
-// react-hook-form
+import {Box,Paper,Typography,Divider,Grid,Button,Stack,} from "@mui/material";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
- 
-// Custom controlled components
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
  
- 
-/* FORM TYPES */
+
 type PharmacyFormValues = {
   pharmacyName: string;
   address: string;
@@ -36,7 +20,6 @@ type PharmacyFormValues = {
 };
  
 function PharmacyProfile() {
-  // react-hook-form setup
   const methods = useForm<PharmacyFormValues>({
     mode: "onChange",
     defaultValues: {
@@ -55,20 +38,17 @@ function PharmacyProfile() {
  
   const { handleSubmit, reset } = methods;
  
-  // File input ref
   const fileInputRef = useRef<HTMLInputElement | null>(null);
  
   // Image preview state
   const [previewImage, setPreviewImage] = useState<string | null>(null);
  
-  /* Submit Handler */
   const onSubmit: SubmitHandler<PharmacyFormValues> = (data) => {
     console.log("Form submitted with:", data);
     window.alert("Data saved successfully!");
     handleReset();
   };
  
-  /* Image Change Handler */
   const handleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ): void => {
@@ -88,32 +68,32 @@ function PharmacyProfile() {
   };
  
   /* Styles */
-  const cardStyle = {
-    p: { xs: 2, md: 4 },
-    borderRadius: 2,
-    boxShadow: 4,
-    position: { xs: "static" as const },
-    mb: { xs: 4, md: 4 },
-  };
+ const cardStyle = {
+  p: { xs: 2, md: 4 },
+  borderRadius: "5px",
+  boxShadow: 3,
+  mb: 1,
+};
  
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Box sx={{  width: "100%" }}>
+        <Box sx={{ width: "100%", backgroundColor: "#f9f9f9", }}>
  
-          {/* CARD 1 : Pharmacy Profile */}
-          <Paper sx={cardStyle}>
-            <Typography
+  <Typography
               variant="h6"
-              sx={{ fontWeight: 700, mb: { xs: 3, md: 8} }}
+              sx={{ fontWeight: 700, mb: { xs: 2, md: 4} }}
             >
               Pharmacy Profile
             </Typography>
+          {/* CARD 1 : Pharmacy Profile */}
+          <Paper sx={cardStyle}>
+           
  
             <Grid container spacing={{ xs: 3, md: 12 }}>
               {/* Left Column */}
               <Grid size={{ xs: 12, md: 6 }}>
-                <Stack spacing={{ xs: 2.5, md: 2 }}>
+                <Stack spacing={{ xs: 2, md: 2 }}>
                   <TextInputField
                     name="pharmacyName"
                     label="Pharmacy Name"
@@ -135,8 +115,6 @@ function PharmacyProfile() {
                     label="Drug License No."
                     placeholder="DL-KA-2023-001245"
                     required
-                    //maxlength={15}
-                   // max={100000000}
                      
                   />
                 </Stack>
@@ -145,7 +123,7 @@ function PharmacyProfile() {
               {/* Right Column (Upload Logo + FSSAI) */}
               <Grid size={{ xs: 12, md: 6}}>
                 <Stack
-                  spacing={{ xs: 3, md: 3}}
+                  spacing={{  md: 3}}
                   alignItems={{ xs: "center", md: "flex-start" }}
                 >
                   {/* Upload Logo */}
@@ -154,7 +132,8 @@ function PharmacyProfile() {
                       sx={{
                         mb: 1,
                         fontWeight: 600,
-                        textAlign: { xs: "center", md: "left" },
+                        textAlign: { md: "left" },
+                       xs:{ml:5} ,
                       }}
                     >
                       Upload Logo
@@ -163,8 +142,9 @@ function PharmacyProfile() {
                     <Box
                       sx={{
                         display: "flex",
-                        flexDirection: { xs: "column", md: "row" },
-                        gap: { xs: 2, md: 25},
+                      flexDirection: "row",
+                        gap: { xs: 3, md: 6 },
+                        flexWrap: "wrap",
                  
                         alignItems: "center",
                         justifyContent: { xs: "center", md: "flex-start" },
@@ -265,7 +245,7 @@ function PharmacyProfile() {
             </Typography>
             <Divider sx={{ my: 2 }} />
  
-            <Grid container spacing={{ xs: 3, md: 9 }}>
+            <Grid container spacing={{ xs: 2, md: 9 }}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <MobileField
                   name="contact"
@@ -323,39 +303,44 @@ function PharmacyProfile() {
           </Paper>
  
           {/* Buttons */}
-          <Box sx={{ display: "flex", justifyContent: "space-between", mt: 4 }}>
-            <Button
-              variant="outlined"
-              onClick={handleReset}
-              sx={{
-                color: "#238878",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                },
-              }}
-            >
-              Reset
-            </Button>
- 
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                backgroundColor: "#238878",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                },
-              }}
-            >
-              Save
-            </Button>
-          </Box>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+              <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => reset()}
+                  sx={{
+                    color: "#238878",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#238878",
+                      color: "#fff",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                  Reset
+                </Button>
+      
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#238878",
+                    color: "#fff",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#fff",
+                      color: "#238878",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                 
+                  Save
+                </Button>
+            </Box>
         </Box>
       </form>
     </FormProvider>

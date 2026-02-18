@@ -23,6 +23,14 @@ type DoctorSettingsState = {
   showDoctorOnPrescription: boolean;
 };
 
+const headingStyle = {
+  fontWeight: 700,
+  fontSize: "18px",
+  color: "#212529",
+  mb: 1,
+};
+
+
 const defaultState: DoctorSettingsState = {
   doctorName: false,
   registrationNumber: false,
@@ -65,6 +73,13 @@ const DoctorsSettings: React.FC = () => {
     console.log("Saved Settings:", settings);
     alert("Settings saved successfully");
   };
+  const cardStyle = {
+p: { xs: 2, md: 4 },
+  borderRadius: "5px",
+  boxShadow: 3,
+  mb: 1,
+};
+
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3 } }}>
@@ -77,9 +92,9 @@ const DoctorsSettings: React.FC = () => {
       </Typography>
 
       {/* Doctor Details */}
-      <Card sx={{ mb: 3 }}>
+      <Card sx={cardStyle}>
         <CardContent>
-          <Typography variant="h6" mb={1}>
+          <Typography sx={headingStyle}>
             Mandatory Doctor Details
           </Typography>
 
@@ -147,7 +162,7 @@ const DoctorsSettings: React.FC = () => {
       {/* Invoice & Prescription */}
       <Card>
         <CardContent>
-          <Typography variant="h6" mb={1}>
+          <Typography sx={headingStyle}>
             Invoice & Prescription Settings
           </Typography>
 
@@ -160,6 +175,7 @@ const DoctorsSettings: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                gap:2,
               }}
             >
               <Typography
@@ -217,47 +233,44 @@ const DoctorsSettings: React.FC = () => {
       </Card>
 
       {/* Buttons */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          mt: 4,
-          flexDirection: { xs: "column", md: "row" },
-          gap: { xs: 2, md: 0 },
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
         <Button
-          variant="outlined"
-          onClick={handleReset}
-          sx={{
-            color: "#238878",
-            border: "2px solid #238878",
-            textTransform: "none",
-            "&:hover": {
+            type="button"
+            variant="outlined"
+            onClick={handleReset}
+            sx={{
+              color: "#238878",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+              },
+            }}
+          >
+            Reset
+          </Button>
+
+          <Button
+            type="submit"
+            variant="contained"
+            onClick={handleSave}
+            sx={{
               backgroundColor: "#238878",
               color: "#fff",
-            },
-          }}
-        >
-          Reset
-        </Button>
-
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          sx={{
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
-            },
-          }}
-        >
-          Save
-        </Button>
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
+          >
+           
+            Save
+          </Button>
       </Box>
     </Box>
   );
