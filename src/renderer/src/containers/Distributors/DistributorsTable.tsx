@@ -1,7 +1,7 @@
  import SearchField from "@/components/controlled/SearchField";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { URL_PATH } from "@/constants/UrlPath";
-import { Box, Typography, Paper, MenuItem, Button, Select } from "@mui/material";
+import { Box, Typography, Paper, MenuItem, Button, Select, Divider } from "@mui/material";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -86,6 +86,7 @@ const Distributors = () => {
   return (
     <>
       <FormProvider {...methods}>
+        
         <Paper sx={{ px: { xs: 2, md: 4 }, pt: 2, pb: { xs: 2, md: 2 } }}>
           <Box
             display="flex"
@@ -126,14 +127,16 @@ const Distributors = () => {
       </FormProvider>
 
       <Paper sx={{ mt: 3, p: { xs: 1, md: 3 } }}>
-        <Typography fontSize={{ xs: 18, md: 22 }} mb={2} fontWeight={600}>
+        <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
           Distributors List
         </Typography>
-
+        <Divider sx={{ mb: 3 }} />
         {/* The Data Table */}
         <UniversalTable
           data={filteredDistributors}
           columns={columns}
+          showSearch={true}         
+          showExport={true}         
           tableSize="small"
           getRowId={(row) => row.id}
           actions={{

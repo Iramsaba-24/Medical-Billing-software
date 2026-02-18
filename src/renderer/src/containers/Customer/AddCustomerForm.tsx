@@ -7,7 +7,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
-import ItemsSection from "@/containers/customer/ItemsSection";
+import ItemsSection from "@/containers/Customer/ItemsSection";
 import { useNavigate } from "react-router-dom";
 import { Invoice } from "../Invoices/InvoiceView";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -111,7 +111,7 @@ const handlePrint = () => {
 
         {/* Top Header Section */}
         <Box sx={{ display: "flex", flexDirection: { xs: "column-reverse", sm: "row" }, justifyContent: "space-between", gap: 2, mb: 3 }}>
-          <Typography variant="h5" fontWeight="bold">Add New Invoice</Typography>
+          <Typography variant="h5" fontWeight="bold">Add Customers</Typography>
           <Button startIcon={<ArrowBack />} variant="outlined" onClick={onBack} sx={{ color: "#248a76", borderColor: "#248a76" }}>
             Back
           </Button>

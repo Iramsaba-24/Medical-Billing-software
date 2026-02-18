@@ -28,9 +28,19 @@ export default function InventoryPage() {
 
 return (
     <Box>
-      <Typography fontSize={20} fontWeight={600} mb={2}>
-        Inventory
-      </Typography>
+      <Box>
+          <Typography
+            sx={{
+              fontSize: { xs: 20, sm: 24, md: 28 },  
+              fontWeight: 700,
+              color: '#111827',
+              mt: {xs:1 , md:0.5},
+              mb: 0.5,
+            }}
+          >
+            Inventory
+          </Typography>
+      </Box>
 
       <Box
         display="grid"

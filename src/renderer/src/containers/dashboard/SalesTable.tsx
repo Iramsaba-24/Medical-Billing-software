@@ -6,8 +6,8 @@ import {
   Typography,
   TextField,
   InputAdornment,
-  Chip,
   Slide,
+  Divider,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -43,7 +43,8 @@ const filterOptions = [
 ];
 
 const parseDate = (dateStr: string): Date => {
-  const months: any = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const months: Record<string, number> = {
     Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
     Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
   };
@@ -177,10 +178,10 @@ const SalesTable: React.FC = () => {
           <CardContent>
             <FormProvider {...methods}>
               <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6" fontWeight={600}>
+                <Typography fontSize={{ xs: 18, md: 20 }} fontWeight={600}>
                   Recent Sales List
                 </Typography>
-
+                
                 <Box display="flex" alignItems="center" gap={2}>
                   <TextField
                     size="small"
@@ -220,20 +221,24 @@ const SalesTable: React.FC = () => {
                     />
                   </Box>
                 </Box>
+                
               </Box>
+              
             </FormProvider>
 
-            <Chip
+            {/* <Chip
               label={`Filter: ${selectedMonth}`}
               sx={{ mb: 2 }}
               color="primary"
-            />
-
+            /> */}
+            <Divider sx={{ mb: 1 }} />
             <UniversalTable
               data={filteredSalesData}
               columns={columns}
               rowsPerPage={5}
-              enableCheckbox={true}
+              enableCheckbox={true}        
+              showExport={true} 
+              showSearch={true} 
               getRowId={(row) => row.id}
               onDeleteSelected={handleDeleteSelected}
               actions={{

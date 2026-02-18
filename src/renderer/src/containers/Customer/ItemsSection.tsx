@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { useEffect } from "react";
-import { ItemRow } from "@/containers/customer/AddCustomerForm";
+import { ItemRow } from "@/containers/Customer/AddCustomerForm";
 
 // Defining the types for the props passed to this component
 interface ItemsSectionProps {

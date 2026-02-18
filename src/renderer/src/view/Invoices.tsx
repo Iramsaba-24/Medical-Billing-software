@@ -1,4 +1,4 @@
-import { Box, Typography, Divider } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import BillingTable from "@/containers/Invoices/BillingTable";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -38,10 +38,19 @@ const Billing = () => {
 
   return (
     <Box>
-      <Typography variant="h5" mb={2}>
-        Invoices
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+      <Box>
+        <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 24, md: 28 },
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb:0.5
+          }}
+        >
+          Invoices
+        </Typography>
+      </Box>
 
       <Box
         display="flex"

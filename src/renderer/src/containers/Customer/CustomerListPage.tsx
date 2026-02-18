@@ -1,7 +1,7 @@
   import { useState, useMemo } from "react";
 import { CustomerData } from "@/view/CustomerMaster";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
-import { Box, Button, TextField, InputAdornment, Typography } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Typography, Divider } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
  
@@ -39,9 +39,20 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
   ];
  
   return (
-    <Box sx={{ bgcolor: "#f8f9fa",
-     
-      }}>
+    <Box sx={{ bgcolor: "#f8f9fa",}}>
+      <Box>
+        <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 24, md: 28 },  
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb: 0.5,
+          }}
+        >
+          Customers 
+        </Typography>
+        </Box>
      
       {/* Search and Add Button */}
       <Box sx={{
@@ -83,12 +94,16 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
  
       {/*  Horizontal scroll enabled for mobile */}
       <Box sx={{ bgcolor: "#fff", p: { xs: 1, md: 2 }, borderRadius: "12px", border: "1px solid #e0e0e0" }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>Customers List</Typography>
-       
+        <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
+          Customers List
+        </Typography>  
+        <Divider sx={{ mb: 1}} />     
         <Box sx={{ width: "100%", overflowX: "auto" }}>
           <UniversalTable<CustomerData & Record<string, unknown>>
             columns={columns}
             data={filteredData}
+            showExport={true}
+            showSearch={true} 
             actions={{
               view: onView,
               edit: onEdit,

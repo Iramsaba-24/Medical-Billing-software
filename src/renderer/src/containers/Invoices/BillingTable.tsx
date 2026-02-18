@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Paper, Button } from "@mui/material";
+import { Box, Paper, Button, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -112,6 +112,9 @@ const BillingTable = ({ onCreate }: Props) => {
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 2 }}>
+                <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
+          Invoice List
+        </Typography>
         <Box mb={2} display="flex" 
         flexDirection={{xs:"column", md:"row"}}
         justifyContent="space-between" alignItems="center">
@@ -143,7 +146,6 @@ const BillingTable = ({ onCreate }: Props) => {
         <UniversalTable<Invoice>
           data={filteredInvoices}
           columns={columns}
-          caption="Billing Invoices"
           showSearch
           showExport
           enableCheckbox
