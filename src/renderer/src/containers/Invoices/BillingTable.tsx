@@ -13,9 +13,10 @@ import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
 import { URL_PATH } from "@/constants/UrlPath";
 
+//  Reusable Import
+import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage.tsx"; 
 type Props = {
   onCreate: () => void;
-  onView: (invoice: Invoice) => void;
 };
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
@@ -49,6 +50,7 @@ const BillingTable = ({ onCreate }: Props) => {
     },
   ]);
 
+  // ---------------- Add new invoice ----------------
   useEffect(() => {
     if (location.state) {
       const newInvoice = location.state as Invoice;
@@ -56,16 +58,7 @@ const BillingTable = ({ onCreate }: Props) => {
       setInvoices((prev) => {
         const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
         if (exists) return prev;
-
-        const safeInvoice = {
-          ...newInvoice,
-          medicines: newInvoice.medicines.map((med) => ({
-            ...med,
-            amount: Number(med.amount),
-          })),
-        };
-
-        return [safeInvoice, ...prev];
+        return [newInvoice, ...prev];
       });
     }
   }, [location.state]);
@@ -85,9 +78,17 @@ const BillingTable = ({ onCreate }: Props) => {
     const invoiceDate = new Date(invoice.date);
     const today = new Date();
 
-    if (filterType === "daily") return invoiceDate.toDateString() === today.toDateString();
-    if (filterType === "monthly") return invoiceDate.getMonth() === today.getMonth() && invoiceDate.getFullYear() === today.getFullYear();
-    if (filterType === "yearly") return invoiceDate.getFullYear() === today.getFullYear();
+    if (filterType === "daily")
+      return invoiceDate.toDateString() === today.toDateString();
+
+    if (filterType === "monthly")
+      return (
+        invoiceDate.getMonth() === today.getMonth() &&
+        invoiceDate.getFullYear() === today.getFullYear()
+      );
+
+    if (filterType === "yearly")
+      return invoiceDate.getFullYear() === today.getFullYear();
 
     return true;
   });
@@ -96,7 +97,11 @@ const BillingTable = ({ onCreate }: Props) => {
     { key: "invoice", label: "Invoice" },
     { key: "patient", label: "Patient" },
     { key: "date", label: "Date" },
-    { key: "price", label: "Price", render: (row) => `₹ ${row.price.toLocaleString()}` },
+    {
+      key: "price",
+      label: "Price",
+      render: (row) => `₹ ${row.price.toLocaleString()}`,
+    },
     { key: "status", label: "Status" },
     { key: "actionbutton", label: "Action" },
   ];
@@ -109,19 +114,42 @@ const BillingTable = ({ onCreate }: Props) => {
 
   const methods = useForm({ defaultValues: { filterType: "all" } });
 
+  //  UPDATED DELETE
+  const handleDelete = async (invoiceNo: string) => {
+    const confirmed = await showConfirmation(
+      "Are you sure you want to delete this invoice?",
+      "Confirm Delete"
+    );
+
+    if (!confirmed) return;
+
+    setInvoices((prev) =>
+      prev.filter((inv) => inv.invoice !== invoiceNo)
+    );
+
+    showToast("success", "Invoice deleted successfully");
+  };
+
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 2 }}>
-        <Box mb={2} display="flex" 
-        flexDirection={{xs:"column", md:"row"}}
-        justifyContent="space-between" alignItems="center">
+        <Box
+          mb={2}
+          display="flex"
+          flexDirection={{ xs: "column", md: "row" }}
+          justifyContent="space-between"
+          alignItems="center"
+          gap={2}
+        >
           <Box width={220}>
             <DropdownField
               name="filterType"
               label="Filter"
               options={filterOptions}
               freeSolo={false}
-              onChangeCallback={(value) => setFilterType(value as FilterType)}
+              onChangeCallback={(value) =>
+                setFilterType(value as FilterType)
+              }
             />
           </Box>
 
@@ -133,7 +161,11 @@ const BillingTable = ({ onCreate }: Props) => {
               color: "#fff",
               border: "2px solid #238878",
               textTransform: "none",
-              "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
             }}
           >
             + Create Invoice
@@ -154,19 +186,46 @@ const BillingTable = ({ onCreate }: Props) => {
             onChange: (row, value) => {
               setInvoices((prev) =>
                 prev.map((inv) =>
-                  inv.invoice === row.invoice ? { ...inv, status: value as InvoiceStatus } : inv
+                  inv.invoice === row.invoice
+                    ? { ...inv, status: value as InvoiceStatus }
+                    : inv
                 )
               );
+
+              showToast("success", "Status updated successfully");
             },
           }}
           actions={{
-            view: (invoice) => navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, { state: invoice }),
-            print: (invoice) => navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, { state: invoice }),
-            download: (invoice) => navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, { state: invoice }),
+            view: (invoice) =>
+              navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
+                state: invoice,
+              }),
+
+            edit: (invoice) =>
+              navigate(URL_PATH.CreateInvoice, {
+                state: invoice,
+              }),
+
+            delete: (invoice) =>
+              handleDelete(invoice.invoice),
           }}
-          onDeleteSelected={(rows) =>
-            setInvoices((prev) => prev.filter((inv) => !rows.some((r) => r.invoice === inv.invoice)))
-          }
+          onDeleteSelected={async (rows) => {
+            const confirmed = await showConfirmation(
+              "Delete selected invoices?",
+              "Confirm Delete"
+            );
+
+            if (!confirmed) return;
+
+            setInvoices((prev) =>
+              prev.filter(
+                (inv) =>
+                  !rows.some((r) => r.invoice === inv.invoice)
+              )
+            );
+
+            showToast("success", "Selected invoices deleted");
+          }}
         />
       </Paper>
     </FormProvider>

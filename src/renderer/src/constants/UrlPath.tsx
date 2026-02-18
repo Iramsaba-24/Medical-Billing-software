@@ -1,10 +1,12 @@
 
+
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
 
   Landing: "/landing",
   Dashboard: "/dashboard",
+  SalesView:"/dashboard/sales-view",
   Customer: "/customers",
 
   Doctors: "/doctors",
@@ -48,4 +50,6 @@ export const URL_PATH = {
   PaymentDetails: "/billing/payment-details",
  
   DoctorsSettings: "/settings/doctors-settings"
+
+
 };
