@@ -8,6 +8,7 @@ import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import ItemsSection from "@/containers/customer/ItemsSection";
+import DropdownField from "@/components/controlled/DropdownField";
 
 // Structure for each medicine/item row in the bill
 export interface ItemRow { 
@@ -39,6 +40,22 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     }
   });
 
+  const [doctorOptions, setDoctorOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    const storedDoctors = JSON.parse(localStorage.getItem("doctors") || "[]");
+    const options = storedDoctors.map((doc: { doctorName: string }) => ({
+      label: doc.doctorName,
+      value: doc.doctorName,
+    }));
+    setDoctorOptions(options);
+  }, []);
+
+  // Load existing customers from LocalStorage for the search dropdown
+  useEffect(() => {
+    const saved = localStorage.getItem("medical_customers");
+    if (saved) setCustomerOptions(JSON.parse(saved));
+  }, []);
   // Common styling for action buttons (Print, Pay, Save)
   const buttonStyle = {
     backgroundColor: "#238878",
@@ -137,7 +154,11 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>Doctor Information</Typography>
               <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
-                <TextInputField name="doctor" label="Doctor Name" inputType="alphabet" required />
+                <DropdownField
+                  name="doctor"
+                  label="Doctor Name"
+                  options={doctorOptions}
+                />
                 <TextInputField name="doctorAddress" label="Doctor Address/Clinic" inputType="textarea" rows={1} />
               </Box>
             </Box>
@@ -201,3 +222,5 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
 };
 
 export default AddCustomerForm;
+
+

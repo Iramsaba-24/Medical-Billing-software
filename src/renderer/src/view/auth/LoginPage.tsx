@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import TextInputField from '@/components/controlled/TextInputField';
 import BgImage from '@/assets/bgloginpage.svg';
 import LogoImage from '@/assets/logoimg.svg';
-import AppToast from '@/containers/Distributors/AppToast';
+import AppToast from '@/containers/distributors/AppToast';
 import { URL_PATH } from '@/constants/UrlPath';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 

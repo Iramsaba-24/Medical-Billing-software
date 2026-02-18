@@ -15,9 +15,7 @@ import Dashboard from "@/view/Dashboard";
 import CustomerMaster from "@/view/CustomerMaster";
 import DoctorTable from "@/view/Doctors";
 import AddDoctor from "@/containers/doctors/AddDoctor";
-import DoctorsDetail from "@/containers/doctors/DoctorsDetail";
 import DistributorsPage from "@/view/DistributorsPage";
-
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
 import DistributorDetails from "@/containers/distributors/DistributorsDetails";
@@ -68,10 +66,6 @@ export const mainRoutes: RouteObject[] = [
         element: <AddDoctor />,
       },
       {
-        path: URL_PATH.DoctorsDetail,
-        element: <DoctorsDetail />,
-      },
-      {
         path: URL_PATH.CreateInvoice,
         element: <CreateInvoice />,
       },
@@ -100,7 +94,7 @@ export const mainRoutes: RouteObject[] = [
         element: <MedicineGroup />,
       },
       {
-        path: "/medicine-groups/:id",
+        path: "/medicine-groups/:groupName",
         element: <MedicineGroupView />,
       },
       {
