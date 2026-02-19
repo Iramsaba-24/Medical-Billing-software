@@ -62,44 +62,32 @@ const ReportSettings = () => {
           />
         </Paper>
         {/*  Buttons- save reset*/}
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
-              <Button
-                  type="button"
-                  variant="outlined"
-                  onClick={() => reset()}
-                  sx={{
-                    color: "#238878",
-                    border: "2px solid #238878",
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "#238878",
-                      color: "#fff",
-                      border: "2px solid #238878",
-                    },
-                  }}
-                >
-                  Reset
-                </Button>
-      
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#238878",
-                    color: "#fff",
-                    border: "2px solid #238878",
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "#fff",
-                      color: "#238878",
-                      border: "2px solid #238878",
-                    },
-                  }}
-                >
-                 
-                  Save
-                </Button>
-            </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, gap: 4 }}>
+          <Button 
+            variant="outlined" 
+            onClick={() => reset()}                       
+           sx={{
+           color: "#238878",
+           border: "2px solid #238878",
+           textTransform: "none",
+          "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
+          }}>           
+        Reset
+          </Button>
+          <Button 
+              type="submit" 
+              variant="contained" 
+              sx={{
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+                textTransform: "none",
+                "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
+              }}
+            >
+              Save
+            </Button>
+        </Box>
         </form>
       </FormProvider>
     </Box>

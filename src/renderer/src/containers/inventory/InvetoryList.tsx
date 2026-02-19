@@ -1,14 +1,13 @@
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 
 
 export type InventoryItem = {
   itemName: string;
   itemId: string;
-  category: string;
+  medicineGroup: string;
   stockQty: number;
   pricePerUnit: number;
   gst: "12%";
@@ -19,8 +18,6 @@ export type InventoryItem = {
 const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]); 
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null); 
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = localStorage.getItem("inventory");
@@ -64,7 +61,7 @@ const InventoryList = () => {
   
   const columns: Column<InventoryItem>[] = [
     { key: "itemName", label: "Item" },
-    { key: "category", label: "Category" },
+    { key: "medicineGroup", label: "Group" },
     { key: "stockQty", label: "Stock" },
     { key: "pricePerUnit", label: "Price",
       render: (row) => `₹ ${row.pricePerUnit}`, 
@@ -86,21 +83,6 @@ const InventoryList = () => {
       <Box sx={{ boxShadow: {xs:1, md:4}, p: {xs:1, md:4}, borderRadius: 2 }}>
         <Box display="flex" justifyContent="space-between" mb={4}>
           <Typography sx={{fontSize: { xs:"16", md:"20" }, }}>Inventory List</Typography>
-
-          {/* add inventory button */}
-          <Button
-            variant="contained"
-            sx={{
-              px: 4,
-              py: 1,
-              width: { xs:"50%", md:"20%" },             
-              textTransform: "none",
-              backgroundColor: "#1b7f6b",
-            }}
-            onClick={() => navigate("/inventory/add-inventory-item")}
-          >
-            + Add Inventory Item
-          </Button>
         </Box>
 
         {/* table */}
@@ -137,7 +119,6 @@ const InventoryList = () => {
             mb={4}
             px={4}>
             <Typography><strong>Item ID</strong><br /> {viewItem?.itemId}</Typography>
-            <Typography><strong>Category</strong> <br /> {viewItem?.category}</Typography>
             <Typography><strong>Expiry Date</strong> <br /> {viewItem?.expiryDate}</Typography>
           </Box>
 

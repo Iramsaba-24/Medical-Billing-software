@@ -15,12 +15,10 @@ import Dashboard from "@/view/Dashboard";
 import CustomerMaster from "@/view/CustomerMaster";
 import DoctorTable from "@/view/Doctors";
 import AddDoctor from "@/containers/doctors/AddDoctor";
-import DoctorsDetail from "@/containers/doctors/DoctorsDetail";
 import DistributorsPage from "@/view/DistributorsPage";
-
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
-import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
+import DistributorDetails from "@/containers/distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
@@ -28,7 +26,7 @@ import GeneralSettings from "@/containers/setting/GeneralSettings";
 
 import Setting from "@/containers/layout/Setting";
 
-import DistributorsForm from "@/containers/Distributors/DistributorsForm";
+import DistributorsForm from "@/containers/distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 
 import MediPoints from "@/containers/billing/MediPoints";
@@ -68,10 +66,6 @@ export const mainRoutes: RouteObject[] = [
         element: <AddDoctor />,
       },
       {
-        path: URL_PATH.DoctorsDetail,
-        element: <DoctorsDetail />,
-      },
-      {
         path: URL_PATH.CreateInvoice,
         element: <CreateInvoice />,
       },
@@ -82,6 +76,10 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.Inventory,
         element: <Inventory />,
+      },
+      {
+        path: URL_PATH.RetailInvoice,
+        element: <RetailInvoice />,
       },
       {
         path: URL_PATH.InventoryList,
@@ -96,7 +94,7 @@ export const mainRoutes: RouteObject[] = [
         element: <MedicineGroup />,
       },
       {
-        path: "/medicine-groups/:id",
+        path: "/medicine-groups/:groupName",
         element: <MedicineGroupView />,
       },
       {
@@ -174,6 +172,18 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.InventorySettings,
         element: <InventorySettings />,
       },
+       {
+        path: URL_PATH.PharmacyProfile,
+        element: <PharmacyProfile />,
+      },
+       {
+        path: URL_PATH.CustomerSettings,
+        element: <CustomerSettings />,
+      },
+      // {
+      //   path: URL_PATH.DoctorsSettings,
+      //   element: <DoctorsSettings />,
+      // },
       {
         path: URL_PATH.InvoiceSetting,
         element: <InvoiceSettings />,
