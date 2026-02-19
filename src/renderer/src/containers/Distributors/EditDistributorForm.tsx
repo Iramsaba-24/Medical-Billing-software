@@ -1,22 +1,31 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
+import {Dialog, DialogTitle, DialogContent,DialogActions,Button,TextField,Select, MenuItem,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { SalesData } from "./SalesTable";
 
-type Props = {
-  editingRow: SalesData | null;
-  onClose: () => void;
-  onSave: (data: SalesData) => void;
+export type Distributor = {
+  id: string;
+  companyName: string;
+  mobile: string;
+  email: string;
+  date: string;
+  registrationNumber: string;
+  address: string;
+  status: "Active" | "Inactive";
 };
 
-const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
-  const [formData, setFormData] = useState<SalesData | null>(null);
+type Props = {
+  editingRow: Distributor | null;
+  onClose: () => void;
+  onSave: (data: Distributor) => void;
+};
+
+const EditDistributorForm = ({
+  editingRow,
+  onClose,
+  onSave,
+}: Props) => {
+  const [formData, setFormData] =
+    useState<Distributor | null>(null);
 
   useEffect(() => {
     setFormData(editingRow);
@@ -31,47 +40,51 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
       maxWidth="sm"
       fullWidth
     >
-      <DialogTitle>Edit Sales Record</DialogTitle>
+      <DialogTitle>Edit Distributor</DialogTitle>
 
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
         <TextField
-          label="Customer Name"
-          value={formData.name}
-          onChange={(e) =>
-            setFormData({ ...formData, name: e.target.value })
-          }
-        />
-
-        <TextField
-          label="Medicine"
-          value={formData.medicine}
-          onChange={(e) =>
-            setFormData({ ...formData, medicine: e.target.value })
-          }
-        />
-
-        <TextField
-          label="Quantity"
-          type="number"
-          value={formData.quantity}
+          label="Company Name"
+          value={formData.companyName}
           onChange={(e) =>
             setFormData({
               ...formData,
-              quantity: Number(e.target.value),
+              companyName: e.target.value,
             })
           }
         />
 
         <TextField
-          label="Total Price"
-          type="number"
-          value={formData.totalPrice}
+          label="Registration No"
+          value={formData.registrationNumber}
           onChange={(e) =>
             setFormData({
               ...formData,
-              totalPrice: Number(e.target.value),
+              registrationNumber: e.target.value,
+            })
+          }
+        />
+
+        <TextField
+          label="Mobile"
+          value={formData.mobile}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              mobile: e.target.value,
+            })
+          }
+        />
+
+        <TextField
+          label="Email"
+          value={formData.email}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              email: e.target.value,
             })
           }
         />
@@ -80,17 +93,42 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
           label="Date"
           value={formData.date}
           onChange={(e) =>
-            setFormData({ ...formData, date: e.target.value })
+            setFormData({
+              ...formData,
+              date: e.target.value,
+            })
           }
         />
 
         <TextField
-          label="Time"
-          value={formData.time}
+          label="Address"
+          value={formData.address}
           onChange={(e) =>
-            setFormData({ ...formData, time: e.target.value })
+            setFormData({
+              ...formData,
+              address: e.target.value,
+            })
           }
         />
+
+        <Select
+          value={formData.status}
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              status: e.target.value as
+                | "Active"
+                | "Inactive",
+            })
+          }
+        >
+          <MenuItem value="Active">
+            Active
+          </MenuItem>
+          <MenuItem value="Inactive">
+            Inactive
+          </MenuItem>
+        </Select>
       </DialogContent>
 
       <DialogActions sx={{ gap: 2, px: 3, pb: 2 }}>
@@ -98,7 +136,7 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
           onClick={onClose}
           sx={{
             px: 4,
-            width: "18%",
+            width: "20%",
             textTransform: "none",
             border: "2px solid #1b7f6b",
             color: "#1b7f6b",
@@ -119,7 +157,7 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
           }}
           sx={{
             px: 4,
-            width: "18%",
+            width: "20%",
             textTransform: "none",
             backgroundColor: "#1b7f6b",
             "&:hover": {
@@ -136,4 +174,4 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
   );
 };
 
-export default EditSalesForm;
+export default EditDistributorForm;

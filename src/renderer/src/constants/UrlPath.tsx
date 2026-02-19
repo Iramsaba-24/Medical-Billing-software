@@ -4,6 +4,7 @@ export const URL_PATH = {
 
   Landing: "/landing",
   Dashboard: "/dashboard",
+  SalesView:"/dashboard/sales-view",
   Customer: "/customers",
 
   Doctors: "/doctors",
@@ -48,4 +49,6 @@ export const URL_PATH = {
 
 
   DoctorsSettings: "/settings/doctors-settings"
+
+
 };
