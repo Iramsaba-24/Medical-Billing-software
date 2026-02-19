@@ -84,25 +84,6 @@ const InventoryList = () => {
       <Box sx={{ boxShadow: {xs:1, md:4}, p: {xs:1, md:4}, borderRadius: 2 }}>
         <Box display="flex" justifyContent="space-between" mb={4}>
           <Typography sx={{fontSize: { xs:"16", md:"20" }, }}>Inventory List</Typography>
-
-          {/* add inventory button
-          <Button
-            variant="contained"
-           sx={{
-              px: 4,
-              width: { xs: "100%", md: "14%" },
-              textTransform: "none",
-              backgroundColor: "#1b7f6b",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#1b7f6b",
-                border: "2px solid #1b7f6b",
-              },
-            }}
-            onClick={() => navigate("/inventory/add-inventory-item")}
-          >
-            + Add Medicine
-          </Button> */}
         </Box>
 
         {/* table */}

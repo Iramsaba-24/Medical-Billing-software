@@ -73,11 +73,10 @@ const autoRefreshOptions = [
 ];
  
 const cardStyle = {
-  backgroundColor: "#fff",
-  borderRadius: "6px",
-  boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
-  p: 2.5,
-  mb: 2,
+   p: { xs: 2, md: 4 },
+  borderRadius: "5px",
+  boxShadow: 3,
+  mb: 1,
 };
  
 const DashboardSettings = () => {
@@ -247,52 +246,44 @@ const DashboardSettings = () => {
           </Paper>
  
           {/* Actions */}
-          <Box
-            display="flex"
-            justifyContent={{
-              xs: "center",
-              md: "center",
-            }}
-            alignItems="center"
-            gap={3}
-            mt={3}
-          >
-            <Button
-              variant="outlined"
-              onClick={() => reset()}
-              sx={{
-                px: 4,
-                textTransform: "none",
-                fontSize: 14,
-                color: "#238878",
-                border: "2px solid #238878",
-                "&:hover": {
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                },
-              }}
-            >
-              Reset
-            </Button>
- 
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                px: 4,
-                fontSize: 14,
-                backgroundColor: "#238878",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                },
-              }}
-            >
-              Save
-            </Button>
-          </Box>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+              <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => reset()}
+                  sx={{
+                    color: "#238878",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#238878",
+                      color: "#fff",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                  Reset
+                </Button>
+      
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#238878",
+                    color: "#fff",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#fff",
+                      color: "#238878",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                 
+                  Save
+                </Button>
+            </Box>
         </Box>
       </form>
     </FormProvider>

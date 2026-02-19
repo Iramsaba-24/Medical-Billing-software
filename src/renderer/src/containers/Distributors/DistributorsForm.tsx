@@ -8,7 +8,7 @@ import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
 import AppToast from '@/containers/distributors/AppToast';
 import { URL_PATH } from '@/constants/UrlPath';
-import BankDetailsForm from './BankDetailForm';
+import BankDetailsForm from '@/containers/Distributors/BankDetailForm';
 
 // Define the structure of the data 
 type DistributorFormInput = {
@@ -28,6 +28,7 @@ type DistributorFormInput = {
   ifsc: string;
   upiId: string;
 }
+
 
 const DistributorsForm = () => {
   // Initialize the form with default empty values

@@ -26,6 +26,20 @@ const InventorySettings = () => {
       alertsVisibility: [],
     },
   });
+
+  const headingStyle = {
+  fontWeight: 700,
+  fontSize: "18px",
+  color: "#212529",
+  mb: 1,
+};
+const paperStyle = {
+  p: { xs: 2, md: 4 },
+  borderRadius: "5px",
+  boxShadow: 3,
+  mb: 1,
+};
+
  
   //  Save Function
   const { handleSubmit, reset } = methods;
@@ -34,7 +48,6 @@ const InventorySettings = () => {
     console.log(data);
   };
  
-  const sectionTitleStyle = { fontWeight: 600, mb: 1, fontSize: '16px' };
  
   return (
      <Box sx={{  backgroundColor: '#f9f9f9' }}>
@@ -57,8 +70,8 @@ const InventorySettings = () => {
           <Stack spacing={2.5}>
            
             {/* Group & Expiry Control */}
-             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={sectionTitleStyle}>Group & Expiry Control</Typography>
+             <Paper sx={paperStyle}>
+              <Typography sx={headingStyle}>Group & Expiry Control</Typography>
               <CheckboxGroup
                 name="groupExpiry"
                 label=""
@@ -71,7 +84,7 @@ const InventorySettings = () => {
  
             {/* Pricing on Purchase */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={sectionTitleStyle}>Pricing on Purchase</Typography>
+              <Typography variant="subtitle1" sx={headingStyle}>Pricing on Purchase</Typography>
               <CheckboxGroup
                 name="pricing"
                 label=""
@@ -80,7 +93,7 @@ const InventorySettings = () => {
             </Paper>
   
               <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-                 <Typography variant="subtitle2" fontWeight={700} mb={1}>Stock Limits</Typography>
+                 <Typography sx={headingStyle}>Stock Limits</Typography>
 
             {/* Row 1 */}
                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
@@ -113,7 +126,7 @@ const InventorySettings = () => {
 
             {/* Barcode & Storage */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={sectionTitleStyle}>Barcode & Storage</Typography>
+              <Typography variant="subtitle1" sx={headingStyle}>Barcode & Storage</Typography>
               <CheckboxGroup
                 name="barcodeStorage"
                 label=""
@@ -126,7 +139,7 @@ const InventorySettings = () => {
  
             {/*  Returns & Auto Update */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={sectionTitleStyle}>Returns & Auto Update</Typography>
+              <Typography variant="subtitle1" sx={headingStyle}>Returns & Auto Update</Typography>
               <CheckboxGroup
                 name="returnsUpdate"
                 label=""
@@ -136,7 +149,7 @@ const InventorySettings = () => {
  
             {/*  Alerts & Visibility */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={sectionTitleStyle}>Alerts & Visibility</Typography>
+              <Typography variant="subtitle1" sx={headingStyle}>Alerts & Visibility</Typography>
               <CheckboxGroup
                 name="alertsVisibility"
                 label=""
@@ -147,32 +160,44 @@ const InventorySettings = () => {
               />
             </Paper>
       {/*  Buttons- save reset*/}
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt:4 , gap: 4 }}>
-          <Button 
-            variant="outlined" 
-            onClick={() => reset()}                       
-           sx={{
-           color: "#238878",
-           border: "2px solid #238878",
-           textTransform: "none",
-          "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
-          }}>           
-        Reset
-          </Button>
-          <Button 
-              type="submit" 
-              variant="contained" 
-              sx={{
-                backgroundColor: "#238878",
-                color: "#fff",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
-              }}
-            >
-              Save
-            </Button>
-        </Box>
+       <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+              <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => reset()}
+                  sx={{
+                    color: "#238878",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#238878",
+                      color: "#fff",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                  Reset
+                </Button>
+      
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#238878",
+                    color: "#fff",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#fff",
+                      color: "#238878",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                 
+                  Save
+                </Button>
+            </Box>
         
  
           </Stack>

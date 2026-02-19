@@ -118,7 +118,7 @@ const DistributorSettings = () => {
             />
             {/* report heading */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-              <Typography sx={{ fontSize: 16 }}>Export as</Typography>
+              <Typography sx={{ fontSize: 16, mb:{xs:3}} }>Export as</Typography>
               <RadioField
                 name="export_format"
                 label=""
