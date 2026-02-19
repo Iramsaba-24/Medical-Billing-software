@@ -6,7 +6,7 @@ import EmailField from '@/components/controlled/EmailField';
 import MobileField from '@/components/controlled/MobileField';
 import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
-import AppToast from '@/containers/Distributors/AppToast';
+import AppToast from '@/containers/distributors/AppToast';
 import { URL_PATH } from '@/constants/UrlPath';
 import BankDetailsForm from '@/containers/Distributors/BankDetailForm';
 
@@ -40,7 +40,6 @@ const DistributorsForm = () => {
       email: '',
       date: '',
       registrationNumber: '',
-      
       website: '',
       gstIn: '',
       address: '',
@@ -53,16 +52,17 @@ const DistributorsForm = () => {
     },
   });
 
-  const navigate = useNavigate(); // Hook to change pages
-  const [toastOpen, setToastOpen] = useState(false); // State to show/hide success message
+  const navigate = useNavigate(); 
+  const [toastOpen, setToastOpen] = useState(false); 
 
-  // Function that runs when the form is submitted successfully
+  // Function  runs when the form  submitted successfully
   const onSubmit = (data: DistributorFormInput) => {
-    //  Get existing distributors from browser storage localStorage
+
+    
     const stored = localStorage.getItem("distributors");
     const currentData = stored ? JSON.parse(stored) : [];
     
-    //  Prepare the new entry with a unique ID and default status
+    //  Prepare new entry with a unique ID and default status
     const newEntry = { 
       ...data, 
       id: Date.now().toString(), 
@@ -73,7 +73,7 @@ const DistributorsForm = () => {
     const updatedData = [...currentData, newEntry];
     localStorage.setItem("distributors", JSON.stringify(updatedData));
     
-    //  Show success toast and redirect to the list page after 1.5 seconds
+    
     setToastOpen(true);
     setTimeout(() => {
       navigate(URL_PATH.DistributorsPage);
@@ -82,16 +82,16 @@ const DistributorsForm = () => {
 
   return (
     <Box p={2} sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      {/* Provider allows child components like BankDetailsForm to access form data */}
+     
       <FormProvider {...methods}>
         <form noValidate onSubmit={methods.handleSubmit(onSubmit)}> 
           
-          {/*  Basic Distributor Details */}
+          {/* Distributor Details */}
           <Paper
             sx={{
               maxWidth: 800,
               mx: 'auto',
-              p: 4,
+              p: 6,
               backgroundColor: '#fff',
               borderRadius: '10px',
               boxShadow: 3,
@@ -101,7 +101,7 @@ const DistributorsForm = () => {
             <Typography variant="h6" mb={3} fontWeight={600}>
               Add Distributor
             </Typography>
-              {/* Textinputfields */}
+             
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, mt: 2 }}>
             <TextInputField name="companyName" label="Company Name" inputType="textarea" rows={1} required/>
               <TextInputField name="ownerName" label="Owner Name" inputType="alphabet" rows={1} />  
@@ -140,7 +140,7 @@ const DistributorsForm = () => {
             </Box>
           </Paper>
 
-          {/*  Bank Details Separate Component */}
+          {/*  Bank Details */}
           <Paper
             sx={{
               maxWidth: 800,
@@ -153,11 +153,11 @@ const DistributorsForm = () => {
           >
             <BankDetailsForm />
           </Paper>
-              {/* button - save and cancle */}
+              {/* button */}
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 6, }}>
             <Button 
               variant="outlined" 
-              onClick={() => navigate(URL_PATH.DistributorsPage)} // Go back without saving
+              onClick={() => navigate(URL_PATH.DistributorsPage)} 
               sx={{
                 color: "#238878",
                 border: "2px solid #238878",
@@ -183,7 +183,6 @@ const DistributorsForm = () => {
         </form>
       </FormProvider>    
 
-      {/* Success Notification Popup */}
       <AppToast
         open={toastOpen}
         message="Data saved successfully"
