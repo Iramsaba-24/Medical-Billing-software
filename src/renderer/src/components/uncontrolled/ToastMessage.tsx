@@ -46,7 +46,7 @@ export const showSnackbar = ( severity: MessageType = "info", message: string,du
         open={open}
         autoHideDuration={duration}
         onClose={() => setOpen(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert onClose={() => setOpen(false)} severity={severity} sx={{ width: "100%" }}>
           {message}

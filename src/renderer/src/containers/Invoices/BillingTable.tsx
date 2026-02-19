@@ -112,7 +112,9 @@ const BillingTable = ({ onCreate }: Props) => {
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 2 }}>
-        <Box mb={2} display="flex" justifyContent="space-between" alignItems="center">
+        <Box mb={2} display="flex" 
+        flexDirection={{xs:"column", md:"row"}}
+        justifyContent="space-between" alignItems="center">
           <Box width={220}>
             <DropdownField
               name="filterType"

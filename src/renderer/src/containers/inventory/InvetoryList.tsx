@@ -2,6 +2,8 @@ import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActi
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
+
 
 export type InventoryItem = {
   itemName: string;
@@ -38,6 +40,12 @@ const InventoryList = () => {
     const updated = tableData.filter((i) => i.itemId !== item.itemId);
     setTableData(updated);
     localStorage.setItem("inventory", JSON.stringify(updated));
+    showConfirmation("Delete item?", "Confirm").then((ok) => {
+      if (ok) {
+        setTableData(updated);
+        showSnackbar("success", "Item deleted successfully");
+      }
+    });
   };
 
   // status based on quantity
@@ -85,7 +93,7 @@ const InventoryList = () => {
             sx={{
               px: 4,
               py: 1,
-              width: { xs:"50%", md:"18%" },             
+              width: { xs:"50%", md:"20%" },             
               textTransform: "none",
               backgroundColor: "#1b7f6b",
             }}

@@ -1,295 +1,178 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
-  Card,
-  CardContent,
+  Paper,
   Typography,
-  Checkbox,
-  FormControlLabel,
-  Button,
-  Divider,
   Stack,
-  Radio,
+  Button,
   RadioGroup,
-  Snackbar,
-  Alert,
+  Radio,
 } from "@mui/material";
+import { useForm, FormProvider, Controller, useFormContext } from "react-hook-form";
+import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 
-type DoctorSettingsState = {
-  doctorName: boolean;
-  registrationNumber: boolean;
-  hospitalName: boolean;
-  mobile: boolean;
-  email: boolean;
-  showDoctorOnInvoice: boolean;
-  showDoctorOnPrescription: boolean;
+/* Same Card Style as Pharmacy Profile */
+const cardStyle = {
+  p: { xs: 2, md: 4 },
+  borderRadius: "5px",
+  boxShadow: 3,
+  mb: 1,
 };
 
-const defaultState: DoctorSettingsState = {
-  doctorName: false,
-  registrationNumber: false,
-  hospitalName: false,
-  mobile: false,
-  email: false,
-  showDoctorOnInvoice: false,
-  showDoctorOnPrescription: false,
+type DoctorsSettingsForm = {
+  mandatoryDetails: string[];
+  showDoctorOnInvoice: string;
+  showDoctorOnPrescription: string;
+};
+
+const defaultValues: DoctorsSettingsForm = {
+  mandatoryDetails: [],
+  showDoctorOnInvoice: "no",
+  showDoctorOnPrescription: "no",
+};
+
+const RightRadioRow = ({
+  name,
+  label,
+}: {
+  name: keyof DoctorsSettingsForm;
+  label: string;
+}) => {
+  const { control } = useFormContext();
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        py: 0.5,
+      }}
+    >
+      <Typography sx={{ fontWeight: 500 }}>
+        {label}
+      </Typography>
+
+      <Controller
+        name={name}
+        control={control}
+        render={({ field }) => (
+          <RadioGroup
+            row
+            value={field.value}
+            onChange={(e) => field.onChange(e.target.value)}
+            sx={{ m: 0 }}
+          >
+            <Radio value="yes" size="small" sx={{ p: 0.5 }} />
+          </RadioGroup>
+        )}
+      />
+    </Box>
+  );
 };
 
 const DoctorsSettings: React.FC = () => {
-  const [settings, setSettings] =
-    useState<DoctorSettingsState>(defaultState);
+  const methods = useForm<DoctorsSettingsForm>({
+    defaultValues,
+  });
 
-  const [openToast, setOpenToast] = useState(false);
+  const { handleSubmit, reset } = methods;
 
-  const handleCheckboxChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, checked } = event.target;
-    setSettings((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
-  const handleRadioChange = (
-    name: keyof DoctorSettingsState,
-    value: string
-  ) => {
-    setSettings((prev) => ({
-      ...prev,
-      [name]: value === "yes",
-    }));
-  };
-
-  const handleReset = () => {
-    setSettings(defaultState);
-  };
-
-  const handleSave = () => {
-    console.log("Saved Settings:", settings);
-    setOpenToast(true);
-  };
-
-  const handleCloseToast = (
-    event?: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
-    if (reason === "clickaway") return;
-    setOpenToast(false);
+  const onSubmit = (data: DoctorsSettingsForm) => {
+    console.log("Saved Settings:", data);
   };
 
   return (
-    <Box sx={{ p: { xs: 2, sm: 3 } }}>
-      <Typography variant="h5" fontWeight={600}>
-        Doctors Settings
-      </Typography>
+    <FormProvider {...methods}>
+      <Box sx={{ width: "100%", backgroundColor: "#f9f9f9" }}>
+        
+        {/* Page Heading */}
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 700, mb: { xs: 2, md: 4 } }}
+        >
+          Doctors Settings
+        </Typography>
 
-      <Typography variant="body2" color="text.secondary" mb={3}>
-        Manage prescriptions, referrals, and doctor visibility
-      </Typography>
-
-      {/* Doctor Details */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" mb={1}>
+        {/* CARD 1 : Mandatory Doctor Details */}
+        <Paper sx={cardStyle}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
             Mandatory Doctor Details
           </Typography>
 
-          <Divider sx={{ mb: 2 }} />
+          <CheckboxGroup
+            name="mandatoryDetails"
+            label=""
+            options={[
+              { label: "Doctor Name", value: "doctorName" },
+              { label: "Registration Number", value: "registrationNumber" },
+              { label: "Hospital / Clinic Name", value: "hospitalName" },
+              { label: "Mobile Number (Optional)", value: "mobile" },
+              { label: "Email ID (Optional)", value: "email" },
+            ]}
+          />
+        </Paper>
 
-          <Stack>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={settings.doctorName}
-                  name="doctorName"
-                  onChange={handleCheckboxChange}
-                />
-              }
-              label="Doctor Name"
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={settings.registrationNumber}
-                  name="registrationNumber"
-                  onChange={handleCheckboxChange}
-                />
-              }
-              label="Registration Number"
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={settings.hospitalName}
-                  name="hospitalName"
-                  onChange={handleCheckboxChange}
-                />
-              }
-              label="Hospital / Clinic Name"
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={settings.mobile}
-                  name="mobile"
-                  onChange={handleCheckboxChange}
-                />
-              }
-              label="Mobile Number (Optional)"
-            />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={settings.email}
-                  name="email"
-                  onChange={handleCheckboxChange}
-                />
-              }
-              label="Email ID (Optional)"
-            />
-          </Stack>
-        </CardContent>
-      </Card>
-
-      {/* Invoice & Prescription */}
-      <Card>
-        <CardContent>
-          <Typography variant="h6" mb={1}>
+        {/* CARD 2 : Invoice & Prescription */}
+        <Paper sx={cardStyle}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
             Invoice & Prescription Settings
           </Typography>
 
-          <Divider sx={{ mb: 2 }} />
+          <Stack spacing={1}>
+            <RightRadioRow
+              name="showDoctorOnInvoice"
+              label="Show doctor name on invoice"
+            />
 
-          <Stack spacing={2}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: { xs: "14px", sm: "15px", md: "16px" },
-                  fontWeight: 500,
-                }}
-              >
-                Show doctor name on invoice
-              </Typography>
-
-              <RadioGroup
-                row
-                value={settings.showDoctorOnInvoice ? "yes" : "no"}
-                onChange={(e) =>
-                  handleRadioChange(
-                    "showDoctorOnInvoice",
-                    e.target.value
-                  )
-                }
-              >
-                <Radio value="yes" />
-              </RadioGroup>
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: { xs: "14px", sm: "15px", md: "16px" },
-                  fontWeight: 500,
-                }}
-              >
-                Show doctor on prescription print
-              </Typography>
-
-              <RadioGroup
-                row
-                value={
-                  settings.showDoctorOnPrescription ? "yes" : "no"
-                }
-                onChange={(e) =>
-                  handleRadioChange(
-                    "showDoctorOnPrescription",
-                    e.target.value
-                  )
-                }
-              >
-                <Radio value="yes" />
-              </RadioGroup>
-            </Box>
+            <RightRadioRow
+              name="showDoctorOnPrescription"
+              label="Show doctor on prescription print"
+            />
           </Stack>
-        </CardContent>
-      </Card>
+        </Paper>
 
-      {/* Buttons */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          mt: 4,
-          gap: 4,
-        }}
-      >
-        <Button
-          variant="outlined"
-          onClick={handleReset}
-          sx={{
-            color: "#238878",
-            border: "2px solid #238878",
-            textTransform: "none",
-            "&:hover": {
+        {/* Buttons */}
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => reset()}
+            sx={{
+              color: "#238878",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+              },
+            }}
+          >
+            Reset
+          </Button>
+
+          <Button
+            type="submit"
+            variant="contained"
+            onClick={handleSubmit(onSubmit)}
+            sx={{
               backgroundColor: "#238878",
               color: "#fff",
-            },
-          }}
-        >
-          Reset
-        </Button>
-
-        <Button
-          variant="contained"
-          onClick={handleSave}
-          sx={{
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
-            },
-          }}
-        >
-          Save
-        </Button>
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
+          >
+            Save
+          </Button>
+        </Box>
       </Box>
-
-      <Snackbar
-        open={openToast}
-        autoHideDuration={3000}
-        onClose={handleCloseToast}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleCloseToast}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          Settings saved successfully!
-        </Alert>
-      </Snackbar>
-    </Box>
+    </FormProvider>
   );
 };
 

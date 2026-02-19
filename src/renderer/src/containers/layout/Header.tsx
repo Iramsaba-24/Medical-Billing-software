@@ -1,4 +1,4 @@
- 
+
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import {
@@ -24,7 +24,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
 import Setting, { SettingRef } from './Setting';
  
-const MINI_WIDTH = 80;
+const MINI_WIDTH = 90;
 const FULL_WIDTH = 240;
  
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -36,16 +36,17 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
    ...theme.mixins.toolbar,
  }));
  
-const SearchBox = styled(Box)(({ theme }) => ({
+const SearchBox = styled(Box)(() => ({
   display: 'flex',
   alignItems: 'center',
   backgroundColor: '#fff',
   borderRadius: 20,
   padding: '4px 12px',
-  width: 260,
-  [theme.breakpoints.down('sm')]: {
-    width: 160,
-  },
+  MaxWidth: 260,
+  width: '100%',
+  // [theme.breakpoints.down('sm')]: {
+  //   width: 160,
+  // },
 }));
  
 const menuItems = [
@@ -66,12 +67,13 @@ const Sidebar = ({ open }: { open: boolean }) => {
   const settingRef = React.useRef<SettingRef>(null);
  
   return (
-    <List sx={{ px: 1, mt: { xs: 2, md: 1 } }}>
+    <List sx={{ px: 1, mt: { xs: 6, md: 2 } }}>
       {menuItems.map((item) => {
-        const active = location.pathname === item.path;
-        const isSettings = item.text === 'Settings';
- 
-        return (
+        
+      const isSettings = item.text === 'Settings';
+      const active = isSettings ? location.pathname.startsWith(item.path) : location.pathname === item.path;
+       
+      return (
           <Tooltip key={item.text} title={!open ? item.text : ''} placement="right" arrow>
             <ListItem disablePadding sx={{ mb: 2 }}>
               <Button
@@ -123,25 +125,50 @@ const Header: React.FC = () => {
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <StyledAppBar position="fixed">
-        <Toolbar sx={{ gap: 2 }}>
-          <IconButton color="inherit" onClick={() => setOpen(!open)}>
-            <MenuIcon />
-          </IconButton>
-          <Typography sx={{ fontSize: { xs: 14, md: 22 }, flexGrow: 1 }}>
-            ERP Billing Software
-          </Typography>
-          <Home sx={{ cursor: "pointer" }} onClick={() => navigate(URL_PATH.Landing)} />
-          <SearchBox>
-            <SearchIcon sx={{ mr: 1, color: '#666' }} />
-            <InputBase placeholder="Search" fullWidth />
-          </SearchBox>
-          <IconButton color="inherit" onClick={() => navigate(-1)}>
-            <UndoRoundedIcon />
-          </IconButton>
-          <IconButton color="inherit" onClick={() => navigate(1)}>
-            <RedoRoundedIcon />
-          </IconButton>
-        </Toolbar>
+       <Toolbar
+        sx={{
+          gap: { xs: 1, md: 2 },
+          mb: 1.5,
+          flexWrap: 'wrap', 
+        }}
+      >
+      <IconButton color="inherit" onClick={() => setOpen(!open)}>
+        <MenuIcon />
+      </IconButton>
+      <Typography
+        sx={{
+          fontSize: { xs: 16, md: 22 },
+          flexGrow: 1,
+        }} >
+        ERP Billing Software
+      </Typography>
+
+      <Home
+        sx={{ cursor: "pointer" }}
+        onClick={() => navigate(URL_PATH.Landing)}
+      />
+
+      <Box
+        sx={{
+          width: { xs: '100%', md: 'auto' }, 
+          order: { xs: 1, md: 0 }, 
+        }}
+      >
+        <SearchBox>
+          <SearchIcon sx={{ mr: 1, color: '#666' }} />
+          <InputBase placeholder="Search" fullWidth />
+        </SearchBox>
+      </Box>
+
+      <IconButton color="inherit" onClick={() => navigate(-1)}>
+        <UndoRoundedIcon />
+      </IconButton>
+
+      <IconButton color="inherit" onClick={() => navigate(1)}>
+        <RedoRoundedIcon />
+      </IconButton>
+    </Toolbar>
+
       </StyledAppBar>
       <Drawer
         variant={isMobile ? 'temporary' : 'permanent'}
@@ -155,7 +182,7 @@ const Header: React.FC = () => {
             width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
             boxSizing: 'border-box',
-            //  overflowX: 'hidden',
+           
           },
         }}
       >
@@ -167,7 +194,8 @@ const Header: React.FC = () => {
           py: { xs: 9, md: 8 },
            mt: 3,
             px:{xs:1, sm:3, md:5},
-             height: "100vh"
+            //  height: "100vh"
+            overflowY: "auto"
               }}>
         <Outlet />
       </Box>

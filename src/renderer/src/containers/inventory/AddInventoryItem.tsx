@@ -5,6 +5,7 @@ import NumericField from "@/components/controlled/NumericField";
 import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 export type InventoryFormData = {
   itemName: string;
@@ -62,16 +63,16 @@ export default function AddInventoryItem() {
       status,
     };
 
-    localStorage.setItem(
-      "inventory",
+    localStorage.setItem("inventory",
       JSON.stringify([...existing, newItem])
     );
 
-    navigate("/inventory/inventory-list", { replace: true });
+    navigate(URL_PATH.InventoryList, { replace: true });
   };
 
   return (
-    <FormProvider {...methods}>
+  <FormProvider {...methods} >
+    <form onSubmit={methods.handleSubmit(onSubmit)}  noValidate>
   <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
     <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
       <Typography fontSize={20} fontWeight={600} mb={4}>
@@ -137,7 +138,7 @@ export default function AddInventoryItem() {
         <DateTimeField
           name="expiryDate"
           label="Expiry Date"
-          viewMode="date"
+          viewMode="year"
           required
         />
 
@@ -198,6 +199,7 @@ export default function AddInventoryItem() {
       </Box>
     </Paper>
   </Box>
+  </form>
 </FormProvider>
 );
 }
