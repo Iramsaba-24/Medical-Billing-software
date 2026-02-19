@@ -1,32 +1,53 @@
+import DropdownField from "@/components/controlled/DropdownField";
+import TextInputField from "@/components/controlled/TextInputField";
+import { URL_PATH } from "@/constants/UrlPath";
 import {
     Box,
     Button,
-    MenuItem,
     Paper,
-    Select,
-    TextField,
     Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-export default function AddMedicineGroup() {
+export interface AddMedicineGroupFormValues {
+    id: number;
+    groupName: string;
+    category: string;
+}
+
+const AddMedicineGroup = () => {
+    const methods = useForm<AddMedicineGroupFormValues>({
+        defaultValues: {
+            groupName: "",
+            category: "",
+        },
+    });
+
     const navigate = useNavigate();
 
-    const [groupName, setGroupName] = useState("");
-    const [category, setCategory] = useState("Medicines");
+    const onSubmit = (data: AddMedicineGroupFormValues) => {
+        const existingGroups = JSON.parse(
+            localStorage.getItem("medicineGroups") || "[]"
+        );
 
-    const handleSave = () => {
-        const payload = {
-            groupName,
-            category,
+        const newGroup = {
+            id: Date.now(),
+            groupName: data.groupName,
+            category: data.category,
         };
 
-        console.log("SAVE GROUP:", payload);
-       
+        localStorage.setItem(
+            "medicineGroups",
+            JSON.stringify([...existingGroups, newGroup])
+        );
+        navigate(URL_PATH.MedicineGroup);
     };
 
+
     return (
+        <FormProvider {...methods}>
+        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
         <Box display="flex" justifyContent="center" mt={4}>
             <Paper
                 elevation={3}
@@ -40,34 +61,27 @@ export default function AddMedicineGroup() {
                     Add New Group
                 </Typography>
 
-                <Box mb={3}>
-                    <Typography fontSize={14} mb={0.5}>
-                        Group Name
-                    </Typography>
-                    <TextField
-                        fullWidth
-                        size="small"
-                        placeholder="Enter group name"
-                        value={groupName}
-                        onChange={(e) => setGroupName(e.target.value)}
-                    />
-                </Box>
-
-                <Box mb={4}>
-                    <Typography fontSize={14} mb={0.5}>
-                        Category
-                    </Typography>
-                    <Select
-                        fullWidth
-                        size="small"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                    >
-                        <MenuItem value="Medicines">Medicines</MenuItem>
-                        <MenuItem value="Diabetes">Diabetes</MenuItem>
-                        <MenuItem value="Other">Other</MenuItem>
-                    </Select>
-                </Box>
+                    <Box display="flex" flexDirection="column" gap={3} mb={4}>  
+                        <TextInputField 
+                            name="groupName"
+                            label="Group Name"
+                            required
+                            inputType="all"
+                            rows={1}
+                        />
+                        <DropdownField
+                        name="category"
+                        label="Category"
+                        placeholder="Category"
+                        required
+                        options={[
+                            { label: "Medicines", value: "Medicines" },
+                            { label: "Equipment", value: "Equipment" },
+                            { label: "Supplies", value: "Supplies" },
+                            { label: "Other", value: "Other" },
+                        ]}
+                        />
+                    </Box>
 
                 <Box display="flex" justifyContent="flex-end" gap={2}>
                     <Button
@@ -77,8 +91,6 @@ export default function AddMedicineGroup() {
                             backgroundColor: "#fff",
                             color: "#238878",
                             border: "2px solid #238878",
-                            borderRadius: "10px",
-                            fontWeight: 600,
                             fontSize: "0.95rem",
                             textTransform: "none",
                             transition: "all 0.25s ease",
@@ -87,11 +99,9 @@ export default function AddMedicineGroup() {
                                 color: "#fff",
                                 border: "2px solid #238878",
                                 boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
-                                transform: "translateY(-1px)",
+                               
                             },
-                            "&:active": {
-                                transform: "scale(0.98)",
-                            },
+                    
                         }}
                         onClick={() => navigate(-1)}
                     >
@@ -99,14 +109,13 @@ export default function AddMedicineGroup() {
                     </Button>
 
                     <Button
+                    type="submit"
                         variant="contained"
                         sx={{
                             minWidth: 100,
                             backgroundColor: "#238878",
                             color: "#fff",
                             border: "2px solid #238878",
-                            borderRadius: "10px",
-                            fontWeight: 600,
                             fontSize: "0.95rem",
                             textTransform: "none",
                             transition: "all 0.25s ease",
@@ -117,16 +126,16 @@ export default function AddMedicineGroup() {
                                 boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
                                 transform: "translateY(-1px)",
                             },
-                            "&:active": {
-                                transform: "scale(0.98)",
-                            },
                         }}
-                        onClick={handleSave}
                     >
                         Save
                     </Button>
                 </Box>
             </Paper>
         </Box>
+        </form>
+        </FormProvider>
     );
 }
+
+export default AddMedicineGroup;

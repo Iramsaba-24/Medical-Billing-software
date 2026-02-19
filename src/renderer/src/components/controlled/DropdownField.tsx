@@ -9,7 +9,8 @@ import {
   type Theme,
   Autocomplete,
   type AutocompleteRenderInputParams,
-  MenuItem
+  MenuItem,
+  TextFieldProps
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import { getComponentTranslations } from '@/helpers/useTranslations';
@@ -21,7 +22,7 @@ type Option = {
   value: string;
 };
 
-type DropdownFieldProps = {
+type DropdownFieldProps = TextFieldProps & {
   label?: string;
   name: string;
   options: Option[];
@@ -46,7 +47,8 @@ const DropdownField: FC<DropdownFieldProps> = ({
   freeSolo = true,
   placeholder,
   floatLabel = false,
-  isStatic=  false
+  isStatic=  false,
+  ...rest
 }) => {
   const { t } = useTranslation();
   const translations = getComponentTranslations(t);
@@ -134,6 +136,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
               }}
               renderInput={(params: AutocompleteRenderInputParams) => (
                 <TextField
+                  {...rest}
                   {...params}
                   {...field}
                   inputRef={ref}
