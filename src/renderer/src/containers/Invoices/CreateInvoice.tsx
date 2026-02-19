@@ -8,19 +8,21 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import TextInputField from "@/components/controlled/TextInputField";
+import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+// import TextInputField from "@/components/controlled/TextInputField";
 import NumericField from "@/components/controlled/NumericField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
 type InvoiceItem = {
   item: string;
   qty: number;
   price: number;
+  unitPrice:number;
 };
 
 type InvoiceFormData = {
@@ -31,6 +33,56 @@ type InvoiceFormData = {
 };
 
 const CreateInvoice = () => {
+
+  type CustomerOption = {
+  label: string;
+  value: string;
+};
+
+// fetch data from local storage(custemoer list)
+const [customerOptions, setCustomerOptions] = useState<CustomerOption[]>([]);
+useEffect(() => {
+  const stored = localStorage.getItem("medical_customers");
+  if (!stored) return;
+
+  const parsed = JSON.parse(stored);
+
+  const formatted: CustomerOption[] = parsed.map((cust: { name: string }) => ({
+    label: cust.name,
+    value: cust.name,
+  }));
+
+  setCustomerOptions(formatted);
+}, []);
+
+type InventoryOption = {
+  label: string;
+  value: string;
+  price: number;
+};
+
+// fetch data from local storage(inventory list)
+const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>([]);
+useEffect(() => {
+  const stored = localStorage.getItem("inventory");
+  if (!stored) return;
+
+  const parsed = JSON.parse(stored);
+
+  const formatted: InventoryOption[] = parsed.map(
+    (item: {
+      itemName: string;
+      pricePerUnit: number;
+    }) => ({
+      label: item.itemName,
+      value: item.itemName,
+      price: item.pricePerUnit,
+    })
+  );
+
+  setInventoryOptions(formatted);
+}, []);
+
   const navigate = useNavigate();
 
   const methods = useForm<InvoiceFormData>({
@@ -38,17 +90,33 @@ const CreateInvoice = () => {
       patient: "",
       date: "",
       status: "Pending",
-      items: [{ item: "", qty: 1, price: 0 }],
+      items: [{ item: "", qty: 1, price: 0,unitPrice:0 }],
     },
   });
-
+  
   const { control, handleSubmit } = methods;
-
   const { fields, append, remove } = useFieldArray({
     control,
     name: "items",
   });
 
+  //use update the price according to quantity and unit price
+  const {setValue } = methods;
+  const watchedItems = useWatch({
+    control,
+    name: "items",
+  });
+  useEffect(() => {
+    watchedItems?.forEach((item, index) => {
+      const total = Number(item.qty || 0) * Number(item.unitPrice || 0);
+
+      if (item.price !== total) {
+        setValue(`items.${index}.price`, total);
+      }
+    });
+  }, [watchedItems, setValue]);
+
+  // dropdown for status
   const statusOptions = [
     { label: "Paid", value: "Paid" },
     { label: "Pending", value: "Pending" },
@@ -56,32 +124,37 @@ const CreateInvoice = () => {
   ];
 
   const onSubmit = (data: InvoiceFormData) => {
-    const totalPrice = data.items.reduce(
-      (sum, item) => sum + item.qty * item.price,
-      0
-    );
+  const totalPrice = data.items.reduce(
+    (sum, item) => sum + item.price,0
+  );
 
-    const formattedDate = dayjs(data.date).format("DD-MM-YYYY");
+  const formattedDate = dayjs(data.date).format("YYYY-MM-DD");
 
-    const newInvoice = {
-      invoice: `INV-${Date.now()}`,
-      patient: data.patient,
-      date: formattedDate,
-      price: totalPrice,
-      status: data.status,
-      medicines: data.items.map((item) => ({
-        name: item.item,
-        batch: "-",
-        expiry: "-",
-        qty: `${item.qty}`,
-        amount: item.price,
-      })),
-    };
-
-    navigate(URL_PATH.Invoices, {
-      state: newInvoice,
-    });
+  const newInvoice = {
+    invoice: `INV-${Date.now()}`,
+    patient: data.patient,
+    date: formattedDate,
+    price: totalPrice,
+    status: data.status,
+    medicines: data.items.map((item) => ({
+      name: item.item,
+      batch: "-",
+      expiry: "-",
+      qty: `${item.qty}`,
+      amount: item.price,
+    })),
   };
+
+  const stored = localStorage.getItem("invoiceList");
+  const existingInvoices = stored ? JSON.parse(stored) : [];
+
+  const updatedInvoices = [newInvoice, ...existingInvoices];
+
+  localStorage.setItem("invoiceList", JSON.stringify(updatedInvoices));
+
+  navigate(URL_PATH.Invoices);
+};
+
 
   return (
     <FormProvider {...methods}>
@@ -91,12 +164,13 @@ const CreateInvoice = () => {
         </Typography>
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <TextInputField
-            name="patient"
-            label="Patient Name"
-            required
-            fullWidth
-          />
+        <DropdownField
+          name="patient"
+          label="Patient"
+          options={customerOptions}
+          placeholder="Patient Name"
+        />
+
           <DateTimeField
             name="date"
             viewMode="date"
@@ -119,44 +193,76 @@ const CreateInvoice = () => {
           </Typography>
 
           {fields.map((field, index) => (
-            <Stack
-              key={field.id}
-              direction="row"
-              spacing={2}
-              alignItems="center"
-              mb={2}
+          <Stack
+          key={field.id}
+          direction={{ xs: "column", sm: "row" }}
+          spacing={2}
+          alignItems={{ xs: "stretch", sm: "center" }}
+          mb={2}
+        >
+          {/* Dropdown */}
+          <DropdownField
+            name={`items.${index}.item`}
+            label="Item"
+            options={inventoryOptions}
+            fullWidth
+            freeSolo={false}
+            placeholder="Item Name"
+            onChangeCallback={(selected) => {
+              const selectedItem = inventoryOptions.find(
+                (inv) => inv.value === selected
+              );
+
+              if (selectedItem) {
+                methods.setValue(`items.${index}.unitPrice`, selectedItem.price)
+                methods.setValue(`items.${index}.price`, selectedItem.price)
+                // methods.setValue(
+                  // `items.${index}.price`,
+                  // selectedItem.price
+                // );
+              }
+            }}
+          />
+
+          {/* Bottom Row (Qty + Price + Icons) */}
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{
+              width: { xs: "100%", sm: "auto" },
+              justifyContent: { xs: "space-between", sm: "flex-start" },
+            }}
+          >
+            <NumericField
+              name={`items.${index}.qty`}
+              label="Qty"
+              sx={{ width: { xs: "30%", sm: 100 } }}
+            />
+
+            <NumericField
+              name={`items.${index}.price`}
+              label="Price"
+              sx={{ width: { xs: "40%", sm: 140 } }}
+              inputProps={{readOnly:true}}
+            />
+
+            <IconButton
+              color="error"
+              disabled={fields.length === 1}
+              onClick={() => remove(index)}
             >
-              <TextInputField
-                name={`items.${index}.item`}
-                label="Item"
-                fullWidth
-              />
-              <NumericField
-                name={`items.${index}.qty`}
-                label="Qty"
-                sx={{ width: 100 }}
-              />
-              <NumericField
-                name={`items.${index}.price`}
-                label="Price"
-                sx={{ width: 140 }}
-              />
+              <RemoveIcon />
+            </IconButton>
 
-              <IconButton
-                color="error"
-                disabled={fields.length === 1}
-                onClick={() => remove(index)}
-              >
-                <RemoveIcon />
-              </IconButton>
-
-              <IconButton
-                color="success"
-                onClick={() => append({ item: "", qty: 1, price: 0 })}
-              >
-                <AddIcon />
-              </IconButton>
-            </Stack>
+            <IconButton
+              color="success"
+              onClick={() => append({ item: "", qty: 1, price: 0, unitPrice: 0 })}
+            >
+              <AddIcon />
+            </IconButton>
+          </Stack>
+        </Stack>
           ))}
         </Box>
 
