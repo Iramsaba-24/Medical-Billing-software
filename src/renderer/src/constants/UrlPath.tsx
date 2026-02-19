@@ -46,4 +46,6 @@ export const URL_PATH = {
   MediPoints: "/billing/medi-points",
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
+ 
+  DoctorsSettings: "/settings/doctors-settings"
 };

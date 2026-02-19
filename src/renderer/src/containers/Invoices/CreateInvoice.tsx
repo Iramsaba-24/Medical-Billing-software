@@ -1,3 +1,4 @@
+
 import {
   Paper,
   Button,
@@ -9,13 +10,15 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import TextInputField from "@/components/controlled/TextInputField";
+// import TextInputField from "@/components/controlled/TextInputField";
 import NumericField from "@/components/controlled/NumericField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
+
 
 type InvoiceItem = {
   item: string;
@@ -31,6 +34,54 @@ type InvoiceFormData = {
 };
 
 const CreateInvoice = () => {
+
+  type CustomerOption = {
+  label: string;
+  value: string;
+};
+
+const [customerOptions, setCustomerOptions] = useState<CustomerOption[]>([]);
+useEffect(() => {
+  const stored = localStorage.getItem("medical_customers");
+  if (!stored) return;
+
+  const parsed = JSON.parse(stored);
+
+  const formatted: CustomerOption[] = parsed.map((cust: { name: string }) => ({
+    label: cust.name,
+    value: cust.name,
+  }));
+
+  setCustomerOptions(formatted);
+}, []);
+
+type InventoryOption = {
+  label: string;
+  value: string;
+  price: number;
+};
+
+const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>([]);
+useEffect(() => {
+  const stored = localStorage.getItem("inventory");
+  if (!stored) return;
+
+  const parsed = JSON.parse(stored);
+
+  const formatted: InventoryOption[] = parsed.map(
+    (item: {
+      itemName: string;
+      pricePerUnit: number;
+    }) => ({
+      label: item.itemName,
+      value: item.itemName,
+      price: item.pricePerUnit,
+    })
+  );
+
+  setInventoryOptions(formatted);
+}, []);
+
   const navigate = useNavigate();
 
   const methods = useForm<InvoiceFormData>({
@@ -56,32 +107,38 @@ const CreateInvoice = () => {
   ];
 
   const onSubmit = (data: InvoiceFormData) => {
-    const totalPrice = data.items.reduce(
-      (sum, item) => sum + item.qty * item.price,
-      0
-    );
+  const totalPrice = data.items.reduce(
+    (sum, item) => sum + item.qty * item.price,
+    0
+  );
 
-    const formattedDate = dayjs(data.date).format("DD-MM-YYYY");
+  const formattedDate = dayjs(data.date).format("YYYY-MM-DD");
 
-    const newInvoice = {
-      invoice: `INV-${Date.now()}`,
-      patient: data.patient,
-      date: formattedDate,
-      price: totalPrice,
-      status: data.status,
-      medicines: data.items.map((item) => ({
-        name: item.item,
-        batch: "-",
-        expiry: "-",
-        qty: `${item.qty}`,
-        amount: item.price,
-      })),
-    };
-
-    navigate(URL_PATH.Invoices, {
-      state: newInvoice,
-    });
+  const newInvoice = {
+    invoice: `INV-${Date.now()}`,
+    patient: data.patient,
+    date: formattedDate,
+    price: totalPrice,
+    status: data.status,
+    medicines: data.items.map((item) => ({
+      name: item.item,
+      batch: "-",
+      expiry: "-",
+      qty: `${item.qty}`,
+      amount: item.price,
+    })),
   };
+
+  const stored = localStorage.getItem("invoiceList");
+  const existingInvoices = stored ? JSON.parse(stored) : [];
+
+  const updatedInvoices = [newInvoice, ...existingInvoices];
+
+  localStorage.setItem("invoiceList", JSON.stringify(updatedInvoices));
+
+  navigate(URL_PATH.Invoices);
+};
+
 
   return (
     <FormProvider {...methods}>
@@ -91,12 +148,13 @@ const CreateInvoice = () => {
         </Typography>
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-          <TextInputField
-            name="patient"
-            label="Patient Name"
-            required
-            fullWidth
-          />
+        <DropdownField
+          name="patient"
+          label="Patient"
+          options={customerOptions}
+          placeholder="Patient Name"
+        />
+
           <DateTimeField
             name="date"
             viewMode="date"
@@ -126,12 +184,27 @@ const CreateInvoice = () => {
               alignItems="center"
               mb={2}
             >
-              <TextInputField
-                name={`items.${index}.item`}
-                label="Item"
-                placeholder="Item Name"
-                fullWidth
-              />
+<DropdownField
+  name={`items.${index}.item`}
+  label="Item"
+  options={inventoryOptions}
+  fullWidth
+  freeSolo={false}
+  placeholder="Item Name"
+  onChangeCallback={(selected) => {
+    const selectedItem = inventoryOptions.find(
+      (inv) => inv.value === selected
+    );
+
+    if (selectedItem) {
+      methods.setValue(
+        `items.${index}.price`,
+        selectedItem.price
+      );
+    }
+  }}
+/>
+
               <NumericField
                 name={`items.${index}.qty`}
                 label="Qty"

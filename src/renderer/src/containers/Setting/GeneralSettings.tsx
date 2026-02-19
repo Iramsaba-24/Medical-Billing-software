@@ -188,8 +188,8 @@ function GenralSettings() {
             </Box>
           </Box>
 
-           {/* Button: Reset & Submit*/}
-        <Box  sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+        {/* Button: Reset & Submit*/}
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
           <Button
             type="button"
             variant="outlined"

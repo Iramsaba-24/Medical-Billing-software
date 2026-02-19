@@ -179,7 +179,7 @@ const Cards: React.FC = () => {
                     <DropdownField
                       name="filter"
                       options={filterOptions}
-                      //isStatic={true}
+                      isStatic={true}
                       onChangeCallback={handleFilterChange(index)}
                     />
                   </Box>

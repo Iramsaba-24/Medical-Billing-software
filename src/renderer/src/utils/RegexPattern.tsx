@@ -24,9 +24,9 @@ export const TextRegexPattern = {
     message: 'Only alphabets and spaces are allowed.'
   },
   alphanumeric: {
-    regex: /^[a-zA-Z0-9@._]*$/,
-    allowed: /[a-zA-Z0-9@._]/g,
-    message: 'Only alphabets and numbers are allowed.'
+    regex: /^[a-zA-Z0-9@_#$.*-]*$/,
+    allowed: /[a-zA-Z0-9@_#$.*-]/g,
+    message: 'Only alphabets, numbers and symbols (@ _ # $ . * -) are allowed.'
   },
   textarea: {
     regex: /^[\x20-\x7E\r\n]+$/,

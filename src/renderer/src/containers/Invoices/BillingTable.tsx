@@ -1,5 +1,6 @@
+
 import { useEffect, useState } from "react";
-import { Box, Paper, Button } from "@mui/material";
+import { Box, Paper, Button, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -24,30 +25,22 @@ const BillingTable = ({ onCreate }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [invoices, setInvoices] = useState<Invoice[]>([
-    {
-      invoice: "INV-001",
-      patient: "Rajesh Kumar",
-      date: "8/15/2026",
-      price: 2500,
-      status: "Paid",
-      medicines: [
-        { name: "Pantosec D", batch: "14044008", expiry: "10/26", qty: "6xTAB", amount: 91.2 },
-        { name: "Nucoxia PY", batch: "1405019", expiry: "09/26", qty: "6xTAB", amount: 102 },
-      ],
-    },
-    {
-      invoice: "INV-002",
-      patient: "Priya Singh",
-      date: "12/20/2026",
-      price: 5400,
-      status: "Pending",
-      medicines: [
-        { name: "Pantosec DO", batch: "14044008", expiry: "10/26", qty: "6xTAB", amount: 91.2 },
-        { name: "Nucoxia P", batch: "1405019", expiry: "09/26", qty: "6xTAB", amount: 102 },
-      ],
-    },
-  ]);
+  // invoice local storage
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  useEffect(() => {
+  const stored = localStorage.getItem("invoiceList");
+  const parsed = stored ? JSON.parse(stored) : [];
+
+  const safeData = parsed.map((inv: Invoice) => ({
+    ...inv,
+    medicines: inv.medicines.map((med) => ({
+      ...med,
+      amount: Number(med.amount),
+    })),
+  }));
+
+  setInvoices(safeData);
+}, []);
 
   useEffect(() => {
     if (location.state) {
@@ -112,17 +105,19 @@ const BillingTable = ({ onCreate }: Props) => {
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 2 }}>
+                <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
+          Invoice List
+        </Typography>
         <Box mb={2} display="flex" 
         flexDirection={{xs:"column", md:"row"}}
         justifyContent="space-between" alignItems="center">
-          <Box width={160}>
+          <Box width={220}>
             <DropdownField
               name="filterType"
               label="Filter"
               options={filterOptions}
               freeSolo={false}
               onChangeCallback={(value) => setFilterType(value as FilterType)}
-              isStatic={true}
             />
           </Box>
 
@@ -144,7 +139,6 @@ const BillingTable = ({ onCreate }: Props) => {
         <UniversalTable<Invoice>
           data={filteredInvoices}
           columns={columns}
-          caption="Billing Invoices"
           showSearch
           showExport
           enableCheckbox

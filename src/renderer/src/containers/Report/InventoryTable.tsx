@@ -1,131 +1,231 @@
- import { useState, useMemo } from "react";
-import { Box, Chip, Typography, MenuItem, Select, FormControl, Stack, Paper, Divider } from "@mui/material";
+
+import { useState, useMemo, useEffect } from "react";
+import { Box, Chip, Typography, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 
-// Define the data structure 
+import { useForm, FormProvider } from "react-hook-form";
+import DropdownField from "@/components/controlled/DropdownField"; 
+
+//  TYPES
+
 type InventoryItem = {
-  id: string;
-  item: string;
-  category: "Medicine" | "Supplies";
-  stock: string;
-  reorder: number;
+  itemName: string;
+  itemId: string;
+  medicineGroup: string;
+  stockQty: number;
+  pricePerUnit: number;
+  expiryDate: string;
   supplier: string;
-  expiryDate: string; 
-  status: string;
+  status: "In Stock" | "Low Stock" | "Out of Stock";
 };
 
-// Sample data for stock levels and expiry
-const inventoryData: InventoryItem[] = [
-  { id: "101", item: "Paracetamol 500mg", category: "Medicine", stock: "20 Tablets", reorder: 100, supplier: "MediSupply Co.", expiryDate: "08/15/2026", status: "Low Stock" },
-  { id: "102", item: "Syringes (5ml)", category: "Supplies", stock: "150 Units", reorder: 200, supplier: "MedEquip Inc.", expiryDate: "01/15/2027", status: "Low Stock" },
-  { id: "201", item: "Insulin Injection", category: "Medicine", stock: "10 Vials", reorder: 30, supplier: "MediSupply Co.", expiryDate: "01/25/2026", status: "Near Expiry" },
-  { id: "202", item: "Cough Syrup", category: "Medicine", stock: "45 Bottles", reorder: 100, supplier: "PharmaCare Ltd.", expiryDate: "01/29/2026", status: "Near Expiry" },
-  { id: "301", item: "Surgical Gloves", category: "Supplies", stock: "100 Pairs", reorder: 500, supplier: "MedEquip Inc.", expiryDate: "10/12/2025", status: "Expired" },
-  { id: "302", item: "Antibiotics (Amoxicillin)", category: "Medicine", stock: "12 Capsules", reorder: 50, supplier: "PharmaCare Ltd.", expiryDate: "11/20/2025", status: "Expired" },
-  { id: "401", item: "Vitamin C", category: "Medicine", stock: "80 Tablets", reorder: 200, supplier: "MediSupply Co.", expiryDate: "01/27/2026", status: "Near Expiry" },
-];
+// ADDED (Form type for filters)
+type FilterForm = {
+  stockStatus: string;
+  timeFilter: string;
+};
 
 function InventoryTable() {
-  // States to track the selected Stock and Time filters
-  const [stockStatus, setStockStatus] = useState("All");
-  const [timeFilter, setTimeFilter] = useState("All Time");
+  const [inventoryData, setInventoryData] = useState<InventoryItem[]>([]);
 
-  // Filtering data logic
+  // REMOVED useState filters
+  // const [stockStatus, setStockStatus] = useState("All");
+  // const [timeFilter, setTimeFilter] = useState("All Time");
+
+  //  ADDED React Hook Form
+  const methods = useForm<FilterForm>({
+    defaultValues: {
+      stockStatus: "All",
+      timeFilter: "All Time",
+    },
+  });
+
+  const { watch } = methods;
+
+  //  ADDED (watch filter values)
+  const stockStatus = watch("stockStatus");
+  const timeFilter = watch("timeFilter");
+
+  // LOAD INVENTORY 
+
+  useEffect(() => {
+    const loadInventory = () => {
+      const storedInventory: InventoryItem[] = JSON.parse(
+        localStorage.getItem("inventory") || "[]"
+      );
+      setInventoryData(storedInventory);
+    };
+
+    loadInventory();
+
+    window.addEventListener("inventoryUpdated", loadInventory);
+
+    return () => {
+      window.removeEventListener("inventoryUpdated", loadInventory);
+    };
+  }, []);
+
+  // FILTER LOGIC 
+
   const filteredData = useMemo(() => {
     return inventoryData.filter((item) => {
-      // Filter by stock status (Low/Expired etc)
-      const matchesStock = stockStatus === "All" || item.status === stockStatus;
-      
+      const matchesStock =
+        stockStatus === "All" || item.status === stockStatus;
+
       const itemDate = new Date(item.expiryDate);
       const today = new Date();
       let matchesTime = true;
 
       if (timeFilter === "This Month") {
-        matchesTime = itemDate.getMonth() === today.getMonth() && itemDate.getFullYear() === today.getFullYear();
+        matchesTime =
+          itemDate.getMonth() === today.getMonth() &&
+          itemDate.getFullYear() === today.getFullYear();
       } else if (timeFilter === "6 Days") {
-        // Show items expiring in the next 6 days
         const sixDaysLater = new Date();
         sixDaysLater.setDate(today.getDate() + 6);
         matchesTime = itemDate >= today && itemDate <= sixDaysLater;
       }
+
       return matchesStock && matchesTime;
     });
-  }, [stockStatus, timeFilter]);
+  }, [inventoryData, stockStatus, timeFilter]);
 
-  // Define columns and design how cells look
+  // DROPDOWN OPTIONS 
+
+  // ADDED
+  const stockOptions = [
+    { label: "All Stock", value: "All" },
+    { label: "Low Stock", value: "Low Stock" },
+    { label: "In Stock", value: "In Stock" },
+    { label: "Out of Stock", value: "Out of Stock" },
+  ];
+
+  //  ADDED
+  const timeOptions = [
+    { label: "All Time", value: "All Time" },
+    { label: "Next 6 Days", value: "6 Days" },
+    { label: "This Month", value: "This Month" },
+  ];
+
+  //  TABLE COLUMNS (UNCHANGED) 
+
   const columns: Column<InventoryItem>[] = [
-    { key: "item", label: "Item",
+    {
+      key: "itemName",
+      label: "Item",
       render: (row) => (
         <Box>
-          <Typography sx={{ fontSize: "0.9rem", fontWeight: 500 }}>{row.item}</Typography>
-          <Typography sx={{ fontSize: "0.7rem", color: "#9e9e9e" }}>ID: {row.id}</Typography>
+          <Typography sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
+            {row.itemName}
+          </Typography>
+          <Typography sx={{ fontSize: "0.7rem", color: "#9e9e9e" }}>
+            ID: {row.itemId}
+          </Typography>
         </Box>
       ),
     },
-    { key: "category", label: "Category",
-      // Show category as a colored badge (Chip)
+    {
+      key: "medicineGroup",
+      label: "Medicine Group",
       render: (row) => (
-        <Chip label={row.category} size="small"
-          sx={{ bgcolor: row.category === "Medicine" ? "#d1fae5" : "#e0f2fe", color: "#065f46", fontWeight: 600 }}
+        <Chip
+          label={row.medicineGroup}
+          size="small"
+          sx={{ bgcolor: "#d1fae5", color: "#065f46", fontWeight: 600 }}
         />
       ),
     },
-    { key: "stock", label: "Stock",
+    {
+      key: "stockQty",
+      label: "Stock",
       render: (row) => (
         <Box>
-          <Typography sx={{ fontSize: "0.9rem" }}>{row.stock}</Typography>
-          <Typography sx={{ fontSize: "0.7rem", color: "#9e9e9e" }}>Reorder at: {row.reorder}</Typography>
+          <Typography sx={{ fontSize: "0.9rem" }}>
+            {row.stockQty}
+          </Typography>
+          <Typography sx={{ fontSize: "0.7rem", color: "#9e9e9e" }}>
+            Price/unit: ₹{row.pricePerUnit}
+          </Typography>
         </Box>
       ),
     },
     { key: "supplier", label: "Supplier" },
     { key: "expiryDate", label: "Expiry Date" },
-    { key: "status", label: "Status",
-      // Color coding for urgency (Red for Expired, Yellow for Near Expiry)
+    {
+      key: "status",
+      label: "Status",
       render: (row) => {
-        const statusColor = row.status === "Expired" ? "#ef4444" : row.status === "Near Expiry" ? "#eab308" : "#f97316"; 
-        return <Typography sx={{ color: statusColor, fontWeight: 600, fontSize: "0.85rem" }}>{row.status}</Typography>;
+        const statusColor =
+          row.status === "Out of Stock"
+            ? "#ef4444"
+            : row.status === "Low Stock"
+            ? "#f97316"
+            : "#16a34a";
+        return (
+          <Typography
+            sx={{
+              color: statusColor,
+              fontWeight: 600,
+              fontSize: "0.85rem",
+            }}
+          >
+            {row.status}
+          </Typography>
+        );
       },
     },
   ];
 
   return (
-    <Paper sx={{ p: 3, borderRadius: 2 }}>
-      <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-        Inventory Stock Report
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+    // ADDED (Required for DropdownField)
+    <FormProvider {...methods}>
+      <Paper sx={{ p: 3, borderRadius: 2 }}>
+        <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+          Inventory Stock Report
+        </Typography>
 
-      {/* Dropdown Filters */}
-      <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-        <FormControl size="small">
-          <Select value={stockStatus} onChange={(e) => setStockStatus(e.target.value)} sx={{ minWidth: 140, borderRadius: "8px" }}>
-            <MenuItem value="All">All Stock</MenuItem>
-            <MenuItem value="Low Stock">Low Stock</MenuItem>
-            <MenuItem value="Near Expiry">Near Expiry</MenuItem>
-            <MenuItem value="Expired">Expired</MenuItem>
-          </Select>
-        </FormControl>
-        <FormControl size="small">
-          <Select value={timeFilter} onChange={(e) => setTimeFilter(e.target.value)} sx={{ minWidth: 140, borderRadius: "8px" }}>
-            <MenuItem value="All Time">All Time</MenuItem>
-            <MenuItem value="6 Days">Next 6 Days</MenuItem>
-            <MenuItem value="This Month">This Month</MenuItem>
-          </Select>
-        </FormControl>
-      </Stack>
+        <Divider sx={{ mb: 3 }} />
 
-      {/* reusable Table */}
-      <UniversalTable<InventoryItem> 
-        data={filteredData} 
-        columns={columns} 
-        showSearch 
-        showExport 
-        enableCheckbox 
-        rowsPerPage={5} 
-        getRowId={(row) => row.id} 
-      />
-    </Paper>
+        {/* REPLACED Select with DropdownField */}
+        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
+
+          {/* Stock Filter */}
+          <DropdownField
+            name="stockStatus"
+            label="Stock Status"
+            options={stockOptions}
+            isStatic     // behaves like Select
+            freeSolo={false}
+            floatLabel
+            
+          />
+
+          {/* Time Filter */}
+          <DropdownField
+            name="timeFilter"
+            label="Expiry Filter"
+            options={timeOptions}
+            isStatic
+            freeSolo={false}
+            floatLabel
+            
+          />
+
+        </Stack>
+
+        <UniversalTable<InventoryItem>
+          data={filteredData}
+          columns={columns}
+          showSearch
+          showExport
+          enableCheckbox
+          rowsPerPage={5}
+          getRowId={(row) => row.itemId}
+        />
+      </Paper>
+    </FormProvider>
   );
 }
+
 export default InventoryTable;
+

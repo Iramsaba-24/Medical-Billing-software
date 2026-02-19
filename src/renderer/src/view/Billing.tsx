@@ -1,16 +1,16 @@
 import { Box, Button, Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { useState } from "react"; 
+import { useState } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/customer/ItemsSection";
+import ItemsSection from "@/containers/Customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
-import RetailInvoice from "@/containers/billing/RetailInvoice"; 
-
+import RetailInvoice from "@/containers/billing/RetailInvoice";
+ 
 // Payprint button reuse sx
 const PayNPrint = {
   backgroundColor: "#238878",
@@ -25,7 +25,7 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-
+ 
 type NewInvoiceFormValues = {
   name: string;
   age: string;
@@ -36,13 +36,13 @@ type NewInvoiceFormValues = {
   addressLeft: string;
   addressRight: string;
 };
-
+ 
 const doctorOptions = [
   { label: "Dr. Amit Sharma", value: "amit_sharma" },
   { label: "Dr. Sneha Patil", value: "sneha_patil" },
   { label: "Dr. Rahul Mehta", value: "rahul_mehta" },
 ];
-
+ 
 function POSMaster() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,14 +58,14 @@ function POSMaster() {
       addressRight: "",
     },
   });
-
+ 
  
   const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
   const isRetail = activeTab === "retail";
-  
-
+ 
+ 
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
-
+ 
   const invoiceButtonSx = (isActive: boolean) => ({
     backgroundColor: isActive ? "#fff" : "#238878",
     color: isActive ? "#238878" : "#fff",
@@ -79,33 +79,33 @@ function POSMaster() {
       border: "2px solid #238878",
     },
   });
-
+ 
   const onSubmit = (data: NewInvoiceFormValues) => {
     console.log(data);
     navigate(URL_PATH.MediPoints);
   };
-
+ 
   type ItemRow = {
     id: number;
     name: string;
     qty: number | "";
     price: number | "";
   };
-
+ 
   const [rows, setRows] = useState<ItemRow[]>([
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
-
+ 
   const [gst, setGst] = useState(5);
   const [paymentMode, setPaymentMode] = useState("Cash");
-
+ 
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
     0
   );
-
+ 
   const finalTotal = subTotal + (subTotal * gst) / 100;
-
+ 
   return (
     <FormProvider {...methods}>
       {/* New Invoice */}
@@ -131,13 +131,13 @@ function POSMaster() {
       >
         New Invoice
       </Button>
-
+ 
       {/* Retail Invoice */}
       <Button
         onClick={() => {
           if (location.pathname !== URL_PATH.RetailInvoice) {
             navigate(URL_PATH.RetailInvoice);
-          } 
+          }
         }}
         sx={{
           textTransform: "none",
@@ -155,7 +155,7 @@ function POSMaster() {
       >
         Retail Invoice
       </Button>
-
+ 
       {isRetail ? (
         <RetailInvoice />
       ) : (
@@ -167,7 +167,7 @@ function POSMaster() {
             p: 2,
             backgroundColor: "#fff",
           }}>
-
+ 
           <Box
             display="flex"
             gap={1.5}
@@ -180,7 +180,7 @@ function POSMaster() {
             {Array.from({ length: 10 }, (_, i) => {
               const invoiceNumber = i + 1;
               const isActive = String(invoiceNumber) === activeInvoice;
-
+ 
               return (
                 <Button
                   key={invoiceNumber}
@@ -199,7 +199,7 @@ function POSMaster() {
               );
             })}
           </Box>
-
+ 
           <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
             <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3}>
               {/* inner box */}
@@ -223,12 +223,12 @@ function POSMaster() {
                         inputType="alphabet"
                       />
                     </Box>
-
+ 
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <NumericField name="age" label="Age" maxlength={3}/>
                     </Box>
                   </Box>
-
+ 
                   <Box
                     display="flex"
                     gap={2}
@@ -237,7 +237,7 @@ function POSMaster() {
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <MobileField name="mobile" label="Mobile Number" required />
                     </Box>
-
+ 
                     <Box width={{ xs: "100%", sm: "260px" }}>
   <TextInputField
     name="email"
@@ -252,9 +252,9 @@ function POSMaster() {
     }}
   />
 </Box>
-
+ 
                   </Box>
-
+ 
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
                     <TextInputField
                       name="addressLeft"
@@ -281,13 +281,13 @@ function POSMaster() {
                       placeholder="Doctor"
                     />
                   </Box>
-
+ 
                   <Box width={{ xs: "100%", sm: "260px" }}>
                   <TextInputField
                     name="reference"
                     label="New Reference"
-                    inputType="alphanumeric"   
-                    minLength={3}     
+                    inputType="alphanumeric"  
+                    minLength={3}    
                     maxLength={50}    
                     rules={{
                       pattern: {
@@ -297,7 +297,7 @@ function POSMaster() {
                     }}
                   />
                   </Box>
-
+ 
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <TextInputField
                       name="addressRight"
@@ -309,19 +309,18 @@ function POSMaster() {
                 </Box>
               </Box>
             </Paper>
-
+ 
             <Box mt={3}>
               <ItemsSection
-                rows={rows}
-                setRows={setRows}
-                gst={gst}
-                setGst={setGst}
-                paymentMode={paymentMode}
-                setPaymentMode={setPaymentMode}
-                finalTotal={finalTotal}
-              />
+                  rows={rows}
+                  setRows={setRows}
+                  gst={gst}
+                  setGst={setGst}
+                  paymentMode={paymentMode}
+                  setPaymentMode={setPaymentMode}
+                  finalTotal={finalTotal} isSubmitted={false}              />
             </Box>
-            
+           
             {/* Bottom pay print button */}
             <Box
               sx={{
@@ -361,5 +360,7 @@ function POSMaster() {
     </FormProvider>
   );
 }
-
+ 
 export default POSMaster;
+ 
+ 

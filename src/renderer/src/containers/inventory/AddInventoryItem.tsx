@@ -6,11 +6,12 @@ import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { useEffect, useState } from "react";
 
 export type InventoryFormData = {
   itemName: string;
   itemId: string;
-  category: string;
+  // category: string;
   unit: string;
   stockQty: number;
   medicineGroup: string;
@@ -22,7 +23,8 @@ export type InventoryFormData = {
 export type InventoryItem = {
   itemName: string;
   itemId: string;
-  category: string;
+  medicineGroup: string;
+  // category: string;
   stockQty: number;
   pricePerUnit: number;
   expiryDate: string;
@@ -31,14 +33,19 @@ export type InventoryItem = {
 };
 
 export default function AddInventoryItem() {
+  const methods = useForm<InventoryFormData>({});
   const navigate = useNavigate();
 
-  const methods = useForm<InventoryFormData>({
-    defaultValues: {
-      category: "medicines",
-      unit: "tablets",
-    },
-  });
+  const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    const storedGroups = JSON.parse(localStorage.getItem("medicineGroups") || "[]");
+    const options = storedGroups.map((group: { id: number; groupName: string }) => ({
+      label: group.groupName,
+      value: group.groupName,
+    }));
+    setGroupOptions(options);
+  }, []);
 
   //  submit
   const onSubmit = (data: InventoryFormData) => {
@@ -55,7 +62,8 @@ export default function AddInventoryItem() {
     const newItem: InventoryItem = {
       itemName: data.itemName,
       itemId: data.itemId,
-      category: data.category,
+      // category: data.category,
+      medicineGroup: data.medicineGroup,
       stockQty: data.stockQty,
       pricePerUnit: data.pricePerUnit,
       expiryDate: data.expiryDate,
@@ -67,21 +75,21 @@ export default function AddInventoryItem() {
       JSON.stringify([...existing, newItem])
     );
 
-    navigate(URL_PATH.InventoryList, { replace: true });
+    navigate(URL_PATH.InventoryList);
   };
 
   return (
-  <FormProvider {...methods} >
-    <form onSubmit={methods.handleSubmit(onSubmit)}  noValidate>
+  <FormProvider {...methods}>
   <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
     <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
       <Typography fontSize={20} fontWeight={600} mb={4}>
-        Add Inventory Item
+        Add New Item
       </Typography>
 
       <Box
         component="form"
         onSubmit={methods.handleSubmit(onSubmit)}
+        noValidate
         display="grid"
         gridTemplateColumns={{
           xs: "1fr",
@@ -93,24 +101,32 @@ export default function AddInventoryItem() {
         <TextInputField name="itemName" label="Item Name" required inputType="all" rows={1}/>
         <TextInputField name="itemId" label="Item ID" required />
 
-        <DropdownField
+        {/* <DropdownField
           name="category"
           label="Category"
+          placeholder="Category"
           required
           options={[
             { label: "Medicines", value: "medicines" },
-            { label: "Consumables", value: "consumables" },
+            { label: "Equipment", value: "equipment" },
+            { label: "Supplies", value: "supplies" },
+            { label: "Other", value: "other" },
           ]}
-        />
+        /> */}
 
         <DropdownField
           name="unit"
           label="Unit"
+          placeholder="Unit"
           required
           options={[
             { label: "Tablets", value: "tablets" },
             { label: "Bottle", value: "bottle" },
             { label: "Strip", value: "strip" },
+            { label: "Capsules", value: "capsules" },
+            { label: "Rolls", value: "rolls" },
+            { label: "Boxes", value: "boxes" },
+            { label: "Pairs", value: "pairs" },
           ]}
         />
 
@@ -119,12 +135,9 @@ export default function AddInventoryItem() {
         <DropdownField
           name="medicineGroup"
           label="Medicine Group"
+          placeholder="Medicine Group"
           required
-          options={[
-            { label: "Generic", value: "generic" },
-            { label: "Diabetes", value: "diabetes" },
-            { label: "Other", value: "other" },
-          ]}
+          options={groupOptions}
         />
 
         <NumericField
@@ -138,13 +151,14 @@ export default function AddInventoryItem() {
         <DateTimeField
           name="expiryDate"
           label="Expiry Date"
-          viewMode="year"
+          viewMode="date"
           required
         />
 
         <DropdownField
           name="supplier"
           label="Supplier"
+          placeholder="Suppliers"
           required
           options={[
             { label: "PharmaCare Ltd.", value: "pharmaCare" },
@@ -156,8 +170,7 @@ export default function AddInventoryItem() {
         <Box
           gridColumn="1 / -1"
           display="flex"
-          flexDirection={{ xs: "column", md: "row" }}
-          justifyContent={{ md: "flex-end" }}
+          justifyContent="flex-end"
           gap={2}
         >
           <Button
@@ -165,7 +178,7 @@ export default function AddInventoryItem() {
             onClick={() => navigate(-1)}
             sx={{
               px: 4,
-              width: { xs: "100%", md: "14%" },
+              // width: { xs: "100%", md: "14%" },
               textTransform: "none",
               border: "2px solid #1b7f6b",
               color: "#1b7f6b",
@@ -183,7 +196,7 @@ export default function AddInventoryItem() {
             variant="contained"
             sx={{
               px: 4,
-              width: { xs: "100%", md: "14%" },
+              // width: { xs: "100%", md: "14%" },
               textTransform: "none",
               backgroundColor: "#1b7f6b",
               "&:hover": {
@@ -199,7 +212,6 @@ export default function AddInventoryItem() {
       </Box>
     </Paper>
   </Box>
-  </form>
 </FormProvider>
 );
 }

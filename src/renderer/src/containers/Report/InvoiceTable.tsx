@@ -1,20 +1,20 @@
-import { useState, useMemo } from "react";
+
+
+import { useState, useMemo, useEffect } from "react";
 import {
   Paper,
   Typography,
   Chip,
-  MenuItem,
-  Select,
-  FormControl,
   Stack,
   Divider,
 } from "@mui/material";
-import {
-  UniversalTable,
-  Column,
-} from "@/components/uncontrolled/UniversalTable";
+import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 
-// Define the structure of an Invoice object
+import { useForm, FormProvider } from "react-hook-form"; 
+import DropdownField from "@/components/controlled/DropdownField"; 
+
+//  TYPES
+
 export type InvoiceData = {
   invoice: string;
   patient: string;
@@ -26,68 +26,58 @@ export type InvoiceData = {
   [key: string]: string | number | undefined;
 };
 
+// ADDED (Form type)
+type FilterForm = {
+  statusFilter: string;
+  timeFilter: string;
+};
+
 const InvoiceTable = () => {
-  // State to store the selected status and time filters
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [timeFilter, setTimeFilter] = useState("All Time");
+  const [invoices, setInvoices] = useState<InvoiceData[]>([]);
 
-  // Sample data for the table
-  const [invoices] = useState<InvoiceData[]>([
-    {
-      invoice: "INV-001",
-      patient: "Rajesh Kumar",
-      date: "01/15/2026",
-      price: 2500,
-      gst: 12,
-      total: 2800,
-      status: "Paid",
-    },
-    {
-      invoice: "INV-002",
-      patient: "Priya Singh",
-      date: "12/20/2026",
-      price: 5400,
-      gst: 12,
-      total: 6048,
-      status: "Pending",
-    },
-    {
-      invoice: "INV-003",
-      patient: "Amit Verma",
-      date: "01/10/2026",
-      price: 1500,
-      gst: 12,
-      total: 1680,
-      status: "Paid",
-    },
-    {
-      invoice: "INV-004",
-      patient: "Sneha Reddy",
-      date: "03/01/2027",
-      price: 8200,
-      gst: 12,
-      total: 9184,
-      status: "Overdue",
-    },
-    {
-      invoice: "INV-005",
-      patient: "Vikram Rao",
-      date: "01/20/2026",
-      price: 3200,
-      gst: 12,
-      total: 3584,
-      status: "Pending",
-    },
-  ]);
+  //  REMOVED
+  // const [statusFilter, setStatusFilter] = useState("All");
+  // const [timeFilter, setTimeFilter] = useState("All Time");
 
-  // Logic to filter data based on Status and Time selection
+  //  added (react-hook-form)
+  const methods = useForm<FilterForm>({
+    defaultValues: {
+      statusFilter: "All",
+      timeFilter: "All Time",
+    },
+  });
+
+  const { watch } = methods;
+
+  // added (watch filter values)
+  const statusFilter = watch("statusFilter");
+  const timeFilter = watch("timeFilter");
+
+  // LOAD INVOICES
+
+  useEffect(() => {
+    const loadInvoices = () => {
+      const stored = localStorage.getItem("invoiceList");
+      const parsed: InvoiceData[] = stored ? JSON.parse(stored) : [];
+      setInvoices(parsed);
+    };
+
+    loadInvoices();
+
+    window.addEventListener("invoiceUpdated", loadInvoices);
+
+    return () => {
+      window.removeEventListener("invoiceUpdated", loadInvoices);
+    };
+  }, []);
+
+  //  FILTER LOGIC 
+
   const filteredData = useMemo(() => {
     return invoices.filter((inv) => {
-      // Check if status matches
       const matchesStatus =
         statusFilter === "All" || inv.status === statusFilter;
 
-      // Check if date matches the selected time range
       const invDate = new Date(inv.date);
       const today = new Date();
       let matchesTime = true;
@@ -106,25 +96,44 @@ const InvoiceTable = () => {
     });
   }, [invoices, statusFilter, timeFilter]);
 
-  // Define table columns and how to display the data
+
+  // ADDED (Dropdown Options)
+
+  const statusOptions = [
+    { label: "All Status", value: "All" },
+    { label: "Paid", value: "Paid" },
+    { label: "Pending", value: "Pending" },
+    { label: "Overdue", value: "Overdue" },
+  ];
+
+  const timeOptions = [
+    { label: "All Time", value: "All Time" },
+    { label: "This Month", value: "This Month" },
+    { label: "Last 7 Days", value: "Last 7 Days" },
+  ];
+
+  // TABLE COLUMNS 
+
   const columns: Column<InvoiceData>[] = [
     { key: "invoice", label: "Invoice" },
     { key: "patient", label: "Patient" },
     { key: "date", label: "Date" },
-    // Format price with currency symbol
     {
       key: "price",
       label: "Price",
       render: (row) => `₹ ${row.price.toFixed(2)}`,
     },
-    { key: "gst", label: "GST(%)", render: (row) => `${row.gst}%` },
-    // Format total with currency symbol
+    {
+      key: "gst",
+      label: "GST(%)",
+      render: (row) => `${row.gst ?? 0}%`,
+    },
     {
       key: "total",
       label: "Total",
-      render: (row) => `₹ ${row.total.toFixed(2)}`,
+      render: (row) =>
+        `₹ ${row.total?.toFixed(2) ?? row.price.toFixed(2)}`,
     },
-    // Display status as a colorful Chip
     {
       key: "status",
       label: "Status",
@@ -134,7 +143,9 @@ const InvoiceTable = () => {
           Pending: { bg: "#FFF9C4", color: "#F9A825" },
           Overdue: { bg: "#FFEBEE", color: "#D32F2F" },
         };
+
         const current = styles[row.status];
+
         return (
           <Chip
             label={row.status}
@@ -152,59 +163,55 @@ const InvoiceTable = () => {
   ];
 
   return (
-    <Paper sx={{ p: 3, borderRadius: 2 }}>
-      {/* Title Section */}
-      <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-        Invoice Report Table
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
+    //  added (Required wrapper for dropdown)
+    <FormProvider {...methods}>
+      <Paper sx={{ p: 3, borderRadius: 2 }}>
+        <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+          Invoice Report Table
+        </Typography>
 
-      {/* Filter Dropdowns Section */}
-      <Stack
-        direction="row"
-        justifyContent="flex-end"
-        spacing={2}
-        sx={{ mb: 2 }}
-      >
-        {/* Status Filter */}
-        <FormControl size="small">
-          <Select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            sx={{ minWidth: 130, borderRadius: "8px", fontSize: "0.85rem" }}
-          >
-            <MenuItem value="All">All Status</MenuItem>
-            <MenuItem value="Paid">Paid</MenuItem>
-            <MenuItem value="Pending">Pending</MenuItem>
-            <MenuItem value="Overdue">Overdue</MenuItem>
-          </Select>
-        </FormControl>
+        <Divider sx={{ mb: 3 }} />
 
-        {/* Time Filter */}
-        <FormControl size="small">
-          <Select
-            value={timeFilter}
-            onChange={(e) => setTimeFilter(e.target.value)}
-            sx={{ minWidth: 140, borderRadius: "8px", fontSize: "0.85rem" }}
-          >
-            <MenuItem value="All Time">All Time</MenuItem>
-            <MenuItem value="This Month">This Month</MenuItem>
-            <MenuItem value="Last 7 Days">Last 7 Days</MenuItem>
-          </Select>
-        </FormControl>
-      </Stack>
+     
+        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
 
-      {/* Main Table Component */}
-      <UniversalTable<InvoiceData>
-        data={filteredData}
-        columns={columns}
-        showSearch
-        showExport
-        enableCheckbox
-        getRowId={(row) => row.invoice}
-      />
-    </Paper>
+          {/* Status Filter */}
+          <DropdownField
+            name="statusFilter"
+            label="Status"
+            options={statusOptions}
+            isStatic
+            freeSolo={false}
+            floatLabel
+            
+          />
+
+          {/* Time Filter */}
+          <DropdownField
+            name="timeFilter"
+            label="Time Filter"
+            options={timeOptions}
+            isStatic
+            freeSolo={false}
+            floatLabel
+            
+          />
+
+        </Stack>
+
+        <UniversalTable<InvoiceData>
+          data={filteredData}
+          columns={columns}
+          showSearch
+          showExport
+          enableCheckbox
+          getRowId={(row) => row.invoice}
+        />
+      </Paper>
+    </FormProvider>
   );
 };
 
 export default InvoiceTable;
+
+
