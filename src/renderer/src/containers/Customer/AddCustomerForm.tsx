@@ -158,6 +158,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="doctor"
                   label="Doctor Name"
                   options={doctorOptions}
+                  placeholder="Select Doctors"
                 />
                 <TextInputField name="doctorAddress" label="Doctor Address/Clinic" inputType="textarea" rows={1} />
               </Box>

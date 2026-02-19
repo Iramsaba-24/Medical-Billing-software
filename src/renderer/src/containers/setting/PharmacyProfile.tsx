@@ -79,18 +79,24 @@ function PharmacyProfile() {
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Box sx={{ width: "100%", backgroundColor: "#f9f9f9", }}>
+        <Box mb={2}>
+          <Typography
+            sx={{
+              fontSize: { xs: 20, sm: 22, md: 24 },  
+              fontWeight: 700,
+              color: '#111827',
+              mt: {xs:1 , md:0.5},
+              mb: 0.5,
+            }}
+          >
+            Pharmacy Profile
+          </Typography>
+        </Box>
+        <Box sx={{  width: "100%" }}>
  
-  <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, mb: { xs: 2, md: 4} }}
-            >
-              Pharmacy Profile
-            </Typography>
           {/* CARD 1 : Pharmacy Profile */}
           <Paper sx={cardStyle}>
-           
- 
+
             <Grid container spacing={{ xs: 3, md: 12 }}>
               {/* Left Column */}
               <Grid size={{ xs: 12, md: 6 }}>

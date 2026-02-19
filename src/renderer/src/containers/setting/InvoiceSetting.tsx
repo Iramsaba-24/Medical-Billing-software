@@ -86,9 +86,18 @@ const InvoiceSettings = () => {
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
-      <Typography variant="h6" mb={3} fontWeight={600}>
-        Invoice Settings
-      </Typography>
+          <Box mb={2}> 
+          <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 22, md: 24 },  
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+          }}
+        >
+          Invoice Settings
+        </Typography>
+          </Box>
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>

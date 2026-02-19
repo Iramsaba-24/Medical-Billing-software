@@ -53,7 +53,7 @@ const PaymentTerms = () => {
           name="creditDays"
           options={creditDays}
           sx={{ width: 150, minWidth: 150 }}
-          isStatic={true}
+          //isStatic={true}
         />
       </Box>
     </Paper>

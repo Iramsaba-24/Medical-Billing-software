@@ -118,9 +118,17 @@ const CustomerSettings = () => {
 
           {/* title of the form */}
           <Box mb={2}> 
-            <Typography fontSize={{xs:"20px", sm:"22px", md:"24px"}} fontWeight={700} >
-              Customer Settings
-            </Typography>
+          <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 22, md: 24 },  
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb: 0.5,
+          }}
+        >
+          Customer Settings
+        </Typography>
 
           {/* Subtitle */}
           <Typography fontSize={{xs:"12px", sm:"14px" , ms:"16px"}} color="#8f8f8f" >
@@ -169,7 +177,7 @@ const CustomerSettings = () => {
                 placeholder="select"
                 options={creditDays}
                 sx={{ width: 150, minWidth: 150 }}
-                isStatic={true}
+                // isStatic={true}
                 />
             </Box>
 
@@ -221,7 +229,7 @@ const CustomerSettings = () => {
               placeholder="Select"
               options={defaultDiscount}
               sx={{ width: 150, minWidth: 150 }}
-              isStatic={true}
+              // isStatic={true}
               />
             </Box>
 

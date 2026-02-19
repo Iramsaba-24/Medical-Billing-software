@@ -6,8 +6,8 @@ import {
   Typography,
   TextField,
   InputAdornment,
-  Chip,
   Slide,
+  Chip,
 } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ import { URL_PATH } from "@/constants/UrlPath";
 
 //  IMPORT reusable functions
 import { showConfirmation, showToast } from "@/components/uncontrolled/ToastMessage.tsx"; 
+
 
 // TYPES 
 export interface SalesData {

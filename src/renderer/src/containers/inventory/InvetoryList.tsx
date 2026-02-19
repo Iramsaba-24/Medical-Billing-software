@@ -32,6 +32,7 @@ const InventoryList = () => {
     setTableData(parsed);
   }, []);
 
+  
   // delete
   const handleDelete = (item: InventoryItem) => {
     const updated = tableData.filter((i) => i.itemId !== item.itemId);
