@@ -50,6 +50,10 @@ const PurchaseGSTConfiguration = () => {
         name="gst_settings"
         label=""
         options={options}
+
+
+
+        
       />
     </Paper>
   );
