@@ -56,32 +56,38 @@ const CreateInvoice = () => {
   ];
 
   const onSubmit = (data: InvoiceFormData) => {
-    const totalPrice = data.items.reduce(
-      (sum, item) => sum + item.qty * item.price,
-      0
-    );
+  const totalPrice = data.items.reduce(
+    (sum, item) => sum + item.qty * item.price,
+    0
+  );
 
-    const formattedDate = dayjs(data.date).format("DD-MM-YYYY");
+  const formattedDate = dayjs(data.date).format("YYYY-MM-DD");
 
-    const newInvoice = {
-      invoice: `INV-${Date.now()}`,
-      patient: data.patient,
-      date: formattedDate,
-      price: totalPrice,
-      status: data.status,
-      medicines: data.items.map((item) => ({
-        name: item.item,
-        batch: "-",
-        expiry: "-",
-        qty: `${item.qty}`,
-        amount: item.price,
-      })),
-    };
-
-    navigate(URL_PATH.Invoices, {
-      state: newInvoice,
-    });
+  const newInvoice = {
+    invoice: `INV-${Date.now()}`,
+    patient: data.patient,
+    date: formattedDate,
+    price: totalPrice,
+    status: data.status,
+    medicines: data.items.map((item) => ({
+      name: item.item,
+      batch: "-",
+      expiry: "-",
+      qty: `${item.qty}`,
+      amount: item.price,
+    })),
   };
+
+  const stored = localStorage.getItem("invoiceList");
+  const existingInvoices = stored ? JSON.parse(stored) : [];
+
+  const updatedInvoices = [newInvoice, ...existingInvoices];
+
+  localStorage.setItem("invoiceList", JSON.stringify(updatedInvoices));
+
+  navigate(URL_PATH.Invoices);
+};
+
 
   return (
     <FormProvider {...methods}>

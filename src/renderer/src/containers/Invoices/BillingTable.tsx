@@ -1,19 +1,13 @@
 import { useEffect, useState } from "react";
 import { Box, Paper, Button } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-
-import {
-  UniversalTable,
-  Column,
-  DropdownOption,
+import { UniversalTable, Column, DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
 
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
 import { URL_PATH } from "@/constants/UrlPath";
-
-//  Reusable Import
 import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage.tsx"; 
 type Props = {
   onCreate: () => void;
@@ -29,6 +23,7 @@ const BillingTable = ({ onCreate }: Props) => {
     {
       invoice: "INV-001",
       patient: "Rajesh Kumar",
+
       date: "8/15/2026",
       price: 2500,
       status: "Paid",
@@ -50,7 +45,7 @@ const BillingTable = ({ onCreate }: Props) => {
     },
   ]);
 
-  // ---------------- Add new invoice ----------------
+  //  Add new invoice
   useEffect(() => {
     if (location.state) {
       const newInvoice = location.state as Invoice;
@@ -114,7 +109,7 @@ const BillingTable = ({ onCreate }: Props) => {
 
   const methods = useForm({ defaultValues: { filterType: "all" } });
 
-  //  UPDATED DELETE
+  //  DELETE
   const handleDelete = async (invoiceNo: string) => {
     const confirmed = await showConfirmation(
       "Are you sure you want to delete this invoice?",

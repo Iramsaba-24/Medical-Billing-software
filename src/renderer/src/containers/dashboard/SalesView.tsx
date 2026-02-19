@@ -1,15 +1,6 @@
 import React from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-  Container,
-  Stack,
-} from "@mui/material";
-import {
-  useLocation,
-  useNavigate,
+import { Box, Paper, Typography, Button, Container, Stack,} from "@mui/material";
+import {useLocation, useNavigate,
 } from "react-router-dom";
 import { SalesData } from "./SalesTable";
 
@@ -121,11 +112,23 @@ const SalesView: React.FC = () => {
 
         <Box textAlign="center" mt={5}>
           <Button
-            variant="contained"
-            onClick={() => navigate(-1)}
-          >
-            Back
-          </Button>
+  variant="contained"
+  onClick={() => navigate(-1)}
+  sx={{
+    px: 4,
+    fontSize: 14,
+    backgroundColor: "#238878",
+    border: "2px solid #238878",
+    textTransform: "none",
+    "&:hover": {
+      backgroundColor: "#fff",
+      color: "#238878",
+    },
+  }}
+>
+  Back
+</Button>
+
         </Box>
       </Paper>
     </Container>

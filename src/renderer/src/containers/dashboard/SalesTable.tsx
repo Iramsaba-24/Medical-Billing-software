@@ -22,7 +22,7 @@ import { URL_PATH } from "@/constants/UrlPath";
 //  IMPORT reusable functions
 import { showConfirmation, showToast } from "@/components/uncontrolled/ToastMessage.tsx"; 
 
-// ---------------- TYPES ----------------
+// TYPES 
 export interface SalesData {
   id: number;
   name: string;
@@ -34,7 +34,7 @@ export interface SalesData {
   [key: string]: string | number;
 }
 
-// ---------------- INITIAL DATA ----------------
+//  INITIAL DATA 
 const initialSalesData: SalesData[] = [
   { id: 1, name: "Kishor Kedar", medicine: "Medicine Two", quantity: 1, totalPrice: 152, date: "Jan 05, 2026", time: "10:00AM" },
   { id: 2, name: "Rohit Raut", medicine: "Paracetamol", quantity: 5, totalPrice: 57, date: "Jan 05, 2026", time: "11:00AM" },
@@ -44,7 +44,7 @@ const initialSalesData: SalesData[] = [
   { id: 6, name: "Amit Sharma", medicine: "Aspirin", quantity: 3, totalPrice: 45, date: "Dec 30, 2025", time: "02:00PM" },
 ];
 
-// ---------------- COMPONENT ----------------
+//  COMPONENT
 const SalesTable: React.FC = () => {
   const navigate = useNavigate();
 
@@ -52,7 +52,7 @@ const SalesTable: React.FC = () => {
   const [salesData, setSalesData] = useState<SalesData[]>(initialSalesData);
   const [editingRow, setEditingRow] = useState<SalesData | null>(null);
 
-  // ---------------- SEARCH ----------------
+  //  SEARCH 
   const filteredSalesData = useMemo(() => {
     if (!searchQuery.trim()) return salesData;
 
@@ -63,7 +63,7 @@ const SalesTable: React.FC = () => {
     );
   }, [searchQuery, salesData]);
 
-  // ---------------- TABLE COLUMNS ----------------
+  //  TABLE COLUMNS
   const columns: Column<SalesData>[] = [
     { key: "name", label: "Name" },
     { key: "medicine", label: "Medicine" },
@@ -78,12 +78,12 @@ const SalesTable: React.FC = () => {
     { key: ACTION_KEY, label: "Actions" },
   ];
 
-  // ---------------- EDIT ----------------
+  //  EDIT 
   const handleEdit = (row: SalesData) => {
     setEditingRow(row);
   };
 
-  // ---------------- DELETE (UPDATED) ----------------
+  //  DELETE
   const handleDelete = async (row: SalesData) => {
     const confirmed = await showConfirmation(
       `Are you sure you want to delete ${row.name}'s record?`,
