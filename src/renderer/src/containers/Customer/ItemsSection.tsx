@@ -49,25 +49,25 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
             
             {/*  Medicine Name */}
             <Grid size={{ xs: 12, sm: 4 }}>
-              <TextField   size="small" fullWidth label="Item Name" value={row.name} 
+              <TextField   fullWidth label="Item Name" value={row.name} 
                 onChange={(e) => updateRow(row.id, "name", e.target.value)}    />
             </Grid>
 
             {/* Quantity */}
             <Grid size={{ xs: 12, sm: 2 }}>
-              <TextField  size="small" fullWidth label="Qty" type="number" value={row.qty} 
+              <TextField   fullWidth label="Qty" type="number" value={row.qty} 
                 onChange={(e) => updateRow(row.id, "qty", e.target.value === "" ? "" : Number(e.target.value))}  />
             </Grid>
 
             {/*  Price per item */}
             <Grid size={{ xs: 12, sm: 2 }}>
-              <TextField   size="small" fullWidth label="Price" type="number" value={row.price} 
+              <TextField   fullWidth label="Price" type="number" value={row.price} 
                 onChange={(e) => updateRow(row.id, "price", e.target.value === "" ? "" : Number(e.target.value))}  />
             </Grid>
 
             {/*  Calculated Total for this row Qty * Price */}
             <Grid size={{ xs: 12, sm: 2 }}>
-              <TextField   size="small" fullWidth label="Total" 
+              <TextField   fullWidth label="Total" 
                 value={(Number(row.qty) * Number(row.price)) || 0}  disabled  />
             </Grid>
 
@@ -89,13 +89,13 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
       <Box sx={{  mt: 2, pt: 2, borderTop: "2px solid #f0f0f0",  display: 'flex', flexDirection: { xs: "column", md: "row" },   justifyContent: 'space-between', gap: 2, alignItems: 'center'  }}>
         
         {/* Payment & GST Dropdowns */}
-        <Box sx={{ display: 'flex', flexDirection: { xs: "column", sm: "row" }, gap: 2, width: { xs: "100%", md: "400px" } }}>
-          <TextField  select size="small" label="Payment" value={paymentMode} 
+        <Box sx={{ display: 'flex', flexDirection: { xs: "column", sm: "row" }, gap: 2, width: { xs: "92%", md: "400px" }, }}>
+          <TextField  select label="Payment" value={paymentMode} 
             onChange={(e) => setPaymentMode(e.target.value)} sx={{ flex: 1 }}  >
             {["Cash", "UPI", "Card"].map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
           </TextField>
 
-          <TextField  select size="small" label="GST" value={gst} 
+          <TextField  select  label="GST" value={gst} 
             onChange={(e) => setGst(Number(e.target.value))} sx={{ flex: 1 }}>
             {[5, 12, 18].map(g => <MenuItem key={g} value={g}>{g}%</MenuItem>)}
           </TextField>
