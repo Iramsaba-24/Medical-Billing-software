@@ -1,6 +1,6 @@
  import { Box, Button, Typography, TextField, MenuItem, IconButton, Divider, Paper } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
-import { ItemRow } from "@/containers/customer/AddCustomerForm";
+import { ItemRow } from "@/containers/Customer/AddCustomerForm";
 
 // Define the props  from the  component
 interface ItemsSectionProps {

@@ -9,19 +9,19 @@ import {
   type Theme,
   Autocomplete,
   type AutocompleteRenderInputParams,
-  MenuItem,
-  TextFieldProps
+  TextFieldProps,
+  MenuItem
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import { getComponentTranslations } from '@/helpers/useTranslations';
 import { useTranslation } from 'react-i18next';
-
-
+ 
+ 
 type Option = {
   label: string;
   value: string;
 };
-
+ 
 type DropdownFieldProps = TextFieldProps & {
   label?: string;
   name: string;
@@ -35,14 +35,14 @@ type DropdownFieldProps = TextFieldProps & {
   floatLabel?: boolean;
   isStatic?: boolean
 };
-
-const DropdownField: FC<DropdownFieldProps> = ({ 
-  label, 
-  name, 
-  disabled, 
-  options, 
-  required = false, 
-  sx = {}, 
+ 
+const DropdownField: FC<DropdownFieldProps> = ({
+  label,
+  name,
+  disabled,
+  options,
+  required = false,
+  sx = {},
   onChangeCallback,
   freeSolo = true,
   placeholder,
@@ -56,7 +56,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
     control,
     formState: { errors }
   } = useFormContext();
-
+ 
   return (
     <Controller
       name={name}
@@ -72,7 +72,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
       render={({ field: { onChange, value, ref, ...field } }) => {
         // Find the selected option or use string value
         const selectedOption = options.find(option => option.value === value);
-        
+       
         return (
           <FormControl
             fullWidth
@@ -87,25 +87,31 @@ const DropdownField: FC<DropdownFieldProps> = ({
             disabled={disabled}
           >
           {isStatic ? (
-              <TextField
-                select
-                fullWidth
-                value={value || ''}
-                onChange={(e) => {
-                  onChange(e.target.value);
-                }}
-                label={floatLabel ? label : undefined}
-                placeholder={!floatLabel ? placeholder : undefined}
-                error={!!errors[name]}
-                required={required}
-              >
-                {options.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            ):(
+  <TextField
+    select
+    fullWidth
+    value={value || ''}
+    onChange={(e) => {
+      const newValue = e.target.value;
+      onChange(newValue);
+
+      if (onChangeCallback) {
+        onChangeCallback(newValue);
+      }
+    }}
+    label={floatLabel ? label : undefined}
+    placeholder={!floatLabel ? placeholder : undefined}
+    error={!!errors[name]}
+    required={required}
+  >
+    {options.map((option) => (
+      <MenuItem key={option.value} value={option.value}>
+        {option.label}
+      </MenuItem>
+    ))}
+  </TextField>
+) : (
+
             <Autocomplete
               freeSolo={freeSolo}
               options={options}
@@ -114,7 +120,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
               forcePopupIcon  
               onChange={(_event: SyntheticEvent<Element, Event>, newValue: any) => {
                 let newValueStr = '';
-                
+               
                 if (typeof newValue === 'string') {
                   // User typed a free text value
                   newValueStr = newValue;
@@ -122,7 +128,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
                   // User selected an option
                   newValueStr = newValue.value;
                 }
-                
+               
                 onChange(newValueStr);
                 if (onChangeCallback) {
                   onChangeCallback(newValueStr);
@@ -156,60 +162,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
     />
   );
 };
-
+ 
 export default DropdownField;
-
-
-// import { FC } from "react";
-// import {
-//   TextField,
-//   MenuItem,
-//   SxProps,
-//   Theme
-// } from "@mui/material";
-
-// export type DropdownOption = {
-//   label: string;
-//   value: string;
-// };
-
-// type DropdownInputProps = {
-//   placeholder?: string;
-//   value: string;
-//   options: DropdownOption[];
-//   onChange: (value: string) => void;
-//   disabled?: boolean;
-//   sx?: SxProps<Theme>;
-// };
-
-// const DropdownInput: FC<DropdownInputProps> = ({
-//   placeholder = "Select",
-//   value,
-//   options,
-//   onChange,
-//   disabled,
-//   sx
-// }) => {
-//   return (
-//     <TextField
-//       select
-//       fullWidth
-//       value={value}
-//       disabled={disabled}
-//       onChange={(e) => onChange(e.target.value)}
-//       sx={sx}
-//     >
-//       <MenuItem value="" disabled>
-//         {placeholder}
-//       </MenuItem>
-
-//       {options.map((option) => (
-//         <MenuItem key={option.value} value={option.value}>
-//           {option.label}
-//         </MenuItem>
-//       ))}
-//     </TextField>
-//   );
-// };
-
-// export default DropdownInput;
+ 
+ 

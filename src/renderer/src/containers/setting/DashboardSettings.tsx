@@ -107,10 +107,18 @@ const DashboardSettings = () => {
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box sx={{ maxWidth: "100%", overflowX: "hidden" }}>
           
-          <Box mb={3}>
-            <Typography fontSize={22} fontWeight={700}>
-              Dashboard Settings
-            </Typography>
+          <Box mb={2}>
+          <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 22, md: 24 },  
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb: 0.5,
+          }}
+        >
+          Dashboard Settings
+        </Typography>
             <Typography fontSize={15} color="#8F8D8D">
               Control what appears on the main dashboard
             </Typography>

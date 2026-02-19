@@ -1,7 +1,7 @@
  import { useState, useMemo } from "react";
 import { CustomerData } from "@/view/CustomerMaster";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
-import { Box, Button, TextField, InputAdornment, Typography } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Typography, Divider } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -83,22 +83,25 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
           Add Customer
         </Button>
       </Box>
-
-      {/* Main Container for the Customer Table */}
-      <Box sx={{ bgcolor: "#fff", p: { xs: 1, md: 2 }, borderRadius: "8px", border: "1px solid #e0e0e0" }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>Customers List</Typography>
-        
-        {/* Box with overflowX "auto"  */}
+ 
+      {/*  Horizontal scroll enabled for mobile */}
+      <Box sx={{ bgcolor: "#fff", p: { xs: 1, md: 2 }, borderRadius: "12px", border: "1px solid #e0e0e0" }}>
+        <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
+          Customers List
+        </Typography>  
+        <Divider sx={{ mb: 1}} />     
         <Box sx={{ width: "100%", overflowX: "auto" }}>
-           <UniversalTable<CustomerData>
-             columns={columns as unknown as Column<CustomerData>[]}
-             data={filteredData}  
-             actions={{
-               view: onView,
-               edit: onEdit,
-               delete: onDelete
-             }}
-           />
+          <UniversalTable<CustomerData & Record<string, unknown>>
+            columns={columns}
+            data={filteredData}
+            showExport={true}
+            showSearch={true} 
+            actions={{
+              view: onView,
+              edit: onEdit,
+              delete: onDelete
+            }}
+          />
         </Box>
       </Box>
     </Box>

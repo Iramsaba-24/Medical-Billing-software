@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Paper, Button } from "@mui/material";
+import { Box, Paper, Button, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { UniversalTable, Column, DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
@@ -10,53 +10,39 @@ import DropdownField from "@/components/controlled/DropdownField";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage.tsx"; 
 type Props = {
+  invoices: Invoice[];
+  setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
   onCreate: () => void;
+  onView: (invoice: Invoice) => void;
 };
+
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ onCreate }: Props) => {
+const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [invoices, setInvoices] = useState<Invoice[]>([
-    {
-      invoice: "INV-001",
-      patient: "Rajesh Kumar",
-
-      date: "8/15/2026",
-      price: 2500,
-      status: "Paid",
-      medicines: [
-        { name: "Pantosec D", batch: "14044008", expiry: "10/26", qty: "6xTAB", amount: 91.2 },
-        { name: "Nucoxia PY", batch: "1405019", expiry: "09/26", qty: "6xTAB", amount: 102 },
-      ],
-    },
-    {
-      invoice: "INV-002",
-      patient: "Priya Singh",
-      date: "12/20/2026",
-      price: 5400,
-      status: "Pending",
-      medicines: [
-        { name: "Pantosec DO", batch: "14044008", expiry: "10/26", qty: "6xTAB", amount: 91.2 },
-        { name: "Nucoxia P", batch: "1405019", expiry: "09/26", qty: "6xTAB", amount: 102 },
-      ],
-    },
-  ]);
-
-  //  Add new invoice
+  // invoice local storage
   useEffect(() => {
     if (location.state) {
-      const newInvoice = location.state as Invoice;
-
+      const newInvoice = location.state as Invoice; //convert data into invoice type
+      //check if invoice item already exists
       setInvoices((prev) => {
         const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
         if (exists) return prev;
-        return [newInvoice, ...prev];
+
+        const safeInvoice = {
+          ...newInvoice,
+          medicines: newInvoice.medicines.map((med) => ({
+            ...med,
+            amount: Number(med.amount),
+          })),
+        };
+        return [safeInvoice, ...prev];
       });
     }
-  }, [location.state]);
+  },[location.state, setInvoices] );
 
   const [filterType, setFilterType] = useState<FilterType>("all");
 
@@ -128,26 +114,30 @@ const BillingTable = ({ onCreate }: Props) => {
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 2 }}>
+                <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
+          Invoice List
+        </Typography>
+      <Box
+        mb={2}
+        display="flex"
+        justifyContent="flex-end"
+      >
         <Box
-          mb={2}
           display="flex"
-          flexDirection={{ xs: "column", md: "row" }}
-          justifyContent="space-between"
-          alignItems="center"
+          flexDirection={{ xs: "column", sm: "row" }}
+
           gap={2}
+          width={{ xs: "100%", sm: "auto" }}
         >
-          <Box width={220}>
+          <Box sx={{ width: { xs: "100%", sm: 180 } }}>
             <DropdownField
               name="filterType"
               label="Filter"
               options={filterOptions}
-              freeSolo={false}
-              onChangeCallback={(value) =>
-                setFilterType(value as FilterType)
-              }
+              onChangeCallback={(value) => setFilterType(value as FilterType)}
+              size="small"
             />
           </Box>
-
           <Button
             variant="contained"
             onClick={onCreate}
@@ -156,6 +146,7 @@ const BillingTable = ({ onCreate }: Props) => {
               color: "#fff",
               border: "2px solid #238878",
               textTransform: "none",
+              height: 40,
               "&:hover": {
                 backgroundColor: "#fff",
                 color: "#238878",
@@ -166,11 +157,10 @@ const BillingTable = ({ onCreate }: Props) => {
             + Create Invoice
           </Button>
         </Box>
-
+      </Box>
         <UniversalTable<Invoice>
           data={filteredInvoices}
           columns={columns}
-          caption="Billing Invoices"
           showSearch
           showExport
           enableCheckbox

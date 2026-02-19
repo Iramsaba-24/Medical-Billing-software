@@ -64,9 +64,12 @@ function CustomerTable() {
   return (
     <Paper sx={{ p: 3, borderRadius: 2 }}>
       {/* Page Title */}
-      <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+      {/* <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
         Customers List
-      </Typography>
+      </Typography> */}
+              <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
+          Customer List
+        </Typography>
       <Divider sx={{ mb: 3 }} />
       
       {/* Dropdown menu for selecting time filters */}
