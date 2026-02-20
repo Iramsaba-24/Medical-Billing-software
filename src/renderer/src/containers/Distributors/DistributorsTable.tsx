@@ -140,9 +140,9 @@ const Distributors = () => {
           tableSize="small"
           getRowId={(row) => row.id}
           actions={{
-  view: (distributor) =>
-    navigate(URL_PATH.DistributorDetails, {
-      state: { distributor },
+          view: (distributor) =>
+          navigate(URL_PATH.DistributorDetails, {
+          state: { distributor },
     }),
  
 }}
