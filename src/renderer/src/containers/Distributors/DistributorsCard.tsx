@@ -15,7 +15,22 @@ interface DistributorCardsProps {
   ];
 
   return (
+    <Box>
+      <Box>
+        <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 24, md: 28 },
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb:0.5
+          }}
+        >
+          Distributors 
+        </Typography>   
+      </Box>
     <Box display="grid" gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }} gap={2} mb={3}>
+
       {cardData.map((card) => (
         <Paper 
           key={card.label} 
@@ -40,6 +55,7 @@ interface DistributorCardsProps {
           <Box component="img" src={card.img} sx={{ width: 60, height: 60 }} />
         </Paper>
       ))}
+    </Box>
     </Box>
   );
 }

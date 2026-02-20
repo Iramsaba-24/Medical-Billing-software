@@ -1,6 +1,4 @@
-
-
- import {
+import {
   Box,
   Grid,
   Typography,
@@ -330,6 +328,3 @@ const RetailInvoice = () => {
 };
 
 export default RetailInvoice;
- 
- 
- 

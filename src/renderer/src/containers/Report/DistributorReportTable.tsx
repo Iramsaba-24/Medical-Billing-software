@@ -135,9 +135,9 @@ function DistributorReportTable() {
             name="statusFilter"      // must match form field
             label="Status"
             options={statusOptions}
-            isStatic                 
+            //isStatic                 
             freeSolo={false}
-            floatLabel
+            //floatLabel
             
           />
 
@@ -147,9 +147,9 @@ function DistributorReportTable() {
             name="timeFilter"        
             label="Time Filter"
             options={timeOptions}
-            isStatic
+            //isStatic
             freeSolo={false}
-            floatLabel
+           // floatLabel
            
           />
 

@@ -28,9 +28,7 @@ type FilterForm = {
 function InventoryTable() {
   const [inventoryData, setInventoryData] = useState<InventoryItem[]>([]);
 
-  // REMOVED useState filters
-  // const [stockStatus, setStockStatus] = useState("All");
-  // const [timeFilter, setTimeFilter] = useState("All Time");
+  
 
   //  ADDED React Hook Form
   const methods = useForm<FilterForm>({
@@ -194,9 +192,9 @@ function InventoryTable() {
             name="stockStatus"
             label="Stock Status"
             options={stockOptions}
-            isStatic     // behaves like Select
+            //isStatic     // behaves like Select
             freeSolo={false}
-            floatLabel
+           // floatLabel
             
           />
 
@@ -205,9 +203,9 @@ function InventoryTable() {
             name="timeFilter"
             label="Expiry Filter"
             options={timeOptions}
-            isStatic
+           // isStatic
             freeSolo={false}
-            floatLabel
+           // floatLabel
             
           />
 

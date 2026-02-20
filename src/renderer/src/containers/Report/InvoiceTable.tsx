@@ -35,9 +35,7 @@ type FilterForm = {
 const InvoiceTable = () => {
   const [invoices, setInvoices] = useState<InvoiceData[]>([]);
 
-  //  REMOVED
-  // const [statusFilter, setStatusFilter] = useState("All");
-  // const [timeFilter, setTimeFilter] = useState("All Time");
+  
 
   //  added (react-hook-form)
   const methods = useForm<FilterForm>({
@@ -180,9 +178,9 @@ const InvoiceTable = () => {
             name="statusFilter"
             label="Status"
             options={statusOptions}
-            isStatic
+           // isStatic
             freeSolo={false}
-            floatLabel
+            //floatLabel
             
           />
 
@@ -191,9 +189,9 @@ const InvoiceTable = () => {
             name="timeFilter"
             label="Time Filter"
             options={timeOptions}
-            isStatic
+           // isStatic
             freeSolo={false}
-            floatLabel
+           // floatLabel
             
           />
 

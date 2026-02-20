@@ -87,7 +87,7 @@ const SalesGraph = () => {
                   { label: "Others", value: "Others" },
                 ]}
    
-                isStatic={true}
+                //isStatic={true}
                 onChangeCallback={(val) => console.log("Selected Group:", val)}
               />
             </Grid>

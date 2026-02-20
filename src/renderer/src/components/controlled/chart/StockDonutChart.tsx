@@ -111,7 +111,7 @@ const StockDonutChart = ({ title }: { title: string }) => {
               options={filterOptions}
               onChangeCallback={handleFilterChange}
               
-              isStatic={true}
+              //isStatic={true}
               // sx={{
               //   height: 34,
               //   backgroundColor: '#fff',

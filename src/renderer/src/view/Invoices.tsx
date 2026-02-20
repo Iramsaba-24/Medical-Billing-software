@@ -1,5 +1,6 @@
-import { Box, Typography, Divider } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
 import BillingTable from "@/containers/Invoices/BillingTable";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Invoice } from "@/types/invoice";
@@ -8,18 +9,7 @@ import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
 
-
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
-
-export type MedicineItem = {
-  name: string;
-  batch: string;
-  expiry: string;
-  qty: string;
-  amount: number;
-};
-
-/*  STYLES  */
 
 const cardHover = {
   cursor: "pointer",
@@ -32,25 +22,49 @@ const cardHover = {
   },
 };
 
-
 const Billing = () => {
   const navigate = useNavigate();
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+
+  // Load invoices from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("invoiceList");
+    const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
+    setInvoices(parsed);
+  }, []);
+
+  // Memoized Calculations 
+  const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
+    const revenue = invoices
+      .filter(inv => inv.status === "Paid")
+      .reduce((sum, inv) => sum + inv.price, 0);
+
+    const pending = invoices
+      .filter(inv => inv.status === "Pending")
+      .reduce((sum, inv) => sum + inv.price, 0);
+
+    return {
+      totalRevenue: revenue,
+      pendingAmount: pending,
+      totalInvoices: invoices.length,
+    };
+  }, [invoices]);
 
   return (
     <Box>
-      <Typography variant="h5" mb={2}>
-        Invoices
-      </Typography>
-      <Divider sx={{ mb: 3 }} />
-
+     <Typography variant="h5" mb={2}>
+      Invoices
+    </Typography>
+    <Divider sx={{ mb: 3 }} />
+      {/* Cards */}
       <Box
         display="flex"
         flexDirection={{xs:"column", md:"row"}}
         mb={4}
         gap={2}
       >
-
-        <Box
+        {/* Revenue Card */}
+        <Box 
           p={{ xs: 2, md: 5 }}
           
           bgcolor="#fff"
@@ -64,20 +78,16 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
-            height: {  md: 105}
-          }}
-        >
-
-          <Box  >
-            <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              ₹ 4,000
+          }}>
+          <Box>
+             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
+              ₹ {totalRevenue.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Total Revenue (Paid)
             </Typography>
           </Box>
-
-          <Box
+           <Box
             component="img"
             src={revenueImg}
             alt="Revenue"
@@ -86,10 +96,11 @@ const Billing = () => {
               height: { xs: 44, md: 80 },
               flexShrink: 0,
             }}
-          />
-        </Box>
+          />        
+          </Box>
 
-        <Box
+        {/* Pending Card */}
+         <Box
           p={{ xs: 2, md: 5 }}
           bgcolor="#fff"
           borderRadius={2}
@@ -105,16 +116,14 @@ const Billing = () => {
              height: {  md: 105}
           }}
         >
-
           <Box>
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              ₹ 16,800
+              ₹ {pendingAmount.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Pending Amount
             </Typography>
           </Box>
-
           <Box
             component="img"
             src={pendingImg}
@@ -124,9 +133,10 @@ const Billing = () => {
               height: { xs: 44, md: 80 },
               flexShrink: 0,
             }}
-          />
-        </Box>
+          />       
+          </Box>
 
+        {/* Total Invoices */}
         <Box
           p={{ xs: 2, md: 5 }}
           bgcolor="#fff"
@@ -143,16 +153,14 @@ const Billing = () => {
              height: {  md: 105}
           }}
         >
-
           <Box>
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              5
+              {totalInvoices}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Total Invoices
             </Typography>
           </Box>
-
           <Box
             component="img"
             src={invoiceImg}
@@ -163,10 +171,12 @@ const Billing = () => {
               flexShrink: 0,
             }}
           />
-        </Box>
+        </Box>        
       </Box>
 
       <BillingTable
+        invoices={invoices}
+        setInvoices={setInvoices}
         onCreate={() => navigate(URL_PATH.CreateInvoice)}
         onView={(invoice: Invoice) =>
           navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {

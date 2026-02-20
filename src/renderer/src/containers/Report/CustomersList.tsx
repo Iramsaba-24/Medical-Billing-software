@@ -164,8 +164,8 @@ function CustomerTable() {
             name="timeFilter"
             label="Filter"
             options={filterOptions}
-            isStatic={true}  
-            floatLabel
+            //isStatic={true}  
+           // floatLabel
             
           />
         </Stack>
