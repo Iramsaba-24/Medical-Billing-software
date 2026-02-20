@@ -66,6 +66,7 @@ const Billing = () => {
         {/* Revenue Card */}
         <Box 
           p={{ xs: 2, md: 5 }}
+          
           bgcolor="#fff"
           borderRadius={2}
           boxShadow={1}
@@ -112,6 +113,7 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
+             height: {  md: 105}
           }}
         >
           <Box>
@@ -148,6 +150,7 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
+             height: {  md: 105}
           }}
         >
           <Box>

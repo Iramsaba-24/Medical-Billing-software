@@ -15,16 +15,14 @@ import {
 import PrintIcon from "@mui/icons-material/Print";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { useState, useEffect } from "react";
+
 import EmailField from "@/components/controlled/EmailField";
 import MobileField from "@/components/controlled/MobileField";
 import TextInputField from "@/components/controlled/TextInputField";
 import DropdownField from "@/components/controlled/DropdownField";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-import { FormControl,InputLabel,Select,MenuItem} from "@mui/material";
-
 
 /* STYLES */
 const TEAL_COLOR = "#2D8B7A";
@@ -38,26 +36,11 @@ const containerStyle = {
   mb: 2,
 };
 
-type InventoryItem = {
-  itemName: string;
-  pricePerUnit: number;
-};
-
-
 type ItemRow = {
   name: string;
   qty: number;
   mrp: number;
   discount: number;
-};
-type Distributor = {
-  id: string;
-  companyName: string;
-  ownerName?: string;
-  mobile: string;
-  email: string;
-  address: string;
-  status: "Active" | "Inactive";
 };
 
 type FormData = {
@@ -72,8 +55,6 @@ type FormData = {
 
 const RetailInvoice = () => {
   const navigate = useNavigate();
-  const location = useLocation();  
-  const [distributors, setDistributors] = useState<Distributor[]>([]);
 
   const methods = useForm<FormData>({
     mode: "onSubmit",
@@ -108,35 +89,14 @@ const RetailInvoice = () => {
 
     return qty * priceAfterDiscount;
   };
-   const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
-
 
   const subTotal = items.reduce(
     (sum, row) => sum + getRowAmount(row),
     0
   );
 
-const [inventory, setInventory] = useState<InventoryItem[]>([]);
-
-const inventoryOptions = inventory.map((item) => ({
-  label: item.itemName,
-  value: item.itemName,
-}));
-
-
-
-  useEffect(() => {
-  const saved = localStorage.getItem("distributors");
-  if (saved) {
-    const parsed: Distributor[] = JSON.parse(saved);
-    setDistributors(parsed);
-  }
-}, []);
-
   const gstAmount = (subTotal * gst) / 100;
   const finalTotal = subTotal + gstAmount;
-  const selectedCompany = watch("company");
-
 
   const onSubmit = (data: FormData) => {
     console.log("FORM SUBMITTED:", data);
@@ -150,89 +110,14 @@ const inventoryOptions = inventory.map((item) => ({
     showToast("error", "Please fill all required fields");
   };
 
- const companyOptions = distributors
-  .filter((d) => d.status === "Active")
-  .map((d) => ({
-    label: d.companyName,
-    value: d.companyName,
-  }));
-
-
-  useEffect(() => {
-  const savedInventory = localStorage.getItem("inventory");
-  if (savedInventory) {
-    const parsed: InventoryItem[] = JSON.parse(savedInventory);
-    setInventory(parsed);
-  }
-}, []);
-
-
-  useEffect(() => {
-  if (selectedCompany) {
-    const selectedDistributor = distributors.find(
-      (d) => d.companyName === selectedCompany
-    );
-
-    if (selectedDistributor) {
-      methods.setValue("mobile", selectedDistributor.mobile || "");
-      methods.setValue("email", selectedDistributor.email || "");
-      methods.setValue("address", selectedDistributor.address || "");
-      methods.setValue("supplier", selectedDistributor.ownerName || "");
-    }
-  }
-}, [selectedCompany, distributors, methods]);
-
-
+  const companyOptions = [
+    { label: "MediSupply Co", value: "MediSupply Co" },
+    { label: "PharmaCare Pvt. Ltd.", value: "PharmaCare Pvt. Ltd." },
+    { label: "MedPlus Ltd.", value: "MedPlus Ltd." },
+  ];
 
   return (
     <FormProvider {...methods}>
-         <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.Billing) {
-            navigate(URL_PATH.Billing);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-          color: activeTab === "new" ? "#fff" : "#000",
-          border: activeTab === "new" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        New Invoice
-      </Button>
-
-      {/* Retail Invoice */}
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.RetailInvoice) {
-            navigate(URL_PATH.RetailInvoice);
-          } 
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-          color: activeTab === "retail" ? "#fff" : "#000",
-          border: activeTab === "retail" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        Retail Invoice
-      </Button>
-      
       <Paper sx={{ p: 2 }}>
         <form
           onSubmit={handleSubmit(onSubmit, onError)}
@@ -241,23 +126,12 @@ const inventoryOptions = inventory.map((item) => ({
           <Box sx={containerStyle}>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth>
-  <InputLabel>Company</InputLabel>
-  <Select
-    value={methods.watch("company") || ""}
-    label="Company"
-    onChange={(e) => {
-      methods.setValue("company", e.target.value);
-    }}
-  >
-    {companyOptions.map((option) => (
-      <MenuItem key={option.value} value={option.value}>
-        {option.label}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-
+                <DropdownField
+                  name="company"
+                  label="Company"
+                  required
+                  options={companyOptions}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
@@ -320,29 +194,11 @@ const inventoryOptions = inventory.map((item) => ({
             {fields.map((field, index) => (
               <Grid container spacing={2} mb={2} key={field.id}>
                 <Grid size={{ xs: 12, md: 3 }}>
-        
-<DropdownField
-  name={`items.${index}.name`}
-  label="Item"
-  options={inventoryOptions}
-  required
-  freeSolo={false}
-  onChangeCallback={(selectedValue) => {
-    const selectedItem = inventory.find(
-      (item) => item.itemName === selectedValue
-    );
-
-    if (selectedItem) {
-      methods.setValue(
-        `items.${index}.mrp`,
-        selectedItem.pricePerUnit
-      );
-    } else {
-      methods.setValue(`items.${index}.mrp`, 0);
-    }
-  }}
-/>
-
+                  <TextInputField
+                    name={`items.${index}.name`}
+                    label="Item"
+                    required
+                  />
                 </Grid>
 
                 <Grid size={{ xs: 12, md: 2 }}>
