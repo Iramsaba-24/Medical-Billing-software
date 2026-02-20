@@ -11,6 +11,9 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage.tsx"; 
 type Props = {
   onCreate: () => void;
+   onView: (invoice: Invoice) => void;
+ 
+ 
 };
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
