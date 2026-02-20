@@ -1,9 +1,9 @@
 import { Grid, Box } from '@mui/material';
 import ReusableTable, { type TableColumn, type FooterRow } from '@/components/uncontrolled/ReusableTable';
 
-/* =======================
-   STOCK OVERVIEW TABLE
-======================= */
+
+  //  STOCK OVERVIEW TABLE
+
 
 type StockOverviewRow = {
   stock: string;
@@ -36,9 +36,9 @@ const stockFooter: FooterRow[] = [
   },
 ];
 
-/* =======================
-   OUTSTANDING BILLS TABLE
-======================= */
+
+  //  OUTSTANDING BILLS TABLE
+
 
 type OutstandingRow = {
   period: string;

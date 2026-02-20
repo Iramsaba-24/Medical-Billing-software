@@ -1,6 +1,6 @@
-import { Box, Button, Paper } from "@mui/material";
+import { Box, Button, Paper, } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
@@ -10,7 +10,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
 import RetailInvoice from "@/containers/billing/RetailInvoice";
- 
+
+
 // Payprint button reuse sx
 const PayNPrint = {
   backgroundColor: "#238878",
@@ -25,7 +26,19 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
- 
+
+type Doctor = {
+  id: number;
+  doctorName: string;
+  degree: string;
+  phone: string;
+  email: string;
+  registrationNo: string;
+  address: string;
+  status: "Active";
+};
+
+
 type NewInvoiceFormValues = {
   name: string;
   age: string;
@@ -36,13 +49,7 @@ type NewInvoiceFormValues = {
   addressLeft: string;
   addressRight: string;
 };
- 
-const doctorOptions = [
-  { label: "Dr. Amit Sharma", value: "amit_sharma" },
-  { label: "Dr. Sneha Patil", value: "sneha_patil" },
-  { label: "Dr. Rahul Mehta", value: "rahul_mehta" },
-];
- 
+
 function POSMaster() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,14 +65,18 @@ function POSMaster() {
       addressRight: "",
     },
   });
- 
- 
+
   const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
   const isRetail = activeTab === "retail";
- 
- 
+
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
- 
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>({});
+
+  const [doctorList, setDoctorList] = useState<Doctor[]>([]);
+
+  // Invoice button reusable sx
   const invoiceButtonSx = (isActive: boolean) => ({
     backgroundColor: isActive ? "#fff" : "#238878",
     color: isActive ? "#238878" : "#fff",
@@ -79,33 +90,184 @@ function POSMaster() {
       border: "2px solid #238878",
     },
   });
- 
+
+
+  // saved to local storage
   const onSubmit = (data: NewInvoiceFormValues) => {
-    console.log(data);
-    navigate(URL_PATH.MediPoints);
+  setIsSubmitted(true);
+  const hasInvalidItems = rows.some(
+    (row) =>
+      row.name.trim() === "" ||
+      row.qty === "" ||
+      Number(row.qty) <= 0 ||
+      row.price === "" ||
+      Number(row.price) <= 0
+  );
+  if (hasInvalidItems) {
+    return;
+  }
+  const invoiceData = {
+    form: data,
+    rows,
+    gst,
+    paymentMode,
+    createdAt: new Date().toISOString(),
   };
- 
+  const existingInvoices = JSON.parse(
+    localStorage.getItem("billing_invoices") || "[]"
+  );
+  existingInvoices.push(invoiceData);
+  localStorage.setItem(
+    "billing_invoices",
+    JSON.stringify(existingInvoices)
+  );
+  console.log("Saved Invoice:", invoiceData);
+  navigate(URL_PATH.MediPoints, { state: { totalFromInvoice: finalTotal } });
+};
+
+
+
   type ItemRow = {
     id: number;
     name: string;
     qty: number | "";
     price: number | "";
   };
- 
+
+  type InvoiceData = {
+    form: NewInvoiceFormValues;
+    rows: ItemRow[];
+    gst: number;
+    paymentMode: string;
+  };
+
+  type Customer = {
+    name: string;
+    age: string;
+    mobile: string;
+    email: string;
+    address: string;
+    doctor: string;
+  };
+
   const [rows, setRows] = useState<ItemRow[]>([
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
- 
+
   const [gst, setGst] = useState(5);
+
   const [paymentMode, setPaymentMode] = useState("Cash");
- 
+
+  const [doctorOptions, setDoctorOptions] = useState<{ label: string; value: string }[]>([]);
+
+  const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
+
+
+  // when invoice button change
+  useEffect(() => {
+    const savedData = invoiceForms[activeInvoice];
+    if (savedData) {
+      methods.reset(savedData.form);
+      setRows(savedData.rows);
+      setGst(savedData.gst);
+      setPaymentMode(savedData.paymentMode);
+    } else {
+      methods.reset({
+        name: "",
+        age: "",
+        mobile: "",
+        email: "",
+        doctor: "",
+        reference: "",
+        addressLeft: "",
+        addressRight: "",
+      });
+      setRows([{ id: Date.now(), name: "", qty: 1, price: "" }]);
+      setGst(5);
+      setPaymentMode("Cash");
+    }
+  }, [activeInvoice, invoiceForms]);
+
+
+  // load doctor list
+  useEffect(() => {
+    const storedDoctors = localStorage.getItem("doctors");
+
+    if (storedDoctors) {
+      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors);       //string->obj
+      setDoctorList(parsedDoctors);
+      const options = parsedDoctors.map((doc) => ({
+        label: `Dr. ${doc.doctorName}`,
+        value: doc.doctorName,
+      }));
+
+      setDoctorOptions(options);
+    }
+  }, []);
+
+
+  const selectedDoctorName = methods.watch("doctor");
+
+  const nameOptions = customerOptions.map((customer) => ({
+    label: customer.name,
+    value: customer.name,
+  }));
+
+  const selectedCustomerName = methods.watch("name");
+
+
+  // when name change
+  useEffect(() => {
+    if (!selectedCustomerName) return;
+    const selectedCustomer = customerOptions.find(
+      (c) => c.name === selectedCustomerName
+    );
+    if (selectedCustomer) {
+      // Existing customer - Autofill
+      methods.setValue("age", selectedCustomer.age || "");
+      methods.setValue("mobile", selectedCustomer.mobile || "");
+      methods.setValue("email", selectedCustomer.email || "");
+      methods.setValue("addressLeft", selectedCustomer.address || "");
+      methods.setValue("doctor", selectedCustomer.doctor || "");
+    } else {
+      // New name - Clear other fields
+      methods.setValue("age", "");
+      methods.setValue("mobile", "");
+      methods.setValue("email", "");
+      methods.setValue("addressLeft", "");
+      methods.setValue("doctor", "");
+    }
+  }, [selectedCustomerName, customerOptions, methods]);
+
+  // data load
+  useEffect(() => {
+    const saved = localStorage.getItem("medical_customers");
+    if (saved) {
+      setCustomerOptions(JSON.parse(saved));
+    }
+  }, []);
+
+
+  // Doctor Address Autofill 
+  useEffect(() => {
+    if (selectedDoctorName) {
+      const selectedDoctor = doctorList.find(
+        (doc) => doc.doctorName === selectedDoctorName
+      );
+
+      if (selectedDoctor) {
+        methods.setValue("addressRight", selectedDoctor.address);
+      }
+    }
+  }, [selectedDoctorName, doctorList, methods]);
+
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
     0
   );
- 
+
   const finalTotal = subTotal + (subTotal * gst) / 100;
- 
+
   return (
     <FormProvider {...methods}>
       {/* New Invoice */}
@@ -131,7 +293,7 @@ function POSMaster() {
       >
         New Invoice
       </Button>
- 
+
       {/* Retail Invoice */}
       <Button
         onClick={() => {
@@ -155,7 +317,7 @@ function POSMaster() {
       >
         Retail Invoice
       </Button>
- 
+
       {isRetail ? (
         <RetailInvoice />
       ) : (
@@ -167,7 +329,7 @@ function POSMaster() {
             p: 2,
             backgroundColor: "#fff",
           }}>
- 
+
           <Box
             display="flex"
             gap={1.5}
@@ -180,7 +342,7 @@ function POSMaster() {
             {Array.from({ length: 10 }, (_, i) => {
               const invoiceNumber = i + 1;
               const isActive = String(invoiceNumber) === activeInvoice;
- 
+
               return (
                 <Button
                   key={invoiceNumber}
@@ -190,16 +352,30 @@ function POSMaster() {
                     minWidth: { xs: "unset", md: "250px" },
                     fontSize: { xs: "12px", md: "14px" },
                   }}
-                  onClick={() =>
-                    navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`)
-                  }
+                  onClick={() => {
+
+                    setInvoiceForms((prev) => ({
+                      ...prev,
+                      [activeInvoice]: {
+                        form: methods.getValues(),
+                        rows,
+                        gst,
+                        paymentMode,
+                      },
+                    }));
+
+                    // Navigate to new invoice
+                    navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
+                  }}
                 >
+
+
                   Invoice {invoiceNumber}
                 </Button>
               );
             })}
           </Box>
- 
+
           <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
             <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3}>
               {/* inner box */}
@@ -216,19 +392,24 @@ function POSMaster() {
                     flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <TextInputField
+
+                      <DropdownField
                         name="name"
                         label="Name"
+                        options={nameOptions}
                         required
-                        inputType="alphabet"
+                        freeSolo   // typing allowed
+                        editable={true}
+                        placeholder="Select or Type Name"
                       />
+
                     </Box>
- 
+
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <NumericField name="age" label="Age" maxlength={3}/>
+                      <NumericField name="age" label="Age" maxlength={3} />
                     </Box>
                   </Box>
- 
+
                   <Box
                     display="flex"
                     gap={2}
@@ -237,24 +418,24 @@ function POSMaster() {
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <MobileField name="mobile" label="Mobile Number" required />
                     </Box>
- 
+
                     <Box width={{ xs: "100%", sm: "260px" }}>
-  <TextInputField
-    name="email"
-    label="Email"
-    rules={{
-      required: "Email is required",
-      validate: (value: string) => {
-        if (!/[@]/.test(value)) return "Add special character (@)";
-        if (!/[.]/.test(value)) return "Add special character (.)";
-        return true;
-      },
-    }}
-  />
-</Box>
- 
+                      <TextInputField
+                        name="email"
+                        label="Email"
+                        rules={{
+                          required: "Email is required",
+                          validate: (value: string) => {
+                            if (!/[@]/.test(value)) return "Add special character (@)";
+                            if (!/[.]/.test(value)) return "Add special character (.)";
+                            return true;
+                          },
+                        }}
+                      />
+                    </Box>
+
                   </Box>
- 
+
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
                     <TextInputField
                       name="addressLeft"
@@ -275,29 +456,29 @@ function POSMaster() {
                     <DropdownField
                       name="doctor"
                       label="Doctor"
-                      required
                       options={doctorOptions}
-                      freeSolo={false}
-                      placeholder="Doctor"
+                      freeSolo
+                      editable={true}
+                      placeholder="Select Dr"
                     />
                   </Box>
- 
+
                   <Box width={{ xs: "100%", sm: "260px" }}>
-                  <TextInputField
-                    name="reference"
-                    label="New Reference"
-                    inputType="alphanumeric"  
-                    minLength={3}    
-                    maxLength={50}    
-                    rules={{
-                      pattern: {
-                        value: /^[A-Za-z0-9\s-]+$/,  
-                        message: "Only letters, numbers, spaces, and hyphens allowed",
-                      },
-                    }}
-                  />
+                    <TextInputField
+                      name="reference"
+                      label="New Reference"
+                      inputType="alphanumeric"
+                      minLength={3}
+                      maxLength={50}
+                      rules={{
+                        pattern: {
+                          value: /^[A-Za-z0-9\s-]+$/,
+                          message: "Only letters, numbers, spaces, and hyphens allowed",
+                        },
+                      }}
+                    />
                   </Box>
- 
+
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <TextInputField
                       name="addressRight"
@@ -309,18 +490,18 @@ function POSMaster() {
                 </Box>
               </Box>
             </Paper>
- 
-            <Box mt={3}>
+
+            <Box mt={3} >
               <ItemsSection
-                  rows={rows}
-                  setRows={setRows}
-                  gst={gst}
-                  setGst={setGst}
-                  paymentMode={paymentMode}
-                  setPaymentMode={setPaymentMode}
-                  finalTotal={finalTotal} isSubmitted={false}              />
+                rows={rows}
+                setRows={setRows}
+                gst={gst}
+                setGst={setGst}
+                paymentMode={paymentMode}
+                setPaymentMode={setPaymentMode}
+                finalTotal={finalTotal} isSubmitted={isSubmitted} />
             </Box>
-           
+
             {/* Bottom pay print button */}
             <Box
               sx={{
@@ -360,7 +541,5 @@ function POSMaster() {
     </FormProvider>
   );
 }
- 
+
 export default POSMaster;
- 
- 

@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { type FC, type SyntheticEvent } from 'react';
+
+import { type FC } from 'react';
 import {
   TextField,
   FormControl,
@@ -9,13 +8,11 @@ import {
   type Theme,
   Autocomplete,
   type AutocompleteRenderInputParams,
-  TextFieldProps,
-  MenuItem
+  type TextFieldProps
 } from '@mui/material';
-import { useFormContext, Controller } from 'react-hook-form';
+import { useFormContext, Controller, get } from 'react-hook-form';
 import { getComponentTranslations } from '@/helpers/useTranslations';
 import { useTranslation } from 'react-i18next';
- 
  
 type Option = {
   label: string;
@@ -32,8 +29,7 @@ type DropdownFieldProps = TextFieldProps & {
   onChangeCallback?: (value: string) => void;
   freeSolo?: boolean;
   placeholder?: string;
-  floatLabel?: boolean;
-  isStatic?: boolean
+  editable?: boolean;
 };
  
 const DropdownField: FC<DropdownFieldProps> = ({
@@ -44,10 +40,9 @@ const DropdownField: FC<DropdownFieldProps> = ({
   required = false,
   sx = {},
   onChangeCallback,
-  freeSolo = true,
+  freeSolo = false,
   placeholder,
-  floatLabel = false,
-  isStatic=  false,
+  editable = false,
   ...rest
 }) => {
   const { t } = useTranslation();
@@ -70,14 +65,15 @@ const DropdownField: FC<DropdownFieldProps> = ({
         }
       }}
       render={({ field: { onChange, value, ref, ...field } }) => {
-        // Find the selected option or use string value
-        const selectedOption = options.find(option => option.value === value);
-       
+        const selectedOption = !freeSolo
+          ? options.find((option) => option.value === value)
+          : null;
+ 
         return (
           <FormControl
             fullWidth
             required={required}
-            error={!!errors[name]}
+            error={!!get(errors, name)}
             sx={{
               '& .MuiFormLabel-asterisk': {
                 color: 'error.main'
@@ -86,75 +82,68 @@ const DropdownField: FC<DropdownFieldProps> = ({
             }}
             disabled={disabled}
           >
-          {isStatic ? (
-  <TextField
-    select
-    fullWidth
-    value={value || ''}
-    onChange={(e) => {
-      const newValue = e.target.value;
-      onChange(newValue);
-
-      if (onChangeCallback) {
-        onChangeCallback(newValue);
-      }
-    }}
-    label={floatLabel ? label : undefined}
-    placeholder={!floatLabel ? placeholder : undefined}
-    error={!!errors[name]}
-    required={required}
-  >
-    {options.map((option) => (
-      <MenuItem key={option.value} value={option.value}>
-        {option.label}
-      </MenuItem>
-    ))}
-  </TextField>
-) : (
-
             <Autocomplete
-              freeSolo={freeSolo}
+              freeSolo={freeSolo && editable}
               options={options}
-              value={selectedOption || value || null}
-              popupIcon={<KeyboardArrowDownIcon />}
-              forcePopupIcon  
-              onChange={(_event: SyntheticEvent<Element, Event>, newValue: any) => {
+              value={selectedOption}
+              inputValue={typeof value === 'string' ? value : value?.toString() || ''}
+              isOptionEqualToValue={(option, val) => {
+                if (!val) return false;
+                if (typeof val === 'string') {
+                  return option.value === val;
+                }
+                return option.value === val?.value;
+              }}
+              onChange={(_e, newValue) => {
                 let newValueStr = '';
                
                 if (typeof newValue === 'string') {
-                  // User typed a free text value
                   newValueStr = newValue;
-                } else if (newValue && newValue.value) {
-                  // User selected an option
+                } else if (newValue && typeof newValue === 'object') {
                   newValueStr = newValue.value;
                 }
                
                 onChange(newValueStr);
-                if (onChangeCallback) {
-                  onChangeCallback(newValueStr);
+                onChangeCallback?.(newValueStr);
+              }}
+              onInputChange={(_e, newInputValue, reason) => {
+                if (freeSolo && editable && reason === 'input') {
+                  onChange(newInputValue);
+                  onChangeCallback?.(newInputValue);
                 }
               }}
-              getOptionLabel={(option: any) => {
+              getOptionLabel={(option: Option | string) => {
                 if (typeof option === 'string') {
                   return option;
                 }
-                return option.label || '';
+                return option.label || option.value || '';
               }}
+              selectOnFocus={editable}
+              clearOnBlur={editable}
+              handleHomeEndKeys={editable}
               renderInput={(params: AutocompleteRenderInputParams) => (
                 <TextField
-                  {...rest}
                   {...params}
                   {...field}
+                  {...rest}
                   inputRef={ref}
-                  label={floatLabel ? label : undefined}
-                  placeholder={!floatLabel ? placeholder : undefined}
-                  error={!!errors[name]}
+                  label={label}
+                  placeholder={placeholder}
+                  error={!!get(errors, name)}
                   required={required}
+                  InputLabelProps={{
+                    ...params.InputLabelProps,
+                    shrink: true
+                  }}
+                  inputProps={{
+                    ...params.inputProps,
+                    readOnly: !editable,
+                  }}
                 />
               )}
-            />)}
-            <FormHelperText sx={{ mt: 0.5, mx: 0 }}>
-              {errors[name]?.message?.toString() || ' '}
+            />
+            <FormHelperText sx={{ mt: 0.5, mx: 0}}>
+              {get(errors, name)?.message?.toString() || ' '}
             </FormHelperText>
           </FormControl>
         );
@@ -164,5 +153,4 @@ const DropdownField: FC<DropdownFieldProps> = ({
 };
  
 export default DropdownField;
- 
  
