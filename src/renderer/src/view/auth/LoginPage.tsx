@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import {
-  Box,
-  Button,
-  IconButton,
-  InputAdornment,
-  Typography,
-} from "@mui/material";
+import { Box, Button, IconButton, InputAdornment, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import TextInputField from "@/components/controlled/TextInputField";
 import BgImage from "@/assets/bgloginpage.svg";
@@ -110,13 +104,7 @@ const LoginPage = () => {
           }}
         >
           {/* logo img */}
-          <Box mb={1}>
-            <img
-              src={LogoImage}
-              alt="Medi Logo"
-              style={{ width: "160px", maxWidth: "100%" }}
-            />
-          </Box>
+          <Box mb={1}> <img src={LogoImage} alt="Medi Logo" style={{ width: "160px", maxWidth: "100%" }} /> </Box>
 
           {/* heading  */}
           <Typography

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import AddCustomerForm, { ItemRow } from "@/containers/customer/AddCustomerForm"; 
-import CustomerListPage from "@/containers/customer/CustomerListPage";
-import CustomerViewDetails from "@/containers/customer/CustomerViewDetails";
+import AddCustomerForm, { ItemRow } from "@/containers/Customer/AddCustomerForm"; 
+import CustomerListPage from "@/containers/Customer/CustomerListPage";
+import CustomerViewDetails from "@/containers/Customer/CustomerViewDetails";
 import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage"
 
 // Structure for a single purchase invoice record

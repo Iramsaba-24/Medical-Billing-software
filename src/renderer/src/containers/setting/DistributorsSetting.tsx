@@ -4,6 +4,7 @@ import CheckboxGroup from '@/components/controlled/CheckboxGroup';
 import RadioField from '@/components/controlled/RadioField';
 import PaymentTerms from './PaymentTerm';
 import PurchaseGSTConfiguration from './PurchaseGstConfiguration';
+import {showToast } from "@/components/uncontrolled/ToastMessage";
 
 type DistributorFormValues = {
   supplier_details: string[];
@@ -32,7 +33,7 @@ const DistributorSettings = () => {
 
   const onSubmit = (data: DistributorFormValues) => {
     console.log(" Data:", data);
-    alert("Data saved successfully!");
+     showToast("success", "Data Saved");
   };
   return (
     <Box sx={{  backgroundColor: '#f9f9f9' }}>
@@ -41,7 +42,7 @@ const DistributorSettings = () => {
       </Typography>
 
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
         {/*  Mandatory Supplier Details */}
         <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
           <Typography sx={{ fontWeight: 600, mb: 1, fontSize: '16px' }}>Mandatory Supplier Details</Typography>

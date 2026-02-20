@@ -1,6 +1,7 @@
 import { useForm, FormProvider } from 'react-hook-form';
 import { Paper, Typography, Box, Button } from '@mui/material';
 import CheckboxGroup from '@/components/controlled/CheckboxGroup';
+import {showToast } from "@/components/uncontrolled/ToastMessage";
 
 type ReportFormValues = {
   export_format: string[];
@@ -17,6 +18,7 @@ const ReportSettings = () => {
   const { handleSubmit, reset } = methods;
   const onSubmit = (data: ReportFormValues) => {
     console.log(" Data:", data);
+    showToast("success", "Data Saved");
   }
 
   return (
