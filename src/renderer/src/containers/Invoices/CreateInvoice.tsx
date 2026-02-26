@@ -225,7 +225,7 @@ useEffect(() => {
             }}
           />
 
-          {/* Bottom Row (Qty + Price + Icons) */}
+          {/* Bottom Row */}
           <Stack
             direction="row"
             spacing={2}
