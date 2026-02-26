@@ -82,3 +82,4 @@ const EditInvoice = ({ editingRow, onClose, onSave }: Props) => {
 };
 
 export default EditInvoice;
+

@@ -23,6 +23,9 @@ type PaymentMethods = {
   Cvv?: string;
   UpiId?: string;
 };
+type RetailInvoiceItem = {
+  total: number;
+};
 
 // paper style of card and upi
 const PaperStyle ={
@@ -131,6 +134,7 @@ const PaymentMethod = () => {
       setCardPaymentStatus("success");
 
       const storedInvoice = localStorage.getItem("currentInvoice");
+      const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
 
       if (storedInvoice) {
         const invoice = JSON.parse(storedInvoice);
@@ -148,6 +152,26 @@ const PaymentMethod = () => {
 
         localStorage.removeItem("currentInvoice");
       }
+
+      if (storedRetailInvoice) {
+        const retailInvoices = JSON.parse(storedRetailInvoice);
+
+        const existingRetail = JSON.parse(
+          localStorage.getItem("retailInvoices") || "[]"
+        );
+
+        const updatedRetail = [...existingRetail, ...retailInvoices];
+
+        localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
+        localStorage.removeItem("currentRetailInvoice");
+      }
+    //     setTimeout(() => {
+    //   if (storedRetailInvoice) {
+    //     navigate(URL_PATH.DistributorDetails);
+    //   } else {
+    //     navigate(URL_PATH.Dashboard);
+    //   }
+    // }, 1000);
 
     }, 1500);
   };
@@ -159,6 +183,7 @@ const PaymentMethod = () => {
       setUpiPaymentStatus("success");
 
       const storedInvoice = localStorage.getItem("currentInvoice");
+      const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");      
 
       if (storedInvoice) {
         const invoice = JSON.parse(storedInvoice);
@@ -176,6 +201,26 @@ const PaymentMethod = () => {
 
         localStorage.removeItem("currentInvoice");
       }
+
+      if (storedRetailInvoice) {
+      const retailInvoices = JSON.parse(storedRetailInvoice);
+
+      const existingRetail = JSON.parse(
+        localStorage.getItem("retailInvoices") || "[]"
+      );
+
+      const updatedRetail = [...existingRetail, ...retailInvoices];
+
+      localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
+      localStorage.removeItem("currentRetailInvoice");
+    }
+    //  setTimeout(() => {
+    //   if (storedRetailInvoice) {
+    //     navigate(URL_PATH.DistributorDetails);
+    //   } else {
+    //     navigate(URL_PATH.Dashboard);
+    //   }
+    // }, 1000);
 
     }, 2000);
   };
@@ -222,10 +267,22 @@ const [finalAmount, setFinalAmount] = useState<number>(0);
 
 useEffect(() => {
   const storedInvoice = localStorage.getItem("currentInvoice");
+    const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+
 
   if (storedInvoice) {
     const invoice = JSON.parse(storedInvoice);
     setFinalAmount(invoice.totalPrice);
+  }
+  if (storedRetailInvoice) {
+   const retailInvoices: RetailInvoiceItem[] = JSON.parse(storedRetailInvoice);
+
+const total = retailInvoices.reduce(
+  (sum, item) => sum + item.total,
+  0
+);
+
+setFinalAmount(total);
   }
 }, []);
 

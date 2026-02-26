@@ -18,6 +18,7 @@ import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 type InvoiceItem = {
   item: string;
@@ -85,6 +86,8 @@ useEffect(() => {
 }, []);
 
   const navigate = useNavigate();
+  const location = useLocation();
+const editingInvoice = location.state as any;
 
   const methods = useForm<InvoiceFormData>({
     defaultValues: {
@@ -132,7 +135,9 @@ useEffect(() => {
   const formattedDate = dayjs(data.date).format("YYYY-MM-DD");
 
   const newInvoice = {
-    invoice: `INV-${Date.now()}`,
+    invoice: editingInvoice
+  ? editingInvoice.invoice
+  : `INV-${Date.now()}`,
     patient: data.patient,
     date: formattedDate,
     price: totalPrice,
@@ -149,20 +154,46 @@ useEffect(() => {
   const stored = localStorage.getItem("invoiceList");
   const existingInvoices = stored ? JSON.parse(stored) : [];
 
-  const updatedInvoices = [newInvoice, ...existingInvoices];
+  let updatedInvoices;
+
+if (editingInvoice) {
+  // UPDATE
+  updatedInvoices = existingInvoices.map((inv: any) =>
+    inv.invoice === editingInvoice.invoice ? newInvoice : inv
+  );
+} else {
+  // CREATE
+  updatedInvoices = [newInvoice, ...existingInvoices];
+}
 
   localStorage.setItem("invoiceList", JSON.stringify(updatedInvoices));
 
-  navigate(URL_PATH.Invoices);
+ navigate(URL_PATH.Invoices, { replace: true });
 };
+
+useEffect(() => {
+  if (editingInvoice) {
+    methods.reset({
+      patient: editingInvoice.patient,
+      date: editingInvoice.date,
+      status: editingInvoice.status,
+      items: editingInvoice.medicines.map((med: any) => ({
+        item: med.name,
+        qty: Number(med.qty),
+        price: med.amount,
+        unitPrice: med.amount / Number(med.qty),
+      })),
+    });
+  }
+}, [editingInvoice]);
 
 
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 4, maxWidth: 900, mx: "auto" }}>
-        <Typography variant="h6" mb={3}>
-          Create New Invoice
-        </Typography>
+       <Typography variant="h6" mb={3}>
+  {editingInvoice ? "Edit Invoice" : "Create New Invoice"}
+</Typography>
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
         <DropdownField
@@ -284,24 +315,24 @@ useEffect(() => {
           >
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            onClick={handleSubmit(onSubmit)}
-            sx={{
-              backgroundColor: "#238878",
-              color: "#fff",
-              border: "2px solid #238878",
-              textTransform: "none",
+         <Button
+  variant="contained"
+  onClick={handleSubmit(onSubmit)}
+  sx={{
+    backgroundColor: "#238878",
+    color: "#fff",
+    border: "2px solid #238878",
+    textTransform: "none",
+    "&:hover": {
+      backgroundColor: "#fff",
+      color: "#238878",
+      border: "2px solid #238878",
+    },
+  }}
+>
+  {editingInvoice ? "Update Invoice" : "Create Invoice"}
+</Button>
 
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-              },
-            }}
-          >
-            Create Invoice
-          </Button>
         </Stack>
       </Paper>
     </FormProvider>
