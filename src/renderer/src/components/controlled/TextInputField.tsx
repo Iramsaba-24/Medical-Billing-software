@@ -92,6 +92,7 @@ const TextInputField: FC<TextInputFieldProps> = ({
             fullWidth
             required={required}
             label={label}
+            
             multiline={inputType === 'textarea' || inputType === 'all'}
             rows={inputType === 'textarea' || inputType === 'all' ? rows : undefined}
             value={field.value || ''}
