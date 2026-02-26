@@ -11,11 +11,7 @@ import { useNavigate } from "react-router-dom";
 import TextInputField from "@/components/controlled/TextInputField";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
-<<<<<<< HEAD
-import AppToast from "@/containers/Distributors/AppToast";
-=======
 //import AppToast from "@/containers/distributors/AppToast";
->>>>>>> 361b54dc52239c0e8bbab2e10ed13dbdc1f4a900
 import { URL_PATH } from "@/constants/UrlPath";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
