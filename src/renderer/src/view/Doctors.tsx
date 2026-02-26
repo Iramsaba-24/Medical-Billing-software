@@ -1,6 +1,6 @@
 import SearchField from "@/components/controlled/SearchField";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
-import { Box, Typography, Paper, MenuItem, Button, Select, Dialog, DialogActions } from "@mui/material";
+import { Box, Typography, Paper, MenuItem, Button, Select, Divider, Dialog, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -87,9 +87,25 @@ const Doctors = () => {
     <>
     {/* search & add doctor */}
       <FormProvider {...methods}>
+        <Box>
+          <Typography
+            sx={{
+              fontSize: { xs: 20, sm: 24, md: 28 },  
+              fontWeight: 700,
+              color: '#111827',
+              mt: {xs:1 , md:0.5},
+              mb: 0.5,
+            }}
+          >
+            Doctors
+          </Typography>
+        </Box>
         <Paper sx={{ px: { xs:2, md:4 },
-         pt:2,        
+         pt:2,
+          
           pb:{ xs:2, md:0} }}>
+
+            
           <Box display="flex"
            flexDirection={{ xs:"column", md:"row" }} justifyContent="space-between" alignItems={{ md:"center" }} 
            sx={{
@@ -113,14 +129,18 @@ const Doctors = () => {
       </FormProvider>
 
       <Paper sx={{ 
-         mt:3, p: { xs:1, md:3 } }}>
-        <Typography fontSize={{xs:18, md:22}} mb={2}>
+        //mx:{xs:1, md:2},
+         mt:2, p: { xs:1, md:2 } }}>
+        <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
           Doctors List
         </Typography>
-
+        <Divider sx={{ mb: 3 }} />
+     
           <UniversalTable
             data={filteredDoctors}
             columns={columns}
+            showSearch={true}         
+            showExport={true}
             tableSize="small"
             actions={{
               view: setViewItem,

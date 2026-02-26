@@ -1,7 +1,14 @@
-import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
+import {Box,Button,Typography,Dialog,DialogTitle,DialogContent,DialogActions,TextField,
+} from "@mui/material";
+import { ACTION_KEY, Column, UniversalTable,
+} from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
-import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
+import {
+  showConfirmation,
+  showSnackbar,
+} from "@/components/uncontrolled/ToastMessage";
+import { URL_PATH } from "@/constants/UrlPath";
+import { useNavigate } from "react-router-dom";
 
 
 export type InventoryItem = {
@@ -16,8 +23,10 @@ export type InventoryItem = {
 };
 
 const InventoryList = () => {
-  const [tableData, setTableData] = useState<InventoryItem[]>([]); 
-  const [viewItem, setViewItem] = useState<InventoryItem | null>(null); 
+  const [tableData, setTableData] = useState<InventoryItem[]>([]);
+  const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
+  const [editItem, setEditItem] = useState<InventoryItem | null>(null); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = localStorage.getItem("inventory");
@@ -26,153 +35,280 @@ const InventoryList = () => {
     const parsed: InventoryItem[] = JSON.parse(stored).map(
       (item: InventoryItem) => ({
         ...item,
-        stockQty: Number(item.stockQty), 
+        stockQty: Number(item.stockQty),
       })
     );
     setTableData(parsed);
   }, []);
 
-  // delete
+  // DELETE
   const handleDelete = (item: InventoryItem) => {
-    const updated = tableData.filter((i) => i.itemId !== item.itemId);
-    setTableData(updated);
-    localStorage.setItem("inventory", JSON.stringify(updated));
     showConfirmation("Delete item?", "Confirm").then((ok) => {
-      if (ok) {
-        setTableData(updated);
-        showSnackbar("success", "Item deleted successfully");
-      }
+      if (!ok) return;
+
+      const updated = tableData.filter(
+        (i) => i.itemId !== item.itemId
+      );
+
+      setTableData(updated);
+      localStorage.setItem("inventory", JSON.stringify(updated));
+      showSnackbar("success", "Item deleted successfully");
     });
   };
 
-  // status based on quantity
+  // SAVE EDIT
+  const handleSaveEdit = () => {
+    if (!editItem) return;
+
+    const updated = tableData.map((item) =>
+      item.itemId === editItem.itemId ? editItem : item
+    );
+
+    setTableData(updated);
+    localStorage.setItem("inventory", JSON.stringify(updated));
+    showSnackbar("success", "Item updated successfully");
+    setEditItem(null);
+  };
+
+  // STATUS
   const getStatus = (qty: number) => {
     if (qty === 0) return "Out of Stock";
     if (qty <= 10) return "Low Stock";
     return "In Stock";
   };
 
-  // status color
   const getStatusColor = (qty: number) => {
     if (qty === 0) return "error.main";
     if (qty <= 10) return "warning.main";
     return "success.main";
   };
-  
+
   const columns: Column<InventoryItem>[] = [
     { key: "itemName", label: "Item" },
     { key: "medicineGroup", label: "Group" },
     { key: "stockQty", label: "Stock" },
-    { key: "pricePerUnit", label: "Price",
-      render: (row) => `₹ ${row.pricePerUnit}`, 
+    {
+      key: "pricePerUnit",
+      label: "Price",
+      render: (row) => `₹ ${row.pricePerUnit}`,
     },
     { key: "supplier", label: "Supplier" },
     { key: "expiryDate", label: "Expiry Date" },
-    { key: "status", label: "Status",
+    {key: "status", label: "Status",
       render: (row) => (
         <Typography fontWeight={500} color={getStatusColor(row.stockQty)}>
           {getStatus(row.stockQty)}
         </Typography>
       ),
     },
-    { key: ACTION_KEY, label: "Action" }, 
+    { key: ACTION_KEY, label: "Action" },
   ];
 
   return (
     <>
-      <Box sx={{ boxShadow: {xs:1, md:4}, p: {xs:1, md:4}, borderRadius: 2 }}>
+    <Box display="flex" justifyContent="flex-end" mb={2}>
+      <Button
+        variant="contained"
+        onClick={() => navigate(URL_PATH.Inventory)}
+        sx={{
+          mr: 5,   
+          backgroundColor: "#238878",
+          color: "#fff",
+          textTransform: "none",
+          border: "2px solid #238878",
+          "&:hover": {
+            backgroundColor: "#fff",
+            color: "#238878",
+            border: "2px solid #238878",
+          },
+        }}
+      >
+         Back to Home
+      </Button>
+    </Box>
+    <Box display="flex" justifyContent="flex-end" mb={2}>
+          </Box>
+      <Box
+        sx={{
+          boxShadow: { xs: 1, md: 4 },
+          p: { xs: 1, md: 4 },
+          borderRadius: 2,
+        }}
+      >
         <Box display="flex" justifyContent="space-between" mb={4}>
-          <Typography sx={{fontSize: { xs:"16", md:"20" }, }}>Inventory List</Typography>
-
-          {/* add inventory button
-          <Button
-            variant="contained"
-           sx={{
-              px: 4,
-              width: { xs: "100%", md: "14%" },
-              textTransform: "none",
-              backgroundColor: "#1b7f6b",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#1b7f6b",
-                border: "2px solid #1b7f6b",
-              },
-            }}
-            onClick={() => navigate("/inventory/add-inventory-item")}
-          >
-            + Add Medicine
-          </Button> */}
+          <Typography fontSize={{ xs: "16px", md: "20px" }}>
+            Inventory List
+          </Typography>
         </Box>
 
-        {/* table */}
         <UniversalTable
           data={tableData}
           columns={columns}
           tableSize="small"
           rowsPerPage={5}
           actions={{
-            view: setViewItem, 
-            delete: handleDelete, 
+            view: setViewItem,
+            edit: setEditItem,
+            delete: handleDelete,
           }}
         />
       </Box>
 
-      {/* view dialog box */}
+      {/* VIEW DIALOG */}
       <Dialog
-        open={!!viewItem}
-        onClose={() => setViewItem(null)}
-        maxWidth="md"
+  open={!!viewItem}
+  onClose={() => setViewItem(null)}
+  maxWidth="sm"   
+  fullWidth
+>
+  <DialogTitle>View Item</DialogTitle>
+
+  <DialogContent>
+    {viewItem && (
+      <Box px={3} py={2} display="flex" flexDirection="column" gap={3}>
+
+        {/* Row 1 */}
+        <Box
+          display="flex"
+          flexDirection={{ xs: "column", md: "row" }}
+          gap={{ xs: 2, md: 6 }}
+        >
+          <Box>
+            <Typography fontWeight={600}>Item Name</Typography>
+            <Typography>{viewItem.itemName}</Typography>
+          </Box>
+
+          <Box>
+            <Typography fontWeight={600}>Item ID</Typography>
+            <Typography>{viewItem.itemId}</Typography>
+          </Box>
+
+          <Box>
+            <Typography fontWeight={600}>Expiry Date</Typography>
+            <Typography>{viewItem.expiryDate}</Typography>
+          </Box>
+        </Box>
+
+        {/* Row 2 */}
+        <Box
+          display="flex"
+          flexDirection={{ xs: "column", md: "row" }}
+          gap={{ xs: 2, md: 6 }}
+        >
+          <Box>
+            <Typography fontWeight={600}>Quantity</Typography>
+            <Typography>{viewItem.stockQty}</Typography>
+          </Box>
+
+          <Box>
+            <Typography fontWeight={600}>GST</Typography>
+            <Typography>12%</Typography>
+          </Box>
+
+          <Box>
+            <Typography fontWeight={600}>Supplier</Typography>
+            <Typography>{viewItem.supplier}</Typography>
+          </Box>
+        </Box>
+
+        {/* Row 3 */}
+        <Box>
+          <Typography fontWeight={600}>Status</Typography>
+
+          <Typography
+            sx={{
+              color: getStatusColor(viewItem.stockQty),
+            }}
+          >
+            {getStatus(viewItem.stockQty)}
+          </Typography>
+
+        </Box>
+
+      </Box>
+    )}
+  </DialogContent>
+
+  <DialogActions
+    sx={{
+      justifyContent: "flex-end", 
+      pr: 3
+    }}
+  >
+    <Button
+      onClick={() => setViewItem(null)}
+      variant="contained"
+      sx={{
+        backgroundColor: "#238878",
+        color: "#fff",
+        border: "2px solid #238878",
+        textTransform: "none",
+        "&:hover": {
+          backgroundColor: "#fff",
+          color: "#238878",
+          border: "2px solid #238878",
+        },
+      }}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
+      {/* EDIT DIALOG */}
+      <Dialog
+        open={!!editItem}
+        onClose={() => setEditItem(null)}
+        maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>
-          <Typography p={2} fontSize={20} fontWeight={600}>
-            {viewItem?.itemName} 
-          </Typography>
-        </DialogTitle>
+        <DialogTitle>Edit Item</DialogTitle>
 
         <DialogContent>
-          {/* Item details */}
-          <Box display="flex"
-            flexDirection={{ xs:"column", md:"row" }}
-            gap={{ xs:2, md:20 }}
-            mb={4}
-            px={4}>
-            <Typography><strong>Item ID</strong><br /> {viewItem?.itemId}</Typography>
-            <Typography><strong>Expiry Date</strong> <br /> {viewItem?.expiryDate}</Typography>
-          </Box>
+          {editItem && (
+            <Box display="flex" flexDirection="column" gap={2} mt={2}>
+              <TextField
+                label="Item Name"
+                value={editItem.itemName}
+                onChange={(e) =>
+                  setEditItem({
+                    ...editItem,
+                    itemName: e.target.value,
+                  })
+                }
+              />
 
-          <Box display="flex"
-            flexDirection={{ xs:"column", md:"row" }}
-            gap={{ xs:2, md:20 }}
-            mb={2}
-            px={4}>
-            <Typography>
-              <strong>Quantity</strong> <br />{viewItem?.stockQty}
-            </Typography>
-            <Typography>
-              <strong>GST</strong> <br />12%
-            </Typography>
-            <Typography>
-              <strong>Supplier</strong> <br />{viewItem?.supplier}
-            </Typography>
-          </Box>
+              <TextField
+                label="Stock Quantity"
+                type="number"
+                value={editItem.stockQty}
+                onChange={(e) =>
+                  setEditItem({
+                    ...editItem,
+                    stockQty: Number(e.target.value),
+                  })
+                }
+              />
 
-          <Typography px={4}>
-            <strong>Status</strong>
-            <Typography
-              sx={{ color: getStatusColor(viewItem?.stockQty ?? 0) }}
-            >
-              {viewItem && getStatus(viewItem.stockQty)}
-            </Typography>
-          </Typography>
+              <TextField
+                label="Price"
+                type="number"
+                value={editItem.pricePerUnit}
+                onChange={(e) =>
+                  setEditItem({
+                    ...editItem,
+                    pricePerUnit: Number(e.target.value),
+                  })
+                }
+              />
+            </Box>
+          )}
         </DialogContent>
 
-        {/* Close button */}
         <DialogActions>
           <Button
+            onClick={() => setEditItem(null)}
+            variant="contained"
             sx={{
-              px: 2.5,
-              minWidth: 100,
               backgroundColor: "#238878",
               color: "#fff",
               border: "2px solid #238878",
@@ -180,11 +316,28 @@ const InventoryList = () => {
               "&:hover": {
                 backgroundColor: "#fff",
                 color: "#238878",
+                border: "2px solid #238878",
               },
             }}
-            onClick={() => setViewItem(null)}
           >
-            Close
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveEdit}
+            variant="contained"
+            sx={{
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
+          >
+            Save
           </Button>
         </DialogActions>
       </Dialog>

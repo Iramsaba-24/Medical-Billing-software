@@ -1,4 +1,5 @@
- import { useForm, FormProvider } from 'react-hook-form';
+
+import { useForm, FormProvider } from 'react-hook-form';
 import { Box, Button, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import TextInputField from '@/components/controlled/TextInputField';
@@ -8,7 +9,7 @@ import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
 import AppToast from '@/containers/distributors/AppToast';
 import { URL_PATH } from '@/constants/UrlPath';
-import BankDetailsForm from './BankDetailForm';
+import BankDetailsForm from '@/containers/distributors/BankDetailForm';
 
 // Define the structure of the data 
 type DistributorFormInput = {
@@ -28,6 +29,7 @@ type DistributorFormInput = {
   ifsc: string;
   upiId: string;
 }
+
 
 const DistributorsForm = () => {
   // Initialize the form with default empty values

@@ -1,6 +1,8 @@
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
+ ChoosePlan:"/chooseplan",
+ AccountSetup:"/accountsetup",
 
   Landing: "/landing",
   Dashboard: "/dashboard",
@@ -46,6 +48,7 @@ export const URL_PATH = {
   MediPoints: "/billing/medi-points",
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
+  
 
 
   DoctorsSettings: "/settings/doctors-settings"

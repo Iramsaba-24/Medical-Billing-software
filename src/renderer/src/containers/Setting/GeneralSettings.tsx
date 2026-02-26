@@ -75,25 +75,28 @@ function GenralSettings() {
 
   return (
     <FormProvider {...methods}>
-      <Typography variant="h6" mb={3} sx={{ mb: { xs: 1, md: 3 },}} fontWeight="bold">
-        General Settings
-      </Typography>
-
+      <Box mb={2}>
+        <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 22, md: 24 },  
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb: 0.5,
+          }}
+        >
+          General Settings
+        </Typography>
+      </Box>
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-       <Paper
-  sx={{
-    p: { xs: 2, md: 4 },
-    mt: { xs: 1, md: 2 }, 
-    borderRadius: 0,
-    backgroundColor: "transparent",
-  }}
->
+       <Paper sx={{p: { xs: 2, md: 4 }, borderRadius: "5px",boxShadow: 3,mb: 1,}}>
+        
           {/* Language  */}
           <Box
             display="flex"
             flexDirection={{ xs: "column", md: "row" }}
             gap={3}
-            mb={3}
+             mb={{ xs: 2.5, md:0}}
             flexWrap="wrap" 
           >
             <Box flex={1}>
@@ -125,7 +128,7 @@ function GenralSettings() {
             display="flex"
             flexDirection={{ xs: "column", md: "row" }}
             gap={3}
-            mb={3}
+             mb={{ xs: 2.5, md:0}}
           >
             <Box flex={1}>
               <Typography variant="subtitle2" mb={1}>
@@ -155,7 +158,7 @@ function GenralSettings() {
             display="flex"
             flexDirection={{ xs: "column", md: "row" }}
             gap={3}
-            mb={4}
+             mb={{ xs: 2.5, md: 0}}
           >
             <Box flex={1}>
               <Typography variant="subtitle2" mb={1}>

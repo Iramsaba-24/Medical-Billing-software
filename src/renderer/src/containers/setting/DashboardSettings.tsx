@@ -73,11 +73,10 @@ const autoRefreshOptions = [
 ];
  
 const cardStyle = {
-  backgroundColor: "#fff",
-  borderRadius: "6px",
-  boxShadow: "0px 2px 8px rgba(0,0,0,0.08)",
-  p: 2.5,
-  mb: 2,
+   p: { xs: 2, md: 4 },
+  borderRadius: "5px",
+  boxShadow: 3,
+  mb: 1,
 };
  
 const DashboardSettings = () => {
@@ -107,10 +106,18 @@ const DashboardSettings = () => {
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box sx={{ maxWidth: "100%", overflowX: "hidden" }}>
           
-          <Box mb={3}>
-            <Typography fontSize={22} fontWeight={700}>
-              Dashboard Settings
-            </Typography>
+          <Box mb={2}>
+          <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 22, md: 24 },  
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb: 0.5,
+          }}
+        >
+          Dashboard Settings
+        </Typography>
             <Typography fontSize={15} color="#8F8D8D">
               Control what appears on the main dashboard
             </Typography>
@@ -239,52 +246,44 @@ const DashboardSettings = () => {
           </Paper>
  
           {/* Actions */}
-          <Box
-            display="flex"
-            justifyContent={{
-              xs: "center",
-              md: "center",
-            }}
-            alignItems="center"
-            gap={3}
-            mt={3}
-          >
-            <Button
-              variant="outlined"
-              onClick={() => reset()}
-              sx={{
-                px: 4,
-                textTransform: "none",
-                fontSize: 14,
-                color: "#238878",
-                border: "2px solid #238878",
-                "&:hover": {
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                },
-              }}
-            >
-              Reset
-            </Button>
- 
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                px: 4,
-                fontSize: 14,
-                backgroundColor: "#238878",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                },
-              }}
-            >
-              Save
-            </Button>
-          </Box>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
+              <Button
+                  type="button"
+                  variant="outlined"
+                  onClick={() => reset()}
+                  sx={{
+                    color: "#238878",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#238878",
+                      color: "#fff",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                  Reset
+                </Button>
+      
+                <Button
+                  type="submit"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#238878",
+                    color: "#fff",
+                    border: "2px solid #238878",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#fff",
+                      color: "#238878",
+                      border: "2px solid #238878",
+                    },
+                  }}
+                >
+                 
+                  Save
+                </Button>
+            </Box>
         </Box>
       </form>
     </FormProvider>

@@ -136,3 +136,7 @@ const SalesView: React.FC = () => {
 };
 
 export default SalesView;
+
+
+
+
