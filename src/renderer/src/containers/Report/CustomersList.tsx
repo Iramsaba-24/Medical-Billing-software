@@ -7,12 +7,13 @@ import {
   Paper,
   Divider,
 } from "@mui/material";
+
 import {
   UniversalTable,
   Column,
 } from "@/components/uncontrolled/UniversalTable";
-import DropdownField from "@/components/controlled/DropdownField";
 
+import DropdownField from "@/components/controlled/DropdownField";
 import { useForm, FormProvider } from "react-hook-form";
 
 // TYPES
@@ -56,8 +57,9 @@ function CustomerTable() {
 
   const timeFilter = methods.watch("timeFilter");
 
-  //  LOAD DATA 
-
+  
+  // LOAD DATA FROM LOCAL STORAGE
+  
   useEffect(() => {
     const savedData = localStorage.getItem("medical_customers");
 
@@ -98,8 +100,9 @@ function CustomerTable() {
     setCustomers(formatted);
   }, []);
 
-  // FILTER LOGIC 
-
+  
+  // FILTER LOGIC
+  
   const filteredData = useMemo(() => {
     return customers.filter((customer) => {
       if (timeFilter === "All Time") return true;
@@ -124,7 +127,27 @@ function CustomerTable() {
     });
   }, [customers, timeFilter]);
 
+  
+  // DELETE SELECTED ROWS FUNCTION
+  
+  const handleDeleteSelected = (rowsToDelete: Customer[]) => {
+    const updatedCustomers = customers.filter(
+      (customer) =>
+        !rowsToDelete.some((row) => row.id === customer.id)
+    );
+
+    setCustomers(updatedCustomers);
+
+    // Update localStorage
+    localStorage.setItem(
+      "medical_customers",
+      JSON.stringify(updatedCustomers)
+    );
+  };
+
+  
   // TABLE COLUMNS
+  
   const columns: Column<Customer>[] = [
     { key: "name", label: "Name" },
     { key: "medicines", label: "Medicines" },
@@ -138,20 +161,14 @@ function CustomerTable() {
     { key: "date", label: "Date" },
   ];
 
-  //  DROPDOWN OPTIONS 
-
   const filterOptions = [
     { label: "All Time", value: "All Time" },
     { label: "Last 7 Days", value: "Last 7 Days" },
     { label: "This Month", value: "This Month" },
   ];
 
-  //  UI 
-
   return (
-    <FormProvider {...methods}>   
-      {/* FormProvider is required for DropdownField */}
-
+    <FormProvider {...methods}>
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
           Customers List
@@ -159,17 +176,19 @@ function CustomerTable() {
 
         <Divider sx={{ mb: 3 }} />
 
-        <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          sx={{ mb: 2 }}
+        >
           <DropdownField
             name="timeFilter"
             label="Filter"
             options={filterOptions}
-            //isStatic={true}  
-           // floatLabel
-            
           />
         </Stack>
 
+        <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
         <UniversalTable<Customer>
           data={filteredData}
           columns={columns}
@@ -177,11 +196,17 @@ function CustomerTable() {
           showSearch
           showExport
           getRowId={(row) => row.id}
+          
+          // DELETE FEATURE 
+          onDeleteSelected={handleDeleteSelected}
         />
+        </div>
       </Paper>
     </FormProvider>
   );
 }
 
 export default CustomerTable;
+
+
 

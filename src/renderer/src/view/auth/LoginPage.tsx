@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import TextInputField from "@/components/controlled/TextInputField";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
-import AppToast from "@/containers/distributors/AppToast";
+//import AppToast from "@/containers/distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -30,12 +30,12 @@ const LoginPage = () => {
     mode: "onChange",
   });
   const navigate = useNavigate();
-  const [toastOpen, setToastOpen] = useState(false);
+  // const [toastOpen, setToastOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = (data: LoginFormInputs) => {
     console.log(data);
-    setToastOpen(true);
+    // setToastOpen(true);
     navigate(URL_PATH.Landing, {
       state: {
         username: data.username,
@@ -159,7 +159,7 @@ const LoginPage = () => {
                      return true;
                     }
                    if (usernameRegex.test(value)) {
-                  
+
                     return true;
                     }
 
@@ -239,13 +239,14 @@ const LoginPage = () => {
         </Box>
       </FormProvider>
       {/* toast msg */}
-      <AppToast
+      {/* <AppToast
         open={toastOpen}
         message="Login successful"
         severity="success"
         onClose={() => setToastOpen(false)}
-      />
+      /> */}
     </Box>
   );
 };
 export default LoginPage;
+
