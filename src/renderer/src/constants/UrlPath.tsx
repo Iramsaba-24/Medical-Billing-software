@@ -1,6 +1,8 @@
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
+  ChoosePlan:"/chooseplan",
+ AccountSetup:"/accountsetup",
   
 
   Landing: "/landing",
