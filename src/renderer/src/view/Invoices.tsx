@@ -1,6 +1,6 @@
 import { Box, Typography, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import BillingTable from "@/containers/Invoices/BillingTable";
+import BillingTable from "@/containers/invoices/BillingTable";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Invoice } from "@/types/invoice";
 
