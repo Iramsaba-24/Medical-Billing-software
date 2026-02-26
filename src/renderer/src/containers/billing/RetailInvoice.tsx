@@ -23,7 +23,7 @@ import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { FormControl,InputLabel,Select,MenuItem} from "@mui/material";
 
 
 /* STYLES */
@@ -36,6 +36,20 @@ const containerStyle = {
   borderRadius: "12px",
   border: `1px solid ${BORDER_COLOR}`,
   mb: 2,
+};
+
+const PayNPrint = {
+  backgroundColor: "#238878",
+  color: "#fff",
+  border: "2px solid #238878",
+  textTransform: "none",
+  minWidth: "250px",
+  height: "36px",
+  "&:hover": {
+    backgroundColor: "#fff",
+    color: "#238878",
+    border: "2px solid #238878",
+  },
 };
 
 type InventoryItem = {
@@ -72,7 +86,7 @@ type FormData = {
 
 const RetailInvoice = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation();  
   const [distributors, setDistributors] = useState<Distributor[]>([]);
 
   const methods = useForm<FormData>({
@@ -108,7 +122,7 @@ const RetailInvoice = () => {
 
     return qty * priceAfterDiscount;
   };
-  const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
+   const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
 
 
   const subTotal = items.reduce(
@@ -116,22 +130,22 @@ const RetailInvoice = () => {
     0
   );
 
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
-  const inventoryOptions = inventory.map((item) => ({
-    label: item.itemName,
-    value: item.itemName,
-  }));
+const inventoryOptions = inventory.map((item) => ({
+  label: item.itemName,
+  value: item.itemName,
+}));
 
 
 
   useEffect(() => {
-    const saved = localStorage.getItem("distributors");
-    if (saved) {
-      const parsed: Distributor[] = JSON.parse(saved);
-      setDistributors(parsed);
-    }
-  }, []);
+  const saved = localStorage.getItem("distributors");
+  if (saved) {
+    const parsed: Distributor[] = JSON.parse(saved);
+    setDistributors(parsed);
+  }
+}, []);
 
   const gstAmount = (subTotal * gst) / 100;
   const finalTotal = subTotal + gstAmount;
@@ -166,43 +180,43 @@ const RetailInvoice = () => {
     showToast("error", "Please fill all required fields");
   };
 
-  const companyOptions = distributors
-    .filter((d) => d.status === "Active")
-    .map((d) => ({
-      label: d.companyName,
-      value: d.companyName,
-    }));
+ const companyOptions = distributors
+  .filter((d) => d.status === "Active")
+  .map((d) => ({
+    label: d.companyName,
+    value: d.companyName,
+  }));
 
 
   useEffect(() => {
-    const savedInventory = localStorage.getItem("inventory");
-    if (savedInventory) {
-      const parsed: InventoryItem[] = JSON.parse(savedInventory);
-      setInventory(parsed);
-    }
-  }, []);
+  const savedInventory = localStorage.getItem("inventory");
+  if (savedInventory) {
+    const parsed: InventoryItem[] = JSON.parse(savedInventory);
+    setInventory(parsed);
+  }
+}, []);
 
 
   useEffect(() => {
-    if (selectedCompany) {
-      const selectedDistributor = distributors.find(
-        (d) => d.companyName === selectedCompany
-      );
+  if (selectedCompany) {
+    const selectedDistributor = distributors.find(
+      (d) => d.companyName === selectedCompany
+    );
 
-      if (selectedDistributor) {
-        methods.setValue("mobile", selectedDistributor.mobile || "");
-        methods.setValue("email", selectedDistributor.email || "");
-        methods.setValue("address", selectedDistributor.address || "");
-        methods.setValue("supplier", selectedDistributor.ownerName || "");
-      }
+    if (selectedDistributor) {
+      methods.setValue("mobile", selectedDistributor.mobile || "");
+      methods.setValue("email", selectedDistributor.email || "");
+      methods.setValue("address", selectedDistributor.address || "");
+      methods.setValue("supplier", selectedDistributor.ownerName || "");
     }
-  }, [selectedCompany, distributors, methods]);
+  }
+}, [selectedCompany, distributors, methods]);
 
 
 
   return (
     <FormProvider {...methods}>
-      <Button
+         <Button
         onClick={() => {
           if (location.pathname !== URL_PATH.Billing) {
             navigate(URL_PATH.Billing);
@@ -230,7 +244,7 @@ const RetailInvoice = () => {
         onClick={() => {
           if (location.pathname !== URL_PATH.RetailInvoice) {
             navigate(URL_PATH.RetailInvoice);
-          }
+          } 
         }}
         sx={{
           textTransform: "none",
@@ -248,7 +262,7 @@ const RetailInvoice = () => {
       >
         Retail Invoice
       </Button>
-
+      
       <Paper sx={{ p: 2 }}>
         <form
           onSubmit={handleSubmit(onSubmit, onError)}
@@ -258,21 +272,21 @@ const RetailInvoice = () => {
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth>
-                  <InputLabel>Company</InputLabel>
-                  <Select
-                    value={methods.watch("company") || ""}
-                    label="Company"
-                    onChange={(e) => {
-                      methods.setValue("company", e.target.value);
-                    }}
-                  >
-                    {companyOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+  <InputLabel>Company</InputLabel>
+  <Select
+    value={methods.watch("company") || ""}
+    label="Company"
+    onChange={(e) => {
+      methods.setValue("company", e.target.value);
+    }}
+  >
+    {companyOptions.map((option) => (
+      <MenuItem key={option.value} value={option.value}>
+        {option.label}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
 
               </Grid>
 
@@ -336,28 +350,28 @@ const RetailInvoice = () => {
             {fields.map((field, index) => (
               <Grid container spacing={2} mb={2} key={field.id}>
                 <Grid size={{ xs: 12, md: 3 }}>
+        
+<DropdownField
+  name={`items.${index}.name`}
+  label="Item"
+  options={inventoryOptions}
+  required
+  freeSolo={false}
+  onChangeCallback={(selectedValue) => {
+    const selectedItem = inventory.find(
+      (item) => item.itemName === selectedValue
+    );
 
-                  <DropdownField
-                    name={`items.${index}.name`}
-                    label="Item"
-                    options={inventoryOptions}
-                    required
-                    freeSolo={false}
-                    onChangeCallback={(selectedValue) => {
-                      const selectedItem = inventory.find(
-                        (item) => item.itemName === selectedValue
-                      );
-
-                      if (selectedItem) {
-                        methods.setValue(
-                          `items.${index}.mrp`,
-                          selectedItem.pricePerUnit
-                        );
-                      } else {
-                        methods.setValue(`items.${index}.mrp`, 0);
-                      }
-                    }}
-                  />
+    if (selectedItem) {
+      methods.setValue(
+        `items.${index}.mrp`,
+        selectedItem.pricePerUnit
+      );
+    } else {
+      methods.setValue(`items.${index}.mrp`, 0);
+    }
+  }}
+/>
 
                 </Grid>
 
@@ -454,13 +468,8 @@ const RetailInvoice = () => {
             <Button
               variant="contained"
               type="submit"
-
-              sx={{
-                bgcolor: TEAL_COLOR,
-                color: "#fff",
-                "&:hover": { bgcolor: "#fff", color: TEAL_COLOR },
-                px: 4,
-              }}
+              
+              sx={{...PayNPrint,minWidth: "140px"}}
             >
               Save And Submit
             </Button>
@@ -470,12 +479,7 @@ const RetailInvoice = () => {
               startIcon={<PrintIcon />}
               type="button"
               onClick={() => window.print()}
-              sx={{
-                bgcolor: TEAL_COLOR,
-                color: "#fff",
-                "&:hover": { bgcolor: "#fff", color: TEAL_COLOR },
-                px: 4,
-              }}
+              sx={{...PayNPrint, minWidth: "140px"}}
             >
               Print
             </Button>

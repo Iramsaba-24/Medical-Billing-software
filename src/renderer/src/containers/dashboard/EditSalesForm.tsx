@@ -8,6 +8,9 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { SalesData } from "./SalesTable";
+import { InventoryItem } from "@/containers/inventory/InvetoryList";
+import DropdownField from "@/components/controlled/DropdownField";
+import { useForm, FormProvider } from "react-hook-form";
 
 type Props = {
   editingRow: SalesData | null;
@@ -16,15 +19,30 @@ type Props = {
 };
 
 const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
+  const methods = useForm();
+  
   const [formData, setFormData] = useState<SalesData | null>(null);
+const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
-  useEffect(() => {
+useEffect(() => {
+  if (editingRow) {
     setFormData(editingRow);
-  }, [editingRow]);
 
-  if (!formData) return null;
+    methods.reset({
+      medicine: editingRow.medicine,
+    });
+  }
+}, [editingRow, methods]);
 
+useEffect(() => {
+  const stored = localStorage.getItem("inventory");
+  if (!stored) return;
+  setInventory(JSON.parse(stored));
+}, []);
+
+if (!formData) return null;
   return (
+    <FormProvider {...methods}>
     <Dialog
       open={Boolean(editingRow)}
       onClose={onClose}
@@ -37,6 +55,7 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
         sx={{ display: "flex", flexDirection: "column", gap: 2 }}
       >
         <TextField
+          sx={{ mt: 1}}
           label="Customer Name"
           value={formData.name}
           onChange={(e) =>
@@ -44,37 +63,57 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
           }
         />
 
-        <TextField
-          label="Medicine"
-          value={formData.medicine}
-          onChange={(e) =>
-            setFormData({ ...formData, medicine: e.target.value })
-          }
-        />
+<DropdownField
+  label="Medicine"
+  name="medicine"
+  options={inventory.map((item) => ({
+    label: item.itemName,
+    value: item.itemName,
+  }))}
+  required
+  onChangeCallback={(selectedValue) => {
+    const selectedItem = inventory.find(
+      (item) => item.itemName === selectedValue
+    );
 
-        <TextField
-          label="Quantity"
-          type="number"
-          value={formData.quantity}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              quantity: Number(e.target.value),
-            })
-          }
-        />
+    if (!selectedItem) return;
 
-        <TextField
-          label="Total Price"
-          type="number"
-          value={formData.totalPrice}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              totalPrice: Number(e.target.value),
-            })
-          }
-        />
+    setFormData((prev) => ({
+      ...prev!,
+      medicine: selectedValue,
+      quantity: 1,
+      totalPrice: selectedItem.pricePerUnit,
+    }));
+  }}
+/>
+
+<TextField
+  label="Quantity"
+  type="number"
+  value={formData.quantity}
+  onChange={(e) => {
+    const qty = Number(e.target.value);
+
+    const selectedItem = inventory.find(
+      (item) => item.itemName === formData.medicine
+    );
+
+    if (!selectedItem) return;
+
+    setFormData({
+      ...formData,
+      quantity: qty,
+      totalPrice: qty * selectedItem.pricePerUnit, // ✅ auto total
+    });
+  }}
+/>
+
+<TextField
+  label="Total Price"
+  type="number"
+  value={formData.totalPrice}
+  InputProps={{ readOnly: true }}
+/>
 
         <TextField
           label="Date"
@@ -133,6 +172,7 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
         </Button>
       </DialogActions>
     </Dialog>
+    </FormProvider>
   );
 };
 

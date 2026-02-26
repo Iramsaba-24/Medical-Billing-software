@@ -10,11 +10,10 @@ import {
 } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 
-import { useForm, FormProvider } from "react-hook-form"; 
-import DropdownField from "@/components/controlled/DropdownField"; 
+import { useForm, FormProvider } from "react-hook-form";
+import DropdownField from "@/components/controlled/DropdownField";
 
-//  TYPES
-
+// TYPES
 export type InvoiceData = {
   invoice: string;
   patient: string;
@@ -26,7 +25,6 @@ export type InvoiceData = {
   [key: string]: string | number | undefined;
 };
 
-// ADDED (Form type)
 type FilterForm = {
   statusFilter: string;
   timeFilter: string;
@@ -35,9 +33,6 @@ type FilterForm = {
 const InvoiceTable = () => {
   const [invoices, setInvoices] = useState<InvoiceData[]>([]);
 
-  
-
-  //  added (react-hook-form)
   const methods = useForm<FilterForm>({
     defaultValues: {
       statusFilter: "All",
@@ -46,13 +41,10 @@ const InvoiceTable = () => {
   });
 
   const { watch } = methods;
-
-  // added (watch filter values)
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
   // LOAD INVOICES
-
   useEffect(() => {
     const loadInvoices = () => {
       const stored = localStorage.getItem("invoiceList");
@@ -61,7 +53,6 @@ const InvoiceTable = () => {
     };
 
     loadInvoices();
-
     window.addEventListener("invoiceUpdated", loadInvoices);
 
     return () => {
@@ -69,8 +60,7 @@ const InvoiceTable = () => {
     };
   }, []);
 
-  //  FILTER LOGIC 
-
+  // FILTER LOGIC
   const filteredData = useMemo(() => {
     return invoices.filter((inv) => {
       const matchesStatus =
@@ -94,8 +84,26 @@ const InvoiceTable = () => {
     });
   }, [invoices, statusFilter, timeFilter]);
 
+  // ADDED DELETE FUNCTION
+  const handleDeleteSelected = (rowsToDelete: InvoiceData[]) => {
+    const updatedInvoices = invoices.filter(
+      (inv) =>
+        !rowsToDelete.some(
+          (row) => row.invoice === inv.invoice
+        )
+    );
 
-  // ADDED (Dropdown Options)
+    setInvoices(updatedInvoices);
+
+    //  ADDED Update localStorage
+    localStorage.setItem(
+      "invoiceList",
+      JSON.stringify(updatedInvoices)
+    );
+
+    // Optional: trigger refresh event
+    window.dispatchEvent(new Event("invoiceUpdated"));
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -109,8 +117,6 @@ const InvoiceTable = () => {
     { label: "This Month", value: "This Month" },
     { label: "Last 7 Days", value: "Last 7 Days" },
   ];
-
-  // TABLE COLUMNS 
 
   const columns: Column<InvoiceData>[] = [
     { key: "invoice", label: "Invoice" },
@@ -161,7 +167,6 @@ const InvoiceTable = () => {
   ];
 
   return (
-    //  added (Required wrapper for dropdown)
     <FormProvider {...methods}>
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
@@ -169,34 +174,26 @@ const InvoiceTable = () => {
         </Typography>
 
         <Divider sx={{ mb: 3 }} />
+        
 
-     
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
 
-          {/* Status Filter */}
           <DropdownField
             name="statusFilter"
             label="Status"
             options={statusOptions}
-           // isStatic
             freeSolo={false}
-            //floatLabel
-            
           />
 
-          {/* Time Filter */}
           <DropdownField
             name="timeFilter"
             label="Time Filter"
             options={timeOptions}
-           // isStatic
             freeSolo={false}
-           // floatLabel
-            
           />
 
         </Stack>
-
+       <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
         <UniversalTable<InvoiceData>
           data={filteredData}
           columns={columns}
@@ -204,12 +201,15 @@ const InvoiceTable = () => {
           showExport
           enableCheckbox
           getRowId={(row) => row.invoice}
+          
+          //  CONNECT DELETE HERE
+          onDeleteSelected={handleDeleteSelected}
         />
+        </div>
       </Paper>
     </FormProvider>
   );
 };
 
 export default InvoiceTable;
-
 

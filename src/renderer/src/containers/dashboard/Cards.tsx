@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Card, Typography, Divider } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
+import { InventoryItem } from "@/containers/inventory/AddInventoryItem";
 
 type FilterType = "Today" | "6 Days" | "This Month";
 
@@ -104,8 +105,46 @@ const getGridArea = (title: string) => {
       return "auto";
   }
 };
+interface SalesData {
+  id: number;
+  name: string;
+  medicine: string;
+  quantity: number;
+  totalPrice: number;
+  date: string;
+  time: string;
+}
 
 const Cards: React.FC = () => {
+  const getTopSellingMedicine = (): string => {
+  const stored = localStorage.getItem("salesData");
+  if (!stored) return "No Sales";
+
+  const sales: SalesData[] = JSON.parse(stored);
+
+  const counts: Record<string, number> = {};
+
+  sales.forEach((sale) => {
+    const medicineList = sale.medicine.split(",");
+
+    medicineList.forEach((item) => {
+      const name = item.trim();
+      counts[name] = (counts[name] || 0) + sale.quantity;
+    });
+  });
+
+  let highestMedicine = "";
+  let highestCount = 0;
+
+  Object.entries(counts).forEach(([medicine, qty]) => {
+    if (qty > highestCount) {
+      highestCount = qty;
+      highestMedicine = medicine;
+    }
+  });
+
+  return highestMedicine || "No Data";
+};
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
     1: "This Month",
@@ -125,6 +164,26 @@ const Cards: React.FC = () => {
     }));
   };
 
+  // fetch total medicines from local storage
+  const totalMedicines = (): string => {
+  const data = localStorage.getItem("inventory");
+  if (!data) {
+    return "0";
+  }
+  const parsedData: InventoryItem[] = JSON.parse(data);
+  return parsedData.length.toString();
+  };
+
+  //fetch total medicine group from local storage
+  const totalMedicineGroups =() : string =>
+  {
+    const data = localStorage.getItem("medicineGroups")
+    if(!data){
+      return "0"
+    }
+    const parsedData = JSON.parse(data);
+    return parsedData.length.toString();
+  }
   return (
     <Box width="100%">
       <Box
@@ -172,10 +231,10 @@ const Cards: React.FC = () => {
             >
               {/* Header */}
               <Box display="flex" justifyContent="space-between" mb={2} gap={2}>
-                <Typography fontWeight={600}>{card.title}</Typography>
+                <Typography fontWeight={600} fontSize={{xs:16, md:18}}>{card.title}</Typography>
 
                 <FormProvider {...methods}>
-                  <Box minWidth={150}>
+                  <Box width={200} height={50}>
                     <DropdownField
                       name="filter"
                       options={filterOptions}
@@ -247,9 +306,18 @@ const Cards: React.FC = () => {
                 </Box>
               ) : (
                 <Box display="flex" justifyContent="space-between">
-                  <Box>
-                    <Typography fontSize={24} fontWeight={700}>
-                      {info?.leftValue}
+                  <Box >
+                    {/* <Typography fontSize={24} fontWeight={800}>
+                      {card.title === "Inventory"
+                        ? totalMedicines()  
+                        : info?.leftValue}
+                    </Typography> */}
+                    <Typography fontSize={24} fontWeight={800}>
+                      {card.title === "Inventory"
+                        ? totalMedicines()//function to get total medicines count from local storage
+                        : card.title === "Top Selling Medicine"
+                        ? getTopSellingMedicine() //function to get top selling medicine from local storage
+                        : info?.leftValue}
                     </Typography>
                     <Typography fontSize={12} color="text.secondary">
                       {info?.leftLabel}
@@ -258,7 +326,10 @@ const Cards: React.FC = () => {
 
                   <Box>
                     <Typography fontSize={24} fontWeight={700}>
-                      {info?.rightValue}
+                      {/* {info?.rightValue} */}
+                      {card.title === "Inventory"
+                        ? totalMedicineGroups() //function to get total medicine groups count from local storage
+                        : info?.rightValue}
                     </Typography>
                     <Typography fontSize={12} color="text.secondary">
                       {info?.rightLabel}

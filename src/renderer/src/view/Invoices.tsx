@@ -102,6 +102,7 @@ const Billing = () => {
               width: { xs: 44, md: 80 },
               height: { xs: 44, md: 80 },
               flexShrink: 0,
+              
             }}
           />        
           </Box>

@@ -27,6 +27,20 @@ type InfoRowProps = {
   color?: string;
 };
 
+// btn style
+const PayNPrint = {
+  backgroundColor: "#238878",
+  color: "#fff",
+  border: "2px solid #238878",
+  textTransform: "none",
+  minWidth: "250px",
+  height: "36px",
+  "&:hover": {
+    backgroundColor: "#fff",
+    color: "#238878",
+    border: "2px solid #238878",
+  },
+};
 
 const MediPoints: React.FC = () => {
   const navigate = useNavigate();
@@ -102,8 +116,22 @@ const MediPoints: React.FC = () => {
     </Box>
   );
   
-   const onSubmit = (data:  MediPointsForm) => {
-    console.log(data);
+  //data pass to payment method page 
+  const onSubmit = (data: MediPointsForm) => {
+    const storedInvoice = localStorage.getItem("currentInvoice");
+
+    if (storedInvoice) {
+      const invoice = JSON.parse(storedInvoice);
+
+      // Update totalPrice with discounted amount
+      invoice.totalPrice = Number(data.discountedAmount);
+
+      localStorage.setItem(
+        "currentInvoice",
+        JSON.stringify(invoice)
+      );
+    }
+
     navigate(URL_PATH.PaymentMethod);
   };
   return (
@@ -285,11 +313,7 @@ const MediPoints: React.FC = () => {
             <Button
               variant="contained"
               type="submit"
-              sx={{
-                bgcolor: "#1f8f7a",
-                textTransform: "none",
-                
-              }}
+              sx={{...PayNPrint,minWidth: "140px"}}
             >
               Save & Continue
             </Button>
@@ -297,10 +321,7 @@ const MediPoints: React.FC = () => {
             <Button
               startIcon={<PrintIcon />}
               variant="contained"
-              sx={{
-                bgcolor: "#1f8f7a",
-                textTransform: "none",
-              }}
+              sx={{...PayNPrint,minWidth: "140px"}}
             >
               PRINT
             </Button>
