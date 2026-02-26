@@ -38,15 +38,16 @@ const Billing = () => {
 
   return (
     <Box>
-      <Typography variant="h6" mb={2}>
+      <Typography variant="h5" mb={2}>
         Invoices
       </Typography>
       <Divider sx={{ mb: 3 }} />
 
       <Box
         display="flex"
+        flexDirection={{xs:"column", md:"row"}}
         mb={4}
-        gap={3}
+        gap={2}
       >
 
         <Box

@@ -8,7 +8,9 @@ import {
   type SxProps,
   type Theme,
   Autocomplete,
-  type AutocompleteRenderInputParams
+  type AutocompleteRenderInputParams,
+  MenuItem,
+  TextFieldProps
 } from '@mui/material';
 import { useFormContext, Controller } from 'react-hook-form';
 import { getComponentTranslations } from '@/helpers/useTranslations';
@@ -20,7 +22,7 @@ type Option = {
   value: string;
 };
 
-type DropdownFieldProps = {
+type DropdownFieldProps = TextFieldProps & {
   label?: string;
   name: string;
   options: Option[];
@@ -31,6 +33,7 @@ type DropdownFieldProps = {
   freeSolo?: boolean;
   placeholder?: string;
   floatLabel?: boolean;
+  isStatic?: boolean
 };
 
 const DropdownField: FC<DropdownFieldProps> = ({ 
@@ -43,7 +46,9 @@ const DropdownField: FC<DropdownFieldProps> = ({
   onChangeCallback,
   freeSolo = true,
   placeholder,
-  floatLabel = false
+  floatLabel = false,
+  isStatic=  false,
+  ...rest
 }) => {
   const { t } = useTranslation();
   const translations = getComponentTranslations(t);
@@ -81,6 +86,26 @@ const DropdownField: FC<DropdownFieldProps> = ({
             }}
             disabled={disabled}
           >
+          {isStatic ? (
+              <TextField
+                select
+                fullWidth
+                value={value || ''}
+                onChange={(e) => {
+                  onChange(e.target.value);
+                }}
+                label={floatLabel ? label : undefined}
+                placeholder={!floatLabel ? placeholder : undefined}
+                error={!!errors[name]}
+                required={required}
+              >
+                {options.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            ):(
             <Autocomplete
               freeSolo={freeSolo}
               options={options}
@@ -111,6 +136,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
               }}
               renderInput={(params: AutocompleteRenderInputParams) => (
                 <TextField
+                  {...rest}
                   {...params}
                   {...field}
                   inputRef={ref}
@@ -120,7 +146,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
                   required={required}
                 />
               )}
-            />
+            />)}
             <FormHelperText sx={{ mt: 0.5, mx: 0 }}>
               {errors[name]?.message?.toString() || ' '}
             </FormHelperText>

@@ -1,41 +1,64 @@
-import { Box, Button, Chip, Paper, Typography } from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
-
+import { UniversalTable, Column, ACTION_KEY } from "@/components/uncontrolled/UniversalTable";
+import { useEffect, useState } from "react";
+import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
+import { URL_PATH } from "@/constants/UrlPath";
 
 type MedicineGroupRow = {
   id: number;
-  name: string;
+  groupName: string;
+  category: string;
   count: string;
 };
 
-const medicineGroups: MedicineGroupRow[] = [
-  { id: 1, name: "Generic Medicines", count: "02" },
-  { id: 2, name: "Diabetes", count: "32" },
-  { id: 3, name: "Other", count: "01" },
-];
+const MedicineGroup = () => {
+  const [medicineGroups, setMedicineGroups] = useState<MedicineGroupRow[]>([]);
 
-const columns: Column<MedicineGroupRow>[] = [
-  {
-    key: "name",
-    label: "Group Name",
-  },
-  {
-    key: "count",
-    label: "No of Medicines",
+  const navigate = useNavigate();
+
+ useEffect(() => {
+  const groups = JSON.parse(
+    localStorage.getItem("medicineGroups") || "[]"
+  );
+
+  const inventory = JSON.parse(
+    localStorage.getItem("inventory") || "[]"
+  );
+
+  const updatedGroups = groups.map(
+    (group: { id: number; groupName: string; category: string }) => {
+      const count = inventory.filter(
+        (item: { medicineGroup: string }) =>
+          item.medicineGroup === group.groupName
+      ).length;
+
+      return {
+        ...group,
+        count: count.toString(),
+      };
+    }
+  );
+
+  setMedicineGroups(updatedGroups);
+}, []);
+
+  const saveGroups = (updated: MedicineGroupRow[]) => {
+    localStorage.setItem("medicineGroups", JSON.stringify(updated));
+    setMedicineGroups(updated);
+  };
+
+  const columns: Column<MedicineGroupRow>[] = [
+  { key: "groupName", label: "Group Name" },
+  { key: "category", label: "Category",},
+  { key: "count", label: "No of items",
     render: (row) => (
-      <Typography align="center">{row.count}</Typography>
+      <Typography>{row.count}</Typography>
     ),
   },
-  {
-    key: "actionbutton",
-    label: "Action",
-    render: () => null, 
+  { key: ACTION_KEY,  label: "Action",
   },
 ];
-
-export default function MedicineGroup() {
-  const navigate = useNavigate();
 
   return (
     <Paper sx={{ p: 3, borderRadius: 2 }}>
@@ -52,18 +75,14 @@ export default function MedicineGroup() {
           gap={1}
         >
           Medicine Groups
-          <Chip label={medicineGroups.length} size="small" />
         </Typography>
 
         <Button
-          size="small"
-          onClick={() => navigate("/inventory/add-medicine-group")}
+          onClick={() => navigate(URL_PATH.AddMedicineGroup)}
           sx={{
             backgroundColor: "#238878",
             color: "#fff",
             textTransform: "none",
-            fontWeight: 600,
-            borderRadius: "6px",
             px: 2,
             "&:hover": {
               backgroundColor: "#1f7669",
@@ -77,21 +96,20 @@ export default function MedicineGroup() {
       <UniversalTable<MedicineGroupRow>
         data={medicineGroups}
         columns={columns}
-        caption={null}
         tableSize="small"
         rowsPerPage={5}
         actions={{
-          view: (row) => navigate(`/medicine-groups/${row.id}`),
-        }}
-        getRowId={(row) => row.id}
-        paperSx={{
-          boxShadow: "none",
-          borderRadius: 1,
-        }}
-        headerSx={{
-          textAlign: "center",
-        }}
+          view: (row) => navigate(`/medicine-groups/${row.groupName}`),
+          delete: async (row) => {
+            const ok = await showConfirmation("Delete this group?", "Confirm");
+            if (ok) {
+              saveGroups(medicineGroups.filter((g) => g.id !== row.id));
+              showSnackbar("success", "Group deleted successfully");
+            }
+        }
+      }}
       />
     </Paper>
   );
 }
+export default  MedicineGroup;

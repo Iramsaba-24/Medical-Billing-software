@@ -127,18 +127,7 @@ const columns: Column<InventoryItem>[] = [
       </Typography>
     ),
   },
-  // {
-  //   key: "id",
-  //   label: "Actions",
-  //   render: (row) => (
-  //     // <IconButton 
-  //     //   onClick={() => console.log("Share:", row)}
-  //     //   sx={{ color: "gray" }}
-  //     // >
-  //     //   <SendIcon sx={{ fontSize: 20, transform: "rotate(-30deg)" }} />
-  //     // </IconButton>
-  //   ),
-  // },
+  
   {
     key: "id",
     label: "Actions",

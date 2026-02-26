@@ -69,6 +69,7 @@ const DateTimeField: FC<DateFieldProps> = ({
       case "datetime":
         return dayjs(value);
       case "date":
+        return dayjs(value, "YYYY-MM-DD", true);
       default:
         return dayjs(value);
     }
@@ -84,7 +85,9 @@ const DateTimeField: FC<DateFieldProps> = ({
       case "time":
         return date.format("HH:mm");
       case "datetime":
+        return date.toISOString();
       case "date":
+        return date.format("YYYY-MM-DD");
       default:
         return date.toISOString();
     }

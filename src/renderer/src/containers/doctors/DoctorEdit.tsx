@@ -6,6 +6,8 @@ type Doctor = {
   doctorName: string;
   degree: string;
   phone: string;
+  email: string;
+  registrationNo: string;
   address: string;
   status: "Active" | "Inactive";
 };
@@ -16,7 +18,7 @@ type Props = {
   onSave: (doctor: Doctor) => void;
 };
 
-const DoctorEdit = ({ doctor, onClose, onSave }: Props) => {
+const DoctorEdit = ({doctor, onClose, onSave}: Props) => {
   const [formData, setFormData] = useState<Doctor | null>(null);
 
   // update the doctor
@@ -29,8 +31,7 @@ const DoctorEdit = ({ doctor, onClose, onSave }: Props) => {
     <Dialog open={Boolean(doctor)} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Edit Doctor</DialogTitle>
 
-  {/* form fields */}
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <DialogContent sx={{display: "flex", flexDirection: "column", gap: 2}}>
         <TextField
           label="Doctor Name"
           value={formData.doctorName}

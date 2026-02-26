@@ -8,9 +8,9 @@ import DistributorReportTable from '@/containers/report/DistributorReportTable';
 const ReportPage = () => {
   return (
    
-    <div className="container" style={{ padding: '20px' }}>
+    <div className="container"  >
       
-      <h2 style={{ marginBottom: '20px' }}>Reports</h2>
+      <h2 style={{ marginTop: '-20px' }}>Reports</h2>
       <ReportCards />
       <SalesGraph />
       <div style={{ 

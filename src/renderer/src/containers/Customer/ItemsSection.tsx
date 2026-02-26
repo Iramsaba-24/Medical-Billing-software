@@ -1,112 +1,159 @@
- import { Box, Button, Typography, Grid, TextField, MenuItem, IconButton, Divider, Paper } from "@mui/material";
+ import { Box, Button, Typography, TextField, MenuItem, IconButton, Divider, Paper } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 import { ItemRow } from "@/containers/customer/AddCustomerForm";
 
-// Define what information this component needs from the parent
+// Define the props  from the  component
 interface ItemsSectionProps {
-  rows: ItemRow[]; 
+  rows: ItemRow[];
   setRows: (rows: ItemRow[]) => void;
-  gst: number; 
+  gst: number;
   setGst: (val: number) => void;
-  paymentMode: string; 
+  paymentMode: string;
   setPaymentMode: (val: string) => void;
   finalTotal: number;
+  isSubmitted: boolean;
 }
 
-const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode, finalTotal }: ItemsSectionProps) => {
-
-  // Function to add a new empty row for a medicine
+const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode, finalTotal, isSubmitted }: ItemsSectionProps) => {
+  
+  // Logic to add a new empty row for a new medicine
   const addRow = () => setRows([...rows, { id: Date.now(), name: "", qty: "", price: "" }]);
+  
+  // Logic to remove a row by its ID
+  const removeRow = (id: number) => setRows(rows.filter((r) => r.id !== id));
 
-  // Function to remove a specific row using its ID
-  const removeRow = (id: number) => setRows(rows.filter(r => r.id !== id));
-
-  // Function to update values (name, qty, or price) in a specific row
+  // Logic to update values like Name, Quantity, or Price in a specific row
   const updateRow = (id: number, field: keyof ItemRow, value: string | number) => {
-    setRows(rows.map(r => r.id === id ? { ...r, [field]: value } : r));
+    setRows(rows.map((r) => {
+      if (r.id === id) {
+        // Prevent typing negative numbers for quantity and price
+        if ((field === "qty" || field === "price") && value !== "" && Number(value) < 0) return r;
+        
+        // Remove special characters from name (allow only letters, numbers, and spaces)
+        if (field === "name") return { ...r, [field]: String(value).replace(/[^a-zA-Z0-9\s-]/g, "") };
+        
+        return { ...r, [field]: value };
+      }
+      return r;
+    }));
   };
 
   return (
-    <Paper 
-      sx={{ p: { xs: 2, md: 3 }, borderRadius: "7px", border: "1px solid #e0e0e0", boxShadow: "0px 3px 6px rgba(0,0,0,0.1)" }} 
-      elevation={0}
-    >
-      {/* Title and Add Button */}
-      <Box display="flex" justifyContent="space-between" mb={2}>
-        <Typography variant="h6" fontWeight={600}>Items List</Typography>
-        <Button  size="small"   startIcon={<Add />}   onClick={addRow} 
-          sx={{ color: "#248a76", fontWeight: "bold", textTransform: "none" }} >
-          Add Item
-        </Button>
-      </Box>
+    <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: "7px", border: "1px solid #e0e0e0" }} elevation={0}>
       
+      {/*  Header with Title and Add Button */}
+      <Box display="flex" justifyContent="space-between" mb={2} alignItems="center">
+        <Typography variant="h6" fontWeight={600}>Items List</Typography>
+        <Button startIcon={<Add />} onClick={addRow} sx={{ color: "#248a76", fontWeight: "bold" }}>ADD ITEM</Button>
+      </Box>
       <Divider sx={{ mb: 3 }} />
 
-      {/*  Loop through each row and create input fields */}
-      {rows.map((row, i) => (
-        <Box key={row.id} sx={{ mb: 2, p: { xs: 1.5, md: 0 }, bgcolor: { xs: "#fcfcfc", md: "transparent" }, borderRadius: "8px" }}>
-          <Grid container spacing={2} alignItems="center">
+      {/*  Medicine Rows Responsive Grid */}
+      {rows.map((row) => {
+        // Validation: Show error if fields are empty after clicking Save
+        const nameError = isSubmitted && row.name.trim() === "";
+        const qtyError = isSubmitted && (row.qty === "" || Number(row.qty) <= 0);
+        const priceError = isSubmitted && (row.price === "" || Number(row.price) <= 0);
+
+        return (
+          <Box key={row.id} sx={{ 
+            display: "grid", 
+            // Laptop: 5 columns in a row | Mobile: 1 column (Stacked)
+            gridTemplateColumns: { md: "4fr 1fr 1.5fr 1.5fr 50px", xs: "1fr" }, 
+            gap: 2, 
+            mb: { xs: 4, md: 2 }, // Extra gap between rows on mobile
+            alignItems: "start" 
+          }}>
+            {/* Item Name Input */}
+            <TextField
+              fullWidth
+              label="Item Name"
+              value={row.name}
+              error={nameError}
+              onChange={(e) => updateRow(row.id, "name", e.target.value)}
+            />
             
-            {/*  Medicine Name */}
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <TextField   fullWidth label="Item Name" value={row.name} 
-                onChange={(e) => updateRow(row.id, "name", e.target.value)}    />
-            </Grid>
-
-            {/* Quantity */}
-            <Grid size={{ xs: 12, sm: 2 }}>
-              <TextField   fullWidth label="Qty" type="number" value={row.qty} 
-                onChange={(e) => updateRow(row.id, "qty", e.target.value === "" ? "" : Number(e.target.value))}  />
-            </Grid>
-
-            {/*  Price per item */}
-            <Grid size={{ xs: 12, sm: 2 }}>
-              <TextField   fullWidth label="Price" type="number" value={row.price} 
-                onChange={(e) => updateRow(row.id, "price", e.target.value === "" ? "" : Number(e.target.value))}  />
-            </Grid>
-
-            {/*  Calculated Total for this row Qty * Price */}
-            <Grid size={{ xs: 12, sm: 2 }}>
-              <TextField   fullWidth label="Total" 
-                value={(Number(row.qty) * Number(row.price)) || 0}  disabled  />
-            </Grid>
-
-            {/* Delete Button  */}
-            <Grid size={{ xs: 12, sm: 2 }} textAlign={{ xs: "right", md: "center" }}>{rows.length > 1 && (
-                <IconButton onClick={() => removeRow(row.id)} color="error">
-                  <Remove />
-                </IconButton>
+            {/* Quantity Input Blocked 'e', '-', '+' keys */}
+            <TextField
+              fullWidth
+              label="Qty"
+              type="number"
+              value={row.qty}
+              error={qtyError}
+              onKeyDown={(e) => ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()}
+              onChange={(e) => updateRow(row.id, "qty", e.target.value === "" ? "" : Number(e.target.value))}
+            />
+            
+            {/* Price Input */}
+            <TextField
+              fullWidth
+              label="Price"
+              type="number"
+              value={row.price}
+              error={priceError}
+              onKeyDown={(e) => ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()}
+              onChange={(e) => updateRow(row.id, "price", e.target.value === "" ? "" : Number(e.target.value))}
+            />
+            
+            {/* Row Total (Calculated Automatically) */}
+            <TextField label="Total" value={(Number(row.qty) * Number(row.price)).toFixed(2)} disabled   />
+            
+            {/* Delete Icon (Hidden if only one row exists) */}
+            <Box display="flex" justifyContent="center">
+              {rows.length > 1 && (
+                <IconButton onClick={() => removeRow(row.id)} color="error"  ><Remove /></IconButton>
               )}
-            </Grid>
-          </Grid>
+            </Box>
+          </Box>
+        );
+      })}
 
-          {/* Line separator for mobile view only */}
-          {i !== rows.length - 1 && <Divider sx={{ my: 2, display: { md: "none" } }} />}
-        </Box>
-      ))}
-
-      {/* Payment Mode, GST Selection, and  Total */}
-      <Box sx={{  mt: 2, pt: 2, borderTop: "2px solid #f0f0f0",  display: 'flex', flexDirection: { xs: "column", md: "row" },   justifyContent: 'space-between', gap: 2, alignItems: 'center'  }}>
+      {/*  Billing Summary (Payment, GST, Total) */}
+      <Box sx={{ 
+        borderTop: "1px solid #eee", 
+        pt: 3, 
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 3 
+      }}>
         
-        {/* Payment & GST Dropdowns */}
-        <Box sx={{ display: 'flex', flexDirection: { xs: "column", sm: "row" }, gap: 2, width: { xs: "92%", md: "400px" }, }}>
-          <TextField  select label="Payment" value={paymentMode} 
-            onChange={(e) => setPaymentMode(e.target.value)} sx={{ flex: 1 }}  >
-            {["Cash", "UPI", "Card"].map(m => <MenuItem key={m} value={m}>{m}</MenuItem>)}
+        {/* Payment and GST Selectors - Mobile: Column | Tablet+: Row */}
+        <Box sx={{ 
+          display: "flex", 
+          flexDirection: { xs: "column", sm: "row" }, 
+          gap: 2, 
+          width: "100%",
+          maxWidth: { md: "500px" } 
+        }}>
+          {/* Dropdown for Payment Mode */}
+          <TextField select label="Payment Mode" value={paymentMode} onChange={(e) => setPaymentMode(e.target.value)} fullWidth size="small">
+            {["Cash", "UPI", "Card"].map((m) => <MenuItem key={m} value={m}>{m}</MenuItem>)}
           </TextField>
-
-          <TextField  select  label="GST" value={gst} 
-            onChange={(e) => setGst(Number(e.target.value))} sx={{ flex: 1 }}>
-            {[5, 12, 18].map(g => <MenuItem key={g} value={g}>{g}%</MenuItem>)}
+          
+          {/* Dropdown for GST Percentage */}
+          <TextField select label="GST %" value={gst} onChange={(e) => setGst(Number(e.target.value))} fullWidth size="small">
+            {[5, 12, 18].map((g) => <MenuItem key={g} value={g}>{g}%</MenuItem>)}
           </TextField>
         </Box>
-
-        {/* Display Final Bill Amount */}
-        <Typography variant="h5"  sx={{  fontWeight: "600", bgcolor: "#e8f5f2", px: 3, py: 1, 
-            borderRadius: '12px', textAlign: "center", color: "#248a76" 
-          }} >
-          Total: ₹{finalTotal.toFixed(2)}
-        </Typography>
+        
+        {/* Grand Total Display - Mobile: Center | Laptop: End */}
+        <Box sx={{ 
+          display: "flex", 
+          justifyContent: { xs: "center", md: "flex-end" }, 
+          width: "100%" 
+        }}>
+          <Typography variant="h6" sx={{ 
+            fontWeight: "bold", 
+            bgcolor: "#e8f5f2", 
+            px: { xs: 5, md: 3 }, 
+            py: 1, 
+            borderRadius: "8px",
+            width: { xs: "100%", sm: "auto" }, 
+            textAlign: "center"
+          }}>
+            Grand Total: ₹{finalTotal.toFixed(2)}
+          </Typography>
+        </Box>
       </Box>
     </Paper>
   );

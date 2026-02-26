@@ -14,7 +14,7 @@ type InventoryItem = {
   status: "In Stock" | "Low Stock" | "Out of Stock";
 };
 
-const REORDER_LIMIT = 10;
+const Reorder = 10;
 
 const ReorderList = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -30,7 +30,7 @@ const ReorderList = () => {
           ...item,
           stockQty: Number(item.stockQty),
         }))
-        .filter((item: InventoryItem) => item.stockQty < REORDER_LIMIT)
+        .filter((item: InventoryItem) => item.stockQty < Reorder)
     );
   }, []);
 
@@ -72,7 +72,7 @@ const ReorderList = () => {
     // update reorder list
     setItems(
       updatedInventory.filter(
-        (item: InventoryItem) => item.stockQty < REORDER_LIMIT
+        (item: InventoryItem) => item.stockQty < Reorder
       )
     );
 
@@ -83,21 +83,13 @@ const ReorderList = () => {
     { key: "itemName", label: "Item" },
     { key: "stockQty", label: "Stock" },
     { key: "pricePerUnit", label: "MRP" },
-    {
-      key: "gst",
-      label: "GST (12%)",
-      render: (row) =>
-        `₹ ${(row.pricePerUnit * 0.12).toFixed(2)}`,
+    { key: "gst", label: "GST (12%)",
+      render: (row) => `₹ ${(row.pricePerUnit * 0.12).toFixed(2)}`,
     },
-    {
-      key: "total",
-      label: "Total",
-      render: (row) =>
-        `₹ ${(row.pricePerUnit * 1.12).toFixed(2)}`,
+    { key: "total", label: "Total",
+      render: (row) => `₹ ${(row.pricePerUnit * 1.12).toFixed(2)}`,
     },
-    {
-      key: "reorder",
-      label: "Reorder",
+    { key: "reorder", label: "Reorder",
       render: (row) => (
         <Button
           size="small"
