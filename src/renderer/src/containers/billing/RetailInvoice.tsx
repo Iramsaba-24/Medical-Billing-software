@@ -395,7 +395,7 @@ const RetailInvoice = () => {
                     value={getRowAmount(items[index]).toFixed(2)}
                   />
                 </Grid>
-
+ 
                 {/* <Grid size={{ xs: 12, md: 1 }}> */}
                 <Grid textAlign={{ xs: "right", md: "center" }} size={{ xs: 12, md: 1 }}>
                   <Button

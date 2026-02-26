@@ -43,7 +43,7 @@ const RetailInvoice: React.FC = () => {
       ifsc: "",
     },
     mode: "onChange",
-  });
+  }); 
  
  const onSubmit = (data: FormValues) => {
   localStorage.setItem(

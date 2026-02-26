@@ -29,7 +29,7 @@ const DistributorDetails = () => {
   ];
 
   return (
-    <Box p={2}>
+    <Box p={-2}>
      {/* DistributorsDetails */}
       <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 3 }}>
         <BankInfo title="Distributor Details" details={distributorFields} />
