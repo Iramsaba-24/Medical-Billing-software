@@ -44,6 +44,8 @@ import SalesView from "@/containers/dashboard/SalesView";
 import AccountSetup from "@/view/auth/AccountSetup";
 
 
+
+
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
@@ -237,6 +239,7 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AccountSetup,
         element: <AccountSetup />,
       },
+    
     
     
       

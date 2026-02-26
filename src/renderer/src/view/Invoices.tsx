@@ -78,6 +78,7 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
+             height: {  md: 105}
           }}>
           <Box>
              <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
@@ -95,6 +96,7 @@ const Billing = () => {
               width: { xs: 44, md: 80 },
               height: { xs: 44, md: 80 },
               flexShrink: 0,
+              
             }}
           />        
           </Box>
