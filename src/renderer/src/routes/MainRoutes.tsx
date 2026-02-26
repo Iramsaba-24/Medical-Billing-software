@@ -31,7 +31,7 @@ import InventorySettings from "@/containers/setting/InventorySettings";
 
 import MediPoints from "@/containers/billing/MediPoints";
 import Billing from "@/view/Billing";
-
+import ChoosePlan from "@/view/auth/ChoosePlan.js"
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
@@ -41,6 +41,8 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
+import AccountSetup from "@/view/auth/AccountSetup";
+
 
 export const mainRoutes: RouteObject[] = [
   {
@@ -227,6 +229,15 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
       },
+      {
+        path: URL_PATH.ChoosePlan,
+        element: <ChoosePlan />,
+      },
+      {
+        path: URL_PATH.AccountSetup,
+        element: <AccountSetup />,
+      },
+    
     
       
     ],
