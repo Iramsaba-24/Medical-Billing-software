@@ -106,26 +106,27 @@ function POSMaster() {
   if (hasInvalidItems) {
     return;
   }
+
+  const now = new Date();
   const invoiceData = {
-    form: data,
-    rows,
-    gst,
-    paymentMode,
-    createdAt: new Date().toISOString(),
+    id: Date.now(),
+    name: data.name,
+    medicine: rows.map((r) => r.name).join(", "),
+    quantity: rows.reduce(
+      (sum, r) => sum + Number(r.qty || 0),
+      0
+    ),
+    totalPrice: finalTotal,
+    date: now.toLocaleDateString(),
+    time: now.toLocaleTimeString(),
   };
-  const existingInvoices = JSON.parse(
-    localStorage.getItem("billing_invoices") || "[]"
-  );
-  existingInvoices.push(invoiceData);
   localStorage.setItem(
-    "billing_invoices",
-    JSON.stringify(existingInvoices)
+    "currentInvoice",
+    JSON.stringify(invoiceData)
   );
-  console.log("Saved Invoice:", invoiceData);
-  navigate(URL_PATH.MediPoints, { state: { totalFromInvoice: finalTotal } });
-};
-
-
+    console.log("Saved Invoice:", invoiceData);
+    navigate(URL_PATH.MediPoints, { state: { totalFromInvoice: finalTotal } });
+  };
 
   type ItemRow = {
     id: number;
@@ -186,7 +187,7 @@ function POSMaster() {
       setGst(5);
       setPaymentMode("Cash");
     }
-  }, [activeInvoice, invoiceForms]);
+  }, [activeInvoice, invoiceForms, methods]);
 
 
   // load doctor list
