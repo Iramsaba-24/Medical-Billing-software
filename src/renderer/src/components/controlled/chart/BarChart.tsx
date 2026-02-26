@@ -40,7 +40,7 @@ const BarChart: FC<BarChartProps> = ({ title, xLabels, data, xAxisLabel = 'X-Axi
   return (
     <Card sx={{ borderRadius: 3 }} {...rest}>
       <CardContent>
-        <Typography sx={TitleSx} gutterBottom>
+        <Typography fontSize={{xs:16 , md:18}} fontWeight={600} mb={5}>
           {title}
         </Typography>
         <MuiBarChart

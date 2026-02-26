@@ -11,5 +11,5 @@ export const authRoutes: RouteObject[] = [
   {
     path: URL_PATH.LOGIN,
     element: <LOGIN />,
-  },
+  }
 ];
