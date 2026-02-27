@@ -26,6 +26,22 @@ type InvoiceItem = {
   price: number;
   unitPrice:number;
 };
+type MedicineItem = {
+  name: string;
+  batch: string;
+  expiry: string;
+  qty: string;
+  amount: number;
+};
+
+type StoredInvoice = {
+  invoice: string;
+  patient: string;
+  date: string;
+  price: number;
+  status: "Paid" | "Pending" | "Overdue";
+  medicines: MedicineItem[];
+};
 
 type InvoiceFormData = {
   patient: string;
@@ -87,7 +103,7 @@ useEffect(() => {
 
   const navigate = useNavigate();
   const location = useLocation();
-const editingInvoice = location.state as any;
+const editingInvoice = location.state as StoredInvoice | null;
 
   const methods = useForm<InvoiceFormData>({
     defaultValues: {
@@ -152,13 +168,15 @@ const editingInvoice = location.state as any;
   };
 
   const stored = localStorage.getItem("invoiceList");
-  const existingInvoices = stored ? JSON.parse(stored) : [];
+ const existingInvoices: StoredInvoice[] = stored
+  ? JSON.parse(stored)
+  : [];
 
   let updatedInvoices;
 
 if (editingInvoice) {
   // UPDATE
-  updatedInvoices = existingInvoices.map((inv: any) =>
+  updatedInvoices = existingInvoices.map((inv) =>
     inv.invoice === editingInvoice.invoice ? newInvoice : inv
   );
 } else {
@@ -177,7 +195,7 @@ useEffect(() => {
       patient: editingInvoice.patient,
       date: editingInvoice.date,
       status: editingInvoice.status,
-      items: editingInvoice.medicines.map((med: any) => ({
+      items: editingInvoice.medicines.map((med) => ({
         item: med.name,
         qty: Number(med.qty),
         price: med.amount,
