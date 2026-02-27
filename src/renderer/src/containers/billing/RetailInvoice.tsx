@@ -151,12 +151,28 @@ const inventoryOptions = inventory.map((item) => ({
   const finalTotal = subTotal + gstAmount;
   const selectedCompany = watch("company");
 
-
   const onSubmit = (data: FormData) => {
     console.log("FORM SUBMITTED:", data);
+
+    const existingInvoices = JSON.parse(localStorage.getItem("currentRetailInvoice") || "[]");
+
+    // map each item in the invoice separately
+    const formattedInvoices = data.items.map((row) => ({
+      id: Date.now() + Math.random(), // unique ID
+      company: data.company,
+      supplier: data.supplier,
+      item: row.name,
+      quantity: row.qty,
+      mrp: row.mrp,
+      total: row.qty * (row.mrp - (row.discount || 0)),
+    }));
+
+    const updatedInvoices = [...existingInvoices, ...formattedInvoices];
+
+    localStorage.setItem("currentRetailInvoice", JSON.stringify(updatedInvoices));
+
     showToast("success", "Data saved successfully!");
-     navigate(URL_PATH.PaymentDetails );
-    
+    navigate(URL_PATH.PaymentDetails);
   };
 
   const onError = (formErrors: FieldErrors<FormData>) => {
@@ -393,9 +409,9 @@ const inventoryOptions = inventory.map((item) => ({
                     value={getRowAmount(items[index]).toFixed(2)}
                   />
                 </Grid>
-
+ 
                 {/* <Grid size={{ xs: 12, md: 1 }}> */}
-                  <Grid textAlign={{ xs: "right", md: "center" }} size={{ xs: 12, md: 1 }}>
+                <Grid textAlign={{ xs: "right", md: "center" }} size={{ xs: 12, md: 1 }}>
                   <Button
                     type="button"
                     onClick={() => remove(index)}
@@ -467,7 +483,7 @@ const inventoryOptions = inventory.map((item) => ({
             >
               Print
             </Button>
-            </Box>
+          </Box>
 
         </form>
       </Paper>

@@ -43,12 +43,17 @@ const RetailInvoice: React.FC = () => {
       ifsc: "",
     },
     mode: "onChange",
-  });
+  }); 
  
-  const onSubmit = (data: FormValues) => {
-    console.log("FORM DATA:", data);
-    showToast("success", "Details saved ");
-  };
+ const onSubmit = (data: FormValues) => {
+  localStorage.setItem(
+    "paymentDetails",
+    JSON.stringify(data)
+  );
+
+  showToast("success", "Details saved");
+  navigate(URL_PATH.PaymentMethod);
+};
  
   return (
     <Box sx={{ mx: { xs: -2, md: 0.5 } }}>
