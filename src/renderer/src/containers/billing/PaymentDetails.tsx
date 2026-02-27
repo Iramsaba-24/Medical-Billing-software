@@ -216,4 +216,3 @@ const RetailInvoice: React.FC = () => {
 };
  
 export default RetailInvoice;
- 

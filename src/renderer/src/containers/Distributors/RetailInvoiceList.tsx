@@ -6,6 +6,20 @@ import {
 import ShareMenu from "./ShareMenu";
 import { useEffect, useState } from "react";
 
+type RetailRow = {
+  name: string;
+  qty: number;
+  mrp: number;
+  discount?: number;
+};
+
+type RetailInvoice = {
+  id?: number;
+  company: string;
+  supplier: string;
+  items?: RetailRow[];
+};
+
 type InvoiceItem = {
   id: number;
   company: string;
@@ -44,24 +58,23 @@ export default function RetailInvoiceList() {
   useEffect(() => {
     const storedData = localStorage.getItem("retailInvoices");
     if (storedData) {
-      const parsed = JSON.parse(storedData);
-
-      const normalized = parsed
-        .map((inv: any) => {
-          if (inv.items) {
-            return inv.items.map((row: any) => ({
-              id: inv.id || Date.now() + Math.random(),
-              company: inv.company,
-              supplier: inv.supplier,
-              item: row.name,
-              quantity: row.qty,
-              mrp: row.mrp,
-              total: row.qty * (row.mrp - (row.discount || 0)),
-            }));
-          }
-          return inv;
-        })
-        .flat();
+const parsed: RetailInvoice[] = JSON.parse(storedData);
+      const normalized: InvoiceItem[] = parsed
+  .map((inv) => {
+    if (inv.items) {
+      return inv.items.map((row) => ({
+        id: inv.id ?? Date.now() + Math.random(),
+        company: inv.company,
+        supplier: inv.supplier,
+        item: row.name,
+        quantity: row.qty,
+        mrp: row.mrp,
+        total: row.qty * (row.mrp - (row.discount ?? 0)),
+      }));
+    }
+    return inv as unknown as InvoiceItem;
+  })
+  .flat();
 
       setTableData(normalized);
       localStorage.setItem("retailInvoices", JSON.stringify(normalized));
