@@ -18,7 +18,7 @@ import AddDoctor from "@/containers/doctors/AddDoctor";
 import DistributorsPage from "@/view/DistributorsPage";
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
-import DistributorDetails from "@/containers/distributors/DistributorsDetails";
+import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
@@ -26,7 +26,7 @@ import GeneralSettings from "@/containers/setting/GeneralSettings";
 
 import Setting from "@/containers/layout/Setting";
 
-import DistributorsForm from "@/containers/distributors/DistributorsForm";
+import DistributorsForm from "@/containers/Distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 
 import MediPoints from "@/containers/billing/MediPoints";
@@ -185,10 +185,7 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.CustomerSettings,
         element: <CustomerSettings />,
       },
-      // {
-      //   path: URL_PATH.DoctorsSettings,
-      //   element: <DoctorsSettings />,
-      // },
+    
       {
         path: URL_PATH.InvoiceSetting,
         element: <InvoiceSettings />,
@@ -226,9 +223,7 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
-      },
-    
-      
+      },      
     ],
   },
 ];
