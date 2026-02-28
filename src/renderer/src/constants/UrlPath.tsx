@@ -3,7 +3,8 @@ export const URL_PATH = {
   REGISTER: "/register",
   ChoosePlan:"/chooseplan",
  AccountSetup:"/accountsetup",
-  
+  BusinessDetails:"/BusinessDetails",
+  NetBanking_PurchaseDetails:"/NetBanking_PurchaseDetails",
 
   Landing: "/landing",
   Dashboard: "/dashboard",

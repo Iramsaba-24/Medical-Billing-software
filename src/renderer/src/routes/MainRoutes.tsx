@@ -239,8 +239,7 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AccountSetup,
         element: <AccountSetup />,
       },
-    
-    
+
     
       
     ],
