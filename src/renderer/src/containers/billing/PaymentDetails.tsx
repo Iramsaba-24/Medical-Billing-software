@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import TextInputField from "@/components/controlled/TextInputField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-
+ 
 type FormValues = {
   bankName: string;
   accountNumber: string;
@@ -13,7 +13,7 @@ type FormValues = {
   branch: string;
   ifsc: string;
 };
-
+ 
 const PayNPrint = {
   backgroundColor: "#238878",
   color: "#fff",
@@ -27,13 +27,13 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-
-const PaymentDetails: React.FC = () => {
+ 
+const RetailInvoice: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
-
+ 
   const navigate = useNavigate();
   const location = useLocation();
-
+ 
   const methods = useForm<FormValues>({
     defaultValues: {
       bankName: "",
@@ -42,41 +42,19 @@ const PaymentDetails: React.FC = () => {
       branch: "",
       ifsc: "",
     },
-  });
+    mode: "onChange",
+  }); 
+ 
+ const onSubmit = (data: FormValues) => {
+  localStorage.setItem(
+    "paymentDetails",
+    JSON.stringify(data)
+  );
 
-  const allowOnlyNumbers = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!/[0-9]/.test(e.key) && e.key !== "Backspace" && e.key !== "Tab") {
-      e.preventDefault();
-    }
-  };
-
-  const handlePasteNumbersOnly = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const pastedData = e.clipboardData.getData("Text");
-    if (!/^[0-9]+$/.test(pastedData)) {
-      e.preventDefault();
-    }
-  };
-
-  const isFormFilled = (data: FormValues) => {
-    return (
-      data.bankName.trim() !== "" &&
-      data.accountNumber.trim() !== "" &&
-      data.accountHolderName.trim() !== "" &&
-      data.branch.trim() !== "" &&
-      data.ifsc.trim() !== ""
-    );
-  };
-
-  const onSubmit = (data: FormValues) => {
-    if (!isFormFilled(data)) {
-      showToast("error", "Please fill all fields");
-      return;
-    }
-
-    console.log("FORM DATA:", data);
-    showToast("success", "Details saved");
-  };
-
+  showToast("success", "Details saved");
+  navigate(URL_PATH.PaymentMethod);
+};
+ 
   return (
     <Box sx={{ mx: { xs: -2, md: 0.5 } }}>
       <FormProvider {...methods}>
@@ -99,7 +77,7 @@ const PaymentDetails: React.FC = () => {
         >
           New Invoice
         </Button>
-
+ 
         <Button
           onClick={() => {
             setActiveTab("retail");
@@ -119,7 +97,7 @@ const PaymentDetails: React.FC = () => {
         >
           Retail Invoice
         </Button>
-
+ 
         <Box
           sx={{
             border: "1px solid #9a9a9a",
@@ -139,7 +117,7 @@ const PaymentDetails: React.FC = () => {
               <Typography fontWeight={600} mb={1.5} fontSize={{ xs: 16, md: 18 }}>
                 Distributor Bank Details
               </Typography>
-
+ 
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <Box
                   display="flex"
@@ -151,26 +129,29 @@ const PaymentDetails: React.FC = () => {
                     <TextInputField
                       name="bankName"
                       label="Bank Name"
+                      required
                       inputType="alphabet"
                       maxLength={50}
                     />
                   </Box>
-
+ 
                   <Box flex={1}>
                     <TextInputField
                       name="accountNumber"
                       label="Account Number"
+                      required
                       maxLength={13}
                       minLength={9}
-                      inputProps={{
-                        inputMode: "numeric",
-                        onKeyDown: allowOnlyNumbers,
-                        onPaste: handlePasteNumbersOnly,
+                      rules={{
+                        pattern: {
+                          value: /^[0-9]+$/,
+                          message: "Only numbers allowed",
+                        },
                       }}
+                      inputProps={{ inputMode: "numeric" }}
                     />
                   </Box>
                 </Box>
-
                 <Box
                   display="flex"
                   flexDirection={{ xs: "column", sm: "row" }}
@@ -181,32 +162,40 @@ const PaymentDetails: React.FC = () => {
                     <TextInputField
                       name="accountHolderName"
                       label="Account Holder’s Name"
+                      required
                       inputType="alphabet"
                       maxLength={60}
                     />
                   </Box>
-
+ 
                   <Box flex={1}>
                     <TextInputField
                       name="branch"
                       label="Branch"
+                      required
                       inputType="alphabet"
                       maxLength={40}
                     />
                   </Box>
                 </Box>
-
                 <Box display="flex" justifyContent="center" mb={3}>
                   <Box width={{ xs: "100%", sm: "calc(50% - 24px)" }}>
                     <TextInputField
                       name="ifsc"
                       label="IFSC"
+                      required
                       maxLength={11}
+                      rules={{
+                        pattern: {
+                          value: /^[A-Z]{4}0[A-Z0-9]{6}$/,
+                          message: "Invalid IFSC format",
+                        },
+                      }}
                       inputProps={{ style: { textTransform: "uppercase" } }}
                     />
                   </Box>
                 </Box>
-
+ 
                 <Box textAlign="center">
                   <Button
                     variant="contained"
@@ -216,6 +205,7 @@ const PaymentDetails: React.FC = () => {
                     Save & Continue
                   </Button>
                 </Box>
+ 
               </form>
             </CardContent>
           </Card>
@@ -224,5 +214,5 @@ const PaymentDetails: React.FC = () => {
     </Box>
   );
 };
-
-export default PaymentDetails;
+ 
+export default RetailInvoice;

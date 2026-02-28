@@ -6,11 +6,9 @@ import fs from 'node:fs'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isDev = !app.isPackaged
 
-const RENDERER_DIST = isDev
-  ? path.join(process.cwd(), 'dist')
-  : path.join(process.resourcesPath, 'dist')
-
-const INDEX_FILE = path.join(RENDERER_DIST, 'index.html')
+const INDEX_FILE = isDev
+  ? path.join(process.cwd(), 'dist/index.html')
+  : path.join(__dirname, '../dist/index.html')
 
 let win: BrowserWindow | null = null
 
@@ -30,8 +28,10 @@ function createWindow() {
       ? path.join(process.cwd(), 'public', 'electron-vite.svg')
       : path.join(process.resourcesPath, 'icon.ico'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-    },
+  preload: path.join(__dirname, 'preload.js'),
+  contextIsolation: true,
+  nodeIntegration: false
+}
   })
 
   win.setMenuBarVisibility(false)

@@ -7,7 +7,7 @@ import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { useForm, FormProvider } from "react-hook-form"; 
 import DropdownField from "@/components/controlled/DropdownField"; 
 
-//  TYPES 
+// TYPES 
 type DistributorRow = {
   name: string;
   email: string;
@@ -24,25 +24,37 @@ type DistributorStorage = {
   status?: "Active" | "Inactive";
 };
 
-//  Form type for react-hook-form
 type FilterForm = {
   statusFilter: string;
   timeFilter: string;
 };
+
 
 const columns = [
   { key: "name", label: "Name" },
   { key: "email", label: "Email" },
   { key: "contact", label: "Contact" },
   { key: "lastPurchaseDate", label: "Last Purchase Date" },
-  { key: "status", label: "Status" },
+  {
+    key: "status",
+    label: "Status",
+    render: (row: DistributorRow) => (
+      <span
+        style={{
+          color: row.status === "Active" ? "green" : "red",
+          fontWeight: 500,
+        }}
+      >
+        {row.status}
+      </span>
+    ),
+  },
 ];
 
 function DistributorReportTable() {
 
   const [distributorData, setDistributorData] = useState<DistributorRow[]>([]);
 
-  //  REPLACED useState filters with react-hook-form
   const methods = useForm<FilterForm>({
     defaultValues: {
       statusFilter: "All",
@@ -51,12 +63,10 @@ function DistributorReportTable() {
   });
 
   const { watch } = methods;
-
-  //  Watch dropdown values
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  //  LOAD FROM LOCALSTORAGE 
+  // LOAD FROM LOCALSTORAGE
   useEffect(() => {
     const stored = localStorage.getItem("distributors");
 
@@ -75,7 +85,7 @@ function DistributorReportTable() {
     setDistributorData(formattedData);
   }, []);
 
-  // FILTER LOGIC 
+  // FILTER LOGIC
   const filteredData = useMemo(() => {
     return distributorData.filter((distributor) => {
 
@@ -101,16 +111,37 @@ function DistributorReportTable() {
     });
   }, [statusFilter, timeFilter, distributorData]);
 
-  //  DROPDOWN OPTIONS 
+  //  DELETE SELECTED ROWS FUNCTION ADDED
+  const handleDeleteSelected = (rowsToDelete: DistributorRow[]) => {
+    const updatedData = distributorData.filter(
+      (dist) =>
+        !rowsToDelete.some(
+          (row) =>
+            row.name === dist.name &&
+            row.lastPurchaseDate === dist.lastPurchaseDate
+        )
+    );
 
-  // Added options for status
+    setDistributorData(updatedData);
+
+    //  Update localStorage
+    const updatedStorage = updatedData.map((item) => ({
+      companyName: item.name,
+      email: item.email,
+      mobile: item.contact,
+      date: item.lastPurchaseDate,
+      status: item.status,
+    }));
+
+    localStorage.setItem("distributors", JSON.stringify(updatedStorage));
+  };
+
   const statusOptions = [
     { label: "All Status", value: "All" },
     { label: "Active", value: "Active" },
     { label: "Inactive", value: "Inactive" },
   ];
 
-  // Added options for time
   const timeOptions = [
     { label: "All Time", value: "All Time" },
     { label: "This Month", value: "This Month" },
@@ -118,7 +149,6 @@ function DistributorReportTable() {
   ];
 
   return (
-    // REQUIRED for DropdownField to work
     <FormProvider {...methods}>
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
@@ -127,34 +157,25 @@ function DistributorReportTable() {
 
         <Divider sx={{ mb: 3 }} />
 
-        {/*  REPLACED Select components with DropdownField */}
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
 
-          {/* Status Dropdown */}
           <DropdownField
-            name="statusFilter"      // must match form field
+            name="statusFilter"
             label="Status"
             options={statusOptions}
-            //isStatic                 
             freeSolo={false}
-            //floatLabel
-            
           />
-
-          {/* Time Dropdown */}
 
           <DropdownField
-            name="timeFilter"        
+            name="timeFilter"
             label="Time Filter"
             options={timeOptions}
-            //isStatic
             freeSolo={false}
-           // floatLabel
-           
           />
-
         </Stack>
 
+        
+        <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
         <UniversalTable<DistributorRow>
           data={filteredData}
           showSearch={true}
@@ -162,7 +183,11 @@ function DistributorReportTable() {
           columns={columns}
           enableCheckbox={true}
           getRowId={(row) => `${row.name}-${row.lastPurchaseDate}`}
+          
+          //  DELETE 
+          onDeleteSelected={handleDeleteSelected}
         />
+        </div>
       </Paper>
     </FormProvider>
   );

@@ -4,11 +4,13 @@ import { URL_PATH } from "../constants/UrlPath";
 import RegisterPage from "@/view/auth/RegisterPage";
 import ProceedToPaymentPage from "@/view/auth/ProceedToPaymentPage";
 
+
 export const authRoutes: RouteObject[] = [
   {
     index: true,
     element: <RegisterPage />,
   },
+   
   {
     path: URL_PATH.ProceedToPaymentPage,
     element: <ProceedToPaymentPage />,
@@ -17,4 +19,9 @@ export const authRoutes: RouteObject[] = [
     path: URL_PATH.LOGIN,
     element: <LOGIN />,
   },
+ 
+
+  
 ];
+
+

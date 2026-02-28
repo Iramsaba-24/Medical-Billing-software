@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
 
+
 export type InventoryFormData = {
   itemName: string;
   itemId: string;
@@ -125,12 +126,14 @@ export default function AddInventoryItem() {
             sx={{ px: { xs: 0, md: 4 } }}
           >
             <TextInputField
+              inputType="all"
+              rows={1}
               name="itemName"
               label="Item Name"
               required
             />
 
-            <TextInputField
+            <NumericField
               name="itemId"
               label="Item ID"
               required
@@ -166,7 +169,7 @@ export default function AddInventoryItem() {
               options={groupOptions}
             />
 
-            <TextInputField
+            <NumericField
               name="pricePerUnit"
               label="Price per Unit (₹)"
               required

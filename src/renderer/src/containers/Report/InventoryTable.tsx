@@ -1,25 +1,23 @@
 
+
 import { useState, useMemo, useEffect } from "react";
 import { Box, Chip, Typography, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 
 import { useForm, FormProvider } from "react-hook-form";
-import DropdownField from "@/components/controlled/DropdownField"; 
-
-//  TYPES
+import DropdownField from "@/components/controlled/DropdownField";
 
 type InventoryItem = {
   itemName: string;
   itemId: string;
   medicineGroup: string;
-  stockQty: number;
+  stockQty: number | string; // allow string (safety)
   pricePerUnit: number;
   expiryDate: string;
   supplier: string;
   status: "In Stock" | "Low Stock" | "Out of Stock";
 };
 
-// ADDED (Form type for filters)
 type FilterForm = {
   stockStatus: string;
   timeFilter: string;
@@ -28,9 +26,6 @@ type FilterForm = {
 function InventoryTable() {
   const [inventoryData, setInventoryData] = useState<InventoryItem[]>([]);
 
-  
-
-  //  ADDED React Hook Form
   const methods = useForm<FilterForm>({
     defaultValues: {
       stockStatus: "All",
@@ -39,12 +34,8 @@ function InventoryTable() {
   });
 
   const { watch } = methods;
-
-  //  ADDED (watch filter values)
   const stockStatus = watch("stockStatus");
   const timeFilter = watch("timeFilter");
-
-  // LOAD INVENTORY 
 
   useEffect(() => {
     const loadInventory = () => {
@@ -55,7 +46,6 @@ function InventoryTable() {
     };
 
     loadInventory();
-
     window.addEventListener("inventoryUpdated", loadInventory);
 
     return () => {
@@ -63,12 +53,18 @@ function InventoryTable() {
     };
   }, []);
 
-  // FILTER LOGIC 
-
+  //  FILTER FIXED (number force conversion)
   const filteredData = useMemo(() => {
     return inventoryData.filter((item) => {
-      const matchesStock =
-        stockStatus === "All" || item.status === stockStatus;
+      const qty = Number(item.stockQty);
+
+      const matchesStock = (() => {
+        if (stockStatus === "All") return true;
+        if (stockStatus === "Out of Stock") return qty === 0;
+        if (stockStatus === "Low Stock") return qty > 0 && qty < 20;
+        if (stockStatus === "In Stock") return qty >= 20;
+        return true;
+      })();
 
       const itemDate = new Date(item.expiryDate);
       const today = new Date();
@@ -88,9 +84,23 @@ function InventoryTable() {
     });
   }, [inventoryData, stockStatus, timeFilter]);
 
-  // DROPDOWN OPTIONS 
+  //  DELETE FUNCTION
+  const handleDeleteSelected = (rowsToDelete: InventoryItem[]) => {
+    const updatedInventory = inventoryData.filter(
+      (item) =>
+        !rowsToDelete.some((row) => row.itemId === item.itemId)
+    );
 
-  // ADDED
+    setInventoryData(updatedInventory);
+
+    localStorage.setItem(
+      "inventory",
+      JSON.stringify(updatedInventory)
+    );
+
+    window.dispatchEvent(new Event("inventoryUpdated"));
+  };
+
   const stockOptions = [
     { label: "All Stock", value: "All" },
     { label: "Low Stock", value: "Low Stock" },
@@ -98,14 +108,11 @@ function InventoryTable() {
     { label: "Out of Stock", value: "Out of Stock" },
   ];
 
-  //  ADDED
   const timeOptions = [
     { label: "All Time", value: "All Time" },
     { label: "Next 6 Days", value: "6 Days" },
     { label: "This Month", value: "This Month" },
   ];
-
-  //  TABLE COLUMNS (UNCHANGED) 
 
   const columns: Column<InventoryItem>[] = [
     {
@@ -149,16 +156,28 @@ function InventoryTable() {
     },
     { key: "supplier", label: "Supplier" },
     { key: "expiryDate", label: "Expiry Date" },
+
+    // STATUS FIXED COMPLETELY
     {
       key: "status",
       label: "Status",
       render: (row) => {
+        const qty = Number(row.stockQty);
+
+        const calculatedStatus =
+          qty === 0
+            ? "Out of Stock"
+            : qty < 20
+            ? "Low Stock"
+            : "In Stock";
+
         const statusColor =
-          row.status === "Out of Stock"
+          calculatedStatus === "Out of Stock"
             ? "#ef4444"
-            : row.status === "Low Stock"
+            : calculatedStatus === "Low Stock"
             ? "#f97316"
             : "#16a34a";
+
         return (
           <Typography
             sx={{
@@ -167,7 +186,7 @@ function InventoryTable() {
               fontSize: "0.85rem",
             }}
           >
-            {row.status}
+            {calculatedStatus}
           </Typography>
         );
       },
@@ -175,7 +194,6 @@ function InventoryTable() {
   ];
 
   return (
-    // ADDED (Required for DropdownField)
     <FormProvider {...methods}>
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
@@ -184,33 +202,26 @@ function InventoryTable() {
 
         <Divider sx={{ mb: 3 }} />
 
-        {/* REPLACED Select with DropdownField */}
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-
-          {/* Stock Filter */}
           <DropdownField
             name="stockStatus"
             label="Stock Status"
             options={stockOptions}
-            //isStatic     // behaves like Select
             freeSolo={false}
-           // floatLabel
-            
           />
 
-          {/* Time Filter */}
           <DropdownField
             name="timeFilter"
             label="Expiry Filter"
             options={timeOptions}
-           // isStatic
             freeSolo={false}
-           // floatLabel
-            
           />
-
         </Stack>
 
+
+        <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
+
+        
         <UniversalTable<InventoryItem>
           data={filteredData}
           columns={columns}
@@ -218,12 +229,16 @@ function InventoryTable() {
           showExport
           enableCheckbox
           rowsPerPage={5}
-          getRowId={(row) => row.itemId}
+          getRowId={(row, index) => `${row.itemId}-${index}`}
+
+          //getRowId={(row) => row.itemId}
+  
+          onDeleteSelected={handleDeleteSelected}
         />
+        </div>
       </Paper>
     </FormProvider>
   );
 }
 
 export default InventoryTable;
-

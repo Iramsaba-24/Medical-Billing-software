@@ -1,14 +1,12 @@
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Typography } from "@mui/material";
-import DateTimeField from "@/components/controlled/DateTimeField";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { showSnackbar } from "@/components/uncontrolled/ToastMessage";
-import { FormProvider, useForm } from "react-hook-form";
 
 type ReorderDialogProps = {
   open: boolean; 
   itemName: string; 
   onClose: () => void; 
-  onSubmit: (qty: number, expiryDate: string) => void; 
+  onSubmit: (qty: number) => void; 
 };
 
 const ReorderDialog = ({
@@ -18,25 +16,10 @@ const ReorderDialog = ({
   onSubmit,
 }: ReorderDialogProps) => {
   const [qty, setQty] = useState<number>(0);
-
-  const [expiryDate, setExpiryDate] = useState<string>("");
-
-  const methods = useForm({
-    defaultValues: {
-      date: "",
-    },
-  });
-
-  useEffect(() => {
-    if (open) {
-      setExpiryDate("");
-    }
-  }, [open]);
-
   const handleSubmit = () => {
-    if (!qty || !expiryDate) return;
+    if (!qty) return;
 
-    onSubmit(qty, expiryDate);
+    onSubmit(qty);
     showSnackbar("success", "Reorder successful");
     onClose();
     
@@ -56,14 +39,6 @@ const ReorderDialog = ({
             fullWidth
             onChange={(e) => setQty(Number(e.target.value))}
           />
-          <FormProvider {...methods}>
-          <DateTimeField
-           name="date"
-           label="Date"
-           viewMode="date"
-           onChange={(date) => setExpiryDate(date ? String(date) : "")}                  
-          />
-          </FormProvider>
         </Box>
       </DialogContent>
 
