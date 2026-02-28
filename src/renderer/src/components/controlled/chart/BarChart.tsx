@@ -20,7 +20,7 @@ type BarChartProps = CardProps & {
 
 const defaultColors = ['#1976d2', '#90caf9'];
 
-const BarChart: FC<BarChartProps> = ({ title, xLabels, data, xAxisLabel = 'X-Axis', yAxisLabel = 'Y-Axis', TitleSx, chartSx, ...rest }) => {
+const BarChart: FC<BarChartProps> = ({ title, xLabels, data, xAxisLabel = 'X-Axis', yAxisLabel = 'Y-Axis',  chartSx, ...rest }) => {
   const isMulti = Array.isArray(data) && typeof data[0] === 'object' && 'label' in data[0];
 
   const series: BarSeries[] = isMulti
@@ -40,7 +40,7 @@ const BarChart: FC<BarChartProps> = ({ title, xLabels, data, xAxisLabel = 'X-Axi
   return (
     <Card sx={{ borderRadius: 3 }} {...rest}>
       <CardContent>
-        <Typography sx={TitleSx} gutterBottom>
+        <Typography fontSize={{xs:16 , md:18}} fontWeight={600} mb={5}>
           {title}
         </Typography>
         <MuiBarChart

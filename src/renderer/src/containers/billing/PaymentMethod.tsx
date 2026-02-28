@@ -1,4 +1,4 @@
-import { useForm, FormProvider, useWatch } from "react-hook-form";
+import { useForm, FormProvider, useWatch} from "react-hook-form";
 import { Paper, Box, Button } from "@mui/material";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import RadioField from "@/components/controlled/RadioField";
@@ -10,7 +10,7 @@ import upiIcon from "@/assets/icons/upi.svg";
 import phonepeIcon from "@/assets/icons/phonepe.svg";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation  } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 
@@ -22,6 +22,9 @@ type PaymentMethods = {
   CardHolderName?: string;
   Cvv?: string;
   UpiId?: string;
+};
+type RetailInvoiceItem = {
+  total: number;
 };
 
 // paper style of card and upi
@@ -45,7 +48,7 @@ const radioStyle = {
 const btnStyle = {
    backgroundColor: "#238878",
   height: 40,
-  minWidth: 80,
+  minWidth: 150,
   color: "#fff",
   textTransform: "none",
   "&:hover": {
@@ -126,18 +129,101 @@ const PaymentMethod = () => {
 
   const onCardPay = () => {
     setCardPaymentStatus("loading");
+
     setTimeout(() => {
       setCardPaymentStatus("success");
+
+      const storedInvoice = localStorage.getItem("currentInvoice");
+      const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+
+      if (storedInvoice) {
+        const invoice = JSON.parse(storedInvoice);
+
+        const existingSales = JSON.parse(
+          localStorage.getItem("salesData") || "[]"
+        );
+
+        existingSales.push(invoice);
+
+        localStorage.setItem(
+          "salesData",
+          JSON.stringify(existingSales)
+        );
+
+        localStorage.removeItem("currentInvoice");
+      }
+
+      if (storedRetailInvoice) {
+        const retailInvoices = JSON.parse(storedRetailInvoice);
+
+        const existingRetail = JSON.parse(
+          localStorage.getItem("retailInvoices") || "[]"
+        );
+
+        const updatedRetail = [...existingRetail, ...retailInvoices];
+
+        localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
+        localStorage.removeItem("currentRetailInvoice");
+      }
+    //     setTimeout(() => {
+    //   if (storedRetailInvoice) {
+    //     navigate(URL_PATH.DistributorDetails);
+    //   } else {
+    //     navigate(URL_PATH.Dashboard);
+    //   }
+    // }, 1000);
+
     }, 1500);
   };
 
-const onUpiPay =() =>
-{
-  setUpiPaymentStatus("loading");
-  setTimeout(()=>{
-    setUpiPaymentStatus("success")
-  },1500)
-}
+  const onUpiPay = () => {
+    setUpiPaymentStatus("loading");
+
+    setTimeout(() => {
+      setUpiPaymentStatus("success");
+
+      const storedInvoice = localStorage.getItem("currentInvoice");
+      const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");      
+
+      if (storedInvoice) {
+        const invoice = JSON.parse(storedInvoice);
+
+        const existingSales = JSON.parse(
+          localStorage.getItem("salesData") || "[]"
+        );
+
+        existingSales.push(invoice);
+
+        localStorage.setItem(
+          "salesData",
+          JSON.stringify(existingSales)
+        );
+
+        localStorage.removeItem("currentInvoice");
+      }
+
+      if (storedRetailInvoice) {
+      const retailInvoices = JSON.parse(storedRetailInvoice);
+
+      const existingRetail = JSON.parse(
+        localStorage.getItem("retailInvoices") || "[]"
+      );
+
+      const updatedRetail = [...existingRetail, ...retailInvoices];
+
+      localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
+      localStorage.removeItem("currentRetailInvoice");
+    }
+    //  setTimeout(() => {
+    //   if (storedRetailInvoice) {
+    //     navigate(URL_PATH.DistributorDetails);
+    //   } else {
+    //     navigate(URL_PATH.Dashboard);
+    //   }
+    // }, 1000);
+
+    }, 2000);
+  };
 
 
 // function to show the status of payment for upi and card
@@ -149,6 +235,11 @@ const showPaymentStatus = (
       <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
         <CircularProgress />
         <Box textAlign="center">
+          {/* <Box mb={1} >
+            <Typography sx={{fontWeight:700}}>
+              Payable Amount:  ₹{finalAmount}
+            </Typography>
+          </Box> */}
           Waiting for payment confirmation…
           <br />
           Please complete the payment.
@@ -163,13 +254,37 @@ const showPaymentStatus = (
         <CheckCircleIcon
           sx={{ color: "success.main", fontSize: { xs: 44, sm: 60 } }}
         />
-        <Box fontWeight={500}>Successful</Box>
+        <Box fontWeight={700}>Successful ₹{finalAmount}</Box>
       </Box>
     );
   }
 
   return null;
 };
+
+// get final amount from local storage
+const [finalAmount, setFinalAmount] = useState<number>(0);
+
+useEffect(() => {
+  const storedInvoice = localStorage.getItem("currentInvoice");
+    const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+
+
+  if (storedInvoice) {
+    const invoice = JSON.parse(storedInvoice);
+    setFinalAmount(invoice.totalPrice);
+  }
+  if (storedRetailInvoice) {
+   const retailInvoices: RetailInvoiceItem[] = JSON.parse(storedRetailInvoice);
+
+const total = retailInvoices.reduce(
+  (sum, item) => sum + item.total,
+  0
+);
+
+setFinalAmount(total);
+  }
+}, []);
 
 const [activeTab, setActiveTab] = useState<"new" | "retail">("new");   
 const navigate = useNavigate();
@@ -350,6 +465,8 @@ const navigate = useNavigate();
           label=""
           sx={radioStyle}
         />
+
+        
 
         <Box display="flex" flexDirection="column" gap={1}>
           <Box display="flex" alignItems="center" gap={2}>

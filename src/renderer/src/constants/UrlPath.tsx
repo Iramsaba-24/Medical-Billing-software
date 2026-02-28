@@ -1,8 +1,14 @@
+
+
+
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
- ChoosePlan:"/chooseplan",
+  ChoosePlan:"/chooseplan",
  AccountSetup:"/accountsetup",
+ NetBanking:"/netbanking",
+ ReceiverDetails:"receiverdetails",
+  
 
   Landing: "/landing",
   Dashboard: "/dashboard",
@@ -17,6 +23,7 @@ export const URL_PATH = {
 
   AddForm: "/form",
   CreateInvoice: "/create-invoice",
+ 
   InvoiceView: "/invoice-view",
   DistributorsTable: "/table",
 
@@ -48,10 +55,11 @@ export const URL_PATH = {
   MediPoints: "/billing/medi-points",
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
+
+
+  DoctorsSettings: "/settings/doctors-settings",
+
   
-
-
-  DoctorsSettings: "/settings/doctors-settings"
 
 
 };
