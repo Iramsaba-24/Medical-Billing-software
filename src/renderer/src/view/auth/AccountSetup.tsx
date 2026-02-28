@@ -1,11 +1,16 @@
-import { Box, Button, Typography, InputAdornment, IconButton,
+import {
+  Box,
+  Button,
+  Typography,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import BgImage from "@/assets/bgloginpage.svg";
-import LogoImage from "@/assets/logoimg.svg";   
+import LogoImage from "@/assets/logoimg.svg";
 import TextInputField from "@/components/controlled/TextInputField";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 
@@ -53,18 +58,21 @@ const AccountSetup = () => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: 1.5,
+            gap: 1,
             px: 2,
           }}
         >
           {/* Logo */}
-          <img src={LogoImage} style={{ width: "100%", maxWidth: "170px" }} />
+          <img
+            src={LogoImage}
+            style={{ width: "100%", maxWidth: "160px" }}
+          />
 
           {/* Title */}
           <Typography
             sx={{
               fontSize: { xs: "1.5rem", sm: "1.7rem" },
-              mb: 1,
+              mb: 0.5,
             }}
           >
             Account Setup
@@ -84,13 +92,13 @@ const AccountSetup = () => {
                 },
                 validate: (value: string) => {
                   if (!/[A-Z]/.test(value))
-                    return "Add at least one capital letter (A-Z)";
+                    return "Add at least one capital letter";
                   if (!/[a-z]/.test(value))
-                    return "Add at least one small letter (a-z)";
+                    return "Add at least one small letter";
                   if (!/[0-9]/.test(value))
-                    return "Add at least one number (0-9)";
+                    return "Add at least one number";
                   if (!/[@$_#.*]/.test(value))
-                    return "Add at least one special character (@$_#.*)";
+                    return "Add special character";
                   return true;
                 },
               }}
@@ -98,9 +106,15 @@ const AccountSetup = () => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() =>
+                        setShowPassword(!showPassword)
+                      }
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                      {showPassword ? (
+                        <VisibilityOff />
+                      ) : (
+                        <Visibility />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -117,7 +131,9 @@ const AccountSetup = () => {
               rules={{
                 required: "Confirm Password is required",
                 validate: (value) => {
-                  if (value !== methods.getValues("password"))
+                  if (
+                    value !== methods.getValues("password")
+                  )
                     return "Passwords do not match";
                   return true;
                 },
@@ -126,9 +142,15 @@ const AccountSetup = () => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={() => setShowConfirm(!showConfirm)}
+                      onClick={() =>
+                        setShowConfirm(!showConfirm)
+                      }
                     >
-                      {showConfirm ? <VisibilityOff /> : <Visibility />}
+                      {showConfirm ? (
+                        <VisibilityOff />
+                      ) : (
+                        <Visibility />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -137,41 +159,45 @@ const AccountSetup = () => {
           </Box>
 
           {/* Checkbox */}
-          <Box sx={{ width: "100%", maxWidth: 420, mt: 1 }}>
+          <Box sx={{ width: "100%", maxWidth: 420 }}>
             <CheckboxGroup
               name="checkbox"
               label=""
               options={[
                 {
-                  label: "I agree to Terms & Privacy Policy",
+                  label:
+                    "I agree to Terms & Privacy Policy",
                   value: "terms",
                 },
                 {
-                  label: "I want product updates via email (optional)",
+                  label:
+                    "I want product updates via email (optional)",
                   value: "email",
                 },
               ]}
             />
           </Box>
 
-          {/* Submit Button */}
+          {/* Button */}
           <Button
             type="submit"
-            variant="contained"
             fullWidth
+            variant="contained"
             sx={{
               maxWidth: 420,
-              mt: 1.5,
-              height: 45,
-              background: "#2c8a7b",
-              textTransform: "none",
+              mt: 2, // ✅ margin कमी (3-5 → 2)
               fontWeight: 600,
-              borderRadius: 1,
-              boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+              fontSize: { xs: "1rem", sm: "1.05rem" },
+              backgroundColor: "#1b7f6b",
+              textTransform: "none",
+              border: "2px solid #1b7f6b",
+              boxShadow:
+                "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
+              transition: "all 0.25s ease",
               "&:hover": {
-                background: "#fff",
-                color: "#2c8a7b",
-                border: "2px solid #2c8a7b",
+                backgroundColor: "#fff",
+                color: "#1b7f6b",
+                border: "2px solid #1b7f6b",
               },
             }}
           >

@@ -47,7 +47,7 @@ const ChoosePlan = () => {
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
-            gap: 0.5, 
+            gap: 0.5,
             px: 2,
           }}
         >
@@ -67,7 +67,6 @@ const ChoosePlan = () => {
               mb: 1.5,
               color: "#333",
               fontWeight: 500,
-              fontFamily: '"Poppins", sans-serif',
               fontSize: { xs: "1.6rem", sm: "2rem" },
             }}
           >
@@ -101,23 +100,22 @@ const ChoosePlan = () => {
             </Box>
           </Box>
 
-          {/* Button */}
+          {/* Updated Button */}
           <Button
             type="submit"
-            variant="contained"
             fullWidth
+            variant="contained"
             sx={{
-              maxWidth: 360,
-              mt: 2,
-              height: 45,
-              fontWeight: 700,
+              maxWidth: 420,
+              mt: { xs: 3, sm: 5 },
+              fontWeight: 600,
               fontSize: { xs: "1rem", sm: "1.05rem" },
-              fontFamily: '"Poppins", sans-serif',
               backgroundColor: "#1b7f6b",
               textTransform: "none",
               border: "2px solid #1b7f6b",
               boxShadow:
                 "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
+              transition: "all 0.25s ease",
               "&:hover": {
                 backgroundColor: "#fff",
                 color: "#1b7f6b",
