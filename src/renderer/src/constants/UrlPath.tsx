@@ -4,7 +4,9 @@ export const URL_PATH = {
   ProceedToPaymentPage: "/proceed-to-payment",
   ChoosePlan: "/chooseplan",
   AccountSetup: "/accountsetup",
-
+  BusinessDetails:"/businessdetails",
+  NetBanking_PurchaseDetails:"/netbanking_purchasedetails",
+ 
   Landing: "/landing",
   Dashboard: "/dashboard",
   SalesView: "/dashboard/sales-view",
