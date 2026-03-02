@@ -13,6 +13,8 @@ import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import TextInputField from "@/components/controlled/TextInputField";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
+import { URL_PATH } from "@/constants/UrlPath";
+import { useNavigate } from "react-router-dom";
 
 type AccountForm = {
   password: string;
@@ -32,8 +34,10 @@ const AccountSetup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+     const navigate = useNavigate();
   const onSubmit = (data: AccountForm) => {
     console.log(data);
+    navigate(URL_PATH.ProceedToPaymentPage);
   };
 
   return (
@@ -163,11 +167,13 @@ const AccountSetup = () => {
             <CheckboxGroup
               name="checkbox"
               label=""
+              required
               options={[
                 {
                   label:
                     "I agree to Terms & Privacy Policy",
                   value: "terms",
+                  
                 },
                 {
                   label:

@@ -108,7 +108,7 @@ const RegisterPage = () => {
     };
 
     console.log(cleanedData);
-    navigate(URL_PATH.LOGIN);
+    navigate(URL_PATH.BusinessDetails);
   };
 
   return (
