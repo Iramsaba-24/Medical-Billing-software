@@ -5,7 +5,7 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import BgImage from "@/assets/bgloginpage.svg";
@@ -16,6 +16,7 @@ import RadioField from "@/components/controlled/RadioField";
 import { useForm, FormProvider } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 type CardFormFields = {
   paymentMethod: "credit-card";
@@ -56,20 +57,29 @@ const CardPayment: React.FC = () => {
 
   
   const { handleSubmit } = methods;
-  const navigate = useNavigate();
 
   // payment status 
   const [cardPaymentStatus, setCardPaymentStatus] = useState<"default" | "loading" | "success"
   >("default");
 
-const onCardPay = () => {
-  setCardPaymentStatus("loading");
+  const onCardPay = () => {
+    setCardPaymentStatus("loading");
+    setTimeout(() => {
+      setCardPaymentStatus("success");
+    }, 2000);
+  };
 
-  setTimeout(() => {
-    setCardPaymentStatus("success");
-    navigate(URL_PATH.PaymentSuccess);
-  }, 1500);
-};
+  //redorect to the purachase detail page
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (cardPaymentStatus === "success") {
+      const timer = setTimeout(() => {
+        navigate(URL_PATH.NetPurchaseDetails);
+        showToast("success", "Payment Successful!");
+      }, 900);
+      return () => clearTimeout(timer);
+    }
+  }, [cardPaymentStatus, navigate]);
 
   //Status UI 
   const showPaymentStatus = (

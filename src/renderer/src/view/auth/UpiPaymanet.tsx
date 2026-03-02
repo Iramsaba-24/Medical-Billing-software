@@ -1,5 +1,5 @@
 import {Box,Paper,Button,CircularProgress, Typography} from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
@@ -12,6 +12,7 @@ import upiIcon from "@/assets/icons/upi.svg";
 import phonepeIcon from "@/assets/icons/phonepe.svg";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 type UpiFormFields = {
   paymentMethod: "upi";
@@ -79,23 +80,35 @@ const UpiPayment: React.FC = () => {
   });
 
   const { handleSubmit, control } = methods;
-  const navigate = useNavigate();
+
 
   // watch UPI ID for live icon detection
   const upiId = useWatch({ control, name: "UpiId" });
   const detectedIcon = getUpiApp(upiId) || "upi";
 
   // payment status 
-const [upiPaymentStatus, setUpiPaymentStatus] = useState <"default" | "loading" | "success">("default");
+  const [upiPaymentStatus, setUpiPaymentStatus] = useState <"default" | "loading" | "success">("default");
 
   const onUpiPay = () => {
     setUpiPaymentStatus("loading");
-
     setTimeout(() => {
       setUpiPaymentStatus("success");
-      navigate(URL_PATH.PaymentSuccess);
     }, 2000);
   };
+
+    
+  const navigate = useNavigate();
+  useEffect(() => {
+  if (upiPaymentStatus === "success") {
+    const timer = setTimeout(() => {
+      navigate(URL_PATH.NetPurchaseDetails);
+        showToast("success", "Payment Successful!");
+      
+    }, 900); 
+
+    return () => clearTimeout(timer);
+  }
+}, [upiPaymentStatus, navigate]);
 
   const showPaymentStatus = (
     status: "default" | "loading" | "success"

@@ -105,7 +105,7 @@ const PaymentSuccess: React.FC = () => {
             }}
             onClick={handleClick}
           >
-            Next Step
+            Get Started
           </Button>
       </Box>
     </Box>

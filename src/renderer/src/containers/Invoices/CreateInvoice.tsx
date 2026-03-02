@@ -1,4 +1,3 @@
-
 import {
   Paper,
   Button,
@@ -19,6 +18,7 @@ import DropdownField from "@/components/controlled/DropdownField";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import TextInputField from "@/components/controlled/TextInputField";
 
 type InvoiceItem = {
   item: string;
@@ -102,8 +102,8 @@ useEffect(() => {
 }, []);
 
   const navigate = useNavigate();
-  const location = useLocation();
-const editingInvoice = location.state as StoredInvoice | null;
+const location = useLocation() as { state?: StoredInvoice };
+const editingInvoice = location.state;
 
   const methods = useForm<InvoiceFormData>({
     defaultValues: {
@@ -114,7 +114,7 @@ const editingInvoice = location.state as StoredInvoice | null;
     },
   });
   
-  const { control, handleSubmit } = methods;
+  const { control, handleSubmit, reset } = methods;
   const { fields, append, remove } = useFieldArray({
     control,
     name: "items",
@@ -191,7 +191,7 @@ if (editingInvoice) {
 
 useEffect(() => {
   if (editingInvoice) {
-    methods.reset({
+    reset({
       patient: editingInvoice.patient,
       date: editingInvoice.date,
       status: editingInvoice.status,
@@ -203,8 +203,7 @@ useEffect(() => {
       })),
     });
   }
-}, [editingInvoice]);
-
+}, [editingInvoice, reset]);
 
   return (
     <FormProvider {...methods}>
@@ -290,7 +289,8 @@ useEffect(() => {
               sx={{ width: { xs: "30%", sm: 100 } }}
             />
 
-            <NumericField
+            <TextInputField
+            type="numeric"
               name={`items.${index}.price`}
               label="Price"
               sx={{ width: { xs: "40%", sm: 140 } }}
@@ -319,7 +319,7 @@ useEffect(() => {
         <Stack direction="row" justifyContent="space-between" mt={4}>
           <Button
             variant="outlined"
-            onClick={() => navigate("/Invoice")}
+            onClick={() => navigate(URL_PATH.Invoices)}
             sx={{
               backgroundColor: "#fff",
               color: "#238878",

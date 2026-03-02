@@ -7,6 +7,14 @@ import PaymentSuccess from "@/view/auth/PaymentSuccess";
 import UpiPayment from "@/view/auth/UpiPaymanet";
 
 
+import BusinessDetails from "@/view/auth/BusinessDetails";
+import ChoosePlan from "@/view/auth/ChoosePlan";
+import AccountSetup from "@/view/auth/AccountSetup";
+import NetPurchaseDetails from "@/view/auth/NetPurchaseDetails";
+import ProceedToPaymentPage from "@/view/auth/ProceedToPaymentPage";
+import NetBanking from "@/view/auth/NetBanking";
+import ReceiverDetails from "@/view/auth/ReceiverDetails";
+
 
 export const authRoutes: RouteObject[] = [
   {
@@ -27,10 +35,42 @@ export const authRoutes: RouteObject[] = [
         element: <PaymentSuccess />,
       },
    
+
   {
     path: URL_PATH.LOGIN,
     element: <LOGIN />,
   },
+  {
+          path: URL_PATH.ChoosePlan,
+          element: <ChoosePlan />,
+        },
+        {
+          path: URL_PATH.AccountSetup,
+          element: <AccountSetup />,
+        },
+ 
+ {
+    path: URL_PATH.BusinessDetails,
+    element: <BusinessDetails />,
+  },
+
+   {
+    path: URL_PATH.NetPurchaseDetails,
+    element: <NetPurchaseDetails />,
+  },
+  {
+    path: URL_PATH.ProceedToPaymentPage,
+    element: <ProceedToPaymentPage />,
+  },
+{
+  path: URL_PATH.NetBanking,
+  element: <NetBanking />,
+},
+{
+  path: URL_PATH.ReceiverDetails,
+  element: <ReceiverDetails />,
+}
+
   
 ];
 
