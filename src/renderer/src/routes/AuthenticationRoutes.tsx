@@ -2,9 +2,10 @@ import { RouteObject } from "react-router-dom";
 import LOGIN from "@/view/auth/LoginPage";
 import { URL_PATH } from "../constants/UrlPath";
 import RegisterPage from "@/view/auth/RegisterPage";
-import ChoosePlan from "@/view/auth/ChoosePlan";
-import AccountSetup from "@/view/auth/AccountSetup";
+import ProceedToPaymentPage from "@/view/auth/ProceedToPaymentPage";
 import NetBanking from "@/view/auth/NetBanking";
+import AccountSetup from "@/view/auth/AccountSetup";
+import ChoosePlan from "@/view/auth/ChoosePlan";
 import ReceiverDetails from "@/view/auth/ReceiverDetails";
 
 
@@ -14,6 +15,10 @@ export const authRoutes: RouteObject[] = [
     element: <RegisterPage />,
   },
    
+  {
+    path: URL_PATH.ProceedToPaymentPage,
+    element: <ProceedToPaymentPage />,
+  },
   {
     path: URL_PATH.LOGIN,
     element: <LOGIN />,

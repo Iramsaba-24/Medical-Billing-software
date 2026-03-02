@@ -185,7 +185,7 @@ const AccountSetup = () => {
             variant="contained"
             sx={{
               maxWidth: 420,
-              mt: 2, // ✅ margin कमी (3-5 → 2)
+              mt: 2, 
               fontWeight: 600,
               fontSize: { xs: "1rem", sm: "1.05rem" },
               backgroundColor: "#1b7f6b",

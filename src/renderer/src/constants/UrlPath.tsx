@@ -1,18 +1,16 @@
 
-
-
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
-  ChoosePlan:"/chooseplan",
- AccountSetup:"/accountsetup",
- NetBanking:"/netbanking",
- ReceiverDetails:"receiverdetails",
-  
+  ProceedToPaymentPage: "/proceed-to-payment",
+  ChoosePlan: "/chooseplan",
+  AccountSetup: "/accountsetup",
+  NetBanking:"/netbanking",
+  ReceiverDetails:"/receiverdetails",
 
   Landing: "/landing",
   Dashboard: "/dashboard",
-  SalesView:"/dashboard/sales-view",
+  SalesView: "/dashboard/sales-view",
   Customer: "/customers",
 
   Doctors: "/doctors",
@@ -23,7 +21,7 @@ export const URL_PATH = {
 
   AddForm: "/form",
   CreateInvoice: "/create-invoice",
- 
+
   InvoiceView: "/invoice-view",
   DistributorsTable: "/table",
 
@@ -45,10 +43,10 @@ export const URL_PATH = {
   InvoiceSetting: "/settings/invoice",
   InventorySettings: "/settings/inventory",
   DashboardSettings: "/settings/dashboard",
-  GeneralSettings: '/settings/general',
-  DoctorSettings: '/settings/DoctorSettings',
-  PharmacyProfile: '/settings/PharmacyProfile',
-  CustomerSettings: '/settings/Customer',
+  GeneralSettings: "/settings/general",
+  DoctorSettings: "/settings/DoctorSettings",
+  PharmacyProfile: "/settings/PharmacyProfile",
+  CustomerSettings: "/settings/Customer",
 
   RetailInvoice: "/billing/retail-invoice",
   Billing: "/billing/new-invoice",
@@ -56,10 +54,5 @@ export const URL_PATH = {
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
 
-
   DoctorsSettings: "/settings/doctors-settings",
-
-  
-
-
 };

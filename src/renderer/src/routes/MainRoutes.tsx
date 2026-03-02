@@ -27,7 +27,6 @@ import DistributorsForm from "@/containers/distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 import MediPoints from "@/containers/billing/MediPoints";
 import Billing from "@/view/Billing";
-
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
@@ -37,7 +36,6 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
-
 
 
 
@@ -194,10 +192,6 @@ export const mainRoutes: RouteObject[] = [
         element: <PaymentMethod />,
       },
       
-      
-    
-    
-    
       
     ],
   },
