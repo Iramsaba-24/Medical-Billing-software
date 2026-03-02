@@ -11,7 +11,6 @@ import {
 import { useForm, FormProvider, Controller, useFormContext } from "react-hook-form";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 
-/* Same Card Style as Pharmacy Profile */
 const cardStyle = {
   p: { xs: 2, md: 4 },
   borderRadius: "5px",
