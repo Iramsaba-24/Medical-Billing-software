@@ -24,7 +24,7 @@ interface DistributorCardsProps {
             color: '#111827',
             mt: {xs:1 , md:0.5},
             mb:0.5
-          }}
+          }} 
         >
           Distributors 
         </Typography>   

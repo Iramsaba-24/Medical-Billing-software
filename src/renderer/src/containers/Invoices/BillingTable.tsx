@@ -114,51 +114,59 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
 
   return (
     <FormProvider {...methods}>
-      <Paper sx={{ p: 2 }}>
-                <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
-          Invoice List
-        </Typography>
-      <Box
-        mb={2}
-        display="flex"
-        justifyContent="flex-end"
-      >
-        <Box
-          display="flex"
-          flexDirection={{ xs: "column", sm: "row" }}
+      <Paper sx={{ p: 1 }}>
+              <Box
+  display="flex"
+  flexDirection={{ xs: "column", sm: "row" }}
+  justifyContent="space-between"
+  alignItems={{ xs: "flex-start", sm: "center" }}
+  mb={2}
+  gap={2}
+>
+  {/* Heading */}
+  <Typography fontSize={{ xs: 18, md: 22 }} fontWeight={600}>
+    Invoice List
+  </Typography>
 
-          gap={2}
-          width={{ xs: "100%", sm: "auto" }}
-        >
-          <Box sx={{ width: { xs: "100%", sm: 180 } }}>
-            <DropdownField
-              name="filterType"
-              label="Filter"
-              options={filterOptions}
-              onChangeCallback={(value) => setFilterType(value as FilterType)}
-              size="small"
-            />
-          </Box>
-          <Button
-            variant="contained"
-            onClick={onCreate}
-            sx={{
-              backgroundColor: "#238878",
-              color: "#fff",
-              border: "2px solid #238878",
-              textTransform: "none",
-              height: 40,
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-              },
-            }}
-          >
-            + Create Invoice
-          </Button>
-        </Box>
-      </Box>
+  {/* Filter + Create button */}
+  <Box
+    display="flex"
+    flexDirection={{ xs: "column", sm: "row" }}
+    gap={ {xs: 0, sm: 2} }
+    width={{ xs: "100%", sm: "auto" }}
+    mt={2}
+  >
+    <Box sx={{ width: { xs: "100%", sm: 180 } }}>
+      <DropdownField
+        name="filterType"
+        label="Filter"
+        options={filterOptions}
+        onChangeCallback={(value) => setFilterType(value as FilterType)}
+        size="small"
+      />
+    </Box>
+    <Button
+      variant="contained"
+      onClick={onCreate}
+      sx={{
+        backgroundColor: "#238878",
+        color: "#fff",
+        border: "2px solid #238878",
+        textTransform: "none",
+        height: 40,
+        mb: { xs: 0.5, sm: 0 },
+        "&:hover": {
+          backgroundColor: "#fff",
+          color: "#238878",
+          border: "2px solid #238878",
+        },
+      }}
+    >
+      + Create Invoice
+    </Button>
+  </Box>
+</Box>
+     
         <UniversalTable<Invoice>
           data={filteredInvoices}
           columns={columns}

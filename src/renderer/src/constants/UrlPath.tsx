@@ -4,6 +4,10 @@ export const URL_PATH = {
   REGISTER: "/register",
   ChoosePlan:"/chooseplan",
  AccountSetup:"/accountsetup",
+  PaymentSuccess: "/payment-success",
+  UpiPayment: "/upi-payment",
+  CardPayment: "/card-payment",
+
   
 
   Landing: "/landing",
@@ -19,6 +23,7 @@ export const URL_PATH = {
 
   AddForm: "/form",
   CreateInvoice: "/create-invoice",
+ 
   InvoiceView: "/invoice-view",
   DistributorsTable: "/table",
 
