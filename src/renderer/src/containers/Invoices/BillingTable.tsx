@@ -1,10 +1,7 @@
-
 import { useEffect, useState } from "react";
 import { Box, Paper, Button, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UniversalTable, Column, DropdownOption,
-} from "@/components/uncontrolled/UniversalTable";
-
+import { UniversalTable, Column, DropdownOption,} from "@/components/uncontrolled/UniversalTable";
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
@@ -97,20 +94,24 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   const methods = useForm({ defaultValues: { filterType: "all" } });
 
   //  DELETE
-  const handleDelete = async (invoiceNo: string) => {
-    const confirmed = await showConfirmation(
-      "Are you sure you want to delete this invoice?",
-      "Confirm Delete"
-    );
+const handleDelete = async (invoiceNo: string) => {
+  const confirmed = await showConfirmation(
+    "Are you sure you want to delete this invoice?",
+    "Confirm Delete"
+  );
 
-    if (!confirmed) return;
+  if (!confirmed) return;
 
-    setInvoices((prev) =>
-      prev.filter((inv) => inv.invoice !== invoiceNo)
-    );
+  setInvoices((prev) => {
+    const updated = prev.filter((inv) => inv.invoice !== invoiceNo);
 
-    showToast("success", "Invoice deleted successfully");
-  };
+    localStorage.setItem("invoices", JSON.stringify(updated));
+
+    return updated;
+  });
+
+  showToast("success", "Invoice deleted successfully");
+};
 
   return (
     <FormProvider {...methods}>
@@ -177,17 +178,21 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
           dropdown={{
             key: "status",
             options: statusOptions,
-            onChange: (row, value) => {
-              setInvoices((prev) =>
-                prev.map((inv) =>
-                  inv.invoice === row.invoice
-                    ? { ...inv, status: value as InvoiceStatus }
-                    : inv
-                )
-              );
+onChange: (row, value) => {
+  setInvoices((prev) => {
+    const updated = prev.map((inv) =>
+      inv.invoice === row.invoice
+        ? { ...inv, status: value as InvoiceStatus }
+        : inv
+    );
 
-              showToast("success", "Status updated successfully");
-            },
+    localStorage.setItem("invoices", JSON.stringify(updated));
+
+    return updated;
+  });
+
+  showToast("success", "Status updated successfully");
+},
           }}
           actions={{
             view: (invoice) =>
@@ -211,13 +216,16 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
 
             if (!confirmed) return;
 
-            setInvoices((prev) =>
-              prev.filter(
-                (inv) =>
-                  !rows.some((r) => r.invoice === inv.invoice)
-              )
-            );
+setInvoices((prev) => {
+  const updated = prev.filter(
+    (inv) =>
+      !rows.some((r) => r.invoice === inv.invoice)
+  );
 
+  localStorage.setItem("invoices", JSON.stringify(updated));
+
+  return updated;
+});
             showToast("success", "Selected invoices deleted");
           }}
         />

@@ -9,8 +9,6 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
-// import TextInputField from "@/components/controlled/TextInputField";
-import NumericField from "@/components/controlled/NumericField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -167,7 +165,7 @@ const editingInvoice = location.state;
     })),
   };
 
-  const stored = localStorage.getItem("invoiceList");
+  const stored = localStorage.getItem("invoices");
  const existingInvoices: StoredInvoice[] = stored
   ? JSON.parse(stored)
   : [];
@@ -184,7 +182,7 @@ if (editingInvoice) {
   updatedInvoices = [newInvoice, ...existingInvoices];
 }
 
-  localStorage.setItem("invoiceList", JSON.stringify(updatedInvoices));
+  localStorage.setItem("invoices", JSON.stringify(updatedInvoices));
 
  navigate(URL_PATH.Invoices, { replace: true });
 };
@@ -265,10 +263,7 @@ useEffect(() => {
               if (selectedItem) {
                 methods.setValue(`items.${index}.unitPrice`, selectedItem.price)
                 methods.setValue(`items.${index}.price`, selectedItem.price)
-                // methods.setValue(
-                  // `items.${index}.price`,
-                  // selectedItem.price
-                // );
+               
               }
             }}
           />
@@ -283,7 +278,8 @@ useEffect(() => {
               justifyContent: { xs: "space-between", sm: "flex-start" },
             }}
           >
-            <NumericField
+            <TextInputField
+            type="numeric"
               name={`items.${index}.qty`}
               label="Qty"
               sx={{ width: { xs: "30%", sm: 100 } }}
