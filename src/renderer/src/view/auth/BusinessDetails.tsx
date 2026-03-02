@@ -6,6 +6,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
+import { URL_PATH } from "@/constants/UrlPath";
 
 
 type FormInputs = {
@@ -31,7 +32,7 @@ const navigate = useNavigate();
   console.log(data);
 
   showToast("success", "Business details saved successfully!");
-   navigate("");
+   navigate(URL_PATH.ChoosePlan);
    
 };
 
@@ -146,7 +147,7 @@ const navigate = useNavigate();
               rows={1}
               minLength={15}
               maxLength={20}
-              required
+              
             />
           </Box>
 

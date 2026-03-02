@@ -1,3 +1,5 @@
+
+
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
@@ -5,7 +7,10 @@ export const URL_PATH = {
   ChoosePlan: "/chooseplan",
   AccountSetup: "/accountsetup",
   BusinessDetails:"/businessdetails",
-  NetBanking_PurchaseDetails:"/netbanking_purchasedetails",
+  NetPurchaseDetails:"/netbanking-purchasedetails",
+  NetBanking:"/netbanking",
+  ReceiverDetails:"/receivers-details",
+
  
   Landing: "/landing",
   Dashboard: "/dashboard",

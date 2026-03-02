@@ -14,7 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
-import { URL_PATH } from "@/constants/UrlPath";
+
 
 type PaymentFormInputs = {
   paymentMethod: string;
@@ -44,7 +44,7 @@ const ProceedToPaymentPage = () => {
 
   const onSubmit = (data: PaymentFormInputs) => {
     console.log("Payment Data:", data);
-    navigate(URL_PATH.LOGIN);
+    navigate("");
   };
 
   return (
