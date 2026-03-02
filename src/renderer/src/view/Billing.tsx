@@ -349,8 +349,8 @@ function POSMaster() {
                   key={invoiceNumber}
                   sx={{
                     ...invoiceButtonSx(isActive),
-                    width: { xs: "calc(50% - 6px)", md: "auto" },
-                    minWidth: { xs: "unset", md: "250px" },
+                    width: { xs: "calc(50% - 6px)", md: "19%" },
+                    minWidth: { xs: "unset", md: "19%" },
                     fontSize: { xs: "12px", md: "14px" },
                   }}
                   onClick={() => {
@@ -365,7 +365,6 @@ function POSMaster() {
                       },
                     }));
 
-                    // Navigate to new invoice
                     navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
                   }}
                 >
