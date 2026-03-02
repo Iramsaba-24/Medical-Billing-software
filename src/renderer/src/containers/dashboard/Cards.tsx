@@ -5,7 +5,10 @@ import DropdownField from "@/components/controlled/DropdownField";
 import { InventoryItem } from "@/containers/inventory/AddInventoryItem";
 
 type FilterType = "Today" | "6 Days" | "This Month";
-
+interface PurchaseData {
+  totalPrice: number;
+  date: string;
+}
 interface CardInfo {
   title: string;
   data: Partial<
@@ -26,22 +29,16 @@ const cardsConfig: CardInfo[] = [
     title: "Inventory",
     data: {
       Today: {
-        leftValue: "290",
-        leftLabel: "Total no of Medicines",
-        rightValue: "22",
-        rightLabel: "Medicines Group",
+        leftLabel: "Total Medicines",
+        rightLabel: "Medicine Groups",
       },
       "6 Days": {
-        leftValue: "295",
-        leftLabel: "Total no of Medicines",
-        rightValue: "23",
-        rightLabel: "Medicines Group",
+        leftLabel: "Total Medicines",
+        rightLabel: "Medicine Groups",
       },
       "This Month": {
-        leftValue: "298",
-        leftLabel: "Total no of Medicines",
-        rightValue: "24",
-        rightLabel: "Medicines Group",
+        leftLabel: "Total Medicines",
+        rightLabel: "Medicine Groups",
       },
     },
   },
@@ -49,16 +46,13 @@ const cardsConfig: CardInfo[] = [
     title: "Top Selling Medicine",
     data: {
       Today: {
-        leftValue: "Paracetamol 500mg",
-        leftLabel: "Frequently bought Item",
+        leftLabel: "Top Medicine",
       },
       "6 Days": {
-        leftValue: "Vitamin C",
-        leftLabel: "Frequently bought Item",
+        leftLabel: "Top Medicine",
       },
       "This Month": {
-        leftValue: "Paracetamol 500mg",
-        leftLabel: "Frequently bought Item",
+        leftLabel: "Top Medicine",
       },
     },
   },
@@ -66,21 +60,15 @@ const cardsConfig: CardInfo[] = [
     title: "Daily Report",
     data: {
       Today: {
-        leftValue: "₹ 3,125",
         leftLabel: "Today's Sale",
-        rightValue: "₹ 6,123",
         rightLabel: "Today's Purchase",
       },
       "6 Days": {
-        leftValue: "₹ 18,450",
         leftLabel: "Sales (6 Days)",
-        rightValue: "₹ 25,300",
         rightLabel: "Purchase (6 Days)",
       },
       "This Month": {
-        leftValue: "₹ 78,560",
         leftLabel: "Monthly Sales",
-        rightValue: "₹ 92,340",
         rightLabel: "Monthly Purchase",
       },
     },
@@ -116,6 +104,65 @@ interface SalesData {
 }
 
 const Cards: React.FC = () => {
+
+  // filter for the dropdown
+  const getFilteredSalesData = (filter: FilterType): SalesData[] => {
+  const stored = localStorage.getItem("salesData");
+  if (!stored) return [];
+
+  const sales: SalesData[] = JSON.parse(stored);
+  const today = new Date();
+
+  return sales.filter((sale) => {
+    const date = new Date(sale.date);
+
+    switch (filter) {
+      case "Today":
+        return date.toDateString() === today.toDateString();
+
+case "6 Days": {
+  const sixDaysAgo = new Date();
+  sixDaysAgo.setDate(today.getDate() - 6);
+  return date >= sixDaysAgo && date <= today;
+}
+
+      case "This Month":
+        return (
+          date.getMonth() === today.getMonth() &&
+          date.getFullYear() === today.getFullYear()
+        );
+
+      default:
+        return true;
+    }
+  });
+};
+const getDailyReportData = (filter: FilterType) => {
+  const filteredSales = getFilteredSalesData(filter);
+
+  const totalSales = filteredSales.reduce(
+    (sum, sale) => sum + sale.totalPrice,
+    0
+  );
+
+  // jar purchase data vegla localStorage madhe asel tar
+  const storedPurchase = localStorage.getItem("purchaseData");
+  let totalPurchase = 0;
+
+  if (storedPurchase) {
+  const purchases: PurchaseData[] = JSON.parse(storedPurchase);
+
+  totalPurchase = purchases.reduce(
+    (sum: number, p: PurchaseData) => sum + p.totalPrice,
+    0
+  );
+  }
+
+  return {
+    sales: `₹ ${totalSales.toFixed(2)}`,
+    purchase: `₹ ${totalPurchase.toFixed(2)}`,
+  };
+};
   const getTopSellingMedicine = (): string => {
   const stored = localStorage.getItem("salesData");
   if (!stored) return "No Sales";
@@ -250,10 +297,11 @@ const Cards: React.FC = () => {
               {/* Content */}
               {card.title === "Daily Report" ? (
                 <Box display="flex" flexDirection="column" gap={2}>
+
                   {/* Sales */}
                   <Box>
                     <Typography fontWeight={700}>
-                      {info?.leftValue}
+                      {getDailyReportData(filter).sales}  
                     </Typography>
                     <Typography fontSize={12} color="text.secondary">
                       {info?.leftLabel}
@@ -280,7 +328,7 @@ const Cards: React.FC = () => {
                   {/* Purchase */}
                   <Box>
                     <Typography fontWeight={700}>
-                      {info?.rightValue}
+                      {getDailyReportData(filter).purchase}                    
                     </Typography>
                     <Typography fontSize={12} color="text.secondary">
                       {info?.rightLabel}

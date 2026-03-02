@@ -18,12 +18,12 @@ import AddDoctor from "@/containers/doctors/AddDoctor";
 import DistributorsPage from "@/view/DistributorsPage";
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
-import DistributorDetails from "@/containers/distributors/DistributorsDetails";
+import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 import Setting from "@/containers/layout/Setting";
-import DistributorsForm from "@/containers/distributors/DistributorsForm";
+import DistributorsForm from "@/containers/Distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 import MediPoints from "@/containers/billing/MediPoints";
 import Billing from "@/view/Billing";
@@ -36,9 +36,6 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
-
-
-
 
 export const mainRoutes: RouteObject[] = [
   {
