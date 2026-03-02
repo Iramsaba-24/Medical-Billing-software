@@ -12,6 +12,7 @@ export const authRoutes: RouteObject[] = [
     element: <RegisterPage />,
   },
    
+
   {
     path: URL_PATH.LOGIN,
     element: <LOGIN />,
@@ -26,7 +27,6 @@ export const authRoutes: RouteObject[] = [
     path: URL_PATH.NetBanking_PurchaseDetails,
     element: <NetBanking_PurchaseDetails />,
   },
-
 
   
 ];

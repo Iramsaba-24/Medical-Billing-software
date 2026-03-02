@@ -1,21 +1,11 @@
-
-
-import React, { useMemo, useState } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  InputAdornment,
-  Chip,
-  Slide,
-} from '@mui/material';
+import React, { useMemo, useState, useEffect } from 'react';
+import {Box,Card,CardContent,Typography,TextField,InputAdornment,Chip,Slide} from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useForm, FormProvider } from 'react-hook-form';
 import DropdownField from '@/components/controlled/DropdownField';
 import { UniversalTable, type Column, ACTION_KEY } from '@/components/uncontrolled/UniversalTable';
 import EditSalesForm from './EditSalesForm';
+import ViewSalesDialog from './ViewSalesTable';
 
 export interface SalesData {
   id: number;
@@ -28,15 +18,6 @@ export interface SalesData {
   [key: string]: string | number;
 }
 
-const initialSalesData: SalesData[] = [
-  { id: 1, name: 'Kishor Kedar', medicine: 'Medicine Two', quantity: 1, totalPrice: 152, date: 'Jan 05, 2026', time: '10:00AM' },
-  { id: 2, name: 'Rohit Raut', medicine: 'Paracetamol', quantity: 5, totalPrice: 57, date: 'Jan 05, 2026', time: '11:00AM' },
-  { id: 3, name: 'Smita Rao', medicine: 'Honitus', quantity: 1, totalPrice: 125, date: 'Jan 04, 2026', time: '04:00PM' },
-  { id: 4, name: 'Shilpa Rathod', medicine: 'Eladi', quantity: 1, totalPrice: 160, date: 'Jan 03, 2026', time: '12:00PM' },
-  { id: 5, name: 'Kanta Jain', medicine: 'Insulin', quantity: 10, totalPrice: 1799, date: 'Jan 01, 2026', time: '10:00AM' },
-  { id: 6, name: 'Amit Sharma', medicine: 'Aspirin', quantity: 3, totalPrice: 45, date: 'Dec 30, 2025', time: '02:00PM' },
-];
-
 const filterOptions = [
   { value: 'Today', label: 'Today' },
   { value: '6 Days', label: '6 Days' },
@@ -44,33 +25,32 @@ const filterOptions = [
   { value: 'All', label: 'All' },
 ];
 
-const parseDate = (dateStr: string): Date => {
-  const months: Record<string, number> = {
-    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
-  };
-
-  const [month, day, year] = dateStr.replace(',', '').split(' ');
-  return new Date(Number(year), months[month], Number(day));
-};
-
 const getFilteredDataByDate = (data: SalesData[], filter: string) => {
-  const today = new Date(2026, 0, 6);
+  const today = new Date();
 
   switch (filter) {
     case 'Today':
-      return data.filter(
-        d =>
-          parseDate(d.date).toDateString() ===
-          new Date(2026, 0, 5).toDateString()
+      return data.filter(d =>
+        new Date(d.date).toDateString() === today.toDateString()
       );
+
     case '6 Days':
       return data.filter(d => {
-        const date = parseDate(d.date);
-        return date >= new Date(2026, 0, 1) && date <= today;
+        const date = new Date(d.date);
+        const sixDaysAgo = new Date();
+        sixDaysAgo.setDate(today.getDate() - 6);
+        return date >= sixDaysAgo && date <= today;
       });
+
     case 'This Month':
-      return data.filter(d => parseDate(d.date).getMonth() === 0);
+      return data.filter(d => {
+        const date = new Date(d.date);
+        return (
+          date.getMonth() === today.getMonth() &&
+          date.getFullYear() === today.getFullYear()
+        );
+      });
+
     case 'All':
     default:
       return data;
@@ -80,7 +60,6 @@ const getFilteredDataByDate = (data: SalesData[], filter: string) => {
 const SalesTable: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('This Month');
-  const [salesData, setSalesData] = useState<SalesData[]>(initialSalesData);
 
   //  Only one state needed for dialog
   const [editingRow, setEditingRow] = useState<SalesData | null>(null);
@@ -90,10 +69,18 @@ const SalesTable: React.FC = () => {
       filter: 'This Month',
     },
   });
+  
+  const [salesList, setSalesList] = useState<SalesData[]>([]);
 
+  useEffect(() => {
+    const storedSales = localStorage.getItem("salesData");
+    // console.log("Stored Sales:", storedSales); 
+    if (storedSales) {
+      setSalesList(JSON.parse(storedSales));
+    }
+  }, []);
   const filteredSalesData = useMemo(() => {
-    const dateFiltered = getFilteredDataByDate(salesData, selectedMonth);
-
+  const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
     if (!searchQuery.trim()) return dateFiltered;
 
     return dateFiltered.filter(
@@ -101,7 +88,7 @@ const SalesTable: React.FC = () => {
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.medicine.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery, selectedMonth, salesData]);
+  }, [searchQuery, selectedMonth, salesList]);
 
   const columns: Column<SalesData>[] = [
     { key: 'name', label: 'Name' },
@@ -125,47 +112,53 @@ const SalesTable: React.FC = () => {
     setEditingRow(null); // closes dialog
   };
 
-  const handleSaveEdit = (data: SalesData) => {
-    setSalesData(prevData => {
-      const newData = prevData.map(item =>
-        item.id === data.id ? { ...item, ...data } : item
-      );
+const handleSaveEdit = (data: SalesData) => {
+  setSalesList(prevData => {
+    const updatedData = prevData.map(item =>
+      item.id === data.id ? { ...item, ...data } : item
+    );
 
-      const updatedFiltered = getFilteredDataByDate(
-        newData,
-        selectedMonth
-      );
+    localStorage.setItem("salesData", JSON.stringify(updatedData));
 
-      if (!updatedFiltered.some(item => item.id === data.id)) {
-        setSelectedMonth('All');
-      }
+    return updatedData;
+  });
 
-      return newData;
+  handleCloseEditDialog();
+};
+
+const handleDelete = (row: SalesData) => {
+  if (window.confirm(`Are you sure you want to delete ${row.name}'s record?`)) {
+    setSalesList(prevData => {
+      const updatedData = prevData.filter(item => item.id !== row.id);
+
+      localStorage.setItem("salesData", JSON.stringify(updatedData));
+
+      return updatedData;
     });
+  }
+};
 
-    handleCloseEditDialog();
-  };
+const handleDeleteSelected = (rows: SalesData[]) => {
+  if (
+    window.confirm(
+      `Are you sure you want to delete ${rows.length} selected record(s)?`
+    )
+  ) {
+    const selectedIds = rows.map(row => row.id);
 
-  const handleDelete = (row: SalesData) => {
-    if (window.confirm(`Are you sure you want to delete ${row.name}'s record?`)) {
-      setSalesData(prevData =>
-        prevData.filter(item => item.id !== row.id)
+    setSalesList(prevData => {
+      const updatedData = prevData.filter(
+        item => !selectedIds.includes(item.id)
       );
-    }
-  };
 
-  const handleDeleteSelected = (rows: SalesData[]) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${rows.length} selected record(s)?`
-      )
-    ) {
-      const selectedIds = rows.map(row => row.id);
-      setSalesData(prevData =>
-        prevData.filter(item => !selectedIds.includes(item.id))
-      );
-    }
-  };
+      localStorage.setItem("salesData", JSON.stringify(updatedData));
+
+      return updatedData;
+    });
+  }
+};
+// view row
+const [viewRow, setViewRow] = useState<SalesData | null>(null);
 
   return (
     <>
@@ -245,6 +238,7 @@ const SalesTable: React.FC = () => {
               getRowId={row => row.id}
               onDeleteSelected={handleDeleteSelected}
               actions={{
+                view: setViewRow,
                 edit: handleEdit,
                 delete: handleDelete,
               }}
@@ -267,10 +261,14 @@ const SalesTable: React.FC = () => {
       </Slide>
 
     
-      <EditSalesForm
+      <EditSalesForm  
         editingRow={editingRow}
         onClose={handleCloseEditDialog}
         onSave={handleSaveEdit}
+      />
+      <ViewSalesDialog
+        viewRow={viewRow}
+        onClose={() => setViewRow(null)}
       />
     </>
   );

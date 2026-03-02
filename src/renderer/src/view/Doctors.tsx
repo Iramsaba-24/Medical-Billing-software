@@ -1,8 +1,8 @@
-import SearchField from "@/components/controlled/SearchField";
+// import SearchField from "@/components/controlled/SearchField";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { Box, Typography, Paper, MenuItem, Button, Select, Divider, Dialog, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+// import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 import DoctorEdit from "@/containers/doctors/DoctorEdit";
@@ -20,14 +20,14 @@ type Doctor = {
 };
 
 const Doctors = () => {
-  const methods = useForm({ defaultValues: { search: "" } });
+  // const methods = useForm({ defaultValues: { search: "" } });
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [viewItem, setViewItem] = useState<Doctor | null>(null);
   const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
 
 
   const navigate = useNavigate();
-  const searchValue = methods.watch("search");
+  // const searchValue = methods.watch("search");
 
   useEffect(() => {
     setDoctors(JSON.parse(localStorage.getItem("doctors") || "[]"));
@@ -79,14 +79,14 @@ const Doctors = () => {
   ];
 
   // filter doctors
-  const filteredDoctors = doctors.filter((d) =>
-    d.doctorName.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  // const filteredDoctors = doctors.filter((d) =>
+  //   d.doctorName.toLowerCase().includes(searchValue.toLowerCase())
+  // );
 
   return (
     <>
     {/* search & add doctor */}
-      <FormProvider {...methods}>
+      {/* <FormProvider {...methods}>
         <Box>
           <Typography
             sx={{
@@ -126,18 +126,58 @@ const Doctors = () => {
                 </Button>
            </Box>
      </Paper>
-      </FormProvider>
-
+      </FormProvider> */}
+<Box >
+  <Typography
+    sx={{
+      fontSize: { xs: 22, md: 28 },
+      fontWeight: 700,
+      color: "#111827",
+    }}
+  >
+    Doctors
+  </Typography>
+</Box>
       <Paper sx={{ 
         //mx:{xs:1, md:2},
-         mt:2, p: { xs:1, md:2 } }}>
-        <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
-          Doctors List
-        </Typography>
-        <Divider sx={{ mb: 3 }} />
+         mt:1, p: { xs:1, md:2 } }}>
+          
+<Box
+  display="flex"
+  flexDirection={{ xs: "column", sm: "row" }}
+  justifyContent="space-between"
+  alignItems={{ xs: "stretch", sm: "center" }}
+  gap={2}
+  mb={2}
+>
+  <Typography
+    fontSize={{ xs: 18, md: 20 }}
+    fontWeight={600}
+  >
+    Doctors List
+  </Typography>
+
+  <Button
+    variant="contained"
+    sx={{
+      textTransform: "none",
+      bgcolor: "#238878",
+      width: { xs: "100%", sm: "auto" },
+      "&:hover": {
+        backgroundColor: "#fff",
+        color: "#238878",
+        border: "2px solid #238878",
+      },
+    }}
+    onClick={() => navigate(URL_PATH.AddDoctor)}
+  >
+    + Add Doctor
+  </Button>
+</Box>
+<Divider sx={{ mb: 3 }} />
      
           <UniversalTable
-            data={filteredDoctors}
+            data={doctors}
             columns={columns}
             showSearch={true}         
             showExport={true}

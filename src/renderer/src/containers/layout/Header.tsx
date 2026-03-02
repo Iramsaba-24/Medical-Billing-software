@@ -127,9 +127,9 @@ const Header: React.FC = () => {
       <StyledAppBar position="fixed">
        <Toolbar
         sx={{
-          gap: { xs: 1, md: 2 },
+          gap: { xs:0, md: 2 },
           mb: 1.5,
-          flexWrap: 'wrap', 
+          flexWrap: 'nowrap', 
         }}
       >
       <IconButton color="inherit" onClick={() => setOpen(!open)}>
@@ -197,6 +197,7 @@ const Header: React.FC = () => {
             //  height: "100vh"
             overflowY: "auto"
               }}>
+                
         <Outlet />
       </Box>
     </Box>

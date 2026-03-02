@@ -65,14 +65,19 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
 
   // Handler for item name selection
   const handleNameChange = (id: number, selectedName: string) => {
-    const item = inventory.find(i => i.itemName === selectedName);
+    const item = inventory.find(
+      (i) => i.itemName.trim().toLowerCase() === selectedName.trim().toLowerCase()
+    );
+
+    console.log("Selected:", selectedName);
+    console.log("Found Item:", item);
 
     setRows(rows.map((r) => {
       if (r.id === id) {
         return {
           ...r,
           name: selectedName,
-          price: item ? item.pricePerUnit : r.price
+          price: item ? Number(item.pricePerUnit) : ""
         };
       }
       return r;

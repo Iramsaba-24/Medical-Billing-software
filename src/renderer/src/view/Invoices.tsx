@@ -52,7 +52,13 @@ const Billing = () => {
 
   return (
     <Box>
-     <Typography variant="h5" mb={2}>
+     <Typography sx={{
+            fontSize: { xs: 20, sm: 24, md: 28 },
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb:0.5
+          }} >
       Invoices
     </Typography>
     <Divider sx={{ mb: 3 }} />
@@ -78,7 +84,7 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
-             height: {  md: 105}
+            height: {  md: 105}
           }}>
           <Box>
              <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
