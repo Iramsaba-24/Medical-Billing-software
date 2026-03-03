@@ -130,9 +130,11 @@ const Doctors = () => {
 <Box >
   <Typography
     sx={{
-      fontSize: { xs: 22, md: 28 },
+      fontSize: { xs: 20, sm:24, md: 28 },
       fontWeight: 700,
       color: "#111827",
+      mt: { xs: 1, md: 0.5 },
+      mb: 0.5,
     }}
   >
     Doctors

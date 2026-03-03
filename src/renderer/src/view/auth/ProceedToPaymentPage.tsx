@@ -14,7 +14,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
-
+import { URL_PATH } from "@/constants/UrlPath";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 type PaymentFormInputs = {
   paymentMethod: string;
@@ -44,7 +45,22 @@ const ProceedToPaymentPage = () => {
 
   const onSubmit = (data: PaymentFormInputs) => {
     console.log("Payment Data:", data);
-    navigate("");
+      showToast("success", "Register and proceed to payment!");
+    
+
+    if (data.paymentMethod === "upi") {
+      navigate(URL_PATH.UpiPayment);
+    } 
+    else if (data.paymentMethod === "card") {
+      navigate(URL_PATH.CardPayment);
+    } 
+    else if (data.paymentMethod === "netbanking") {
+      navigate(URL_PATH.NetBanking);
+    } 
+
+    else {
+      alert("Please select payment method");
+    }
   };
 
   return (
@@ -73,7 +89,6 @@ const ProceedToPaymentPage = () => {
             alignItems: "center",
           }}
         >
-          {/* Logo */}
           <Box mb={{ xs: 1, sm: 1.5 }}>
             <img
               src={LogoImage}
@@ -86,7 +101,6 @@ const ProceedToPaymentPage = () => {
             />
           </Box>
 
-          {/* Title */}
           <Typography
             mb={{ xs: 2.5, sm: 3 }}
             sx={{
@@ -100,7 +114,6 @@ const ProceedToPaymentPage = () => {
             Payment Details
           </Typography>
 
-          {/* Payment Methods */}
           <Box
             sx={{
               width: "100%",
@@ -119,84 +132,15 @@ const ProceedToPaymentPage = () => {
                 rules={{ required: "Please select payment method" }}
                 render={({ field }) => (
                   <RadioGroup {...field}>
-                    <FormControlLabel
-                      value="upi"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
-                      label="UPI"
-                    />
-                    <FormControlLabel
-                      value="card"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
-                      label="Credit / Debit Card"
-                    />
-                    <FormControlLabel
-                      value="netbanking"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
-                      label="Net Banking"
-                    />
-                    <FormControlLabel
-                      value="gateway"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
-                      label="Razorpay / Stripe"
-                    />
-                    <FormControlLabel
-                      value="coupon"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
-                      label="Apply Coupon Code (Optional)"
-                    />
+                    <FormControlLabel value="upi" control={<Radio />} label="UPI" />
+                    <FormControlLabel value="card" control={<Radio />} label="Credit / Debit Card" />
+                    <FormControlLabel value="netbanking" control={<Radio />} label="Net Banking" />
                   </RadioGroup>
                 )}
               />
-
               <FormHelperText>{errors.paymentMethod?.message}</FormHelperText>
             </FormControl>
 
-            {/* Coupon Field */}
             <Collapse in={selectedMethod === "coupon"}>
               <TextField
                 fullWidth
@@ -212,7 +156,6 @@ const ProceedToPaymentPage = () => {
             </Collapse>
           </Box>
 
-          {/* Amount Box */}
           <Box sx={{ width: "100%", mb: 2 }}>
             <Typography sx={{ fontWeight: 500, mb: 1 }}>
               Total Amount Display
@@ -232,17 +175,17 @@ const ProceedToPaymentPage = () => {
                 fontWeight: 600,
                 letterSpacing: "0.5px",
               }}
-            ></Box>
+            >
+            </Box>
           </Box>
 
-          {/* Submit Button */}
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{
-              mt: 1,
-              fontWeight: "1000",
+              mt: { xs: 3, sm: 5 },
+              fontWeight: 600,
               fontSize: { xs: "1rem", sm: "1.05rem" },
               backgroundColor: "#1b7f6b",
               textTransform: "none",

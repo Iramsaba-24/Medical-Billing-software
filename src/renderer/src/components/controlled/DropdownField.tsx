@@ -85,7 +85,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
             <Autocomplete
               freeSolo={freeSolo && editable}
               options={options}
-              value={selectedOption}
+              value={selectedOption || null}
               inputValue={typeof value === 'string' ? value : value?.toString() || ''}
               isOptionEqualToValue={(option, val) => {
                 if (!val) return false;

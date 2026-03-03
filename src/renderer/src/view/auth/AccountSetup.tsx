@@ -15,6 +15,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 type AccountForm = {
   password: string;
@@ -38,6 +39,8 @@ const AccountSetup = () => {
   const onSubmit = (data: AccountForm) => {
     console.log(data);
     navigate(URL_PATH.ProceedToPaymentPage);
+      showToast("success", "Account setup successful!");
+    
   };
 
   return (

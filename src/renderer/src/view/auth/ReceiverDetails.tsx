@@ -14,6 +14,7 @@ import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 
 import { showToast } from "@/components/uncontrolled/ToastMessage";
+import { URL_PATH } from "@/constants/UrlPath";
 
 type FormValues = {
   bankName: string;
@@ -40,7 +41,7 @@ const ReceiverDetails = () => {
   const onSubmit = (data: FormValues) => {
     localStorage.setItem("paymentDetails", JSON.stringify(data));
     showToast("success", "Saved Successfully");
-    navigate(""); 
+    navigate( URL_PATH.NetPurchaseDetails); 
   };
 
   return (

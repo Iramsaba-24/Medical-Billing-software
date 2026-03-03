@@ -1,29 +1,29 @@
-
+ 
 import { useEffect, useState } from "react";
 import { Box, Paper, Button, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { UniversalTable, Column, DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
-
+ 
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
 import { URL_PATH } from "@/constants/UrlPath";
-import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage.tsx"; 
+import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage.tsx";
 type Props = {
   invoices: Invoice[];
   setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
   onCreate: () => void;
   onView: (invoice: Invoice) => void;
 };
-
-
+ 
+ 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
-
+ 
 const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
-
+ 
   // invoice local storage
   useEffect(() => {
     if (location.state) {
@@ -32,7 +32,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
       setInvoices((prev) => {
         const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
         if (exists) return prev;
-
+ 
         const safeInvoice = {
           ...newInvoice,
           medicines: newInvoice.medicines.map((med) => ({
@@ -44,37 +44,37 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
       });
     }
   },[location.state, setInvoices] );
-
+ 
   const [filterType, setFilterType] = useState<FilterType>("all");
-
+ 
   const filterOptions = [
     { label: "All", value: "all" },
     { label: "Daily", value: "daily" },
     { label: "Monthly", value: "monthly" },
     { label: "Yearly", value: "yearly" },
   ];
-
+ 
   const filteredInvoices = invoices.filter((invoice) => {
     if (filterType === "all") return true;
-
+ 
     const invoiceDate = new Date(invoice.date);
     const today = new Date();
-
+ 
     if (filterType === "daily")
       return invoiceDate.toDateString() === today.toDateString();
-
+ 
     if (filterType === "monthly")
       return (
         invoiceDate.getMonth() === today.getMonth() &&
         invoiceDate.getFullYear() === today.getFullYear()
       );
-
+ 
     if (filterType === "yearly")
       return invoiceDate.getFullYear() === today.getFullYear();
-
+ 
     return true;
   });
-
+ 
   const columns: Column<Invoice>[] = [
     { key: "invoice", label: "Invoice" },
     { key: "patient", label: "Patient" },
@@ -87,31 +87,31 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
     { key: "status", label: "Status" },
     { key: "actionbutton", label: "Action" },
   ];
-
+ 
   const statusOptions: DropdownOption[] = [
     { value: "Paid", label: "Paid" },
     { value: "Pending", label: "Pending" },
     { value: "Overdue", label: "Overdue" },
   ];
-
+ 
   const methods = useForm({ defaultValues: { filterType: "all" } });
-
+ 
   //  DELETE
   const handleDelete = async (invoiceNo: string) => {
     const confirmed = await showConfirmation(
       "Are you sure you want to delete this invoice?",
       "Confirm Delete"
     );
-
+ 
     if (!confirmed) return;
-
+ 
     setInvoices((prev) =>
       prev.filter((inv) => inv.invoice !== invoiceNo)
     );
-
+ 
     showToast("success", "Invoice deleted successfully");
   };
-
+ 
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 1 }}>
@@ -127,7 +127,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   <Typography fontSize={{ xs: 18, md: 22 }} fontWeight={600}>
     Invoice List
   </Typography>
-
+ 
   {/* Filter + Create button */}
   <Box
     display="flex"
@@ -185,7 +185,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
                     : inv
                 )
               );
-
+ 
               showToast("success", "Status updated successfully");
             },
           }}
@@ -194,12 +194,12 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
               navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
                 state: invoice,
               }),
-
+ 
             edit: (invoice) =>
               navigate(URL_PATH.CreateInvoice, {
                 state: invoice,
               }),
-
+ 
             delete: (invoice) =>
               handleDelete(invoice.invoice),
           }}
@@ -208,16 +208,16 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
               "Delete selected invoices?",
               "Confirm Delete"
             );
-
+ 
             if (!confirmed) return;
-
+ 
             setInvoices((prev) =>
               prev.filter(
                 (inv) =>
                   !rows.some((r) => r.invoice === inv.invoice)
               )
             );
-
+ 
             showToast("success", "Selected invoices deleted");
           }}
         />
@@ -225,5 +225,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
     </FormProvider>
   );
 };
-
+ 
 export default BillingTable;
+ 
+ 

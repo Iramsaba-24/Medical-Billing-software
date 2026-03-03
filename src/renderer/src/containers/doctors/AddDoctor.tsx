@@ -113,9 +113,12 @@ const AddDoctor = () => {
     {/* registration number */}
         <Box mt={3} width="100%">
           <TextInputField
+            inputType="numbers"
             name="registrationNo"
             label="Registration No."
             required
+            minLength={3}
+            maxLength={15}
             rules={{ required: "Registration No. is required" }}
           />
         </Box>

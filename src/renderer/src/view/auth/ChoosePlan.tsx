@@ -5,6 +5,7 @@ import LogoImage from "@/assets/logoimg.svg";
 import RadioField from "@/components/controlled/RadioField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 type PlanForm = {
   plan: string;
@@ -22,6 +23,7 @@ const ChoosePlan = () => {
   const onSubmit = (data: PlanForm) => {
     console.log(data);
     navigate(URL_PATH.AccountSetup);
+      showToast("success", "Plan selected successfully!");
   };
 
   return (

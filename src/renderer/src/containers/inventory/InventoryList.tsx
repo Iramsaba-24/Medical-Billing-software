@@ -137,18 +137,18 @@ const InventoryList = () => {
       >
         <Box display="flex" justifyContent="space-between" mb={4}>
           <Typography
-    fontSize={{ xs: 18, md: 20 }}
-    fontWeight={600}
-  >
-    Inventory List
-  </Typography>
-  
-  
+              fontSize={{ xs: 18, md: 20 }}
+              fontWeight={600}
+            >
+              Inventory List
+            </Typography>
         </Box>
 
         <UniversalTable
           data={tableData}
           columns={columns}
+          showExport={true}
+          showSearch={true}
           tableSize="small"
           rowsPerPage={5}
           actions={{
