@@ -22,6 +22,7 @@ import { Home } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
 import Setting, { SettingRef } from './Setting';
+import { useEffect } from 'react';
  
 const MINI_WIDTH = 90;
 const FULL_WIDTH = 240;
@@ -60,6 +61,33 @@ const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const settingRef = React.useRef<SettingRef>(null);
+
+   useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.ctrlKey && event.key === "b") {
+          event.preventDefault();
+          navigate(URL_PATH.Billing);
+        }
+         if (event.ctrlKey && event.key === "i") {
+          event.preventDefault();
+          navigate(URL_PATH.Invoices);
+        }
+         if (event.ctrlKey && event.key === "r") {
+          event.preventDefault();
+          navigate(URL_PATH.ReportPage);
+        }
+         if (event.ctrlKey && event.key === "c") {
+          event.preventDefault();
+          navigate(URL_PATH.Customer);
+        }
+      };
+  
+      document.addEventListener("keydown", handleKeyDown);
+  
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [navigate]);
  
   return (
     <List sx={{ px: 1, mt: { xs: 6, md: 2 } }}>
