@@ -181,7 +181,7 @@ return (
         },
       }}
         >
-      {/* <TableCell colSpan={4} sx={{ borderLeft: "2px solid red", borderRight: "2px solid red" }} /> */}
+    
       <TableCell />
       <TableCell />
       <TableCell />
@@ -222,7 +222,7 @@ return (
         },
       }}
         >
-      {/* <TableCell colSpan={4} sx={{borderTop: "none", borderBottom: "none"}} /> */}
+    
       <TableCell sx={{border:"2px solid #000"}} />
       <TableCell sx={{border:"2px solid #000"}} />
       <TableCell sx={{border:"2px solid #000"}} />

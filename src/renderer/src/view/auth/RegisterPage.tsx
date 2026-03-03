@@ -8,6 +8,8 @@ import MobileField from "@/components/controlled/MobileField";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import { URL_PATH } from "@/constants/UrlPath";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
+
 
 type RegisterFormInputs = {
   fullName: string;
@@ -108,7 +110,9 @@ const RegisterPage = () => {
     };
 
     console.log(cleanedData);
-    navigate(URL_PATH.LOGIN);
+    navigate(URL_PATH.BusinessDetails);
+      showToast("success", "Registration successful!");
+    
   };
 
   return (

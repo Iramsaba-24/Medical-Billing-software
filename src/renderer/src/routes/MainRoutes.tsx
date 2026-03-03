@@ -37,9 +37,6 @@ import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
 
-
-
-
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,

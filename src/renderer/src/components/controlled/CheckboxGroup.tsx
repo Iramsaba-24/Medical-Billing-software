@@ -44,7 +44,11 @@ const CheckboxGroup: FC<CheckboxGroupFieldProps> = ({ name, label, required = fa
 
         return (
           <FormControl component="fieldset" required={required} error={!!errors[name]} sx={sx}>
-            <FormLabel component="legend">{label}</FormLabel>
+            <FormLabel component="legend" sx={{
+
+         '& .MuiFormLabel-asterisk': { display: 'none' }
+  }}
+ >{label}</FormLabel>
             {options.map((option, index) => (
               <FormControlLabel
                 key={index}

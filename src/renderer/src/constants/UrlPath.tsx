@@ -1,10 +1,22 @@
+
+
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
-  ProceedToPaymentPage: "/proceed-to-payment",
-  ChoosePlan: "/chooseplan",
-  AccountSetup: "/accountsetup",
+  ChoosePlan:"/chooseplan",
+ AccountSetup:"/accountsetup",
+  PaymentSuccess: "/payment-success",
+  UpiPayment: "/upi-payment",
+  CardPayment: "/card-payment",
 
+  
+  ProceedToPaymentPage: "/proceed-to-payment",
+  BusinessDetails:"/businessdetails",
+  NetPurchaseDetails:"/netbanking-purchasedetails",
+  NetBanking:"/netbanking",
+  ReceiverDetails:"/receivers-details",
+
+ 
   Landing: "/landing",
   Dashboard: "/dashboard",
   SalesView: "/dashboard/sales-view",
