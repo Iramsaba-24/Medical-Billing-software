@@ -1,4 +1,4 @@
- import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Box, Button, Typography, Paper, Autocomplete, TextField } from "@mui/material"; 
 import { useForm, FormProvider } from "react-hook-form";
 import { Save, ArrowBack, Payment, Print } from "@mui/icons-material"; 
@@ -18,6 +18,13 @@ export interface ItemRow {
   price: number | ""; 
 }
 
+interface StoredDoctor {
+  doctorName: string;
+  doctorAddress?: string;
+  address?: string;
+  clinicAddress?: string;
+}
+
 interface Props {
   onBack: () => void;
   onSave: (data: CustomerData, total: number, meds: string, qty: number, actualRows: ItemRow[]) => void;
@@ -31,6 +38,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const [paymentMode, setPaymentMode] = useState("Cash");
   const [isSubmitted, setIsSubmitted] = useState(false); 
   const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
+  const [doctorOptions, setDoctorOptions] = useState<{ label: string; value: string; address: string }[]>([]);
 
   // Initialize the form with react-hook-form and default empty values
   const methods = useForm<CustomerData>({
@@ -40,22 +48,36 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     }
   });
 
-  const [doctorOptions, setDoctorOptions] = useState<{ label: string; value: string }[]>([]);
-
   useEffect(() => {
-    const storedDoctors = JSON.parse(localStorage.getItem("doctors") || "[]");
-    const options = storedDoctors.map((doc: { doctorName: string }) => ({
+    const storedDoctors: StoredDoctor[] = JSON.parse(localStorage.getItem("doctors") || "[]");
+
+    const options = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
+      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
+
     setDoctorOptions(options);
   }, []);
+
+  // Auto fill doctor address when doctor is selected
+  const selectedDoctor = methods.watch("doctor");
+
+  useEffect(() => {
+    if (selectedDoctor) {
+      const doctorData = doctorOptions.find(doc => doc.value === selectedDoctor);
+      if (doctorData) {
+        methods.setValue("doctorAddress", doctorData.address, { shouldValidate: true });
+      }
+    }
+  }, [selectedDoctor, doctorOptions, methods]);
 
   // Load existing customers from LocalStorage for the search dropdown
   useEffect(() => {
     const saved = localStorage.getItem("medical_customers");
     if (saved) setCustomerOptions(JSON.parse(saved));
   }, []);
+
   // Common styling for action buttons (Print, Pay, Save)
   const buttonStyle = {
     backgroundColor: "#238878",
@@ -68,7 +90,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
   };
 
- 
   useEffect(() => {
     // Load existing customers from Local Storage for the search/autocomplete
     const saved = localStorage.getItem("medical_customers");
@@ -81,12 +102,14 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     }
   }, [initialData, methods]);
 
-  
   // When a user selects a customer from the search dropdown
   const handleSelectCustomer = (selected: CustomerData | null) => {
     if (selected) {
       // Auto-fill form with selected customer details
       methods.reset({ ...selected, date: new Date().toISOString().split("T")[0] });
+      if (selected.itemsList && selected.itemsList.length > 0) {
+        setRows(selected.itemsList);
+      }
     } else {
       // Reset form if search is cleared
       methods.reset({ 
@@ -166,7 +189,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
           </Box>
         </Paper>
 
-        {/*  Medicines/Items Table Adding rows and calculating row totals */}
         <ItemsSection 
           rows={rows} setRows={setRows} 
           gst={gst} setGst={setGst} 
@@ -174,7 +196,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
           finalTotal={finalTotal} isSubmitted={isSubmitted} 
         />
 
-        {/*  Footer Action Buttons Print, Pay, Save */}
         <Box sx={{ 
           mt: 4, 
           display: "flex", 
@@ -183,36 +204,19 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
           justifyContent: "flex-end", 
           gap: 2 
         }}>
-          
-          {/*  Opens browser print dialog */}
-          <Button 
-            variant="contained" 
-            startIcon={<Print />} 
-            sx={{ ...buttonStyle, width: { xs: "calc(50% - 8px)", sm: "auto" } }} 
-            onClick={() => window.print()}
-          >
+          <Button variant="contained" startIcon={<Print />} sx={{ ...buttonStyle, width: { xs: "calc(50% - 8px)", sm: "auto" } }} onClick={() => window.print()}>
             Print
           </Button>
 
-          {/*  For payment processing */}
-          <Button 
-            variant="contained" 
-            startIcon={<Payment />} 
-            sx={{ ...buttonStyle, width: { xs: "calc(50% - 8px)", sm: "auto" } }}
-          >
+          <Button variant="contained" startIcon={<Payment />} sx={{ ...buttonStyle, width: { xs: "calc(50% - 8px)", sm: "auto" } }}>
             Pay Now
           </Button>
 
-          {/* Validates all items and saves the invoice */}
           <Button 
             variant="contained" 
             type="submit" 
             startIcon={<Save />} 
-            sx={{ 
-              ...buttonStyle, 
-              width: { xs: "100%", sm: "auto" },
-              order: { xs: 3, sm: 0 } 
-            }}
+            sx={{ ...buttonStyle, width: { xs: "100%", sm: "auto" }, order: { xs: 3, sm: 0 } }}
           >
             Save
           </Button>
@@ -223,5 +227,3 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
 };
 
 export default AddCustomerForm;
-
-
