@@ -136,9 +136,14 @@ const InventoryList = () => {
         }}
       >
         <Box display="flex" justifyContent="space-between" mb={4}>
-          <Typography fontSize={{ xs: "16px", md: "20px" }}>
-            Inventory List
-          </Typography>
+          <Typography
+    fontSize={{ xs: 18, md: 20 }}
+    fontWeight={600}
+  >
+    Inventory List
+  </Typography>
+  
+  
         </Box>
 
         <UniversalTable
@@ -231,9 +236,7 @@ const InventoryList = () => {
 
   <DialogActions
     sx={{
-      justifyContent: "flex-end", 
-      pr: 3
-    }}
+      justifyContent: "flex-end", pr: 3}}
   >
     <Button
       onClick={() => setViewItem(null)}

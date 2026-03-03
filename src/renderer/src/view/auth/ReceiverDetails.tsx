@@ -59,6 +59,7 @@ const ReceiverDetails = () => {
       <FormProvider {...methods}>
         <Box
           component="form"
+          noValidate
           onSubmit={methods.handleSubmit(onSubmit)}
           sx={{ width: "100%", maxWidth: 800, textAlign: "center" }}
         >

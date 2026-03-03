@@ -5,7 +5,7 @@ import Invoices from "@/view/Invoices";
 import CreateInvoice from "@/containers/Invoices/CreateInvoice";
 import InvoiceView from "@/containers/Invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
-import InventoryList from "@/containers/inventory/InvetoryList";
+
 import MedicineGroup from "@/containers/inventory/MedicineGroup";
 import MedicineGroupView from "@/containers/inventory/MedicineGroupView";
 import AddMedicineGroup from "@/containers/inventory/AddMedicineGroup";
@@ -36,6 +36,8 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
+import InventoryList from "@/containers/inventory/InventoryList";
+// import InventoryList from "@/containers/inventory/InventoryList";
 
 
 

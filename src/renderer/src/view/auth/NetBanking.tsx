@@ -16,6 +16,7 @@ import LogoImage from "@/assets/logoimg.svg";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
 
+
 type FormValues = {
   bankName: string;
   accountNumber: string;
@@ -60,6 +61,7 @@ const NetBanking = () => {
       <FormProvider {...methods}>
         <Box
           component="form"
+          noValidate
           onSubmit={methods.handleSubmit(onSubmit)}
           sx={{ width: "100%", maxWidth: 800, textAlign: "center" }}
         >

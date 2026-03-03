@@ -9,7 +9,7 @@ export const URL_PATH = {
   BusinessDetails:"/businessdetails",
   NetPurchaseDetails:"/netbanking-purchasedetails",
   NetBanking:"/netbanking",
-  ReceiverDetails:"/receivers-details",
+  ReceiverDetails:"/receiver-details",
 
  
   Landing: "/landing",
@@ -35,7 +35,7 @@ export const URL_PATH = {
   DistributorDetails: "/distributor-details",
 
   Inventory: "/inventory",
-  InventoryList: "/inventory/inventory-list",
+InventoryList: "/inventory/inventory-list", 
   Reorder: "/inventory/reorder",
   MedicineGroup: "/inventory/medicine-group",
   AddMedicineGroup: "/inventory/add-medicine-group",

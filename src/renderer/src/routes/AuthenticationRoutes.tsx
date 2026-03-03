@@ -8,6 +8,8 @@ import ChoosePlan from "@/view/auth/ChoosePlan";
 import AccountSetup from "@/view/auth/AccountSetup";
 import NetPurchaseDetails from "@/view/auth/NetPurchaseDetails";
 import ProceedToPaymentPage from "@/view/auth/ProceedToPaymentPage";
+import NetBanking from "@/view/auth/NetBanking";
+import ReceiverDetails from "@/view/auth/ReceiverDetails";
 
 
 export const authRoutes: RouteObject[] = [
@@ -43,7 +45,14 @@ export const authRoutes: RouteObject[] = [
     path: URL_PATH.ProceedToPaymentPage,
     element: <ProceedToPaymentPage />,
   },
-
+  {
+    path: URL_PATH.NetBanking,
+    element: <NetBanking />,
+  },
+  {
+    path: URL_PATH.ReceiverDetails,
+    element: <ReceiverDetails />,
+  },
 
   
 ];
