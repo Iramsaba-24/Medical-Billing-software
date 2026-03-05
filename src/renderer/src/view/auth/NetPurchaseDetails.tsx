@@ -11,6 +11,7 @@ import RadioField from "@/components/controlled/RadioField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import MobileField from "@/components/controlled/MobileField";
 import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 
 type FormInputs = {
@@ -37,7 +38,7 @@ const NetBanking_PurchaseDetails = () => {
   const onSubmit = (data: FormInputs) => {
     console.log("Form Data:", data);
     showToast("success", "Payment initiated successfully!");
-    navigate("");
+    navigate(URL_PATH.PaymentSuccess);
   };
 
 

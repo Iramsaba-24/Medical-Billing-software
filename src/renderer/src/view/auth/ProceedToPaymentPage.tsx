@@ -3,48 +3,47 @@ import {
   Box,
   Button,
   Typography,
-  Collapse,
-  TextField,
   Radio,
   RadioGroup,
   FormControlLabel,
   FormControl,
-  FormHelperText,
+  FormLabel,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
+import BgImage from "@/assets/bgloginpage.svg";
+import TextInputField from "@/components/controlled/TextInputField";
 import { URL_PATH } from "@/constants/UrlPath";
 
 type PaymentFormInputs = {
   paymentMethod: string;
-  coupon: string;
+  amount: string;
 };
 
 const ProceedToPaymentPage = () => {
   const methods = useForm<PaymentFormInputs>({
     defaultValues: {
       paymentMethod: "",
-      coupon: "",
+      amount: "",
     },
     mode: "onChange",
   });
 
   const navigate = useNavigate();
-
-  const {
-    watch,
-    handleSubmit,
-    register,
-    control,
-    formState: { errors },
-  } = methods;
-
-  const selectedMethod = watch("paymentMethod");
+  const { handleSubmit, control } = methods;
 
   const onSubmit = (data: PaymentFormInputs) => {
     console.log("Payment Data:", data);
-    navigate(URL_PATH.LOGIN);
+
+    if (data.paymentMethod === "upi") {
+      navigate(URL_PATH.UpiPayment);
+    } else if (data.paymentMethod === "card") {
+      navigate(URL_PATH.CardPayment);
+    } else if (data.paymentMethod === "netbanking") {
+      navigate(URL_PATH.NetBanking);
+    } else {
+      alert("Please select payment method");
+    }
   };
 
   return (
@@ -86,7 +85,7 @@ const ProceedToPaymentPage = () => {
             />
           </Box>
 
-          {/* Title */}
+          {/* Heading */}
           <Typography
             mb={{ xs: 2.5, sm: 3 }}
             sx={{
@@ -100,19 +99,13 @@ const ProceedToPaymentPage = () => {
             Payment Details
           </Typography>
 
-          {/* Payment Methods */}
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              mb: 2,
-            }}
-          >
-            <Typography sx={{ fontWeight: 500 }}>Payment Method</Typography>
+          {/* Payment Method */}
+          <Box sx={{ width: "100%", mb: 3 }}>
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel sx={{ mb: 1, fontWeight: 600, color:"black" }}>
+                Payment Method
+              </FormLabel>
 
-            <FormControl fullWidth error={!!errors.paymentMethod}>
               <Controller
                 name="paymentMethod"
                 control={control}
@@ -121,118 +114,62 @@ const ProceedToPaymentPage = () => {
                   <RadioGroup {...field}>
                     <FormControlLabel
                       value="upi"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
+                      control={<Radio />}
                       label="UPI"
                     />
                     <FormControlLabel
                       value="card"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
+                      control={<Radio />}
                       label="Credit / Debit Card"
                     />
                     <FormControlLabel
                       value="netbanking"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
+                      control={<Radio />}
                       label="Net Banking"
-                    />
-                    <FormControlLabel
-                      value="gateway"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
-                      label="Razorpay / Stripe"
-                    />
-                    <FormControlLabel
-                      value="coupon"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "grey.500",
-                            "&.Mui-checked": {
-                              color: "#238878",
-                            },
-                          }}
-                        />
-                      }
-                      label="Apply Coupon Code (Optional)"
                     />
                   </RadioGroup>
                 )}
               />
-
-              <FormHelperText>{errors.paymentMethod?.message}</FormHelperText>
             </FormControl>
-
-            {/* Coupon Field */}
-            <Collapse in={selectedMethod === "coupon"}>
-              <TextField
-                fullWidth
-                placeholder="Enter coupon code"
-                {...register("coupon")}
-                sx={{
-                  mt: 1,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: "10px",
-                  },
-                }}
-              />
-            </Collapse>
           </Box>
 
-          {/* Amount Box */}
-          <Box sx={{ width: "100%", mb: 2 }}>
-            <Typography sx={{ fontWeight: 500, mb: 1 }}>
+          {/* Total Amount Display */}
+          <Box sx={{ width: "100%", mb: 3 }}>
+            <Typography
+              sx={{
+                fontWeight: 500,
+                fontSize: "1rem",
+                color: "#333",
+                mb: 1,
+              }}
+            >
               Total Amount Display
             </Typography>
 
-            <Box
+            <TextInputField
+              name="amount"
+              label=""
+              required
+              inputType="all"   
+              maxLength={10}
+              placeholder="Enter total amount"
               sx={{
-                height: 64,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                px: 3,
-                borderRadius: "12px",
-                backgroundColor: "#fff",
-                border: "3px solid #1b7f6b",
-                fontSize: "20px",
-                fontWeight: 600,
-                letterSpacing: "0.5px",
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "#f4f4f4",
+                  borderRadius: "8px",
+                  "& fieldset": {
+                    borderColor: "#2a9d8f",
+                    borderWidth: "2px",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#2a9d8f",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#2a9d8f",
+                  },
+                },
               }}
-            ></Box>
+            />
           </Box>
 
           {/* Submit Button */}
@@ -241,8 +178,8 @@ const ProceedToPaymentPage = () => {
             fullWidth
             variant="contained"
             sx={{
-              mt: 1,
-              fontWeight: "1000",
+              mt: { xs: 3, sm: 5 },
+              fontWeight: 600,
               fontSize: { xs: "1rem", sm: "1.05rem" },
               backgroundColor: "#1b7f6b",
               textTransform: "none",
@@ -255,7 +192,7 @@ const ProceedToPaymentPage = () => {
               },
             }}
           >
-            Register & Proceed to Payment
+            Proceed to Payment
           </Button>
         </Box>
       </FormProvider>

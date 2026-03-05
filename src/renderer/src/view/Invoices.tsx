@@ -22,16 +22,18 @@ const cardHover = {
   },
 };
 
+
+
 const Billing = () => {
   const navigate = useNavigate();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   // Load invoices from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("invoiceList");
-    const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
-    setInvoices(parsed);
-  }, []);
+useEffect(() => {
+  const stored = localStorage.getItem("invoices");
+  const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
+  setInvoices(parsed);
+}, []);
 
   // Memoized Calculations 
   const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {

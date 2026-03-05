@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import {
@@ -23,6 +22,7 @@ import { Home } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
 import Setting, { SettingRef } from './Setting';
+import { useEffect } from 'react';
  
 const MINI_WIDTH = 90;
 const FULL_WIDTH = 240;
@@ -42,11 +42,7 @@ const SearchBox = styled(Box)(() => ({
   backgroundColor: '#fff',
   borderRadius: 20,
   padding: '4px 12px',
-  MaxWidth: 260,
   width: '100%',
-  // [theme.breakpoints.down('sm')]: {
-  //   width: 160,
-  // },
 }));
  
 const menuItems = [
@@ -65,6 +61,33 @@ const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const settingRef = React.useRef<SettingRef>(null);
+
+   useEffect(() => {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.ctrlKey && event.key === "b") {
+          event.preventDefault();
+          navigate(URL_PATH.Billing);
+        }
+         if (event.ctrlKey && event.key === "i") {
+          event.preventDefault();
+          navigate(URL_PATH.Invoices);
+        }
+         if (event.ctrlKey && event.key === "r") {
+          event.preventDefault();
+          navigate(URL_PATH.ReportPage);
+        }
+         if (event.ctrlKey && event.key === "c") {
+          event.preventDefault();
+          navigate(URL_PATH.Customer);
+        }
+      };
+  
+      document.addEventListener("keydown", handleKeyDown);
+  
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }, [navigate]);
  
   return (
     <List sx={{ px: 1, mt: { xs: 6, md: 2 } }}>
@@ -120,6 +143,8 @@ const Header: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
+  const [showSearch, setShowSearch] = React.useState(false);
+
  
   return (
     <Box sx={{ display: 'flex' }}>
@@ -127,9 +152,11 @@ const Header: React.FC = () => {
       <StyledAppBar position="fixed">
        <Toolbar
         sx={{
-          gap: { xs:0, md: 2 },
-          mb: 1.5,
-          flexWrap: 'nowrap', 
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 3,
+    minHeight: 64,
         }}
       >
       <IconButton color="inherit" onClick={() => setOpen(!open)}>
@@ -154,10 +181,18 @@ const Header: React.FC = () => {
           order: { xs: 1, md: 0 }, 
         }}
       >
-        <SearchBox>
-          <SearchIcon sx={{ mr: 1, color: '#666' }} />
-          <InputBase placeholder="Search" fullWidth />
-        </SearchBox>
+
+{isMobile ? (
+  <IconButton color="inherit" onClick={() => setShowSearch(!showSearch)}>
+    <SearchIcon />
+  </IconButton>
+) : (
+  <SearchBox>
+    <SearchIcon sx={{ mr: 1, color: '#666' }} />
+    <InputBase placeholder="Search" fullWidth />
+  </SearchBox>
+)}
+        
       </Box>
 
       <IconButton color="inherit" onClick={() => navigate(-1)}>
@@ -168,6 +203,33 @@ const Header: React.FC = () => {
         <RedoRoundedIcon />
       </IconButton>
     </Toolbar>
+    {isMobile && showSearch && (
+  <Box
+    sx={{
+      width: "100%",
+      backgroundColor: "#238878",
+      px: 0,
+      pb: 1,
+    }}
+  >
+    <SearchBox sx={{ width: "100%" }}>
+      <SearchIcon
+        sx={{ mr: 1, color: "#666", cursor: "pointer" }}
+        onClick={() => setShowSearch(false)}
+      />
+      <InputBase
+        placeholder="Search"
+        fullWidth
+        autoFocus
+        sx={{
+          backgroundColor: "#fff",
+          borderRadius: 5,
+          px: 1,
+        }}
+      />
+    </SearchBox>
+  </Box>
+)}
 
       </StyledAppBar>
       <Drawer
@@ -182,27 +244,31 @@ const Header: React.FC = () => {
             width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
             transition: 'width 0.3s',
             boxSizing: 'border-box',
-           
+            paddingTop: isMobile
+    ? showSearch
+      ? 10
+      : 5
+    : 0,
           },
         }}
       >
-        <DrawerHeader />
+        {!isMobile && <DrawerHeader />}
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
-      <Box component="main" sx={{
-         flex: 1, bgcolor: "#f8f9fa",
-          py: { xs: 9, md: 8 },
-           mt: 4,
-            px:{xs:1, sm:3, md:5},
-            //  height: "100vh"
-            overflowY: "auto"
-              }}>
-                
-        <Outlet />
-      </Box>
+     <Box
+  component="main"
+  sx={{
+    flex: 1,
+    bgcolor: "#f8f9fa",
+    pt: { xs: showSearch ? 16 : 10, md: 10 },
+    px: { xs: 1, sm: 3, md: 5 },
+    overflowY: "auto"
+  }}
+>
+  <Outlet />
+</Box>
     </Box>
   );
  };
  
 export default Header;
- 
