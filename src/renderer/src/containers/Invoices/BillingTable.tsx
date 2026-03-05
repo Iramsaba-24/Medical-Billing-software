@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Box, Paper, Button, Typography } from "@mui/material";
+import { Box, Paper,  Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
-import { UniversalTable, Column, DropdownOption,} from "@/components/uncontrolled/UniversalTable";
+import { UniversalTable, Column, DropdownOption,
+} from "@/components/uncontrolled/UniversalTable";
+
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
@@ -17,7 +19,7 @@ type Props = {
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
+const BillingTable = ({ invoices, setInvoices, }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -79,8 +81,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
     {
       key: "price",
       label: "Price",
-      render: (row) => `₹ ${row.price.toLocaleString()}`,
-    },
+render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`    },
     { key: "status", label: "Status" },
     { key: "actionbutton", label: "Action" },
   ];
@@ -94,25 +95,28 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   const methods = useForm({ defaultValues: { filterType: "all" } });
 
   //  DELETE
-const handleDelete = async (invoiceNo: string) => {
-  const confirmed = await showConfirmation(
-    "Are you sure you want to delete this invoice?",
-    "Confirm Delete"
-  );
+  const handleDelete = async (invoiceNo: string) => {
+    const confirmed = await showConfirmation(
+      "Are you sure you want to delete this invoice?",
+      "Confirm Delete"
+    );
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  setInvoices((prev) => {
-    const updated = prev.filter((inv) => inv.invoice !== invoiceNo);
+    setInvoices((prev) =>
+      prev.filter((inv) => inv.invoice !== invoiceNo)
+    );
 
-    localStorage.setItem("invoices", JSON.stringify(updated));
+    showToast("success", "Invoice deleted successfully");
+  };
 
-    return updated;
-  });
 
-  showToast("success", "Invoice deleted successfully");
-};
-
+useEffect(() => {
+  const storedSales = localStorage.getItem("salesData");
+  if (storedSales) {
+    setInvoices(JSON.parse(storedSales));
+  }
+}, [location.pathname]);
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 1 }}>
@@ -146,7 +150,7 @@ const handleDelete = async (invoiceNo: string) => {
         size="small"
       />
     </Box>
-    <Button
+    {/* <Button
       variant="contained"
       onClick={onCreate}
       sx={{
@@ -164,7 +168,7 @@ const handleDelete = async (invoiceNo: string) => {
       }}
     >
       + Create Invoice
-    </Button>
+    </Button> */}
   </Box>
 </Box>
      
@@ -178,21 +182,17 @@ const handleDelete = async (invoiceNo: string) => {
           dropdown={{
             key: "status",
             options: statusOptions,
-onChange: (row, value) => {
-  setInvoices((prev) => {
-    const updated = prev.map((inv) =>
-      inv.invoice === row.invoice
-        ? { ...inv, status: value as InvoiceStatus }
-        : inv
-    );
+            onChange: (row, value) => {
+              setInvoices((prev) =>
+                prev.map((inv) =>
+                  inv.invoice === row.invoice
+                    ? { ...inv, status: value as InvoiceStatus }
+                    : inv
+                )
+              );
 
-    localStorage.setItem("invoices", JSON.stringify(updated));
-
-    return updated;
-  });
-
-  showToast("success", "Status updated successfully");
-},
+              showToast("success", "Status updated successfully");
+            },
           }}
           actions={{
             view: (invoice) =>
@@ -216,16 +216,13 @@ onChange: (row, value) => {
 
             if (!confirmed) return;
 
-setInvoices((prev) => {
-  const updated = prev.filter(
-    (inv) =>
-      !rows.some((r) => r.invoice === inv.invoice)
-  );
+            setInvoices((prev) =>
+              prev.filter(
+                (inv) =>
+                  !rows.some((r) => r.invoice === inv.invoice)
+              )
+            );
 
-  localStorage.setItem("invoices", JSON.stringify(updated));
-
-  return updated;
-});
             showToast("success", "Selected invoices deleted");
           }}
         />
