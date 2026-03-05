@@ -133,7 +133,6 @@ function PharmacyProfile() {
                     maxLength={20}
                     required
                   />
-
                 </Stack>
               </Grid>
 
@@ -292,7 +291,6 @@ function PharmacyProfile() {
                     name="bankName"
                     label="Bank Name"
                     inputType="alphabet"
-                    
                     rows={1}
                     required
                   />
@@ -318,12 +316,7 @@ function PharmacyProfile() {
                     maxLength={11}
                     inputType="alphanumeric"
                     required
-                    // rules={{
-                    //   pattern: {
-                    //     value: /^[A-Z]{4}0[0-9]{6}$/,
-                    //     message: "Enter valid IFSC (e.g., SBIN0000456)"
-                    //   }
-                    // }}
+                    
                   />
 
                   <TextInputField
@@ -345,7 +338,7 @@ function PharmacyProfile() {
             <Button
               type="button"
               variant="outlined"
-              onClick={() => reset()}
+              onClick={handleReset}
               sx={{
                 color: "#238878",
                 border: "2px solid #238878",
