@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Box, Paper, Button, Typography } from "@mui/material";
+import { Box, Paper,  Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { UniversalTable, Column, DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
@@ -20,7 +20,7 @@ type Props = {
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
+const BillingTable = ({ invoices, setInvoices, }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -82,8 +82,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
     {
       key: "price",
       label: "Price",
-      render: (row) => `₹ ${row.price.toLocaleString()}`,
-    },
+    render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`    },
     { key: "status", label: "Status" },
     { key: "actionbutton", label: "Action" },
   ];
@@ -112,6 +111,14 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
     showToast("success", "Invoice deleted successfully");
   };
 
+
+useEffect(() => {
+  const storedSales = localStorage.getItem("salesData");
+  if (storedSales) {
+    setInvoices(JSON.parse(storedSales));
+  }
+// }, [location.pathname])
+})
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 1 }}>
@@ -145,7 +152,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
         size="small"
       />
     </Box>
-    <Button
+    {/* <Button
       variant="contained"
       onClick={onCreate}
       sx={{
@@ -163,7 +170,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
       }}
     >
       + Create Invoice
-    </Button>
+    </Button> */}
   </Box>
 </Box>
      

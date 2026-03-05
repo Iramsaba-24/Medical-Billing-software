@@ -28,7 +28,7 @@ const Billing = () => {
 
   // Load invoices from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem("invoiceList");
+    const stored = localStorage.getItem("salesData");
     const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
     setInvoices(parsed);
   }, []);

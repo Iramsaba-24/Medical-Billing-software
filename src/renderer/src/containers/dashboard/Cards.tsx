@@ -163,7 +163,7 @@ const getDailyReportData = (filter: FilterType) => {
     purchase: `₹ ${totalPurchase.toFixed(2)}`,
   };
 };
-  const getTopSellingMedicine = (): string => {
+const getTopSellingMedicine = (): string => {
   const stored = localStorage.getItem("salesData");
   if (!stored) return "No Sales";
 
@@ -172,11 +172,15 @@ const getDailyReportData = (filter: FilterType) => {
   const counts: Record<string, number> = {};
 
   sales.forEach((sale) => {
+    if (!sale.medicine) return; // ✅ safety check
+
     const medicineList = sale.medicine.split(",");
 
     medicineList.forEach((item) => {
       const name = item.trim();
-      counts[name] = (counts[name] || 0) + sale.quantity;
+      if (!name) return;
+
+      counts[name] = (counts[name] || 0) + (sale.quantity || 0);
     });
   });
 
@@ -192,6 +196,19 @@ const getDailyReportData = (filter: FilterType) => {
 
   return highestMedicine || "No Data";
 };
+
+//   let highestMedicine = "";
+//   let highestCount = 0;
+
+//   Object.entries(counts).forEach(([medicine, qty]) => {
+//     if (qty > highestCount) {
+//       highestCount = qty;
+//       highestMedicine = medicine;
+//     }
+//   });
+
+//   return highestMedicine || "No Data";
+// };
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
     1: "This Month",

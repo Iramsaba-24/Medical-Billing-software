@@ -111,7 +111,11 @@ function POSMaster() {
   const invoiceData = {
     id: Date.now(),
     name: data.name,
-    medicine: rows.map((r) => r.name).join(", "),
+    medicines: rows.map((r) => ({
+      name: r.name,
+      quantity: r.qty,
+      price: r.price,
+    })),
     quantity: rows.reduce(
       (sum, r) => sum + Number(r.qty || 0),
       0
