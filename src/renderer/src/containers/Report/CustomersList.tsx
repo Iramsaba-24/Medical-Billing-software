@@ -1,5 +1,7 @@
 
 
+
+
 import { useState, useMemo, useEffect } from "react";
 import {
   Typography,
@@ -143,6 +145,8 @@ function CustomerTable() {
       "medical_customers",
       JSON.stringify(updatedCustomers)
     );
+
+    window.dispatchEvent(new Event("reportUpdated")); //added for cards
   };
 
   
@@ -199,7 +203,9 @@ function CustomerTable() {
           
           // DELETE FEATURE 
           onDeleteSelected={handleDeleteSelected}
+          
         />
+       
         </div>
       </Paper>
     </FormProvider>
@@ -207,6 +213,10 @@ function CustomerTable() {
 }
 
 export default CustomerTable;
+
+
+
+
 
 
 

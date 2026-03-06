@@ -1,5 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem,  
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 
@@ -27,44 +26,37 @@ const EditInvoice = ({ editingRow, onClose, onSave }: Props) => {
     });
   };
 
+  const handleSave = () => {
+    if (!formData) return;
+
+    // Get existing invoices from localStorage
+    const stored = localStorage.getItem("invoices");
+    const existingInvoices: Invoice[] = stored ? JSON.parse(stored) : [];
+
+    // Update the invoice
+    const updatedInvoices = existingInvoices.map((inv) =>
+      inv.invoice === formData.invoice ? formData : inv
+    );
+
+    // Save back to localStorage
+    localStorage.setItem("invoices", JSON.stringify(updatedInvoices));
+
+    // Notify parent & close dialog
+    onSave(formData);
+    onClose();
+  };
+
   return (
     <Dialog open={Boolean(editingRow)} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Edit Invoice</DialogTitle>
 
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <TextField
-          label="Invoice No"
-          value={formData.invoice}
-          disabled
-        />
+        <TextField label="Invoice No" value={formData.invoice} disabled />
+        <TextField label="Patient" value={formData.patient} onChange={(e) => handleChange("patient", e.target.value)} />
+        <TextField label="Date" value={formData.date} onChange={(e) => handleChange("date", e.target.value)} />
+        <TextField label="Price" type="number" value={formData.price} onChange={(e) => handleChange("price", Number(e.target.value))} />
 
-        <TextField
-          label="Patient"
-          value={formData.patient}
-          onChange={(e) => handleChange("patient", e.target.value)}
-        />
-
-        <TextField
-          label="Date"
-          value={formData.date}
-          onChange={(e) => handleChange("date", e.target.value)}
-        />
-
-        <TextField
-          label="Price"
-          type="number"
-          value={formData.price}
-          onChange={(e) =>
-            handleChange("price", Number(e.target.value))
-          }
-        />
-
-        <Select
-          value={formData.status}
-          onChange={(e) =>
-            handleChange("status", e.target.value as InvoiceStatus)
-          }
-        >
+        <Select value={formData.status} onChange={(e) => handleChange("status", e.target.value as InvoiceStatus)}>
           <MenuItem value="Paid">Paid</MenuItem>
           <MenuItem value="Pending">Pending</MenuItem>
           <MenuItem value="Overdue">Overdue</MenuItem>
@@ -73,7 +65,7 @@ const EditInvoice = ({ editingRow, onClose, onSave }: Props) => {
 
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={() => onSave(formData)}>
+        <Button variant="contained" onClick={handleSave}>
           Save
         </Button>
       </DialogActions>
@@ -82,4 +74,3 @@ const EditInvoice = ({ editingRow, onClose, onSave }: Props) => {
 };
 
 export default EditInvoice;
-

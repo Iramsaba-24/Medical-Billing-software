@@ -1,15 +1,96 @@
+
+
 import { Box, Typography, Paper } from "@mui/material";
+import { useEffect, useState } from "react";
 
 import TotalSalesReport from "@/assets/TotalSalesReport.svg";
 import TotalPurchaseReport from "@/assets/TotalPurchaseReport.svg";
 import ProfitReport from "@/assets/ProfitReport.svg";
 
+type CustomerItem = {
+  qty: number;
+  price: number;
+};
+
+type CustomerStorage = {
+  itemsList?: CustomerItem[];
+};
+
+type RetailInvoiceItem = {
+  total?: number;
+};
+
 function ReportCards() {
-  //  Data for the cards to be displayed
-  const cardData = [
-    { label: "Total Sales Report", value: "₹ 8,55,755", img: TotalSalesReport },
-    { label: "Total Purchase", value: "₹ 10,75,123", img: TotalPurchaseReport },
-    { label: "Profit", value: "₹ 3,10,456", img: ProfitReport },
+  const [totalSales, setTotalSales] = useState<number>(0);
+  const [totalPurchase, setTotalPurchase] = useState<number>(0);
+
+  const calculateTotals = () => {
+    
+    //  SALES (From medical_customers)
+   
+    const customerData: CustomerStorage[] = JSON.parse(
+      localStorage.getItem("medical_customers") || "[]"
+    );
+
+    const sales = customerData.reduce((sum, customer) => {
+      const customerTotal =
+        customer.itemsList?.reduce(
+          (itemSum, item) =>
+            itemSum +
+            (Number(item.qty) || 0) *
+            (Number(item.price) || 0),
+          0
+        ) || 0;
+
+      return sum + customerTotal;
+    }, 0);
+
+    setTotalSales(sales);
+
+   
+    //  PURCHASE (From retailInvoices)
+   
+    const retailInvoices: RetailInvoiceItem[] = JSON.parse(
+      localStorage.getItem("retailInvoices") || "[]"
+    );
+
+    const purchase = retailInvoices.reduce(
+      (sum, invoice) => sum + (Number(invoice.total) || 0),
+      0
+    );
+
+    setTotalPurchase(purchase);
+  };
+
+  useEffect(() => {
+    calculateTotals();
+
+    // Auto refresh when data updates
+    window.addEventListener("reportUpdated", calculateTotals);
+
+    return () => {
+      window.removeEventListener("reportUpdated", calculateTotals);
+    };
+  }, []);
+
+  const profit = totalSales - totalPurchase;
+
+  const cards = [
+    {
+      label: "Total Sales Report",
+      value: `₹ ${totalSales.toLocaleString()}`,
+      img: TotalSalesReport,
+    },
+    {
+      label: "Total Purchase",
+      value: `₹ ${totalPurchase.toLocaleString()}`,
+      img: TotalPurchaseReport,
+    },
+    {
+      label: "Profit",
+      value: `₹ ${profit.toLocaleString()}`,
+      img: ProfitReport,
+    },
   ];
 
   return (
@@ -19,53 +100,32 @@ function ReportCards() {
       gap={3}
       mb={4}
     >
-      {/* Mapping through the cardData array to create each card */}
-      {cardData.map((card) => (
+      {cards.map((card) => (
         <Paper
           key={card.label}
-          elevation={1}
           sx={{
             p: 3,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            borderRadius: "12px",
-            backgroundColor: "#fff",
-            border: "2px solid transparent",
-            transition: "all 0.3s ease",
-            cursor: "pointer",
-            "&:hover": {
-              transform: "translateY(-5px)",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.1)",
-              borderColor: "#1E88FF",
-            },
+            borderRadius: 3,
+            boxShadow: 3,
           }}
         >
-          {/* Left Side: Text information */}
           <Box>
-            <Typography
-              variant="h6"
-              sx={{ fontWeight: 700, fontSize: "1.25rem", color: "#1a1a1a" }}
-            >
+            <Typography variant="h6" fontWeight="bold">
               {card.value}
             </Typography>
-            <Typography
-              variant="body2"
-              sx={{ color: "#666", fontWeight: 500, mt: 0.5 }}
-            >
+            <Typography variant="body2">
               {card.label}
             </Typography>
           </Box>
 
-          {/* Right Side: Icon/Image */}
-          <Box
-            component="img"
-            src={card.img}
-            sx={{ width: 55, height: 55, objectFit: "contain" }}
-          />
+          <Box component="img" src={card.img} width={55} />
         </Paper>
       ))}
     </Box>
   );
 }
+
 export default ReportCards;

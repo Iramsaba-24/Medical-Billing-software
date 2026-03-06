@@ -8,8 +8,32 @@ import BarChart from '@/containers/dashboard/Barchart';
 import SalesTable from '@/containers/dashboard/SalesTable';
 import Cards from '@/containers/dashboard/Cards';
 import Alerts from '@/containers/dashboard/Alerts';
+// import { useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { URL_PATH } from "@/constants/UrlPath";
+
+
 
 const Dashboard: React.FC = () => {
+
+  // const navigate = useNavigate(); 
+
+  // useEffect(() => {
+  //   const handleKeyDown = (event: KeyboardEvent) => {
+  //     if (event.ctrlKey && event.key === "b") {
+  //       event.preventDefault();
+  //       navigate(URL_PATH.Billing);
+  //     }
+  //   };
+
+  //   document.addEventListener("keydown", handleKeyDown);
+
+  //   return () => {
+  //     document.removeEventListener("keydown", handleKeyDown);
+  //   };
+  // }, [navigate]);
+
+
   return (
     <Box sx={{ minHeight: '100vh' }}>
       <Box sx={{ mb: { xs: 2, md: 3 } }}>

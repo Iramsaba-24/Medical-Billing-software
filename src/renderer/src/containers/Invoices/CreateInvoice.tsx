@@ -9,8 +9,6 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
-// import TextInputField from "@/components/controlled/TextInputField";
-import NumericField from "@/components/controlled/NumericField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -37,6 +35,7 @@ type MedicineItem = {
 type StoredInvoice = {
   invoice: string;
   patient: string;
+  name: string; 
   date: string;
   price: number;
   status: "Paid" | "Pending" | "Overdue";
@@ -115,10 +114,11 @@ const editingInvoice = location.state;
   });
   
   const { control, handleSubmit, reset } = methods;
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "items",
-  });
+const { fields, append, remove,replace } = useFieldArray({
+  control,
+  name: "items",
+});
+
 
   //use update the price according to quantity and unit price
   const {setValue } = methods;
@@ -167,7 +167,7 @@ const editingInvoice = location.state;
     })),
   };
 
-  const stored = localStorage.getItem("invoiceList");
+  const stored = localStorage.getItem("invoices");
  const existingInvoices: StoredInvoice[] = stored
   ? JSON.parse(stored)
   : [];
@@ -184,26 +184,46 @@ if (editingInvoice) {
   updatedInvoices = [newInvoice, ...existingInvoices];
 }
 
-  localStorage.setItem("invoiceList", JSON.stringify(updatedInvoices));
+  localStorage.setItem("invoices", JSON.stringify(updatedInvoices));
 
  navigate(URL_PATH.Invoices, { replace: true });
 };
-
+  // prefill the form with existing invoice data for edit
 useEffect(() => {
   if (editingInvoice) {
+
+    const mappedItems =
+      editingInvoice.medicines?.map((med) => {
+        const qty = Number(med.qty) || 1;
+        const price = Number(med.amount) || 0;
+
+        return {
+          item: med.name || "",
+          qty: qty,
+          unitPrice: price / qty,
+          price: price,
+        };
+      }) || [];
+
+    const itemsData = mappedItems.length
+      ? mappedItems
+      : [{ item: "", qty: 1, price: 0, unitPrice: 0 }];
+
+    //  update form fields
     reset({
-      patient: editingInvoice.patient,
-      date: editingInvoice.date,
+      patient: editingInvoice.name,
+      date: dayjs(editingInvoice.date).format("YYYY-MM-DD"),
       status: editingInvoice.status,
-      items: editingInvoice.medicines.map((med) => ({
-        item: med.name,
-        qty: Number(med.qty),
-        price: med.amount,
-        unitPrice: med.amount / Number(med.qty),
-      })),
+      items: itemsData,
     });
+
+    //  update fieldArray UI
+    replace(itemsData);
+
   }
-}, [editingInvoice, reset]);
+}, [editingInvoice]);
+
+
 
   return (
     <FormProvider {...methods}>
@@ -265,10 +285,7 @@ useEffect(() => {
               if (selectedItem) {
                 methods.setValue(`items.${index}.unitPrice`, selectedItem.price)
                 methods.setValue(`items.${index}.price`, selectedItem.price)
-                // methods.setValue(
-                  // `items.${index}.price`,
-                  // selectedItem.price
-                // );
+               
               }
             }}
           />
@@ -283,7 +300,8 @@ useEffect(() => {
               justifyContent: { xs: "space-between", sm: "flex-start" },
             }}
           >
-            <NumericField
+            <TextInputField
+            type="numeric"
               name={`items.${index}.qty`}
               label="Qty"
               sx={{ width: { xs: "30%", sm: 100 } }}
@@ -358,3 +376,6 @@ useEffect(() => {
 };
 
 export default CreateInvoice;
+
+
+
