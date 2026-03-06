@@ -5,7 +5,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 export interface Invoice {
-  patient: string;
+  name: string;
   doctor: string;
   address: string;
   invoice: string;
@@ -42,7 +42,9 @@ interface Medicine {
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
   const location = useLocation();
-  const [invoice, setInvoice] = useState<Invoice>(location.state as Invoice);
+ const [invoice, setInvoice] = useState<Invoice | null>(
+  (location.state as { invoice: Invoice })?.invoice || null
+);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -109,11 +111,11 @@ return (
        <TableCell
        colSpan={4} sx={{border:"2px solid #000"}}>
   <Typography>
-    <strong>Name:</strong> {invoice.patient}
+    <strong>Name:</strong> {invoice?.name}
   </Typography>
 
   <Typography sx={{ mt: 0.5 }}>
-    <strong>Doctor:</strong> {invoice.doctor} {invoice.address}
+    <strong>Doctor:</strong> {invoice?.doctor} {invoice?.address}
   </Typography>
 
   <Box
@@ -126,11 +128,11 @@ return (
     }}
   >
     <Typography>
-      <strong>Invoice No.:</strong> {invoice.invoice}
+      <strong>Invoice No.:</strong> {invoice?.invoice}
     </Typography>
 
     <Typography>
-      <strong>Date:</strong> {invoice.date}
+      <strong>Date:</strong> {invoice?.date}
     </Typography>
   </Box>
 </TableCell>
@@ -152,7 +154,7 @@ return (
       </TableRow>
 
 
-{invoice.medicines.map((med: Medicine, index: number) => (
+{invoice?.medicines?.map((med: Medicine, index: number) => (
   <TableRow
     key={index}
     sx={{
@@ -321,7 +323,7 @@ return (
          >
            Print
         </Button>
-       </Box>
+       </Box> 
     </>
   )
 }
