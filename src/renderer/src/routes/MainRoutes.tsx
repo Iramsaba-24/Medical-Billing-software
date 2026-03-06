@@ -5,7 +5,7 @@ import Invoices from "@/view/Invoices";
 import CreateInvoice from "@/containers/Invoices/CreateInvoice";
 import InvoiceView from "@/containers/Invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
-import InventoryList from "@/containers/inventory/InvetoryList";
+// import InventoryList from "@/containers/inventory/InvetoryList";
 import MedicineGroup from "@/containers/inventory/MedicineGroup";
 import MedicineGroupView from "@/containers/inventory/MedicineGroupView";
 import AddMedicineGroup from "@/containers/inventory/AddMedicineGroup";
@@ -82,10 +82,10 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.RetailInvoice,
         element: <RetailInvoice />,
       },
-      {
-        path: URL_PATH.InventoryList,
-        element: <InventoryList />,
-      },
+      // {
+      //   path: URL_PATH.InventoryList,
+      //   element: <InventoryList />,
+      // },
       {
         path: URL_PATH.Reorder,
         element: <Reorder />,
