@@ -13,7 +13,7 @@ const EditInvoice = ({ editingRow, onClose, onSave }: Props) => {
 
   useEffect(() => {
     if (editingRow) {
-      setFormData(editingRow);
+      setFormData(editingRow); 
     }
   }, [editingRow]);
 

@@ -34,8 +34,8 @@ type MedicineItem = {
 
 type StoredInvoice = {
   invoice: string;
-  patient: string;
-  name: string; 
+  name: string;
+  // name: string; 
   date: string;
   price: number;
   status: "Paid" | "Pending" | "Overdue";
@@ -43,7 +43,7 @@ type StoredInvoice = {
 };
 
 type InvoiceFormData = {
-  patient: string;
+  name: string;
   date: string;
   status: "Paid" | "Pending" | "Overdue";
   items: InvoiceItem[];
@@ -106,7 +106,7 @@ const editingInvoice = location.state;
 
   const methods = useForm<InvoiceFormData>({
     defaultValues: {
-      patient: "",
+      name: "",
       date: "",
       status: "Pending",
       items: [{ item: "", qty: 1, price: 0,unitPrice:0 }],
@@ -154,7 +154,7 @@ const { fields, append, remove,replace } = useFieldArray({
     invoice: editingInvoice
   ? editingInvoice.invoice
   : `INV-${Date.now()}`,
-    patient: data.patient,
+    name: data.name,
     date: formattedDate,
     price: totalPrice,
     status: data.status,
@@ -211,7 +211,7 @@ useEffect(() => {
 
     //  update form fields
     reset({
-      patient: editingInvoice.name,
+      name: editingInvoice.name,
       date: dayjs(editingInvoice.date).format("YYYY-MM-DD"),
       status: editingInvoice.status,
       items: itemsData,
@@ -234,10 +234,10 @@ useEffect(() => {
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
         <DropdownField
-          name="patient"
-          label="Patient"
+          name="name"
+          label="name"
           options={customerOptions}
-          placeholder="Patient Name"
+          placeholder=" Name"
         />
 
           <DateTimeField

@@ -33,7 +33,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   // invoice local storage
 useEffect(() => {
   if (location.state) {
-    const newInvoice = location.state as Invoice;
+   const newInvoice = (location.state as { invoice: Invoice }).invoice;
 
     setInvoices((prev) => {
       const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);

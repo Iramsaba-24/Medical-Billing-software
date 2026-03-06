@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from 'react';
 import {Box,Card,CardContent,Typography,TextField,InputAdornment,Chip,Slide} from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
@@ -20,11 +21,15 @@ export interface SalesData {
 }
 // local storage
 type StoredSale = {
+  name: string;
+  totalPrice: number;
   invoice: string;
   patient: string;
   date: string;
   price: number;
-  medicines: { name: string }[];
+  medicines: {
+    qty: number; name: string 
+}[];
 };
 
 const filterOptions = [
@@ -96,33 +101,29 @@ const SalesTable: React.FC = () => {
   
   const [salesList, setSalesList] = useState<SalesData[]>([]);
 
-  useEffect(() => {
-    const storedSales = localStorage.getItem("salesData");
-    if (!storedSales) return;
+useEffect(() => {
+  const storedSales = localStorage.getItem("invoices");
+  if (!storedSales) return;
 
-    const parsed: StoredSale[] = JSON.parse(storedSales);
+  const parsed: StoredSale[] = JSON.parse(storedSales);
 
-    const onlyPaymentData = parsed.filter(
-      (item) => item.invoice
-    );
+  const formatted: SalesData[] = parsed.map((item, index) => ({
+    id: index + 1,
+    name: item.name || "-",
+    medicine:
+      item.medicines?.length
+        ? item.medicines.map((m) => m.name).join(", ")
+        : "-",
 
-    const formatted: SalesData[] = onlyPaymentData.map(
-      (item, index) => ({
-        id: Number(item.invoice) || index + 1,
-        name: item.patient || "-",
-        medicine:
-          item.medicines && item.medicines.length > 0
-            ? item.medicines.map((m) => m.name).join(", ")
-            : "-",
-        quantity: 1,
-        totalPrice: Number(item.price) || 0,
-        date: item.date || "-",
-        time: new Date().toLocaleTimeString(),
-      })
-    );
+    quantity:
+      item.medicines?.reduce((sum, m) => sum + (m.qty || 0), 0) || 1,
 
-    setSalesList(formatted);
-  }, []);
+    totalPrice: item.totalPrice || 0,
+    date: item.date || new Date().toISOString().split("T")[0],
+    time: new Date().toLocaleTimeString(),
+  }));
+  setSalesList(formatted);
+}, []);
 
   const filteredSalesData = useMemo(() => {
   const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
