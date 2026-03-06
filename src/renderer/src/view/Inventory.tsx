@@ -173,8 +173,8 @@ return (
             + Add New Medicine
           </Button>
 
-          <Button
-            fullWidth
+          {/* <Button
+           fullWidth
            sx={{
             px: 2.5,
             py: 1,
@@ -193,7 +193,7 @@ return (
             onClick={() => navigate(URL_PATH.InventoryList)}
           >
             View Inventory List
-          </Button>
+          </Button> */}
 
            <Button
             fullWidth

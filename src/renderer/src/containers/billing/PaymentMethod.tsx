@@ -139,18 +139,18 @@ const PaymentMethod = () => {
       if (storedInvoice) {
         const invoice = JSON.parse(storedInvoice);
 
-        const existingSales = JSON.parse(
-          localStorage.getItem("invoices") || "[]"
-        );
-existingSales.push(invoice);
+      const existingSales = JSON.parse(
+        localStorage.getItem("invoices") || "[]"
+      );
 
-        localStorage.setItem(
-          "invoices",
-          JSON.stringify(existingSales)
-        );
+      existingSales.push({
+        ...invoice,
+        price: invoice.totalPrice,
+      });
 
-        localStorage.removeItem("currentInvoice");
-      }
+      localStorage.setItem("invoices", JSON.stringify(existingSales));
+              localStorage.removeItem("currentInvoice");
+            }
 
       if (storedRetailInvoice) {
         const retailInvoices = JSON.parse(storedRetailInvoice);
