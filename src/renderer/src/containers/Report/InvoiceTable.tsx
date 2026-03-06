@@ -103,6 +103,8 @@ const InvoiceTable = () => {
 
     // Optional: trigger refresh event
     window.dispatchEvent(new Event("invoiceUpdated"));
+
+    window.dispatchEvent(new Event("reportUpdated")); //added for cards
   };
 
   const statusOptions = [
@@ -212,4 +214,11 @@ const InvoiceTable = () => {
 };
 
 export default InvoiceTable;
+
+
+
+
+
+
+
 

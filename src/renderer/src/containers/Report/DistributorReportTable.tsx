@@ -1,5 +1,4 @@
 
-
 import { useState, useMemo, useEffect } from "react";
 import { Typography, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
@@ -14,6 +13,7 @@ type DistributorRow = {
   contact: string;
   lastPurchaseDate: string;
   status: "Active" | "Inactive";
+   purchaseAmount?: number; // optional for old data safety
 };
 
 type DistributorStorage = {
@@ -22,6 +22,7 @@ type DistributorStorage = {
   mobile: string;
   date: string;
   status?: "Active" | "Inactive";
+  purchaseAmount: number;
 };
 
 type FilterForm = {
@@ -31,7 +32,7 @@ type FilterForm = {
 
 
 const columns = [
-  { key: "name", label: "Name" },
+  { key: "name", label: "Company Name" },
   { key: "email", label: "Email" },
   { key: "contact", label: "Contact" },
   { key: "lastPurchaseDate", label: "Last Purchase Date" },
@@ -134,6 +135,7 @@ function DistributorReportTable() {
     }));
 
     localStorage.setItem("distributors", JSON.stringify(updatedStorage));
+    window.dispatchEvent(new Event("reportUpdated"));
   };
 
   const statusOptions = [
@@ -194,3 +196,6 @@ function DistributorReportTable() {
 }
 
 export default DistributorReportTable;
+
+
+
