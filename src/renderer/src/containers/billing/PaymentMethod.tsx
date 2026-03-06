@@ -140,13 +140,12 @@ const PaymentMethod = () => {
         const invoice = JSON.parse(storedInvoice);
 
         const existingSales = JSON.parse(
-          localStorage.getItem("salesData") || "[]"
+          localStorage.getItem("invoices") || "[]"
         );
-
-        existingSales.push(invoice);
+existingSales.push(invoice);
 
         localStorage.setItem(
-          "salesData",
+          "invoices",
           JSON.stringify(existingSales)
         );
 
@@ -189,13 +188,16 @@ const PaymentMethod = () => {
         const invoice = JSON.parse(storedInvoice);
 
         const existingSales = JSON.parse(
-          localStorage.getItem("salesData") || "[]"
+          localStorage.getItem("invoices") || "[]"
         );
 
-        existingSales.push(invoice);
+      existingSales.push({
+  ...invoice,
+  price: invoice.totalPrice,
+});
 
         localStorage.setItem(
-          "salesData",
+          "invoices",
           JSON.stringify(existingSales)
         );
 
@@ -214,14 +216,6 @@ const PaymentMethod = () => {
       localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
       localStorage.removeItem("currentRetailInvoice");
     }
-    //  setTimeout(() => {
-    //   if (storedRetailInvoice) {
-    //     navigate(URL_PATH.DistributorDetails);
-    //   } else {
-    //     navigate(URL_PATH.Dashboard);
-    //   }
-    // }, 1000);
-
     }, 2000);
   };
 
@@ -235,11 +229,6 @@ const showPaymentStatus = (
       <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
         <CircularProgress />
         <Box textAlign="center">
-          {/* <Box mb={1} >
-            <Typography sx={{fontWeight:700}}>
-              Payable Amount:  ₹{finalAmount}
-            </Typography>
-          </Box> */}
           Waiting for payment confirmation…
           <br />
           Please complete the payment.

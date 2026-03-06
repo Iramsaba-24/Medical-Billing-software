@@ -4,13 +4,13 @@ import { useEffect, useState, useMemo } from "react";
 import BillingTable from "@/containers/Invoices/BillingTable";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Invoice } from "@/types/invoice";
-
+ 
 import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
-
+ 
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
-
+ 
 const cardHover = {
   cursor: "pointer",
   border: "1px solid transparent",
@@ -21,37 +21,36 @@ const cardHover = {
     borderColor: "#1976d2",
   },
 };
-
-
-
+ 
+ 
 const Billing = () => {
   const navigate = useNavigate();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-
+ 
   // Load invoices from localStorage
 useEffect(() => {
   const stored = localStorage.getItem("invoices");
   const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
   setInvoices(parsed);
 }, []);
-
-  // Memoized Calculations 
+ 
+  // Memoized Calculations
   const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
     const revenue = invoices
       .filter(inv => inv.status === "Paid")
       .reduce((sum, inv) => sum + inv.price, 0);
-
+ 
     const pending = invoices
       .filter(inv => inv.status === "Pending")
       .reduce((sum, inv) => sum + inv.price, 0);
-
+ 
     return {
       totalRevenue: revenue,
       pendingAmount: pending,
       totalInvoices: invoices.length,
     };
   }, [invoices]);
-
+ 
   return (
     <Box>
      <Typography sx={{
@@ -72,9 +71,9 @@ useEffect(() => {
         gap={2}
       >
         {/* Revenue Card */}
-        <Box 
+        <Box
           p={{ xs: 2, md: 5 }}
-          
+         
           bgcolor="#fff"
           borderRadius={2}
           boxShadow={1}
@@ -104,11 +103,11 @@ useEffect(() => {
               width: { xs: 44, md: 80 },
               height: { xs: 44, md: 80 },
               flexShrink: 0,
-              
+             
             }}
           />        
           </Box>
-
+ 
         {/* Pending Card */}
          <Box
           p={{ xs: 2, md: 5 }}
@@ -143,9 +142,9 @@ useEffect(() => {
               height: { xs: 44, md: 80 },
               flexShrink: 0,
             }}
-          />       
+          />      
           </Box>
-
+ 
         {/* Total Invoices */}
         <Box
           p={{ xs: 2, md: 5 }}
@@ -183,7 +182,7 @@ useEffect(() => {
           />
         </Box>        
       </Box>
-
+ 
       <BillingTable
         invoices={invoices}
         setInvoices={setInvoices}
@@ -197,5 +196,5 @@ useEffect(() => {
     </Box>
   );
 };
-
+ 
 export default Billing;

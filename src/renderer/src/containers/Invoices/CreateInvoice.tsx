@@ -34,7 +34,8 @@ type MedicineItem = {
 
 type StoredInvoice = {
   invoice: string;
-  patient: string;
+  name: string;
+  // name: string; 
   date: string;
   price: number;
   status: "Paid" | "Pending" | "Overdue";
@@ -42,7 +43,7 @@ type StoredInvoice = {
 };
 
 type InvoiceFormData = {
-  patient: string;
+  name: string;
   date: string;
   status: "Paid" | "Pending" | "Overdue";
   items: InvoiceItem[];
@@ -105,7 +106,7 @@ const editingInvoice = location.state;
 
   const methods = useForm<InvoiceFormData>({
     defaultValues: {
-      patient: "",
+      name: "",
       date: "",
       status: "Pending",
       items: [{ item: "", qty: 1, price: 0,unitPrice:0 }],
@@ -113,10 +114,11 @@ const editingInvoice = location.state;
   });
   
   const { control, handleSubmit, reset } = methods;
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "items",
-  });
+const { fields, append, remove,replace } = useFieldArray({
+  control,
+  name: "items",
+});
+
 
   //use update the price according to quantity and unit price
   const {setValue } = methods;
@@ -152,7 +154,7 @@ const editingInvoice = location.state;
     invoice: editingInvoice
   ? editingInvoice.invoice
   : `INV-${Date.now()}`,
-    patient: data.patient,
+    name: data.name,
     date: formattedDate,
     price: totalPrice,
     status: data.status,
@@ -186,22 +188,42 @@ if (editingInvoice) {
 
  navigate(URL_PATH.Invoices, { replace: true });
 };
-
+  // prefill the form with existing invoice data for edit
 useEffect(() => {
   if (editingInvoice) {
+
+    const mappedItems =
+      editingInvoice.medicines?.map((med) => {
+        const qty = Number(med.qty) || 1;
+        const price = Number(med.amount) || 0;
+
+        return {
+          item: med.name || "",
+          qty: qty,
+          unitPrice: price / qty,
+          price: price,
+        };
+      }) || [];
+
+    const itemsData = mappedItems.length
+      ? mappedItems
+      : [{ item: "", qty: 1, price: 0, unitPrice: 0 }];
+
+    //  update form fields
     reset({
-      patient: editingInvoice.patient,
-      date: editingInvoice.date,
+      name: editingInvoice.name,
+      date: dayjs(editingInvoice.date).format("YYYY-MM-DD"),
       status: editingInvoice.status,
-      items: editingInvoice.medicines.map((med) => ({
-        item: med.name,
-        qty: Number(med.qty),
-        price: med.amount,
-        unitPrice: med.amount / Number(med.qty),
-      })),
+      items: itemsData,
     });
+
+    //  update fieldArray UI
+    replace(itemsData);
+
   }
-}, [editingInvoice, reset]);
+}, [editingInvoice]);
+
+
 
   return (
     <FormProvider {...methods}>
@@ -212,10 +234,10 @@ useEffect(() => {
 
         <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
         <DropdownField
-          name="patient"
-          label="Patient"
+          name="name"
+          label="name"
           options={customerOptions}
-          placeholder="Patient Name"
+          placeholder=" Name"
         />
 
           <DateTimeField
