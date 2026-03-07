@@ -22,27 +22,27 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   const navigate = useNavigate();
   useEffect(() => {
     const storedSales = localStorage.getItem("invoices");
-
+ 
     if (storedSales) {
       const parsedSales = JSON.parse(storedSales);
       setInvoices(parsedSales);
     }
   }, [setInvoices]);
-
+ 
  
   // invoice local storage
 useEffect(() => {
   if (location.state) {
    const newInvoice = (location.state as { invoice: Invoice }).invoice;
-
+ 
     setInvoices((prev) => {
       const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
       if (exists) return prev;
-
+ 
       const updated = [newInvoice, ...prev];
-
+ 
       localStorage.setItem("invoices", JSON.stringify(updated));
-
+ 
       return updated;
     });
   }
@@ -105,8 +105,8 @@ const handleDelete = async (invoiceNo: string) => {
     "Are you sure you want to delete this invoice?",
     "Confirm Delete"
   );
-
-  
+ 
+ 
  
   if (!confirmed) return;
  
