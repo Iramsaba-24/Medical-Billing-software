@@ -62,6 +62,7 @@ function POSMaster() {
       addressLeft: "",
       addressRight: "",
     },
+    mode: "onChange",
   });
 
   const activeTab: "new" | "retail" = location.pathname.includes(
@@ -419,7 +420,7 @@ function POSMaster() {
                       <MobileField
                         name="mobile"
                         label="Mobile Number"
-                        countryCode="91"
+                        countryCode
                         required
                       />
                     </Box>
@@ -466,23 +467,6 @@ function POSMaster() {
                       freeSolo
                       editable={true}
                       placeholder="Select Dr"
-                    />
-                  </Box>
-
-                  <Box width={{ xs: "100%", sm: "260px" }}>
-                    <TextInputField
-                      name="reference"
-                      label="New Reference"
-                      inputType="alphanumeric"
-                      minLength={3}
-                      maxLength={50}
-                      rules={{
-                        pattern: {
-                          value: /^[A-Za-z0-9\s-]+$/,
-                          message:
-                            "Only letters, numbers, spaces, and hyphens allowed",
-                        },
-                      }}
                     />
                   </Box>
 

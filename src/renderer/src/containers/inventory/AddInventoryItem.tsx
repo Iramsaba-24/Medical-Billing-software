@@ -108,7 +108,7 @@ export default function AddInventoryItem() {
 
   return (
     <FormProvider {...methods}>
-      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
+      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8} >
         <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
           <Typography fontSize={20} fontWeight={600} mb={4}>
             Add New Item
