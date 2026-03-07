@@ -78,55 +78,10 @@ const Doctors = () => {
     { key: ACTION_KEY, label: "Actions" },
   ];
 
-  // filter doctors
-  // const filteredDoctors = doctors.filter((d) =>
-  //   d.doctorName.toLowerCase().includes(searchValue.toLowerCase())
-  // );
-
+  
   return (
     <>
-    {/* search & add doctor */}
-      {/* <FormProvider {...methods}>
-        <Box>
-          <Typography
-            sx={{
-              fontSize: { xs: 20, sm: 24, md: 28 },  
-              fontWeight: 700,
-              color: '#111827',
-              mt: {xs:1 , md:0.5},
-              mb: 0.5,
-            }}
-          >
-            Doctors
-          </Typography>
-        </Box>
-        <Paper sx={{ px: { xs:2, md:4 },
-         pt:2,
-          
-          pb:{ xs:2, md:0} }}>
-
-            
-          <Box display="flex"
-           flexDirection={{ xs:"column", md:"row" }} justifyContent="space-between" alignItems={{ md:"center" }} 
-           sx={{
-            gap: {xs:0, md:2 }
-            }} >
-             <SearchField
-              name="search"
-               label="Search" placeholder="Search by Name" size="small"
-                sx={{ 
-                  width: { xs:"100%", md:550 },
-                   }} />
-              <Button
-                     variant="contained"
-                      sx={{ textTransform:"none", alignItems:"center", height:36, width: { xs:"100%", md:"auto" }, bgcolor:"#238878", 
-                      "&:hover": { backgroundColor:"#fff", color:"#1b7f6b", border:"2px solid #1b7f6b", },
-                       }}
-                       onClick={() => navigate(URL_PATH.AddDoctor)} > +Add Doctor 
-                </Button>
-           </Box>
-     </Paper>
-      </FormProvider> */}
+    
 <Box >
   <Typography
     sx={{

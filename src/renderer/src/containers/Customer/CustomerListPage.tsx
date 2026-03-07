@@ -1,6 +1,9 @@
 import { useState, useMemo } from "react";
 import { CustomerData } from "@/view/CustomerMaster";
-import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
+import {
+  UniversalTable,
+  Column,
+} from "@/components/uncontrolled/UniversalTable";
 import { Box, Button, Typography, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 
@@ -13,15 +16,22 @@ interface CustomerListProps {
   onDelete: (data: CustomerData) => void;
 }
 
-export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: CustomerListProps) => {
+export const CustomerListPage = ({
+  data,
+  onAdd,
+  onView,
+  onEdit,
+  onDelete,
+}: CustomerListProps) => {
   const [searchTerm] = useState("");
 
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
     const lowerSearch = searchTerm.toLowerCase();
-    return data.filter((item) =>
-      item.name?.toLowerCase().includes(lowerSearch) ||
-      item.mobile?.toLowerCase().includes(lowerSearch)
+    return data.filter(
+      (item) =>
+        item.name?.toLowerCase().includes(lowerSearch) ||
+        item.mobile?.toLowerCase().includes(lowerSearch)
     );
   }, [data, searchTerm]);
 
@@ -33,12 +43,11 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
     { label: "Total", key: "totalPrice" },
     { label: "Doctor", key: "doctor" },
     { label: "Date", key: "date" },
-    { label: "Actions", key: "actionbutton" }
+    { label: "Actions", key: "actionbutton" },
   ];
 
   return (
     <Box sx={{ bgcolor: "#f8f9fa" }}>
-
       {/* Page Heading */}
       <Box sx={{ mb: 2 }}>
         <Typography
@@ -57,11 +66,18 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
           bgcolor: "#fff",
           p: { xs: 1, md: 2 },
           borderRadius: "12px",
-          border: "1px solid #e0e0e0"
+          border: "1px solid #e0e0e0",
         }}
       >
         {/* Customers List Title + Add Button */}
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
           <Typography fontSize={{ xs: 18, md: 20 }} fontWeight={600}>
             Customers List
           </Typography>
@@ -71,10 +87,14 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
             onClick={onAdd}
             startIcon={<AddIcon />}
             sx={{
-              bgcolor: "#248a76",
-              fontWeight: "bold",
-              border: "1px solid #248a76",
-              "&:hover": { bgcolor: "#fff", color: "#248a76" }
+              textTransform: "none",
+              bgcolor: "#238878",
+              width: { xs: "100%", sm: "auto" },
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
             }}
           >
             Add Customer
@@ -92,7 +112,7 @@ export const CustomerListPage = ({ data, onAdd, onView, onEdit, onDelete }: Cust
             actions={{
               view: onView,
               edit: onEdit,
-              delete: onDelete
+              delete: onDelete,
             }}
           />
         </Box>

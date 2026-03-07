@@ -67,7 +67,7 @@ const PaymentMethod = () => {
     },
   });
 
-  // UPI value watch (instant update)
+  // UPI value watch 
   const upiId = useWatch({
     control: methods.control,
     name: "UpiId",
