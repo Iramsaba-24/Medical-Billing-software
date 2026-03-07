@@ -7,8 +7,8 @@ import {
   showConfirmation,
   showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
-import { URL_PATH } from "@/constants/UrlPath";
-import { useNavigate } from "react-router-dom";
+// import { URL_PATH } from "@/constants/UrlPath";
+// import { useNavigate } from "react-router-dom";
 
 
 export type InventoryItem = {
@@ -26,7 +26,7 @@ const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]);
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null); 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const stored = localStorage.getItem("inventory");
@@ -106,7 +106,7 @@ const InventoryList = () => {
 
   return (
     <>
-    <Box display="flex" justifyContent="flex-end" mb={2}>
+    {/* <Box display="flex" justifyContent="flex-end" mb={2}>
       <Button
         variant="contained"
         onClick={() => navigate(URL_PATH.Inventory)}
@@ -125,7 +125,7 @@ const InventoryList = () => {
       >
          Back to Home
       </Button>
-    </Box>
+    </Box> */}
     <Box display="flex" justifyContent="flex-end" mb={2}>
           </Box>
       <Box

@@ -23,6 +23,14 @@ interface CardInfo {
     >
   >;
 }
+interface Medicine {
+  name: string;
+  qty: number;
+}
+
+interface Invoice {
+  medicines: Medicine[];
+}
 
 const cardsConfig: CardInfo[] = [
   {
@@ -107,7 +115,7 @@ const Cards: React.FC = () => {
 
   // filter for the dropdown
   const getFilteredSalesData = (filter: FilterType): SalesData[] => {
-  const stored = localStorage.getItem("salesData");
+  const stored = localStorage.getItem("invoices");
   if (!stored) return [];
 
   const sales: SalesData[] = JSON.parse(stored);
@@ -115,7 +123,6 @@ const Cards: React.FC = () => {
 
   return sales.filter((sale) => {
     const date = new Date(sale.date);
-
     switch (filter) {
       case "Today":
         return date.toDateString() === today.toDateString();
@@ -163,35 +170,47 @@ const getDailyReportData = (filter: FilterType) => {
     purchase: `₹ ${totalPurchase.toFixed(2)}`,
   };
 };
-  const getTopSellingMedicine = (): string => {
-  const stored = localStorage.getItem("salesData");
-  if (!stored) return "No Sales";
+const getTopSellingMedicine = (): string => {
+  const stored = localStorage.getItem("invoices");
+  if (!stored) return "No Data";
 
-  const sales: SalesData[] = JSON.parse(stored);
+  const invoices: Invoice[] = JSON.parse(stored);
 
   const counts: Record<string, number> = {};
 
-  sales.forEach((sale) => {
-    const medicineList = sale.medicine.split(",");
+  invoices.forEach((sale) => {
+    sale.medicines?.forEach((med) => {
+      const name = med.name;
 
-    medicineList.forEach((item) => {
-      const name = item.trim();
-      counts[name] = (counts[name] || 0) + sale.quantity;
+      counts[name] = (counts[name] || 0) + (med.qty || 1);
     });
   });
 
-  let highestMedicine = "";
-  let highestCount = 0;
+  let topMedicine = "";
+  let highest = 0;
 
-  Object.entries(counts).forEach(([medicine, qty]) => {
-    if (qty > highestCount) {
-      highestCount = qty;
-      highestMedicine = medicine;
+  Object.entries(counts).forEach(([name, qty]) => {
+    if (qty > highest) {
+      highest = qty;
+      topMedicine = name;
     }
   });
 
-  return highestMedicine || "No Data";
+  return topMedicine || "No Data";
 };
+
+//   let highestMedicine = "";
+//   let highestCount = 0;
+
+//   Object.entries(counts).forEach(([medicine, qty]) => {
+//     if (qty > highestCount) {
+//       highestCount = qty;
+//       highestMedicine = medicine;
+//     }
+//   });
+
+//   return highestMedicine || "No Data";
+// };
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
     1: "This Month",

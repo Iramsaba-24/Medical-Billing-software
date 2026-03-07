@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import ReorderDialog from "@/containers/inventory/ReorderDialog";
 import PurchaseRecord from "@/containers/inventory/PurchaseRecord";
 import { URL_PATH } from "@/constants/UrlPath";
-
 type InventoryItem = {
   itemName: string;
   itemId: string;
@@ -13,22 +12,18 @@ type InventoryItem = {
   pricePerUnit: number;
   gst: "12%";
 };
-
 const Reorder = 10;
-
 const ReorderList = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [openItem, setOpenItem] = useState<InventoryItem | null>(null);
+  const [openItem, setOpenItem] =
+    useState<InventoryItem | null>(null);
  
-
+  //  NEW LINE ADDED
   const [refreshKey, setRefreshKey] = useState(0);
-
   const navigate = useNavigate();
-
   useEffect(() => {
     const inventory =
       JSON.parse(localStorage.getItem("inventory") || "[]");
-
     setItems(
       inventory
         .map((item: InventoryItem) => ({
@@ -38,10 +33,8 @@ const ReorderList = () => {
         .filter((item: InventoryItem) => item.stockQty < Reorder)
     );
   }, []);
-
   const handleReorderSubmit = (reorderQty: number) => {
     if (!openItem) return;
-
     const inventory =
       JSON.parse(localStorage.getItem("inventory") || "[]");
 
@@ -60,8 +53,7 @@ const ReorderList = () => {
       "inventory",
       JSON.stringify(updatedInventory)
     );
-
-    
+    // IMPORTANT FIX
     const history =
       JSON.parse(localStorage.getItem("reorderHistory") || "[]");
 
@@ -88,7 +80,8 @@ const ReorderList = () => {
     );
 
     setOpenItem(null);
-
+ 
+    // NEW LINE ADDED
     setRefreshKey(prev => prev + 1);
   };
 
@@ -112,7 +105,7 @@ const ReorderList = () => {
       key: "reorder",
       label: "Reorder",
       render: (row) => (
-        <Button
+<Button
           size="small"
           sx={{
             backgroundColor: "#238878",
@@ -125,21 +118,21 @@ const ReorderList = () => {
             },
           }}
           onClick={() => setOpenItem(row)}
-        >
+>
           Reorder
-        </Button>
+</Button>
       ),
     },
   ];
 
   return (
-    <>
-      <Box
+<>
+<Box
         display="flex"
         justifyContent="flex-end"
         mb={2}
-      >
-        <Button
+>
+<Button
           variant="contained"
           onClick={() =>
             navigate(URL_PATH.Inventory)
@@ -154,40 +147,39 @@ const ReorderList = () => {
               color: "#238878",
             },
           }}
-        >
+>
           Back to Home
-        </Button>
-      </Box>
-      <Box
+</Button>
+</Box>
+<Box
         sx={{
           boxShadow: 4,
           p: 4,
         }}
-      >
-        <Typography
+>
+<Typography
           fontSize={20}
           mb={2}
-        >
+>
           Reorder List
-        </Typography>
-        <UniversalTable
+</Typography>
+<UniversalTable
           data={items}
           columns={columns}
           rowsPerPage={5}
           textAlign="center"
         />
-        <ReorderDialog
+<ReorderDialog
           open={!!openItem}
           itemName={openItem?.itemName || ""}
           onClose={() => setOpenItem(null)}
           onSubmit={handleReorderSubmit}
         />
-      </Box>
+</Box>
  
       {/*  key PROP ADDED */}
-      <PurchaseRecord key={refreshKey} />
-    </>
+<PurchaseRecord key={refreshKey} />
+</>
   );
 };
-
 export default ReorderList;

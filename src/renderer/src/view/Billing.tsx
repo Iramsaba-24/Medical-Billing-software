@@ -1,4 +1,4 @@
-import { Box, Button, Paper, } from "@mui/material";
+import { Box, Button, Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -10,7 +10,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
 import RetailInvoice from "@/containers/billing/RetailInvoice";
-
 
 // Payprint button reuse sx
 const PayNPrint = {
@@ -37,7 +36,6 @@ type Doctor = {
   address: string;
   status: "Active";
 };
-
 
 type NewInvoiceFormValues = {
   name: string;
@@ -66,13 +64,19 @@ function POSMaster() {
     },
   });
 
-  const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
+  const activeTab: "new" | "retail" = location.pathname.includes(
+    "retail-invoice",
+  )
+    ? "retail"
+    : "new";
   const isRetail = activeTab === "retail";
 
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>({});
+  const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>(
+    {},
+  );
 
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
 
@@ -91,39 +95,41 @@ function POSMaster() {
     },
   });
 
-
   // saved to local storage
   const onSubmit = (data: NewInvoiceFormValues) => {
-  setIsSubmitted(true);
-  const hasInvalidItems = rows.some(
-    (row) =>
-      row.name.trim() === "" ||
-      row.qty === "" ||
-      Number(row.qty) <= 0 ||
-      row.price === "" ||
-      Number(row.price) <= 0
-  );
-  if (hasInvalidItems) {
-    return;
-  }
+    setIsSubmitted(true);
+    const hasInvalidItems = rows.some(
+      (row) =>
+        row.name.trim() === "" ||
+        row.qty === "" ||
+        Number(row.qty) <= 0 ||
+        row.price === "" ||
+        Number(row.price) <= 0,
+    );
+    if (hasInvalidItems) {
+      return;
+    }
 
-  const now = new Date();
-  const invoiceData = {
-    id: Date.now(),
-    name: data.name,
-    medicine: rows.map((r) => r.name).join(", "),
-    quantity: rows.reduce(
-      (sum, r) => sum + Number(r.qty || 0),
-      0
-    ),
-    totalPrice: finalTotal,
-    date: now.toLocaleDateString(),
-    time: now.toLocaleTimeString(),
-  };
-  localStorage.setItem(
-    "currentInvoice",
-    JSON.stringify(invoiceData)
-  );
+    const now = new Date();
+    const invoiceData = {
+      invoice: `INV-${Date.now()}`,
+      name: data.name,
+      age: data.age,
+      mobile: data.mobile,
+      email: data.email,
+      doctor: data.doctor,
+      address: data.addressLeft,
+      medicines: rows.map((r) => ({
+        name: r.name,
+        qty: r.qty,
+        amount: Number(r.qty || 0) * Number(r.price || 0),
+      })),
+      totalPrice: finalTotal,
+      status: "Paid",
+      date: now.toLocaleDateString(),
+      time: now.toLocaleTimeString(),
+    };
+    localStorage.setItem("currentInvoice", JSON.stringify(invoiceData));
     console.log("Saved Invoice:", invoiceData);
     navigate(URL_PATH.MediPoints, { state: { totalFromInvoice: finalTotal } });
   };
@@ -159,10 +165,11 @@ function POSMaster() {
 
   const [paymentMode, setPaymentMode] = useState("Cash");
 
-  const [doctorOptions, setDoctorOptions] = useState<{ label: string; value: string }[]>([]);
+  const [doctorOptions, setDoctorOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
   const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
-
 
   // when invoice button change
   useEffect(() => {
@@ -189,13 +196,12 @@ function POSMaster() {
     }
   }, [activeInvoice, invoiceForms, methods]);
 
-
   // load doctor list
   useEffect(() => {
     const storedDoctors = localStorage.getItem("doctors");
 
     if (storedDoctors) {
-      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors);       //string->obj
+      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors); //string->obj
       setDoctorList(parsedDoctors);
       const options = parsedDoctors.map((doc) => ({
         label: `Dr. ${doc.doctorName}`,
@@ -206,7 +212,6 @@ function POSMaster() {
     }
   }, []);
 
-
   const selectedDoctorName = methods.watch("doctor");
 
   const nameOptions = customerOptions.map((customer) => ({
@@ -216,12 +221,11 @@ function POSMaster() {
 
   const selectedCustomerName = methods.watch("name");
 
-
   // when name change
   useEffect(() => {
     if (!selectedCustomerName) return;
     const selectedCustomer = customerOptions.find(
-      (c) => c.name === selectedCustomerName
+      (c) => c.name === selectedCustomerName,
     );
     if (selectedCustomer) {
       // Existing customer - Autofill
@@ -248,12 +252,11 @@ function POSMaster() {
     }
   }, []);
 
-
-  // Doctor Address Autofill 
+  // Doctor Address Autofill
   useEffect(() => {
     if (selectedDoctorName) {
       const selectedDoctor = doctorList.find(
-        (doc) => doc.doctorName === selectedDoctorName
+        (doc) => doc.doctorName === selectedDoctorName,
       );
 
       if (selectedDoctor) {
@@ -264,7 +267,7 @@ function POSMaster() {
 
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
-    0
+    0,
   );
 
   const finalTotal = subTotal + (subTotal * gst) / 100;
@@ -329,8 +332,8 @@ function POSMaster() {
             borderColor: "grey.400",
             p: 2,
             backgroundColor: "#fff",
-          }}>
-
+          }}
+        >
           <Box
             display="flex"
             gap={1.5}
@@ -354,7 +357,6 @@ function POSMaster() {
                     fontSize: { xs: "12px", md: "14px" },
                   }}
                   onClick={() => {
-
                     setInvoiceForms((prev) => ({
                       ...prev,
                       [activeInvoice]: {
@@ -368,8 +370,6 @@ function POSMaster() {
                     navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
                   }}
                 >
-
-
                   Invoice {invoiceNumber}
                 </Button>
               );
@@ -392,17 +392,15 @@ function POSMaster() {
                     flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Box width={{ xs: "100%", sm: "260px" }}>
-
                       <DropdownField
                         name="name"
                         label="Name"
                         options={nameOptions}
                         required
-                        freeSolo   // typing allowed
+                        freeSolo // typing allowed
                         editable={true}
                         placeholder="Select or Type Name"
                       />
-
                     </Box>
 
                     <Box width={{ xs: "100%", sm: "260px" }}>
@@ -416,7 +414,11 @@ function POSMaster() {
                     flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <MobileField name="mobile" label="Mobile Number" required />
+                      <MobileField
+                        name="mobile"
+                        label="Mobile Number"
+                        required
+                      />
                     </Box>
 
                     <Box width={{ xs: "100%", sm: "260px" }}>
@@ -426,14 +428,15 @@ function POSMaster() {
                         rules={{
                           required: "Email is required",
                           validate: (value: string) => {
-                            if (!/[@]/.test(value)) return "Add special character (@)";
-                            if (!/[.]/.test(value)) return "Add special character (.)";
+                            if (!/[@]/.test(value))
+                              return "Add special character (@)";
+                            if (!/[.]/.test(value))
+                              return "Add special character (.)";
                             return true;
                           },
                         }}
                       />
                     </Box>
-
                   </Box>
 
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
@@ -473,7 +476,8 @@ function POSMaster() {
                       rules={{
                         pattern: {
                           value: /^[A-Za-z0-9\s-]+$/,
-                          message: "Only letters, numbers, spaces, and hyphens allowed",
+                          message:
+                            "Only letters, numbers, spaces, and hyphens allowed",
                         },
                       }}
                     />
@@ -491,7 +495,7 @@ function POSMaster() {
               </Box>
             </Paper>
 
-            <Box mt={3} >
+            <Box mt={3}>
               <ItemsSection
                 rows={rows}
                 setRows={setRows}
@@ -499,7 +503,9 @@ function POSMaster() {
                 setGst={setGst}
                 paymentMode={paymentMode}
                 setPaymentMode={setPaymentMode}
-                finalTotal={finalTotal} isSubmitted={isSubmitted} />
+                finalTotal={finalTotal}
+                isSubmitted={isSubmitted}
+              />
             </Box>
 
             {/* Bottom pay print button */}

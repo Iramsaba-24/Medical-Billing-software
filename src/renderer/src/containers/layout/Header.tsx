@@ -62,32 +62,30 @@ const Sidebar = ({ open }: { open: boolean }) => {
   const location = useLocation();
   const settingRef = React.useRef<SettingRef>(null);
 
-   useEffect(() => {
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.ctrlKey && event.key === "b") {
-          event.preventDefault();
-          navigate(URL_PATH.Billing);
-        }
-         if (event.ctrlKey && event.key === "i") {
-          event.preventDefault();
-          navigate(URL_PATH.Invoices);
-        }
-         if (event.ctrlKey && event.key === "r") {
-          event.preventDefault();
-          navigate(URL_PATH.ReportPage);
-        }
-         if (event.ctrlKey && event.key === "c") {
-          event.preventDefault();
-          navigate(URL_PATH.Customer);
-        }
-      };
-  
-      document.addEventListener("keydown", handleKeyDown);
-  
-      return () => {
-        document.removeEventListener("keydown", handleKeyDown);
-      };
-    }, [navigate]);
+  useEffect(() => {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!event.ctrlKey) return;
+
+    const key = event.key.toLowerCase(); 
+
+    const shortcutMap: Record<string, string> = {
+      b: URL_PATH.Billing,
+      i: URL_PATH.Invoices,
+      r: URL_PATH.ReportPage,
+      c: URL_PATH.Customer,
+    };
+
+    if (shortcutMap[key]) {
+      event.preventDefault();
+      navigate(shortcutMap[key]);
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+  return () => {
+    document.removeEventListener("keydown", handleKeyDown);
+  };
+}, [navigate]);
  
   return (
     <List sx={{ px: 1, mt: { xs: 6, md: 2 } }}>

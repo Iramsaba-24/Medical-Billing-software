@@ -23,27 +23,33 @@ type FilterType = "all" | "daily" | "monthly" | "yearly";
 const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
+  useEffect(() => {
+    const storedSales = localStorage.getItem("invoices");
+
+    if (storedSales) {
+      const parsedSales = JSON.parse(storedSales);
+      setInvoices(parsedSales);
+    }
+  }, [setInvoices]);
+
  
   // invoice local storage
-  useEffect(() => {
-    if (location.state) {
-      const newInvoice = location.state as Invoice; //convert data into invoice type
-      //check if invoice item already exists
-      setInvoices((prev) => {
-        const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
-        if (exists) return prev;
- 
-        const safeInvoice = {
-          ...newInvoice,
-          medicines: newInvoice.medicines.map((med) => ({
-            ...med,
-            amount: Number(med.amount),
-          })),
-        };
-        return [safeInvoice, ...prev];
-      });
-    }
-  },[location.state, setInvoices] );
+useEffect(() => {
+  if (location.state) {
+   const newInvoice = (location.state as { invoice: Invoice }).invoice;
+
+    setInvoices((prev) => {
+      const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
+      if (exists) return prev;
+
+      const updated = [newInvoice, ...prev];
+
+      localStorage.setItem("invoices", JSON.stringify(updated));
+
+      return updated;
+    });
+  }
+}, [location.state, setInvoices]);
  
   const [filterType, setFilterType] = useState<FilterType>("all");
  
@@ -77,12 +83,12 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
  
   const columns: Column<Invoice>[] = [
     { key: "invoice", label: "Invoice" },
-    { key: "patient", label: "Patient" },
+    { key: "name", label: "name" },
     { key: "date", label: "Date" },
     {
       key: "price",
       label: "Price",
-      render: (row) => `₹ ${row.price.toLocaleString()}`,
+     render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
     },
     { key: "status", label: "Status" },
     { key: "actionbutton", label: "Action" },
@@ -97,20 +103,26 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
   const methods = useForm({ defaultValues: { filterType: "all" } });
  
   //  DELETE
-  const handleDelete = async (invoiceNo: string) => {
-    const confirmed = await showConfirmation(
-      "Are you sure you want to delete this invoice?",
-      "Confirm Delete"
-    );
+const handleDelete = async (invoiceNo: string) => {
+  const confirmed = await showConfirmation(
+    "Are you sure you want to delete this invoice?",
+    "Confirm Delete"
+  );
+
+  
  
-    if (!confirmed) return;
+  if (!confirmed) return;
  
-    setInvoices((prev) =>
-      prev.filter((inv) => inv.invoice !== invoiceNo)
-    );
+  setInvoices((prev) => {
+    const updated = prev.filter((inv) => inv.invoice !== invoiceNo);
  
-    showToast("success", "Invoice deleted successfully");
-  };
+    localStorage.setItem("invoices", JSON.stringify(updated));
+ 
+    return updated;
+  });
+ 
+  showToast("success", "Invoice deleted successfully");
+};
  
   return (
     <FormProvider {...methods}>
@@ -177,22 +189,26 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
           dropdown={{
             key: "status",
             options: statusOptions,
-            onChange: (row, value) => {
-              setInvoices((prev) =>
-                prev.map((inv) =>
-                  inv.invoice === row.invoice
-                    ? { ...inv, status: value as InvoiceStatus }
-                    : inv
-                )
-              );
+onChange: (row, value) => {
+  setInvoices((prev) => {
+    const updated = prev.map((inv) =>
+      inv.invoice === row.invoice
+        ? { ...inv, status: value as InvoiceStatus }
+        : inv
+    );
  
-              showToast("success", "Status updated successfully");
-            },
+    localStorage.setItem("invoices", JSON.stringify(updated));
+ 
+    return updated;
+  });
+ 
+  showToast("success", "Status updated successfully");
+},
           }}
           actions={{
             view: (invoice) =>
               navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
-                state: invoice,
+                state: { invoice },
               }),
  
             edit: (invoice) =>
@@ -211,13 +227,16 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
  
             if (!confirmed) return;
  
-            setInvoices((prev) =>
-              prev.filter(
-                (inv) =>
-                  !rows.some((r) => r.invoice === inv.invoice)
-              )
-            );
+setInvoices((prev) => {
+  const updated = prev.filter(
+    (inv) =>
+      !rows.some((r) => r.invoice === inv.invoice)
+  );
  
+  localStorage.setItem("invoices", JSON.stringify(updated));
+ 
+  return updated;
+});
             showToast("success", "Selected invoices deleted");
           }}
         />
@@ -227,5 +246,3 @@ const BillingTable = ({ onCreate, invoices, setInvoices, }: Props) => {
 };
  
 export default BillingTable;
- 
- 

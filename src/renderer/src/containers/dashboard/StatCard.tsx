@@ -10,6 +10,14 @@ import Inventory from '@/assets/inventory.svg';
 import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
 import { InventoryItem } from '@/containers/inventory/InvetoryList';
+type CustomerItem = {
+  qty: number;
+  price: number;
+};
+
+type CustomerStorage = {
+  itemsList?: CustomerItem[];
+};
 
 const Dashboard: React.FC = () => {
 
@@ -51,6 +59,26 @@ const inventoryStatus = (): string =>
   }
   return "Critical"
 }
+
+// fetch total revenue
+const totalRevenue = (): string => {
+  const customerData: CustomerStorage[] = JSON.parse(
+    localStorage.getItem("medical_customers") || "[]"
+  );
+
+  const sales = customerData.reduce((sum, customer) => {
+    const customerTotal =
+      customer.itemsList?.reduce(
+        (itemSum, item) =>
+          itemSum + (Number(item.qty) || 0) * (Number(item.price) || 0),
+        0
+      ) || 0;
+
+    return sum + customerTotal;
+  }, 0);
+
+  return `₹ ${sales.toLocaleString()}`;
+};
 
   return (
     <Box>
@@ -100,7 +128,7 @@ const inventoryStatus = (): string =>
         }}
       >
         <StackCard
-          value="₹ 2,30,847"
+          value={totalRevenue()}
           title="Total Revenue"
           icon={Revenue}
         />

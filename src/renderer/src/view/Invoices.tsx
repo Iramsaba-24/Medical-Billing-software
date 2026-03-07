@@ -1,5 +1,4 @@
-import { Box, Divider, Typography } from "@mui/material";
-
+import { Box,  Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState, useMemo } from "react";
@@ -38,6 +37,7 @@ const cardHover = {
 
 };
  
+ 
 const Billing = () => {
 
   const navigate = useNavigate();
@@ -56,14 +56,12 @@ useEffect(() => {
 
 }, []);
  
-  // Memoized Calculations 
-
+  // Memoized Calculations
   const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
 
     const revenue = invoices
 
       .filter(inv => inv.status === "Paid")
-
       .reduce((sum, inv) => sum + inv.price, 0);
  
     const pending = invoices
@@ -101,9 +99,7 @@ useEffect(() => {
           }} >
 
       Invoices
-</Typography>
-<Divider sx={{ mb: 3 }} />
-
+    </Typography>
       {/* Cards */}
 <Box
 
@@ -117,10 +113,9 @@ useEffect(() => {
 >
 
         {/* Revenue Card */}
-<Box 
-
+        <Box
           p={{ xs: 2, md: 5 }}
-
+         
           bgcolor="#fff"
 
           borderRadius={2}
@@ -171,11 +166,11 @@ useEffect(() => {
               height: { xs: 44, md: 80 },
 
               flexShrink: 0,
-
+             
             }}
 
           />        
-</Box>
+          </Box>
  
         {/* Pending Card */}
 <Box
@@ -235,9 +230,8 @@ useEffect(() => {
               flexShrink: 0,
 
             }}
-
-          />       
-</Box>
+          />      
+          </Box>
  
         {/* Total Invoices */}
 <Box
@@ -299,33 +293,21 @@ useEffect(() => {
             }}
 
           />
-</Box>        
-</Box>
+        </Box>        
+      </Box>
  
       <BillingTable
-
         invoices={invoices}
-
         setInvoices={setInvoices}
-
         onCreate={() => navigate(URL_PATH.CreateInvoice)}
-
         onView={(invoice: Invoice) =>
-
           navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
-
             state: invoice,
-
           })
-
         }
-
       />
-</Box>
-
+    </Box>
   );
-
 };
  
 export default Billing;
- 

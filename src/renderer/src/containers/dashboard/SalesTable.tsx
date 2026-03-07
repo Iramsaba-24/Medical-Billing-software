@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from 'react';
 import {Box,Card,CardContent,Typography,TextField,InputAdornment,Chip,Slide} from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
@@ -7,6 +8,7 @@ import { UniversalTable, type Column, ACTION_KEY } from '@/components/uncontroll
 import EditSalesForm from './EditSalesForm';
 import ViewSalesDialog from './ViewSalesTable';
 
+// table data
 export interface SalesData {
   id: number;
   name: string;
@@ -17,6 +19,18 @@ export interface SalesData {
   time: string;
   [key: string]: string | number;
 }
+// local storage
+type StoredSale = {
+  name: string;
+  totalPrice: number;
+  invoice: string;
+  patient: string;
+  date: string;
+  price: number;
+  medicines: {
+    qty: number; name: string 
+}[];
+};
 
 const filterOptions = [
   { value: 'Today', label: 'Today' },
@@ -69,16 +83,48 @@ const SalesTable: React.FC = () => {
       filter: 'This Month',
     },
   });
+  // local storage function
+  const saveToLocalStorage = (data: SalesData[]) => {
+    const formatted = data.map(item => ({
+      invoice: String(item.id),
+      patient: item.name,
+      date: item.date,
+      price: Number(item.totalPrice) || 0,
+      medicines:
+        item.medicine && item.medicine !== "-"
+          ? item.medicine.split(", ").map(name => ({ name }))
+          : []
+    }));
+
+    localStorage.setItem("salesData", JSON.stringify(formatted));
+  };
   
   const [salesList, setSalesList] = useState<SalesData[]>([]);
 
-  useEffect(() => {
-    const storedSales = localStorage.getItem("salesData");
-    // console.log("Stored Sales:", storedSales); 
-    if (storedSales) {
-      setSalesList(JSON.parse(storedSales));
-    }
-  }, []);
+useEffect(() => {
+  const storedSales = localStorage.getItem("invoices");
+  if (!storedSales) return;
+
+  const parsed: StoredSale[] = JSON.parse(storedSales);
+
+  const formatted: SalesData[] = parsed.map((item, index) => ({
+    id: index + 1,
+    name: item.name || "-",
+    medicine:
+      item.medicines?.length
+        ? item.medicines.map((m) => m.name).join(", ")
+        : "-",
+
+    quantity:
+      item.medicines?.reduce((sum, m) => sum + (m.qty || 0), 0) || 1,
+
+    totalPrice: item.totalPrice || 0,
+    date: item.date || new Date().toISOString().split("T")[0],
+    time: new Date().toLocaleTimeString(),
+  }));
+  setSalesList(formatted);
+}, []);
+
   const filteredSalesData = useMemo(() => {
   const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
     if (!searchQuery.trim()) return dateFiltered;
@@ -97,7 +143,10 @@ const SalesTable: React.FC = () => {
     {
       key: 'totalPrice',
       label: 'Price',
-      render: row => row.totalPrice.toFixed(2),
+      render: (row) => {
+        const price = Number(row.totalPrice) || 0;
+        return `₹ ${price.toFixed(2)}`;
+      },
     },
     { key: 'date', label: 'Date' },
     { key: 'time', label: 'Time' },
@@ -111,54 +160,46 @@ const SalesTable: React.FC = () => {
   const handleCloseEditDialog = () => {
     setEditingRow(null); // closes dialog
   };
-
-const handleSaveEdit = (data: SalesData) => {
-  setSalesList(prevData => {
-    const updatedData = prevData.map(item =>
-      item.id === data.id ? { ...item, ...data } : item
-    );
-
-    localStorage.setItem("salesData", JSON.stringify(updatedData));
-
-    return updatedData;
-  });
-
-  handleCloseEditDialog();
-};
-
-const handleDelete = (row: SalesData) => {
-  if (window.confirm(`Are you sure you want to delete ${row.name}'s record?`)) {
-    setSalesList(prevData => {
-      const updatedData = prevData.filter(item => item.id !== row.id);
-
-      localStorage.setItem("salesData", JSON.stringify(updatedData));
-
-      return updatedData;
-    });
-  }
-};
-
-const handleDeleteSelected = (rows: SalesData[]) => {
-  if (
-    window.confirm(
-      `Are you sure you want to delete ${rows.length} selected record(s)?`
-    )
-  ) {
-    const selectedIds = rows.map(row => row.id);
-
-    setSalesList(prevData => {
-      const updatedData = prevData.filter(
-        item => !selectedIds.includes(item.id)
+  //edit
+  const handleSaveEdit = (data: SalesData) => {
+    setSalesList(prev => {
+      const updated = prev.map(item =>
+        item.id === data.id
+          ? { ...item, ...data, totalPrice: Number(data.totalPrice) || 0 }
+          : item
       );
 
-      localStorage.setItem("salesData", JSON.stringify(updatedData));
-
-      return updatedData;
+      saveToLocalStorage(updated);
+      return updated;
     });
-  }
-};
-// view row
-const [viewRow, setViewRow] = useState<SalesData | null>(null);
+
+    handleCloseEditDialog();
+  };
+  // delete single row
+  const handleDelete = (row: SalesData) => {
+    if (!window.confirm(`Delete ${row.name}?`)) return;
+
+    setSalesList(prev => {
+      const updated = prev.filter(item => item.id !== row.id);
+      saveToLocalStorage(updated);
+      return updated;
+    });
+  };
+
+  // delete selected rows
+  const handleDeleteSelected = (rows: SalesData[]) => {
+    if (!window.confirm(`Delete ${rows.length} records?`)) return;
+
+    const ids = rows.map(r => r.id);
+
+    setSalesList(prev => {
+      const updated = prev.filter(item => !ids.includes(item.id));
+      saveToLocalStorage(updated);
+      return updated;
+    });
+  };
+  // view row
+  const [viewRow, setViewRow] = useState<SalesData | null>(null);
 
   return (
     <>

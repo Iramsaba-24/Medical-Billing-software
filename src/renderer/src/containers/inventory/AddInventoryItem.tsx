@@ -103,7 +103,7 @@ export default function AddInventoryItem() {
       JSON.stringify([...existing, newItem])
     );
 
-    navigate(URL_PATH.InventoryList);
+    navigate(URL_PATH.Inventory);
   };
 
   return (
