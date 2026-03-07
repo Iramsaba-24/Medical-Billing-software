@@ -30,6 +30,9 @@ type DropdownFieldProps = TextFieldProps & {
   freeSolo?: boolean;
   placeholder?: string;
   editable?: boolean;
+    onlyAlphabet?: boolean;
+  onlyNumber?: boolean;
+  alphanumeric?: boolean;
 };
  
 const DropdownField: FC<DropdownFieldProps> = ({
@@ -43,6 +46,9 @@ const DropdownField: FC<DropdownFieldProps> = ({
   freeSolo = false,
   placeholder,
   editable = false,
+  onlyAlphabet = false,
+  onlyNumber = false,
+  alphanumeric = false,
   ...rest
 }) => {
   const { t } = useTranslation();
@@ -106,12 +112,31 @@ const DropdownField: FC<DropdownFieldProps> = ({
                 onChange(newValueStr);
                 onChangeCallback?.(newValueStr);
               }}
+              // onInputChange={(_e, newInputValue, reason) => {
+              //   if (freeSolo && editable && reason === 'input') {
+              //     onChange(newInputValue);
+              //     onChangeCallback?.(newInputValue);
+              //   }
+              // }}
               onInputChange={(_e, newInputValue, reason) => {
-                if (freeSolo && editable && reason === 'input') {
-                  onChange(newInputValue);
-                  onChangeCallback?.(newInputValue);
-                }
-              }}
+  if (!(freeSolo && editable && reason === "input")) return;
+
+  let filteredValue = newInputValue;
+
+  if (onlyAlphabet) {
+    filteredValue = newInputValue.replace(/[^A-Za-z\s]/g, "");
+  }
+
+  if (onlyNumber) {
+    filteredValue = newInputValue.replace(/[^0-9]/g, "");
+  }
+  if (alphanumeric) {
+  filteredValue = newInputValue.replace(/[^A-Za-z0-9\s]/g, "");
+}
+
+  onChange(filteredValue);
+  onChangeCallback?.(filteredValue);
+}}
               getOptionLabel={(option: Option | string) => {
                 if (typeof option === 'string') {
                   return option;
