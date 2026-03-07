@@ -52,6 +52,7 @@ function POSMaster() {
   const navigate = useNavigate();
   const location = useLocation();
   const methods = useForm<NewInvoiceFormValues>({
+  reValidateMode: "onChange",
     defaultValues: {
       name: "",
       age: "",
@@ -62,6 +63,7 @@ function POSMaster() {
       addressLeft: "",
       addressRight: "",
     },
+      mode: "onChange",
   });
 
   const activeTab: "new" | "retail" = location.pathname.includes(

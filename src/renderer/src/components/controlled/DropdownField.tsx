@@ -1,4 +1,4 @@
-
+ 
 import { type FC } from 'react';
 import {
   TextField,
@@ -67,6 +67,16 @@ const DropdownField: FC<DropdownFieldProps> = ({
         validate: (value: string) => {
           if (!required && !value) return true;
           if (!value) return translations.dropdownField.emptyError;
+            if (onlyAlphabet && value.length < 3) {
+      return "Minimum 3 characters required";
+    }
+    if (alphanumeric && value.length < 3) {
+      return "Minimum 3 characters required";
+    }
+    if (onlyNumber && Number(value) === 0) {
+      return "0 is not allowed";
+    }
+
           return true;
         }
       }}
@@ -120,20 +130,20 @@ const DropdownField: FC<DropdownFieldProps> = ({
               // }}
               onInputChange={(_e, newInputValue, reason) => {
   if (!(freeSolo && editable && reason === "input")) return;
-
+ 
   let filteredValue = newInputValue;
-
+ 
   if (onlyAlphabet) {
     filteredValue = newInputValue.replace(/[^A-Za-z\s]/g, "");
   }
-
+ 
   if (onlyNumber) {
     filteredValue = newInputValue.replace(/[^0-9]/g, "");
   }
   if (alphanumeric) {
   filteredValue = newInputValue.replace(/[^A-Za-z0-9\s]/g, "");
 }
-
+ 
   onChange(filteredValue);
   onChangeCallback?.(filteredValue);
 }}
@@ -178,4 +188,5 @@ const DropdownField: FC<DropdownFieldProps> = ({
 };
  
 export default DropdownField;
+ 
  

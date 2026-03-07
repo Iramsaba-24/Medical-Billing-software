@@ -1,7 +1,7 @@
 import React from "react";
 import { TextField,Select,MenuItem,  InputAdornment, type SxProps, type Theme, type TextFieldProps } from '@mui/material';
 import { Controller, useFormContext } from 'react-hook-form';
-import { mobileRegex, SanitizeMobileRegex } from '@/utils/RegexPattern';
+import { SanitizeMobileRegex } from '@/utils/RegexPattern';
 import { useTranslation } from 'react-i18next';
 import { getComponentTranslations } from '@/helpers/useTranslations';
 
@@ -48,8 +48,6 @@ const MobileField: React.FC<MobileFieldProps> = ({ label, name, required = false
   if (!value && required) return label ? `${label} is required` : 'Field is required';
 
   const sanitized = value.replace(/\D/g,'');
-
-  if (!mobileRegex.test(value)) return trans.mobileField.invalidFormat;
 
 if (selectedCountry && sanitized.length !== selectedCountry.digits) {
   return `Mobile number must be ${selectedCountry.digits} digits`;
