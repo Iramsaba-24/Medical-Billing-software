@@ -120,7 +120,7 @@ const navigate = useNavigate();
             <TextInputField
               name="gstin"
               label="GSTIN (Optional)"
-              maxLength={35}
+              maxLength={15}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",

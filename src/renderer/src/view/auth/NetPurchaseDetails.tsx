@@ -29,7 +29,8 @@ const NetBanking_PurchaseDetails = () => {
       email: "",
       whatsapp: "",
     },
-    mode: "onSubmit", 
+    
+     mode: "onChange",
   });
 
   const selectedBillType = methods.watch("billType");
@@ -106,6 +107,7 @@ const NetBanking_PurchaseDetails = () => {
             name="amount"
             label="Amount"
             placeholder="Enter Amount"
+            type="number"
             fullWidth
            required
             sx={{
@@ -150,6 +152,7 @@ const NetBanking_PurchaseDetails = () => {
               name="whatsapp"
               label="Whatsapp Number"
               placeholder="Enter WhatsApp Number"
+              countryCode="91"
               required
               fullWidth
               sx={{
