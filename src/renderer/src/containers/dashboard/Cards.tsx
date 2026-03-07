@@ -406,6 +406,7 @@ const getTopSellingMedicine = (): string => {
               )}
             </Card>
           );
+          
         })}
       </Box>
     </Box>
