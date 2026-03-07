@@ -16,13 +16,12 @@ import DropdownField from "@/components/controlled/DropdownField";
 // TYPES
 export type InvoiceData = {
   invoice: string;
-  patient: string;
+  name: string;
   date: string;
   price: number;
-  gst: number;
-  total: number;
+  gst?: number;
+  total?: number;
   status: "Paid" | "Pending" | "Overdue";
-  [key: string]: string | number | undefined;
 };
 
 type FilterForm = {
@@ -44,15 +43,16 @@ const InvoiceTable = () => {
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  // LOAD INVOICES
+  // LOAD DATA FROM LOCAL STORAGE (BillingTable data)
   useEffect(() => {
     const loadInvoices = () => {
-      const stored = localStorage.getItem("invoiceList");
+      const stored = localStorage.getItem("invoices");
       const parsed: InvoiceData[] = stored ? JSON.parse(stored) : [];
       setInvoices(parsed);
     };
 
     loadInvoices();
+
     window.addEventListener("invoiceUpdated", loadInvoices);
 
     return () => {
@@ -68,13 +68,16 @@ const InvoiceTable = () => {
 
       const invDate = new Date(inv.date);
       const today = new Date();
+
       let matchesTime = true;
 
       if (timeFilter === "This Month") {
         matchesTime =
           invDate.getMonth() === today.getMonth() &&
           invDate.getFullYear() === today.getFullYear();
-      } else if (timeFilter === "Last 7 Days") {
+      }
+
+      if (timeFilter === "Last 7 Days") {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
         matchesTime = invDate >= sevenDaysAgo && invDate <= today;
@@ -84,27 +87,22 @@ const InvoiceTable = () => {
     });
   }, [invoices, statusFilter, timeFilter]);
 
-  // ADDED DELETE FUNCTION
+  // DELETE FUNCTION
   const handleDeleteSelected = (rowsToDelete: InvoiceData[]) => {
     const updatedInvoices = invoices.filter(
       (inv) =>
-        !rowsToDelete.some(
-          (row) => row.invoice === inv.invoice
-        )
+        !rowsToDelete.some((row) => row.invoice === inv.invoice)
     );
 
     setInvoices(updatedInvoices);
 
-    //  ADDED Update localStorage
     localStorage.setItem(
-      "invoiceList",
+      "invoices",
       JSON.stringify(updatedInvoices)
     );
 
-    // Optional: trigger refresh event
     window.dispatchEvent(new Event("invoiceUpdated"));
-
-    window.dispatchEvent(new Event("reportUpdated")); //added for cards
+    window.dispatchEvent(new Event("reportUpdated"));
   };
 
   const statusOptions = [
@@ -122,29 +120,38 @@ const InvoiceTable = () => {
 
   const columns: Column<InvoiceData>[] = [
     { key: "invoice", label: "Invoice" },
-    { key: "patient", label: "Patient" },
+
+    { key: "name", label: "Patient Name" },
+
     { key: "date", label: "Date" },
+
     {
       key: "price",
       label: "Price",
-      render: (row) => `₹ ${row.price.toFixed(2)}`,
+      render: (row) => `₹ ${row.price?.toFixed(2)}`,
     },
+
     {
       key: "gst",
       label: "GST(%)",
       render: (row) => `${row.gst ?? 0}%`,
     },
+
     {
       key: "total",
       label: "Total",
       render: (row) =>
-        `₹ ${row.total?.toFixed(2) ?? row.price.toFixed(2)}`,
+        `₹ ${row.total?.toFixed(2) ?? row.price?.toFixed(2)}`,
     },
+
     {
       key: "status",
       label: "Status",
       render: (row) => {
-        const styles: Record<string, { bg: string; color: string }> = {
+        const styles: Record<
+          string,
+          { bg: string; color: string }
+        > = {
           Paid: { bg: "#E8F5E9", color: "#2E7D32" },
           Pending: { bg: "#FFF9C4", color: "#F9A825" },
           Overdue: { bg: "#FFEBEE", color: "#D32F2F" },
@@ -159,7 +166,7 @@ const InvoiceTable = () => {
             sx={{
               backgroundColor: current.bg,
               color: current.color,
-              fontWeight: "600",
+              fontWeight: 600,
               borderRadius: "4px",
             }}
           />
@@ -176,10 +183,13 @@ const InvoiceTable = () => {
         </Typography>
 
         <Divider sx={{ mb: 3 }} />
-        
 
-        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          sx={{ mb: 2 }}
+        >
           <DropdownField
             name="statusFilter"
             label="Status"
@@ -193,20 +203,24 @@ const InvoiceTable = () => {
             options={timeOptions}
             freeSolo={false}
           />
-
         </Stack>
-       <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
-        <UniversalTable<InvoiceData>
-          data={filteredData}
-          columns={columns}
-          showSearch
-          showExport
-          enableCheckbox
-          getRowId={(row) => row.invoice}
-          
-          //  CONNECT DELETE HERE
-          onDeleteSelected={handleDeleteSelected}
-        />
+
+        <div
+          style={{
+            width: "100%",
+            maxWidth: "100%",
+            overflowX: "auto",
+          }}
+        >
+          <UniversalTable<InvoiceData>
+            data={filteredData}
+            columns={columns}
+            showSearch
+            showExport
+            enableCheckbox
+            getRowId={(row) => row.invoice}
+            onDeleteSelected={handleDeleteSelected}
+          />
         </div>
       </Paper>
     </FormProvider>
