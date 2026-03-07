@@ -53,6 +53,7 @@ const CardPayment: React.FC = () => {
       CardHolderName: "",
       Cvv: "",
     },
+    mode: "onChange",
   });
 
   

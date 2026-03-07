@@ -152,7 +152,7 @@ const NetBanking_PurchaseDetails = () => {
               name="whatsapp"
               label="Whatsapp Number"
               placeholder="Enter WhatsApp Number"
-              countryCode="91"
+              countryCode
               required
               fullWidth
               sx={{
