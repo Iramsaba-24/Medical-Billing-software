@@ -78,10 +78,9 @@ const Doctors = () => {
     { key: ACTION_KEY, label: "Actions" },
   ];
 
-  
   return (
     <>
-    
+    <Box sx={{mb:{xs:1, md:4}}}>
 <Box >
   <Typography
     sx={{
@@ -263,7 +262,8 @@ const Doctors = () => {
         showSnackbar("info", "Doctor updated successfully");
         setEditDoctor(null);
       }}
-    />  
+    /> 
+    </Box> 
     </>
   );
 };
