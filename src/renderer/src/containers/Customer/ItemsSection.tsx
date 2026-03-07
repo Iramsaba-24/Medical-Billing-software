@@ -2,7 +2,8 @@ import { Box, Button, Typography, TextField, MenuItem, IconButton, Divider, Pape
 import { Add, Remove } from "@mui/icons-material";
 import { ItemRow } from "@/containers/Customer/AddCustomerForm";
 import { useEffect, useState } from "react";
-import Autocomplete from "@mui/material/Autocomplete";
+
+import DropdownField from "@/components/controlled/DropdownField"; 
 
 
 export type InventoryItem = {
@@ -28,6 +29,7 @@ interface ItemsSectionProps {
   isSubmitted: boolean;
 }
 
+
 const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode, finalTotal, isSubmitted }: ItemsSectionProps) => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
@@ -42,6 +44,11 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
     );
     setInventory(parsed);
   }, []);
+
+  const itemOptions = inventory.map((item) => ({
+  label: item.itemName,
+  value: item.itemName
+}));
 
   // Logic to add a new empty row for a new medicine
   const addRow = () => setRows([...rows, { id: Date.now(), name: "", qty: "", price: "" }]);
@@ -97,7 +104,7 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
       {/* Medicine Rows Responsive Grid */}
       {rows.map((row) => {
         // Validation: Show error if fields are empty after clicking Save
-        const nameError = isSubmitted && row.name.trim() === "";
+      
         const qtyError = isSubmitted && (row.qty === "" || Number(row.qty) <= 0);
         const priceError = isSubmitted && (row.price === "" || Number(row.price) <= 0);
 
@@ -111,22 +118,17 @@ const ItemsSection = ({ rows, setRows, gst, setGst, paymentMode, setPaymentMode,
             alignItems: "start"
           }}>
             {/* Item Name  */}
-            <Autocomplete
-              options={inventory}
-              getOptionLabel={(option) => option.itemName}
-              value={inventory.find(i => i.itemName === row.name) || null}
-              onChange={(_, selected) => {
-                handleNameChange(row.id, selected?.itemName || "");
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Item Name"
-                  error={nameError}
-                  fullWidth
-                />
-              )}
-            />
+            <DropdownField
+  name={`item_${row.id}`}
+  label="Item Name"
+  options={itemOptions}
+  editable
+  freeSolo
+  alphanumeric
+  onChangeCallback={(value) => {
+    handleNameChange(row.id, value);
+  }}
+/>
 
 
             {/* Quantity Input Blocked 'e', '-', '+' keys */}
