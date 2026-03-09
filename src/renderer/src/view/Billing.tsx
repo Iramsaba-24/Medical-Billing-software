@@ -397,8 +397,10 @@ function POSMaster() {
                         label="Name"
                         options={nameOptions}
                         required
+                        onlyAlphabet
                         freeSolo // typing allowed
                         editable={true}
+                        
                         placeholder="Select or Type Name"
                       />
                     </Box>
@@ -417,6 +419,7 @@ function POSMaster() {
                       <MobileField
                         name="mobile"
                         label="Mobile Number"
+                        countryCode="91"
                         required
                       />
                     </Box>

@@ -7,7 +7,7 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
-
+import dayjs from "dayjs";
 
 export type InventoryFormData = {
   itemName: string;
@@ -32,7 +32,10 @@ export type InventoryItem = {
 };
 
 export default function AddInventoryItem() {
-  const methods = useForm<InventoryFormData>({});
+  const methods = useForm<InventoryFormData>({
+    mode: "onChange",
+  });
+
   const navigate = useNavigate();
 
   const [groupOptions, setGroupOptions] = useState<
@@ -116,7 +119,8 @@ export default function AddInventoryItem() {
 
           <Box
             component="form"
-            onSubmit={methods.handleSubmit(onSubmit)}
+             noValidate
+            onSubmit={methods.handleSubmit(onSubmit) }
             display="grid"
             gridTemplateColumns={{
               xs: "1fr",
@@ -130,6 +134,7 @@ export default function AddInventoryItem() {
               rows={1}
               name="itemName"
               label="Item Name"
+              maxLength={30}
               required
             />
 
@@ -142,7 +147,7 @@ export default function AddInventoryItem() {
             <DropdownField
               name="unit"
               label="Unit"
-              placeholder=" Unit"
+              placeholder="Unit"
               required
               options={[
                 { label: "Tablets", value: "tablets" },
@@ -175,17 +180,19 @@ export default function AddInventoryItem() {
               required
             />
 
+            {/* Expiry Date (past date disabled) */}
             <DateTimeField
               name="expiryDate"
               label="Expiry Date"
               viewMode="date"
               required
+              minDate={dayjs()}
             />
 
             <DropdownField
               name="supplier"
               label="Supplier"
-              placeholder=" Supplier"
+              placeholder="Supplier"
               required
               options={supplierOptions}
             />

@@ -24,7 +24,9 @@ type AccountForm = {
 };
 
 const AccountSetup = () => {
+
   const methods = useForm<AccountForm>({
+    mode: "onChange",   
     defaultValues: {
       password: "",
       confirmPassword: "",
@@ -35,12 +37,12 @@ const AccountSetup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-     const navigate = useNavigate();
+  const navigate = useNavigate();
+
   const onSubmit = (data: AccountForm) => {
     console.log(data);
     navigate(URL_PATH.ProceedToPaymentPage);
-      showToast("success", "Account setup successful!");
-    
+    showToast("success", "Account setup successful!");
   };
 
   return (
@@ -182,6 +184,7 @@ const AccountSetup = () => {
                   label:
                     "I want product updates via email (optional)",
                   value: "email",
+                 
                 },
               ]}
             />

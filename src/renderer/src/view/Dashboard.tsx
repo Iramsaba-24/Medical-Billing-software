@@ -8,9 +8,7 @@ import BarChart from '@/containers/dashboard/Barchart';
 import SalesTable from '@/containers/dashboard/SalesTable';
 import Cards from '@/containers/dashboard/Cards';
 import Alerts from '@/containers/dashboard/Alerts';
-// import { useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { URL_PATH } from "@/constants/UrlPath";
+
 
 
 

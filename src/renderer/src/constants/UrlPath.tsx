@@ -40,7 +40,7 @@ export const URL_PATH = {
   DistributorDetails: "/distributor-details",
 
   Inventory: "/inventory",
-  // InventoryList: "/inventory/inventory-list",
+  
   Reorder: "/inventory/reorder",
   MedicineGroup: "/inventory/medicine-group",
   AddMedicineGroup: "/inventory/add-medicine-group",

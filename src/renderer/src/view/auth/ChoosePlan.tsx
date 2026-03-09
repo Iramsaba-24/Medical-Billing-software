@@ -92,7 +92,8 @@ const ChoosePlan = () => {
             >
               <RadioField
                 label=""
-                name="plan"
+                name="plan" 
+                required
                 options={[
                   { label: "Basic Plan -₹999 / month", value: "basic" },
                   { label: "Standard Plan -₹1999 / month", value: "standard" },
