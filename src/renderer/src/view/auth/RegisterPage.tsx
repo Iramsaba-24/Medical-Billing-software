@@ -10,7 +10,6 @@ import LogoImage from "@/assets/logoimg.svg";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 
-
 type RegisterFormInputs = {
   fullName: string;
   email: string;
@@ -74,14 +73,15 @@ const RegisterPage = () => {
   const handleLettersOnlyChange =
     (field: "fullName" | "city" | "state") =>
     (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.replace(/[^A-Za-z ]/g, "");
+      let value = e.target.value.replace(/[^A-Za-z ]/g, "");
+      value = value.slice(0, 20); 
       setValue(field, value, { shouldValidate: true });
       if (value) clearErrors(field);
     };
 
   const handleLettersOnlyInput = (e: FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
-    input.value = input.value.replace(/[^A-Za-z ]/g, "");
+    input.value = input.value.replace(/[^A-Za-z ]/g, "").slice(0, 20);
   };
 
   const validateRequiredFields = (data: RegisterFormInputs) => {
@@ -110,9 +110,9 @@ const RegisterPage = () => {
     };
 
     console.log(cleanedData);
+
     navigate(URL_PATH.BusinessDetails);
-      showToast("success", "Registration successful!");
-    
+    showToast("success", "Registration successful!");
   };
 
   return (
@@ -176,7 +176,10 @@ const RegisterPage = () => {
               label="Full Name"
               required
               sx={inputStyle("fullName")}
-              // inputProps={{ onInput: handleLettersOnlyInput }}
+              inputProps={{
+                maxLength: 20,
+                onInput: handleLettersOnlyInput,
+              }}
               onChange={handleLettersOnlyChange("fullName")}
               rules={{
                 minLength: {
@@ -185,7 +188,7 @@ const RegisterPage = () => {
                 },
                 pattern: {
                   value: /^[A-Za-z ]+$/,
-                  message: "Only letters allowed",
+                  message: "Numbers are not allowed",
                 },
               }}
             />
@@ -200,6 +203,7 @@ const RegisterPage = () => {
             <MobileField
               name="mobile"
               label="Mobile Number"
+              
               required
               sx={inputStyle("mobile")}
             />
@@ -209,6 +213,7 @@ const RegisterPage = () => {
               label="Company / Clinic Name"
               required
               sx={inputStyle("company")}
+              inputProps={{ maxLength: 20 }}
               rules={{
                 minLength: {
                   value: 3,
@@ -222,7 +227,10 @@ const RegisterPage = () => {
               label="City"
               required
               sx={inputStyle("city")}
-              inputProps={{ onInput: handleLettersOnlyInput }}
+              inputProps={{
+                maxLength: 20,
+                onInput: handleLettersOnlyInput,
+              }}
               onChange={handleLettersOnlyChange("city")}
               rules={{
                 minLength: {
@@ -241,7 +249,10 @@ const RegisterPage = () => {
               label="State"
               required
               sx={inputStyle("state")}
-              inputProps={{ onInput: handleLettersOnlyInput }}
+              inputProps={{
+                maxLength: 20,
+                onInput: handleLettersOnlyInput,
+              }}
               onChange={handleLettersOnlyChange("state")}
               rules={{
                 minLength: {
