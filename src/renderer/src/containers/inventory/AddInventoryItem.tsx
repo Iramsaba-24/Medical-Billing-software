@@ -7,7 +7,7 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+
 
 export type InventoryFormData = {
   itemName: string;
@@ -111,7 +111,7 @@ export default function AddInventoryItem() {
 
   return (
     <FormProvider {...methods}>
-      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
+      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8} >
         <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
           <Typography fontSize={20} fontWeight={600} mb={4}>
             Add New Item
@@ -186,7 +186,9 @@ export default function AddInventoryItem() {
               label="Expiry Date"
               viewMode="date"
               required
-              minDate={dayjs()}
+              
+              useCurrentDate={false}
+              dateRestriction="current-future-only"
             />
 
             <DropdownField

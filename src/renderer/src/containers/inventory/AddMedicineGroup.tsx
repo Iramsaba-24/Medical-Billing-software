@@ -72,6 +72,7 @@ const AddMedicineGroup = () => {
                 required
                 inputType="string"
                 maxLength={20}
+                minLength={3}
                 rows={1}
                 rules={{
                   required: "Group name is required",

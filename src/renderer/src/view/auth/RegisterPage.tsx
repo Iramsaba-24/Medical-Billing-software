@@ -176,7 +176,7 @@ const RegisterPage = () => {
               label="Full Name"
               required
               sx={inputStyle("fullName")}
-              inputProps={{ onInput: handleLettersOnlyInput }}
+              // inputProps={{ onInput: handleLettersOnlyInput }}
               onChange={handleLettersOnlyChange("fullName")}
               rules={{
                 minLength: {

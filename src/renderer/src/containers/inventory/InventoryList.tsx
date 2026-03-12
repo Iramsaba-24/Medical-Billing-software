@@ -219,7 +219,6 @@ const InventoryList = () => {
     }
   }}
 />
-
               <TextField
                 label="Stock Quantity"
                 type="number"
@@ -278,3 +277,4 @@ const InventoryList = () => {
 };
 
 export default InventoryList;
+

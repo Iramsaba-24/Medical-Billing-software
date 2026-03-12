@@ -29,15 +29,16 @@ const DoctorEdit = ({doctor, onClose, onSave}: Props) => {
 
   return (
     <Dialog open={Boolean(doctor)} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit Doctor</DialogTitle>
+      <DialogTitle >Edit Doctor</DialogTitle>
 
-      <DialogContent sx={{display: "flex", flexDirection: "column", gap: 2}}>
+      <DialogContent sx={{display: "flex", flexDirection: "column", gap: 2, }}>
         <TextField
           label="Doctor Name"
           value={formData.doctorName}
           onChange={(e) =>
             setFormData({ ...formData, doctorName: e.target.value })
           }
+          sx={{mt:1}}
         />
 
         <TextField

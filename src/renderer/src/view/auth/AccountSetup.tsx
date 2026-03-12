@@ -1,18 +1,12 @@
-import {
-  Box,
-  Button,
-  Typography,
-  InputAdornment,
-  IconButton,
+import { Box, Button, Typography, InputAdornment, IconButton, Checkbox, FormControlLabel, FormHelperText,
 } from "@mui/material";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, Controller } from "react-hook-form";
 import { useState } from "react";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import TextInputField from "@/components/controlled/TextInputField";
-import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
@@ -20,19 +14,28 @@ import { showToast } from "@/components/uncontrolled/ToastMessage";
 type AccountForm = {
   password: string;
   confirmPassword: string;
-  checkbox: string[];
+  terms: boolean;
+  emailUpdates: boolean;
 };
 
 const AccountSetup = () => {
 
   const methods = useForm<AccountForm>({
-    mode: "onChange",   
+    mode: "onChange",
     defaultValues: {
       password: "",
       confirmPassword: "",
-      checkbox: [],
+      terms: false,
+      emailUpdates: false,
     },
   });
+
+  const {
+    control,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = methods;
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -60,7 +63,7 @@ const AccountSetup = () => {
       <FormProvider {...methods}>
         <Box
           component="form"
-          onSubmit={methods.handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit)}
           sx={{
             minHeight: "100vh",
             display: "flex",
@@ -71,6 +74,7 @@ const AccountSetup = () => {
             px: 2,
           }}
         >
+
           {/* Logo */}
           <img
             src={LogoImage}
@@ -119,11 +123,7 @@ const AccountSetup = () => {
                         setShowPassword(!showPassword)
                       }
                     >
-                      {showPassword ? (
-                        <VisibilityOff />
-                      ) : (
-                        <Visibility />
-                      )}
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -139,13 +139,9 @@ const AccountSetup = () => {
               type={showConfirm ? "text" : "password"}
               rules={{
                 required: "Confirm Password is required",
-                validate: (value) => {
-                  if (
-                    value !== methods.getValues("password")
-                  )
-                    return "Passwords do not match";
-                  return true;
-                },
+                validate: (value) =>
+                  value === getValues("password") ||
+                  "Passwords do not match",
               }}
               InputProps={{
                 endAdornment: (
@@ -155,11 +151,7 @@ const AccountSetup = () => {
                         setShowConfirm(!showConfirm)
                       }
                     >
-                      {showConfirm ? (
-                        <VisibilityOff />
-                      ) : (
-                        <Visibility />
-                      )}
+                      {showConfirm ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -167,26 +159,39 @@ const AccountSetup = () => {
             />
           </Box>
 
+          {/* Terms Checkbox */}
+          <Box sx={{ width: "100%", maxWidth: 420 }}>
+            <Controller
+              name="terms"
+              control={control}
+              rules={{ required: "You must accept Terms & Privacy Policy" }}
+              render={({ field }) => (
+                <>
+                  <FormControlLabel
+                    control={<Checkbox {...field} checked={field.value} />}
+                    label="I agree to Terms & Privacy Policy"
+                  />
+                  {errors.terms && (
+                    <FormHelperText error>
+                      {errors.terms.message}
+                    </FormHelperText>
+                  )}
+                </>
+              )}
+            />
+          </Box>
+
           {/* Checkbox */}
           <Box sx={{ width: "100%", maxWidth: 420 }}>
-            <CheckboxGroup
-              name="checkbox"
-              label=""
-              required
-              options={[
-                {
-                  label:
-                    "I agree to Terms & Privacy Policy",
-                  value: "terms",
-                  
-                },
-                {
-                  label:
-                    "I want product updates via email (optional)",
-                  value: "email",
-                 
-                },
-              ]}
+            <Controller
+              name="emailUpdates"
+              control={control}
+              render={({ field }) => (
+                <FormControlLabel
+                  control={<Checkbox {...field} checked={field.value} />}
+                  label="I want product updates via email (optional)"
+                />
+              )}
             />
           </Box>
 
@@ -197,7 +202,7 @@ const AccountSetup = () => {
             variant="contained"
             sx={{
               maxWidth: 420,
-              mt: 2, 
+              mt: 2,
               fontWeight: 600,
               fontSize: { xs: "1rem", sm: "1.05rem" },
               backgroundColor: "#1b7f6b",
@@ -215,6 +220,7 @@ const AccountSetup = () => {
           >
             Next Step
           </Button>
+
         </Box>
       </FormProvider>
     </Box>

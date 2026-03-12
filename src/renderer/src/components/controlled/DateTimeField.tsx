@@ -1,6 +1,7 @@
+ 
 import { type FC } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-
+ 
 import {
   DatePicker,
   TimePicker,
@@ -21,9 +22,25 @@ import CloseIcon from "@mui/icons-material/Close";
 import dayjs, { type Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 import { getComponentTranslations } from "@/helpers/useTranslations";
-
+ 
+ 
+ 
+ 
+ //Allows past, current, and future dates (no restrictions)
+ 
+export const allowPastCurrentFuture = (): Dayjs => {
+  return dayjs("1900-01-01"); // Very past date
+};
+ 
+ 
+ //Allows only current date and future dates (blocks past dates)
+ 
+export const allowCurrentFutureOnly = (): Dayjs => {
+  return dayjs().startOf("day");
+};
+ 
 type ViewMode = "date" | "time" | "datetime" | "month" | "year" | "month-year";
-
+ 
 type DateFieldProps = {
   name: string;
   label: string;
@@ -31,10 +48,11 @@ type DateFieldProps = {
   sx?: SxProps<Theme>;
   viewMode?: ViewMode;
   useCurrentDate?: boolean;
+  dateRestriction?: "past-current-future" | "current-future-only";
 } & Partial<DatePickerProps> &
   Partial<TimePickerProps> &
   Partial<DateTimePickerProps>;
-
+ 
 const DateTimeField: FC<DateFieldProps> = ({
   name,
   label,
@@ -42,6 +60,7 @@ const DateTimeField: FC<DateFieldProps> = ({
   sx,
   viewMode = "date",
   useCurrentDate = false,
+  dateRestriction = "current-future-only", // Default: block past
   ...pickerProps
 }) => {
   const { t } = useTranslation();
@@ -50,14 +69,16 @@ const DateTimeField: FC<DateFieldProps> = ({
     control,
     formState: { errors },
   } = useFormContext();
-
+ 
+ 
+  // Parse field value into Dayjs
+ 
   const parseValue = (value: unknown): Dayjs | null => {
     if (!value) return null;
     if (dayjs.isDayjs(value)) return value;
     if (value instanceof Date) return dayjs(value);
-
     if (typeof value !== "string") return null;
-
+ 
     switch (viewMode) {
       case "year":
         return dayjs(value, "YYYY", true);
@@ -74,7 +95,9 @@ const DateTimeField: FC<DateFieldProps> = ({
         return dayjs(value);
     }
   };
-
+ 
+  // Format value for storage
+ 
   const toStoreValue = (date: Dayjs): string => {
     switch (viewMode) {
       case "year":
@@ -92,7 +115,19 @@ const DateTimeField: FC<DateFieldProps> = ({
         return date.toISOString();
     }
   };
-
+ 
+ 
+  // Determine minDate based on dateRestriction prop
+ 
+  const getMinDate = (): Dayjs => {
+    if (dateRestriction === "past-current-future") {
+      return allowPastCurrentFuture();
+    } else if (dateRestriction === "current-future-only") {
+      return allowCurrentFutureOnly();
+    }
+    return allowCurrentFutureOnly(); // default fallback
+  };
+ 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Controller
@@ -104,13 +139,16 @@ const DateTimeField: FC<DateFieldProps> = ({
             : undefined,
         }}
         render={({ field }) => {
+         
+          // Auto-set current date if useCurrentDate is true
+         
           if (useCurrentDate && !field.value) {
             field.onChange(toStoreValue(dayjs()));
           }
-
+ 
           const parsedValue = parseValue(field.value);
           const hasError = !!errors[name];
-
+ 
           const commonProps = {
             label,
             value: parsedValue,
@@ -121,7 +159,12 @@ const DateTimeField: FC<DateFieldProps> = ({
                 field.onChange(null);
               }
             },
-
+ 
+           
+            // APPLY MIN DATE BASED ON dateRestriction PROP
+           
+            minDate: getMinDate(),
+ 
             slotProps: {
               textField: {
                 fullWidth: true,
@@ -149,29 +192,32 @@ const DateTimeField: FC<DateFieldProps> = ({
                 },
               },
             },
-
+ 
             ...pickerProps,
           };
-
+ 
+          
+          // Render correct picker based on viewMode
+        
           switch (viewMode) {
             case "time":
               return <TimePicker {...commonProps} />;
-
+ 
             case "datetime":
               return (
                 <DateTimePicker {...commonProps} format="DD-MM-YYYY HH:mm" />
               );
-
+ 
             case "month":
               return (
                 <DatePicker {...commonProps} views={["month"]} format="MMMM" />
               );
-
+ 
             case "year":
               return (
                 <DatePicker {...commonProps} views={["year"]} format="YYYY" />
               );
-
+ 
             case "month-year":
               return (
                 <DatePicker
@@ -181,7 +227,7 @@ const DateTimeField: FC<DateFieldProps> = ({
                   format="MMMM YYYY"
                 />
               );
-
+ 
             case "date":
             default:
               return (
@@ -197,5 +243,7 @@ const DateTimeField: FC<DateFieldProps> = ({
     </LocalizationProvider>
   );
 };
-
+ 
 export default DateTimeField;
+ 
+ 

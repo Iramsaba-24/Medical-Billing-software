@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import TextInputField from "@/components/controlled/TextInputField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
- 
+
 type FormValues = {
   bankName: string;
   accountNumber: string;
@@ -13,7 +13,7 @@ type FormValues = {
   branch: string;
   ifsc: string;
 };
- 
+
 const PayNPrint = {
   backgroundColor: "#238878",
   color: "#fff",
@@ -27,13 +27,13 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
- 
+
 const RetailInvoice: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
- 
+
   const navigate = useNavigate();
   const location = useLocation();
- 
+
   const methods = useForm<FormValues>({
     defaultValues: {
       bankName: "",
@@ -43,26 +43,30 @@ const RetailInvoice: React.FC = () => {
       ifsc: "",
     },
     mode: "onChange",
-  }); 
- 
- const onSubmit = (data: FormValues) => {
-  localStorage.setItem(
-    "paymentDetails",
-    JSON.stringify(data)
-  );
+  });
 
-  showToast("success", "Details saved");
-  navigate(URL_PATH.PaymentMethod);
-};
- 
+  const onSubmit = (data: FormValues) => {
+    localStorage.setItem("paymentDetails", JSON.stringify(data));
+    showToast("success", "Details saved");
+    navigate(URL_PATH.PaymentMethod);
+  };
+
+  const handleAccountNumberInput = (
+    event: React.FormEvent<HTMLInputElement>
+  ) => {
+    const input = event.currentTarget;
+    input.value = input.value.replace(/[^0-9]/g, "");
+  };
+
   return (
     <Box sx={{ mx: { xs: -2, md: 0.5 } }}>
       <FormProvider {...methods}>
         <Button
           onClick={() => {
             setActiveTab("new");
-            if (location.pathname !== URL_PATH.Billing)
+            if (location.pathname !== URL_PATH.Billing) {
               navigate(URL_PATH.Billing);
+            }
           }}
           sx={{
             textTransform: "none",
@@ -77,12 +81,13 @@ const RetailInvoice: React.FC = () => {
         >
           New Invoice
         </Button>
- 
+
         <Button
           onClick={() => {
             setActiveTab("retail");
-            if (location.pathname !== URL_PATH.RetailInvoice)
+            if (location.pathname !== URL_PATH.RetailInvoice) {
               navigate(URL_PATH.RetailInvoice);
+            }
           }}
           sx={{
             textTransform: "none",
@@ -97,7 +102,7 @@ const RetailInvoice: React.FC = () => {
         >
           Retail Invoice
         </Button>
- 
+
         <Box
           sx={{
             border: "1px solid #9a9a9a",
@@ -114,10 +119,14 @@ const RetailInvoice: React.FC = () => {
             }}
           >
             <CardContent sx={{ px: { xs: 2, sm: 5 }, py: { xs: 1.5, md: 3 } }}>
-              <Typography fontWeight={600} mb={1.5} fontSize={{ xs: 16, md: 18 }}>
+              <Typography
+                fontWeight={600}
+                mb={1.5}
+                fontSize={{ xs: 16, md: 18 }}
+              >
                 Distributor Bank Details
               </Typography>
- 
+
               <form onSubmit={methods.handleSubmit(onSubmit)}>
                 <Box
                   display="flex"
@@ -131,10 +140,10 @@ const RetailInvoice: React.FC = () => {
                       label="Bank Name"
                       required
                       inputType="alphabet"
-                      maxLength={50}
+                      maxLength={20}
                     />
                   </Box>
- 
+
                   <Box flex={1}>
                     <TextInputField
                       name="accountNumber"
@@ -148,10 +157,14 @@ const RetailInvoice: React.FC = () => {
                           message: "Only numbers allowed",
                         },
                       }}
-                      inputProps={{ inputMode: "numeric" }}
+                      inputProps={{
+                        inputMode: "numeric",
+                        onInput: handleAccountNumberInput,
+                      }}
                     />
                   </Box>
                 </Box>
+
                 <Box
                   display="flex"
                   flexDirection={{ xs: "column", sm: "row" }}
@@ -164,20 +177,21 @@ const RetailInvoice: React.FC = () => {
                       label="Account Holder’s Name"
                       required
                       inputType="alphabet"
-                      maxLength={60}
+                      maxLength={20}
                     />
                   </Box>
- 
+
                   <Box flex={1}>
                     <TextInputField
                       name="branch"
                       label="Branch"
                       required
                       inputType="alphabet"
-                      maxLength={40}
+                      maxLength={20}
                     />
                   </Box>
                 </Box>
+
                 <Box display="flex" justifyContent="center" mb={3}>
                   <Box width={{ xs: "100%", sm: "calc(50% - 24px)" }}>
                     <TextInputField
@@ -191,11 +205,13 @@ const RetailInvoice: React.FC = () => {
                           message: "Invalid IFSC format",
                         },
                       }}
-                      inputProps={{ style: { textTransform: "uppercase" } }}
+                      inputProps={{
+                        style: { textTransform: "uppercase" },
+                      }}
                     />
                   </Box>
                 </Box>
- 
+
                 <Box textAlign="center">
                   <Button
                     variant="contained"
@@ -205,7 +221,6 @@ const RetailInvoice: React.FC = () => {
                     Save & Continue
                   </Button>
                 </Box>
- 
               </form>
             </CardContent>
           </Card>
@@ -214,5 +229,5 @@ const RetailInvoice: React.FC = () => {
     </Box>
   );
 };
- 
+
 export default RetailInvoice;
