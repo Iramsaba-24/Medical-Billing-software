@@ -11,8 +11,7 @@ import phonepeIcon from "@/assets/icons/phonepe.svg";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { URL_PATH } from "@/constants/UrlPath";
+import InvoiceTabButtons from "./InvoiceTabButtons";
 
 // form fields
 type PaymentMethods = {
@@ -21,9 +20,6 @@ type PaymentMethods = {
   CardHolderName?: string;
   Cvv?: string;
   UpiId?: string;
-};
-type RetailInvoiceItem = {
-  total: number;
 };
 
 // paper style of card and upi
@@ -134,35 +130,41 @@ const PaymentMethod = () => {
       setCardPaymentStatus("success");
 
       const storedInvoice = localStorage.getItem("currentInvoice");
-      const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+      const storedNewInvoice = localStorage.getItem("currentNewInvoice");
 
-      if (storedInvoice) {
-        const invoice = JSON.parse(storedInvoice);
+if (storedInvoice) {
+  const invoice = JSON.parse(storedInvoice);
 
-        const existingSales = JSON.parse(
-          localStorage.getItem("invoices") || "[]",
-        );
+  const existingInvoices = JSON.parse(
+    localStorage.getItem("invoices") || "[]"
+  );
 
-        existingSales.push({
-          ...invoice,
-          price: invoice.totalPrice,
-        });
+  const RetailInvoice = {
+    invoice: `INV-${Date.now()}`,
+    name: invoice.name || "Customer",
+    date: new Date().toISOString().split("T")[0],
+    price: invoice.totalPrice || 0,
+    status: "Paid",
+  };
 
-        localStorage.setItem("invoices", JSON.stringify(existingSales));
-        localStorage.removeItem("currentInvoice");
-      }
+  const updated = [RetailInvoice, ...existingInvoices];
 
-      if (storedRetailInvoice) {
-        const retailInvoices = JSON.parse(storedRetailInvoice);
+  localStorage.setItem("invoices", JSON.stringify(updated));
+
+ localStorage.removeItem("currentInvoice");
+}
+
+      if (storedNewInvoice) {
+        const newInvoices = JSON.parse(storedNewInvoice);
 
         const existingRetail = JSON.parse(
-          localStorage.getItem("retailInvoices") || "[]",
+          localStorage.getItem("newInvoices") || "[]",
         );
 
-        const updatedRetail = [...existingRetail, ...retailInvoices];
+        const updatedRetail = [...existingRetail, ...newInvoices];
 
-        localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
-        localStorage.removeItem("currentRetailInvoice");
+        localStorage.setItem("newInvoices", JSON.stringify(updatedRetail));
+        localStorage.removeItem("currentNewInvoice");
       }
     }, 1500);
   };
@@ -174,7 +176,7 @@ const PaymentMethod = () => {
       setUpiPaymentStatus("success");
 
       const storedInvoice = localStorage.getItem("currentInvoice");
-      const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+      const storednewInvoice = localStorage.getItem("currentNewInvoice");
 
       if (storedInvoice) {
         const invoice = JSON.parse(storedInvoice);
@@ -188,22 +190,22 @@ const PaymentMethod = () => {
           price: invoice.totalPrice,
         });
 
-        localStorage.setItem("invoices", JSON.stringify(existingSales));
+       localStorage.setItem("invoices", JSON.stringify(existingSales));
 
         localStorage.removeItem("currentInvoice");
       }
 
-      if (storedRetailInvoice) {
-        const retailInvoices = JSON.parse(storedRetailInvoice);
+      if (storednewInvoice) {
+        const newInvoices = JSON.parse(storednewInvoice);
 
         const existingRetail = JSON.parse(
-          localStorage.getItem("retailInvoices") || "[]",
+          localStorage.getItem("newInvoices") || "[]",
         );
 
-        const updatedRetail = [...existingRetail, ...retailInvoices];
+        const updatedRetail = [...existingRetail, ...newInvoices];
 
-        localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
-        localStorage.removeItem("currentRetailInvoice");
+        localStorage.setItem("newInvoices", JSON.stringify(updatedRetail));
+        localStorage.removeItem("currentNewInvoice");
       }
     }, 2000);
   };
@@ -240,90 +242,61 @@ const PaymentMethod = () => {
   // get final amount from local storage
   const [finalAmount, setFinalAmount] = useState<number>(0);
 
-  useEffect(() => {
-    const storedInvoice = localStorage.getItem("currentInvoice");
-    const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
 
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
-      setFinalAmount(invoice.totalPrice);
+//  useEffect(() => {
+//   const storedInvoice = localStorage.getItem("currentInvoice");
+//   const storednewInvoice = localStorage.getItem("currentNewInvoice");
+
+//   if (storedInvoice) {
+//     const invoice = JSON.parse(storedInvoice);
+//     setFinalAmount(invoice.totalPrice || 0);
+//     return;
+//   }
+
+//   if (storednewInvoice) {
+//     const newInvoices: RetailInvoiceItem[] = JSON.parse(storednewInvoice);
+
+//     const total = newInvoices.reduce(
+//       (sum, item) => sum + item.total,
+//       0
+//     );
+
+//     setFinalAmount(total);
+//   }
+// }, []);
+
+
+useEffect(() => {
+
+  const storedInvoice = localStorage.getItem("currentInvoice");
+  const storedNewInvoice = localStorage.getItem("currentNewInvoice");
+
+  if (storedInvoice) {
+    const invoice = JSON.parse(storedInvoice);
+    setFinalAmount(invoice.totalPrice || 0);
+    return;
+  }
+
+  if (storedNewInvoice) {
+
+    const newInvoices = JSON.parse(storedNewInvoice);
+
+    if (newInvoices.length > 0) {
+
+      const lastInvoice = newInvoices[newInvoices.length - 1];
+
+      setFinalAmount(lastInvoice.totalPrice || 0);
+
     }
-    if (storedRetailInvoice) {
-      const retailInvoices: RetailInvoiceItem[] =
-        JSON.parse(storedRetailInvoice);
 
-      const total = retailInvoices.reduce((sum, item) => sum + item.total, 0);
+  }
 
-      setFinalAmount(total);
-    }
-  }, []);
+}, []);
 
-  const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
-  const navigate = useNavigate();
-  const location = useLocation();
   return (
     <FormProvider {...methods}>
       <form noValidate>
-        {/* new invoice and retail invoice btn */}
-        <Button
-          onClick={() => {
-            setActiveTab("new");
-            if (location.pathname !== URL_PATH.Billing) {
-              navigate(URL_PATH.Billing);
-            }
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-            color: activeTab === "new" ? "#fff" : "#000",
-            border: activeTab === "new" ? "none" : "1px solid #ccc",
-            "&:hover": {
-              backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
-            },
-          }}
-        >
-          New Invoice
-        </Button>
-
-        {/* Retail Invoice */}
-        <Button
-          onClick={() => {
-            setActiveTab("retail");
-            if (location.pathname !== URL_PATH.RetailInvoice) {
-              navigate(URL_PATH.RetailInvoice);
-            }
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-            color: activeTab === "retail" ? "#fff" : "#000",
-            border: activeTab === "retail" ? "none" : "1px solid #ccc",
-            "&:hover": {
-              backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-            },
-          }}
-        >
-          Retail Invoice
-        </Button>
-        <Box
-          display="flex"
-          flexDirection="column"
-          sx={{
-            border: "1px solid #ccc",
-            gap: { xs: 2, sm: 3 },
-            backgroundColor: "#fff",
-            p: { xs: 2, sm: 3 },
-            // mx:{xs:-2 , md:0.5},
-          }}
-        >
+       <InvoiceTabButtons/>
           {/* CARD PAYMENT */}
           <Paper sx={PaperStyle}>
             <RadioField
@@ -462,7 +435,7 @@ const PaymentMethod = () => {
                         payment === "upi" ? "UPI ID is required" : false,
                       pattern: {
                         value:
-                          /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ib|phonepe)$/,
+                          /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ibl|phonepe)$/,
                         message: "Enter valid UPI ID",
                       },
                     }}
@@ -506,7 +479,7 @@ const PaymentMethod = () => {
               </Box>
             </Box>
           </Paper>
-        </Box>
+        
       </form>
     </FormProvider>
   );

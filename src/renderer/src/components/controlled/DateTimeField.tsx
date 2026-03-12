@@ -28,14 +28,13 @@ import { getComponentTranslations } from "@/helpers/useTranslations";
  
  //Allows past, current, and future dates (no restrictions)
  
-export const allowPastCurrentFuture = (): Dayjs => {
-  return dayjs("1900-01-01"); // Very past date
+const allowPastCurrentFuture = (): Dayjs => {
+  return dayjs("1900-01-01");
 };
  
  
- //Allows only current date and future dates (blocks past dates)
- 
-export const allowCurrentFutureOnly = (): Dayjs => {
+  //Allows only current date and future dates (blocks past dates)
+const allowCurrentFutureOnly = (): Dayjs => {
   return dayjs().startOf("day");
 };
  
@@ -196,9 +195,9 @@ const DateTimeField: FC<DateFieldProps> = ({
             ...pickerProps,
           };
  
-          
+         
           // Render correct picker based on viewMode
-        
+       
           switch (viewMode) {
             case "time":
               return <TimePicker {...commonProps} />;

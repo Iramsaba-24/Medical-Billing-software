@@ -2,10 +2,8 @@ import { RouteObject } from "react-router-dom";
 import Layout from "@/containers/layout/Header";
 import { URL_PATH } from "@/constants/UrlPath";
 import Invoices from "@/view/Invoices";
-
-import InvoiceView from "@/containers/Invoices/InvoiceView";
+import InvoiceView from "@/containers/invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
-// import InventoryList from "@/containers/inventory/InvetoryList";
 import MedicineGroup from "@/containers/inventory/MedicineGroup";
 import MedicineGroupView from "@/containers/inventory/MedicineGroupView";
 import AddMedicineGroup from "@/containers/inventory/AddMedicineGroup";
@@ -30,14 +28,15 @@ import Billing from "@/view/Billing";
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
-import RetailInvoice from "@/containers/billing/RetailInvoice";
+import NewInvoice from "@/containers/billing/NewInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
-import PaymentDetails from "@/containers/billing/PaymentDetails";
+// import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
+import EditInvoice from "@/containers/invoices/EditInvoice";
 
-import CreateInvoice from "@/containers/Invoices/CreateInvoice";
+
 
 
 export const mainRoutes: RouteObject[] = [
@@ -68,10 +67,14 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AddDoctor,
         element: <AddDoctor />,
       },
+      // {
+      //   path: URL_PATH.CreateInvoice,
+      //   element: <CreateInvoice />,
+      // },
       {
-        path: URL_PATH.CreateInvoice,
-        element: <CreateInvoice />,
-      },
+  path: "/edit-invoice/:invoiceNo",
+  element: <EditInvoice />,
+},
       {
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
@@ -82,8 +85,8 @@ export const mainRoutes: RouteObject[] = [
         element: <Inventory />,
       },
       {
-        path: URL_PATH.RetailInvoice,
-        element: <RetailInvoice />,
+        path: URL_PATH.NewInvoice,
+        element: <NewInvoice />,
       },
       // {
       //   path: URL_PATH.InventoryList,
@@ -183,10 +186,10 @@ export const mainRoutes: RouteObject[] = [
         element: <DoctorSettings />,
       },
 
-      {
-        path: URL_PATH.PaymentDetails,
-        element: <PaymentDetails />,
-      },
+      // {
+      //   path: URL_PATH.PaymentDetails,
+      //   element: <PaymentDetails />,
+      // },
       {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,

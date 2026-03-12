@@ -7,7 +7,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import ItemsSection from "@/containers/customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
 
 export interface ItemRow {
@@ -41,8 +41,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     { id: Date.now(), name: "", qty: "", price: "" },
   ]);
 
-  const [gst, setGst] = useState(5);
-  const [paymentMode, setPaymentMode] = useState("Cash");
+
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [doctorOptions, setDoctorOptions] = useState<
@@ -129,30 +128,40 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     }
   }, [initialData, methods]);
 
-  const subTotal = rows.reduce(
-    (acc, r) => acc + Number(r.qty) * Number(r.price),
-    0
+
+
+
+
+ const handleActualSave = (data: CustomerData) => {
+  setIsSubmitted(true);
+
+  const areItemsValid = rows.every(
+    (r) => r.name.trim() !== "" && Number(r.qty) > 0 && Number(r.price) > 0
   );
 
-  const finalTotal = subTotal + (subTotal * gst) / 100;
+  if (areItemsValid) {
 
-  const handleActualSave = (data: CustomerData) => {
-    setIsSubmitted(true);
-
-    const areItemsValid = rows.every(
-      (r) => r.name.trim() !== "" && Number(r.qty) > 0 && Number(r.price) > 0
+    const total = rows.reduce(
+      (acc, r) => acc + Number(r.qty) * Number(r.price),
+      0
     );
 
-    if (areItemsValid) {
-      onSave(
-        data,
-        finalTotal,
-        rows.map((r) => r.name).join(", "),
-        rows.length,
-        rows
-      );
-    }
-  };
+    const meds = rows.map((r) => r.name).join(", ");
+
+    onSave(
+      data,
+      total,
+      meds,
+      rows.length,
+      rows
+    );
+  }
+};
+
+const finalTotal = rows.reduce(
+  (acc, r) => acc + Number(r.qty) * Number(r.price),
+  0
+);
 
   return (
     <FormProvider {...methods}>
@@ -282,10 +291,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         <ItemsSection
           rows={rows}
           setRows={setRows}
-          gst={gst}
-          setGst={setGst}
-          paymentMode={paymentMode}
-          setPaymentMode={setPaymentMode}
           finalTotal={finalTotal}
           isSubmitted={isSubmitted}
         />
