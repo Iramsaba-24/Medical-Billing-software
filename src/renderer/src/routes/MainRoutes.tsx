@@ -2,7 +2,7 @@ import { RouteObject } from "react-router-dom";
 import Layout from "@/containers/layout/Header";
 import { URL_PATH } from "@/constants/UrlPath";
 import Invoices from "@/view/Invoices";
-import CreateInvoice from "@/containers/Invoices/CreateInvoice";
+
 import InvoiceView from "@/containers/Invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
 // import InventoryList from "@/containers/inventory/InvetoryList";
@@ -18,12 +18,12 @@ import AddDoctor from "@/containers/doctors/AddDoctor";
 import DistributorsPage from "@/view/DistributorsPage";
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
-import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
+import DistributorDetails from "@/containers/distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 import Setting from "@/containers/layout/Setting";
-import DistributorsForm from "@/containers/Distributors/DistributorsForm";
+import DistributorsForm from "@/containers/distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 import MediPoints from "@/containers/billing/MediPoints";
 import Billing from "@/view/Billing";
@@ -36,6 +36,9 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
+
+import CreateInvoice from "@/containers/Invoices/CreateInvoice";
+
 
 export const mainRoutes: RouteObject[] = [
   {

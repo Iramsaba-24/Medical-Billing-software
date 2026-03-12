@@ -1,11 +1,11 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
+import { Box, Paper, Typography, Button, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import TotalItems from "@/assets/TotalItems.svg";
 import LowStock from "@/assets/warningsign.svg";
 import TotalValue from "@/assets/TotalValue.svg";
 import type { InventoryItem } from "@/containers/inventory/AddInventoryItem";
-import InventoryList from "@/containers/inventory/InvetoryList";
+import InventoryList from "@/containers/inventory/InventoryList";
 import GroupSummary from "@/containers/inventory/GroupSummary";
 
 export default function InventoryPage() {
@@ -41,6 +41,7 @@ return (
           >
             Inventory
           </Typography>
+          <Divider sx={{ mb: 3 }} />
       </Box>
 
       <Box
@@ -172,6 +173,8 @@ return (
           >
             + Add New Medicine
           </Button>
+
+         
 
            <Button
             fullWidth

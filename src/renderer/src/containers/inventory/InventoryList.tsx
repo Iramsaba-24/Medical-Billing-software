@@ -1,15 +1,9 @@
 import {Box,Button,Typography,Dialog,DialogTitle,DialogContent,DialogActions,TextField,
 } from "@mui/material";
-import { ACTION_KEY, Column, UniversalTable,
-} from "@/components/uncontrolled/UniversalTable";
+import { ACTION_KEY, Column, UniversalTable,} from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
-import {
-  showConfirmation,
-  showSnackbar,
+import { showConfirmation, showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
-// import { URL_PATH } from "@/constants/UrlPath";
-// import { useNavigate } from "react-router-dom";
-
 
 export type InventoryItem = {
   itemName: string;
@@ -25,8 +19,7 @@ export type InventoryItem = {
 const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]);
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null); 
-  // const navigate = useNavigate();
+  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("inventory");
@@ -94,7 +87,9 @@ const InventoryList = () => {
     },
     { key: "supplier", label: "Supplier" },
     { key: "expiryDate", label: "Expiry Date" },
-    {key: "status", label: "Status",
+    {
+      key: "status",
+      label: "Status",
       render: (row) => (
         <Typography fontWeight={500} color={getStatusColor(row.stockQty)}>
           {getStatus(row.stockQty)}
@@ -106,28 +101,6 @@ const InventoryList = () => {
 
   return (
     <>
-    {/* <Box display="flex" justifyContent="flex-end" mb={2}>
-      <Button
-        variant="contained"
-        onClick={() => navigate(URL_PATH.Inventory)}
-        sx={{
-          mr: 5,   
-          backgroundColor: "#238878",
-          color: "#fff",
-          textTransform: "none",
-          border: "2px solid #238878",
-          "&:hover": {
-            backgroundColor: "#fff",
-            color: "#238878",
-            border: "2px solid #238878",
-          },
-        }}
-      >
-         Back to Home
-      </Button>
-    </Box> */}
-    <Box display="flex" justifyContent="flex-end" mb={2}>
-          </Box>
       <Box
         sx={{
           boxShadow: { xs: 1, md: 4 },
@@ -136,12 +109,9 @@ const InventoryList = () => {
         }}
       >
         <Box display="flex" justifyContent="space-between" mb={4}>
-          <Typography
-              fontSize={{ xs: 18, md: 20 }}
-              fontWeight={600}
-            >
-              Inventory List
-            </Typography>
+          <Typography fontSize={{ xs: 18, md: 20 }} fontWeight={600}>
+            Inventory List
+          </Typography>
         </Box>
 
         <UniversalTable
@@ -160,128 +130,95 @@ const InventoryList = () => {
       </Box>
 
       {/* VIEW DIALOG */}
-      <Dialog
-  open={!!viewItem}
-  onClose={() => setViewItem(null)}
-  maxWidth="sm"   
-  fullWidth
->
-  <DialogTitle>View Item</DialogTitle>
+      <Dialog open={!!viewItem} onClose={() => setViewItem(null)} maxWidth="sm" fullWidth>
+        <DialogTitle>View Item</DialogTitle>
 
-  <DialogContent>
-    {viewItem && (
-      <Box px={3} py={2} display="flex" flexDirection="column" gap={3}>
+        <DialogContent>
+          {viewItem && (
+            <Box px={3} py={2} display="flex" flexDirection="column" gap={3}>
+              <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={6}>
+                <Box>
+                  <Typography fontWeight={600}>Item Name</Typography>
+                  <Typography>{viewItem.itemName}</Typography>
+                </Box>
 
-        {/* Row 1 */}
-        <Box
-          display="flex"
-          flexDirection={{ xs: "column", md: "row" }}
-          gap={{ xs: 2, md: 6 }}
-        >
-          <Box>
-            <Typography fontWeight={600}>Item Name</Typography>
-            <Typography>{viewItem.itemName}</Typography>
-          </Box>
+                <Box>
+                  <Typography fontWeight={600}>Item ID</Typography>
+                  <Typography>{viewItem.itemId}</Typography>
+                </Box>
 
-          <Box>
-            <Typography fontWeight={600}>Item ID</Typography>
-            <Typography>{viewItem.itemId}</Typography>
-          </Box>
+                <Box>
+                  <Typography fontWeight={600}>Expiry Date</Typography>
+                  <Typography>{viewItem.expiryDate}</Typography>
+                </Box>
+              </Box>
 
-          <Box>
-            <Typography fontWeight={600}>Expiry Date</Typography>
-            <Typography>{viewItem.expiryDate}</Typography>
-          </Box>
-        </Box>
+              <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={6}>
+                <Box>
+                  <Typography fontWeight={600}>Quantity</Typography>
+                  <Typography>{viewItem.stockQty}</Typography>
+                </Box>
 
-        {/* Row 2 */}
-        <Box
-          display="flex"
-          flexDirection={{ xs: "column", md: "row" }}
-          gap={{ xs: 2, md: 6 }}
-        >
-          <Box>
-            <Typography fontWeight={600}>Quantity</Typography>
-            <Typography>{viewItem.stockQty}</Typography>
-          </Box>
+                <Box>
+                  <Typography fontWeight={600}>GST</Typography>
+                  <Typography>12%</Typography>
+                </Box>
 
-          <Box>
-            <Typography fontWeight={600}>GST</Typography>
-            <Typography>12%</Typography>
-          </Box>
+                <Box>
+                  <Typography fontWeight={600}>Supplier</Typography>
+                  <Typography>{viewItem.supplier}</Typography>
+                </Box>
+              </Box>
 
-          <Box>
-            <Typography fontWeight={600}>Supplier</Typography>
-            <Typography>{viewItem.supplier}</Typography>
-          </Box>
-        </Box>
+              <Box>
+                <Typography fontWeight={600}>Status</Typography>
+                <Typography sx={{ color: getStatusColor(viewItem.stockQty) }}>
+                  {getStatus(viewItem.stockQty)}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
 
-        {/* Row 3 */}
-        <Box>
-          <Typography fontWeight={600}>Status</Typography>
-
-          <Typography
+        <DialogActions>
+          <Button
+            onClick={() => setViewItem(null)}
+            variant="contained"
             sx={{
-              color: getStatusColor(viewItem.stockQty),
+              backgroundColor: "#238878",
+              color: "#fff",
+              textTransform: "none",
             }}
           >
-            {getStatus(viewItem.stockQty)}
-          </Typography>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-        </Box>
-
-      </Box>
-    )}
-  </DialogContent>
-
-  <DialogActions
-    sx={{
-      justifyContent: "flex-end", 
-      pr: 3
-    }}
-  >
-    <Button
-      onClick={() => setViewItem(null)}
-      variant="contained"
-      sx={{
-        backgroundColor: "#238878",
-        color: "#fff",
-        border: "2px solid #238878",
-        textTransform: "none",
-        "&:hover": {
-          backgroundColor: "#fff",
-          color: "#238878",
-          border: "2px solid #238878",
-        },
-      }}
-    >
-      Close
-    </Button>
-  </DialogActions>
-</Dialog>
       {/* EDIT DIALOG */}
-      <Dialog
-        open={!!editItem}
-        onClose={() => setEditItem(null)}
-        maxWidth="sm"
-        fullWidth
-      >
+      <Dialog open={!!editItem} onClose={() => setEditItem(null)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Item</DialogTitle>
 
         <DialogContent>
           {editItem && (
             <Box display="flex" flexDirection="column" gap={2} mt={2}>
+              
               <TextField
-                label="Item Name"
+              label="Item Name"
                 value={editItem.itemName}
-                onChange={(e) =>
-                  setEditItem({
-                    ...editItem,
-                    itemName: e.target.value,
-                  })
-                }
-              />
+                 inputProps={{ maxLength: 20 }}
+                   onChange={(e) => {
+                   const value = e.target.value;
 
+    
+               if (/^[A-Za-z0-9]*$/.test(value)) {
+      setEditItem({
+        ...editItem,
+        itemName: value,
+      });
+    }
+  }}
+/>
               <TextField
                 label="Stock Quantity"
                 type="number"
@@ -316,30 +253,19 @@ const InventoryList = () => {
             sx={{
               backgroundColor: "#238878",
               color: "#fff",
-              border: "2px solid #238878",
               textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-              },
             }}
           >
             Cancel
           </Button>
+
           <Button
             onClick={handleSaveEdit}
             variant="contained"
             sx={{
               backgroundColor: "#238878",
               color: "#fff",
-              border: "2px solid #238878",
               textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-                border: "2px solid #238878",
-              },
             }}
           >
             Save
@@ -351,3 +277,4 @@ const InventoryList = () => {
 };
 
 export default InventoryList;
+

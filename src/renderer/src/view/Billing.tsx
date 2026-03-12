@@ -10,7 +10,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
 import RetailInvoice from "@/containers/billing/RetailInvoice";
-
+ 
 // Payprint button reuse sx
 const PayNPrint = {
   backgroundColor: "#238878",
@@ -25,7 +25,7 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-
+ 
 type Doctor = {
   id: number;
   doctorName: string;
@@ -36,7 +36,7 @@ type Doctor = {
   address: string;
   status: "Active";
 };
-
+ 
 type NewInvoiceFormValues = {
   name: string;
   age: string;
@@ -47,11 +47,12 @@ type NewInvoiceFormValues = {
   addressLeft: string;
   addressRight: string;
 };
-
+ 
 function POSMaster() {
   const navigate = useNavigate();
   const location = useLocation();
   const methods = useForm<NewInvoiceFormValues>({
+  reValidateMode: "onChange",
     defaultValues: {
       name: "",
       age: "",
@@ -64,23 +65,23 @@ function POSMaster() {
     },
     mode: "onChange",
   });
-
+ 
   const activeTab: "new" | "retail" = location.pathname.includes(
     "retail-invoice",
   )
     ? "retail"
     : "new";
   const isRetail = activeTab === "retail";
-
+ 
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
   const [isSubmitted, setIsSubmitted] = useState(false);
-
+ 
   const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>(
     {},
   );
-
+ 
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
-
+ 
   // Invoice button reusable sx
   const invoiceButtonSx = (isActive: boolean) => ({
     backgroundColor: isActive ? "#fff" : "#238878",
@@ -95,7 +96,7 @@ function POSMaster() {
       border: "2px solid #238878",
     },
   });
-
+ 
   // saved to local storage
   const onSubmit = (data: NewInvoiceFormValues) => {
     setIsSubmitted(true);
@@ -110,7 +111,7 @@ function POSMaster() {
     if (hasInvalidItems) {
       return;
     }
-
+ 
     const now = new Date();
     const invoiceData = {
       invoice: `INV-${Date.now()}`,
@@ -134,21 +135,21 @@ function POSMaster() {
     console.log("Saved Invoice:", invoiceData);
     navigate(URL_PATH.MediPoints, { state: { totalFromInvoice: finalTotal } });
   };
-
+ 
   type ItemRow = {
     id: number;
     name: string;
     qty: number | "";
     price: number | "";
   };
-
+ 
   type InvoiceData = {
     form: NewInvoiceFormValues;
     rows: ItemRow[];
     gst: number;
     paymentMode: string;
   };
-
+ 
   type Customer = {
     name: string;
     age: string;
@@ -157,21 +158,21 @@ function POSMaster() {
     address: string;
     doctor: string;
   };
-
+ 
   const [rows, setRows] = useState<ItemRow[]>([
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
-
+ 
   const [gst, setGst] = useState(5);
-
+ 
   const [paymentMode, setPaymentMode] = useState("Cash");
-
+ 
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string }[]
   >([]);
-
+ 
   const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
-
+ 
   // when invoice button change
   useEffect(() => {
     const savedData = invoiceForms[activeInvoice];
@@ -196,11 +197,11 @@ function POSMaster() {
       setPaymentMode("Cash");
     }
   }, [activeInvoice, invoiceForms, methods]);
-
+ 
   // load doctor list
   useEffect(() => {
     const storedDoctors = localStorage.getItem("doctors");
-
+ 
     if (storedDoctors) {
       const parsedDoctors: Doctor[] = JSON.parse(storedDoctors); //string->obj
       setDoctorList(parsedDoctors);
@@ -208,20 +209,20 @@ function POSMaster() {
         label: `Dr. ${doc.doctorName}`,
         value: doc.doctorName,
       }));
-
+ 
       setDoctorOptions(options);
     }
   }, []);
-
+ 
   const selectedDoctorName = methods.watch("doctor");
-
+ 
   const nameOptions = customerOptions.map((customer) => ({
     label: customer.name,
     value: customer.name,
   }));
-
+ 
   const selectedCustomerName = methods.watch("name");
-
+ 
   // when name change
   useEffect(() => {
     if (!selectedCustomerName) return;
@@ -244,7 +245,7 @@ function POSMaster() {
       methods.setValue("doctor", "");
     }
   }, [selectedCustomerName, customerOptions, methods]);
-
+ 
   // data load
   useEffect(() => {
     const saved = localStorage.getItem("medical_customers");
@@ -252,27 +253,27 @@ function POSMaster() {
       setCustomerOptions(JSON.parse(saved));
     }
   }, []);
-
+ 
   // Doctor Address Autofill
   useEffect(() => {
     if (selectedDoctorName) {
       const selectedDoctor = doctorList.find(
         (doc) => doc.doctorName === selectedDoctorName,
       );
-
+ 
       if (selectedDoctor) {
         methods.setValue("addressRight", selectedDoctor.address);
       }
     }
   }, [selectedDoctorName, doctorList, methods]);
-
+ 
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
     0,
   );
-
+ 
   const finalTotal = subTotal + (subTotal * gst) / 100;
-
+ 
   return (
     <FormProvider {...methods}>
       {/* New Invoice */}
@@ -298,7 +299,7 @@ function POSMaster() {
       >
         New Invoice
       </Button>
-
+ 
       {/* Retail Invoice */}
       <Button
         onClick={() => {
@@ -322,7 +323,7 @@ function POSMaster() {
       >
         Retail Invoice
       </Button>
-
+ 
       {isRetail ? (
         <RetailInvoice />
       ) : (
@@ -347,7 +348,7 @@ function POSMaster() {
             {Array.from({ length: 10 }, (_, i) => {
               const invoiceNumber = i + 1;
               const isActive = String(invoiceNumber) === activeInvoice;
-
+ 
               return (
                 <Button
                   key={invoiceNumber}
@@ -367,7 +368,7 @@ function POSMaster() {
                         paymentMode,
                       },
                     }));
-
+ 
                     navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
                   }}
                 >
@@ -376,7 +377,7 @@ function POSMaster() {
               );
             })}
           </Box>
-
+ 
           <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
             <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3}>
               {/* inner box */}
@@ -401,16 +402,16 @@ function POSMaster() {
                         onlyAlphabet
                         freeSolo // typing allowed
                         editable={true}
-                        
+                       
                         placeholder="Select or Type Name"
                       />
                     </Box>
-
+ 
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <NumericField name="age" label="Age" maxlength={3} />
                     </Box>
                   </Box>
-
+ 
                   <Box
                     display="flex"
                     gap={2}
@@ -424,7 +425,7 @@ function POSMaster() {
                         required
                       />
                     </Box>
-
+ 
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <TextInputField
                         name="email"
@@ -442,7 +443,7 @@ function POSMaster() {
                       />
                     </Box>
                   </Box>
-
+ 
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
                     <TextInputField
                       name="addressLeft"
@@ -469,7 +470,7 @@ function POSMaster() {
                       placeholder="Select Dr"
                     />
                   </Box>
-
+ 
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <TextInputField
                       name="addressRight"
@@ -481,7 +482,7 @@ function POSMaster() {
                 </Box>
               </Box>
             </Paper>
-
+ 
             <Box mt={3}>
               <ItemsSection
                 rows={rows}
@@ -494,7 +495,7 @@ function POSMaster() {
                 isSubmitted={isSubmitted}
               />
             </Box>
-
+ 
             {/* Bottom pay print button */}
             <Box
               sx={{
@@ -534,5 +535,7 @@ function POSMaster() {
     </FormProvider>
   );
 }
-
+ 
 export default POSMaster;
+ 
+ 
