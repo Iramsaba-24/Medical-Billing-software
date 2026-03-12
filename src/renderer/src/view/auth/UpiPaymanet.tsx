@@ -77,6 +77,7 @@ const UpiPayment: React.FC = () => {
       paymentMethod: "upi",
       UpiId: "",
     },
+    mode: "onChange",
   });
 
   const { handleSubmit, control } = methods;
@@ -215,6 +216,7 @@ const UpiPayment: React.FC = () => {
                     label="Enter your UPI ID"
                     name="UpiId"
                     inputType="alphanumeric"
+                    maxLength={30}
                     rules={{
                       required: "UPI ID is required",
                       pattern: {

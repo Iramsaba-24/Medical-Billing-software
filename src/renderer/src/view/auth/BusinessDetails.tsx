@@ -101,6 +101,7 @@ const navigate = useNavigate();
               name="BuisinessTypes"
               label="Business Types"
               inputType="alphabet"
+              maxLength={30}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",
@@ -119,6 +120,7 @@ const navigate = useNavigate();
             <TextInputField
               name="gstin"
               label="GSTIN (Optional)"
+              maxLength={15}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",

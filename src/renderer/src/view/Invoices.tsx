@@ -1,7 +1,7 @@
-import { Box,  Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
-import BillingTable from "@/containers/Invoices/BillingTable";
+import BillingTable from "@/containers/invoices/BillingTable";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Invoice } from "@/types/invoice";
  
@@ -62,6 +62,7 @@ useEffect(() => {
           }} >
       Invoices
     </Typography>
+    <Divider sx={{ mb: 3 }} />
       {/* Cards */}
       <Box
         display="flex"

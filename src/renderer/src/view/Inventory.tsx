@@ -173,28 +173,6 @@ return (
             + Add New Medicine
           </Button>
 
-          {/* <Button
-           fullWidth
-           sx={{
-            px: 2.5,
-            py: 1,
-            minWidth: 100,
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            fontSize: "0.95rem",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
-              border: "2px solid #238878",
-            }
-          }}
-            onClick={() => navigate(URL_PATH.InventoryList)}
-          >
-            View Inventory List
-          </Button> */}
-
            <Button
             fullWidth
            sx={{

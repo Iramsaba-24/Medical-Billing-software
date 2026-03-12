@@ -6,7 +6,6 @@ import {
   Button,
 } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
-import PrintIcon from "@mui/icons-material/Print";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -318,13 +317,7 @@ const MediPoints: React.FC = () => {
               Save & Continue
             </Button>
 
-            <Button
-              startIcon={<PrintIcon />}
-              variant="contained"
-              sx={{...PayNPrint,minWidth: "140px"}}
-            >
-              PRINT
-            </Button>
+           
           </Box>
         </Paper>
       </Box>

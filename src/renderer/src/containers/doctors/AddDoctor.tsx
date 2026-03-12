@@ -27,6 +27,7 @@ const AddDoctor = () => {
       address: "",
       status: "Active",
     },
+    mode: "onChange",
 });
 
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ const AddDoctor = () => {
   };
 
   return (
-   <Paper sx={{ p: { xs:2, md:4 }, mx: { xs:1, md:4 } }}>
+   <Paper sx={{ p: { xs:2, md:4 }, mx: { xs:1, md:4 }, my: { xs:1, md:4 } }}>
   <Typography fontSize={22} mb={2}>
     Add Doctor
   </Typography>
@@ -78,8 +79,10 @@ const AddDoctor = () => {
               name="doctorName"
               label="Doctor's Name"
               required
-              inputType="all"
+              inputType="alphabet"
               rows={1}
+              minLength={3}
+              maxLength={30}
               rules={{ required: "Doctor's Name is required" }}
             />
           </Box>
@@ -88,6 +91,8 @@ const AddDoctor = () => {
             <TextInputField
               name="degree"
               label="Degree"
+              maxLength={10}
+              inputType="alphabet"
               required
               rules={{ required: "Degree is required" }}
             />
@@ -102,7 +107,7 @@ const AddDoctor = () => {
           mt={3}
         >
           <Box flex={1}>
-            <MobileField name="phone" label="Phone" required />
+            <MobileField name="phone" label="Phone" countryCode required />
           </Box>
 
           <Box flex={1}>

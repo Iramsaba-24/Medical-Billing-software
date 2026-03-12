@@ -29,7 +29,7 @@ export const URL_PATH = {
   Invoices: "/invoice",
 
   AddForm: "/form",
-  CreateInvoice: "/create-invoice",
+  EditInvoice: "/edit-invoice",
 
   InvoiceView: "/invoice-view",
   DistributorsTable: "/table",
@@ -57,8 +57,8 @@ export const URL_PATH = {
   PharmacyProfile: "/settings/PharmacyProfile",
   CustomerSettings: "/settings/Customer",
 
-  RetailInvoice: "/billing/retail-invoice",
-  Billing: "/billing/new-invoice",
+  NewInvoice: "/billing/new-invoice",
+  Billing: "/billing/retail-invoice",
   MediPoints: "/billing/medi-points",
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
