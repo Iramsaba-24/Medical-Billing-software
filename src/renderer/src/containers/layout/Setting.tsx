@@ -1,109 +1,197 @@
-import React, { useState, useImperativeHandle, forwardRef } from 'react';
-import { Popover, List, ListItemButton, ListItemIcon, ListItemText, Box, Typography } from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import GroupIcon from '@mui/icons-material/Group';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import { URL_PATH } from '../../constants/UrlPath';
-import { useNavigate } from 'react-router-dom';
- 
- 
-export interface SettingRef {
-  openDropdown: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}
- 
-interface SettingProps {
-  readonly [key: string]: unknown;
-}
- 
-const Setting = forwardRef<SettingRef, SettingProps>((_, ref) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+import {
+  Box,
+  Button,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Paper,
+  Typography,
+  Drawer,
+  IconButton,
+} from "@mui/material";
+
+import MenuIcon from "@mui/icons-material/Menu";
+import SettingsIcon from "@mui/icons-material/Settings";
+import LocalPharmacyIcon from "@mui/icons-material/LocalPharmacy";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import GroupIcon from "@mui/icons-material/Group";
+import DescriptionIcon from "@mui/icons-material/Description";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import { URL_PATH } from "../../constants/UrlPath";
+import { useState } from "react";
+
+const Setting = () => {
   const navigate = useNavigate();
- 
-  useImperativeHandle(ref, () => ({
-    openDropdown(event: React.MouseEvent<HTMLButtonElement>) {
-      setAnchorEl(event.currentTarget);
-    }
-  }));
- 
-  const handleClose = () => setAnchorEl(null);
- 
- 
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+
+  const toggleDrawer = () => setOpen(!open);
+
   const menuItems = [
-    { text: 'General', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.GeneralSettings},
-    { text: 'Pharmacy Profile', icon: <LocalPharmacyIcon fontSize="small" />, path: URL_PATH.PharmacyProfile },
-      
-    { text: 'Dashboard Settings', icon: <DashboardIcon fontSize="small" />, path: URL_PATH. DashboardSettings},
-    { text: 'Customer Settings', icon: <GroupIcon fontSize="small" />, path: URL_PATH.CustomerSettings},
-    { text: 'Doctors Settings', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DoctorSettings },
-    { text: 'Distributors Settings', icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DistributorsSetting },
-    { text: 'Inventory Settings', icon: <InventoryIcon fontSize="small" />, path: URL_PATH.InventorySettings },
-    { text: 'Invoice Settings', icon: <DescriptionIcon fontSize="small" />, path: URL_PATH.InvoiceSetting },
-    { text: 'Report Settings', icon: <AssessmentIcon fontSize="small" />, path: URL_PATH.ReportSettings },
+    { text: "General", icon: <SettingsIcon fontSize="small" />, path: URL_PATH.GeneralSettings },
+    { text: "Pharmacy Profile", icon: <LocalPharmacyIcon fontSize="small" />, path: URL_PATH.PharmacyProfile },
+    { text: "Dashboard Settings", icon: <DashboardIcon fontSize="small" />, path: URL_PATH.DashboardSettings },
+    { text: "Customer Settings", icon: <GroupIcon fontSize="small" />, path: URL_PATH.CustomerSettings },
+    { text: "Doctors Settings", icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DoctorSettings },
+    { text: "Distributors Settings", icon: <SettingsIcon fontSize="small" />, path: URL_PATH.DistributorsSetting },
+    { text: "Inventory Settings", icon: <InventoryIcon fontSize="small" />, path: URL_PATH.InventorySettings },
+    { text: "Invoice Settings", icon: <DescriptionIcon fontSize="small" />, path: URL_PATH.InvoiceSetting },
+    { text: "Report Settings", icon: <AssessmentIcon fontSize="small" />, path: URL_PATH.ReportSettings },
   ];
- 
- 
+
+  const menuContent = (
+    <>
+      {/* Sidebar Header (Desktop only) */}
+      <Box
+        sx={{
+          display: { xs: "none", md: "flex" },
+          alignItems: "center",
+          borderRadius: 3,
+          gap: 1,
+          p: 2,
+          mb: 1,
+          backgroundColor: "#D9D9D9",
+          // flexDirection: { xs: "column", md: "row" },
+          // mt: { xs: 10}
+        }}
+      >
+        <SettingsIcon />
+        <Typography fontWeight={600}>Settings</Typography>
+      </Box>
+
+      <Paper sx={{ borderRadius: 3, overflow: "hidden" }}>
+        <List sx={{ p: 0 }}>
+          {menuItems.map((item) => {
+            const active = location.pathname === item.path;
+
+            return (
+              <ListItemButton
+                key={item.text}
+                onClick={() => {
+                  navigate(item.path);
+                  setOpen(false);
+                }}
+                sx={{
+                  py: 1.2,
+                  px: 2,
+                  borderBottom: "1px solid #eee",
+                  backgroundColor: "#D9D9D9",
+                  color: active ? "#238878" : "black",
+                  transition: "0.2s",
+
+                  "&:hover": {
+                    color: "#238878",
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 35,
+                    color: active ? "#238878" : "black",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+
+                <ListItemText
+                  primary={item.text}
+                  primaryTypographyProps={{
+                    fontSize: "0.9rem",
+                    fontWeight: 500,
+                  }}
+                />
+              </ListItemButton>
+            );
+          })}
+        </List>
+      </Paper>
+
+      {/* Back Button */}
+      <Button
+        variant="contained"
+        onClick={() => navigate("/dashboard")}
+        sx={{
+          mt: 2,
+          width: "100%",
+          backgroundColor: "#D9D9D9",
+          color: "black",
+          boxShadow: "none",
+
+          "&:hover": {
+            backgroundColor: "#238878",
+            color: "#fff",
+            boxShadow: "none",
+          },
+        }}
+      >
+        ↑ Back
+      </Button>
+    </>
+  );
+
   return (
-    <Popover
-      open={Boolean(anchorEl)}
-      anchorEl={anchorEl}
-      onClose={handleClose}
-     
-      anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
-      transformOrigin={{ vertical: 'center', horizontal: 'left' }}
-      PaperProps={{
-        sx: {
-          ml: 1,
-          width: 280,
-          borderRadius: '12px',
-          backgroundColor: '#ffffff',
-          boxShadow: '0px 4px 20px rgba(0,0,0,0.1)',
-          overflow: 'hidden',
-        },
+    <Box
+      sx={{
+        display: "flex",
+        gap: 3,
+        width: "100%",
+        flexDirection: { xs: "column", md: "row" },
+        ml: { xs: 0, md: -3 },
       }}
     >
-     
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        p: 2,
-        bgcolor: '#f8f9fa',
-        gap: 1.5,
-        borderBottom: '1px solid #eee'
-      }}>
-        <SettingsIcon sx={{ fontSize: 20, color: '#546e7a' }} />
-        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#333' }}>
-          Settings
-        </Typography>
+      {/* Mobile Header */}
+      <Box
+        sx={{
+          display: { xs: "flex", md: "none" },
+          alignItems: "center",
+          gap: 1,
+          px: 1,
+        }}
+      >
+        <IconButton onClick={toggleDrawer}>
+          <MenuIcon />
+        </IconButton>
+
+        <Typography fontWeight={600}>Settings</Typography>
       </Box>
- 
-   
-      <List sx={{ p: 0.5 }}>
-        {menuItems.map((item) => (
-          <ListItemButton
-               key={item.text}
-               onClick={() => {
-               navigate(item.path);
-               handleClose(); }}
-        sx={{borderRadius: '8px', my: 0.2,  py: 1, px: 2, '&:hover': { bgcolor: '#f0f2f5' } }}>
-        <ListItemIcon sx={{ minWidth: 38, color: '#546e7a' }}>
-           {item.icon}
-        </ListItemIcon>
-        <ListItemText primary={item.text} primaryTypographyProps={{ fontSize: '0.875rem', fontWeight: 500 }}
-        />
-         </ListItemButton>
-          ))}
-       </List>
- 
-    </Popover>
+
+      {/* Mobile Drawer */}
+      <Drawer
+        anchor="left"
+        open={open}
+        onClose={toggleDrawer}
+        sx={{
+          display: { xs: "block", md: "none" },
+        }}
+      >
+        <Box sx={{ width: 260, p: 2 }}>{menuContent}</Box>
+      </Drawer>
+
+      {/* Desktop Sidebar */}
+      <Box
+        sx={{
+          width: 260,
+          display: { xs: "none", md: "block" },
+        }}
+      >
+        {menuContent}
+      </Box>
+
+      {/* Content Area */}
+      <Box
+        sx={{
+          flex: 1,
+          mt: { xs: 1, md: 0 },
+        }}
+      >
+        <Outlet />
+      </Box>
+    </Box>
   );
-});
- 
-Setting.displayName = 'Setting';
- 
+};
+
 export default Setting;
- 
- 

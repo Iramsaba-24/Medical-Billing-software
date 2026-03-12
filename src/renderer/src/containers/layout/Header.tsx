@@ -18,10 +18,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
 import { Home } from '@mui/icons-material';
-  import PaymentsIcon from '@mui/icons-material/Payments';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
-import Setting, { SettingRef } from './Setting';
 import { useEffect } from 'react';
  
 const MINI_WIDTH = 90;
@@ -60,12 +59,11 @@ const menuItems = [
 const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const settingRef = React.useRef<SettingRef>(null);
+  // const settingRef = React.useRef<SettingRef>(null);
 
   useEffect(() => {
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!event.ctrlKey) return;
-
     const key = event.key.toLowerCase(); 
 
     const shortcutMap: Record<string, string> = {
@@ -101,13 +99,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
                 fullWidth
                 startIcon={item.icon}
                 variant={active ? 'contained' : 'contained'}
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  if (isSettings) {
-                    settingRef.current?.openDropdown(e);
-                  } else {
-                    navigate(item.path);
-                  }
-                }}
+                onClick={() => navigate(item.path)}
                 sx={{
                   justifyContent: open ? 'flex-start' : 'center',
                   minHeight: 44,
@@ -131,7 +123,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
           </Tooltip>
         );
       })}
-      <Setting ref={settingRef} />
+      {/* <Setting ref={settingRef} /> */}
     </List>
   );
 };
@@ -140,9 +132,12 @@ const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isSettingsPage = location.pathname.startsWith('/settings');
+
   const [open, setOpen] = React.useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
-
  
   return (
     <Box sx={{ display: 'flex' }}>
@@ -230,29 +225,31 @@ const Header: React.FC = () => {
 )}
 
       </StyledAppBar>
-      <Drawer
-        variant={isMobile ? 'temporary' : 'permanent'}
-        open={isMobile ? open : true}
-        onClose={() => setOpen(false)}
-        sx={{
-          width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
-          flexShrink: 0,
-          whiteSpace: 'nowrap',
-          '& .MuiDrawer-paper': {
-            width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
-            transition: 'width 0.3s',
-            boxSizing: 'border-box',
-            paddingTop: isMobile
-    ? showSearch
-      ? 10
-      : 5
-    : 0,
-          },
-        }}
-      >
-        {!isMobile && <DrawerHeader />}
-        <Sidebar open={isMobile ? true : open} />
-      </Drawer>
+{!isSettingsPage && (
+<Drawer
+  variant={isMobile ? 'temporary' : 'permanent'}
+  open={isMobile ? open : true}
+  onClose={() => setOpen(false)}
+  sx={{
+    width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    '& .MuiDrawer-paper': {
+      width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
+      transition: 'width 0.3s',
+      boxSizing: 'border-box',
+      paddingTop: isMobile
+        ? showSearch
+          ? 10
+          : 5
+        : 0,
+    },
+  }}
+>
+  {!isMobile && <DrawerHeader />}
+  <Sidebar open={isMobile ? true : open} />
+</Drawer>
+)}
      <Box
   component="main"
   sx={{
@@ -262,8 +259,14 @@ const Header: React.FC = () => {
     px: { xs: 1, sm: 3, md: 5 },
     overflowY: "auto"
   }}
->
-  <Outlet />
+> 
+<Box sx={{ display: "flex", width: "100%" }}>
+
+  <Box sx={{ flex: 1 }}>
+    <Outlet />
+  </Box>
+</Box>
+  
 </Box>
     </Box>
   );

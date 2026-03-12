@@ -32,6 +32,18 @@ const ProceedToPaymentPage = () => {
   const navigate = useNavigate();
   const { handleSubmit, control } = methods;
 
+  const handleAmountInput = (event: React.FormEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+
+    let value = input.value.replace(/[^0-9]/g, "");
+
+    if (value.length > 4) {
+      value = value.slice(0, 4);
+    }
+
+    input.value = value;
+  };
+
   const onSubmit = (data: PaymentFormInputs) => {
     console.log("Payment Data:", data);
 
@@ -102,7 +114,7 @@ const ProceedToPaymentPage = () => {
           {/* Payment Method */}
           <Box sx={{ width: "100%", mb: 3 }}>
             <FormControl component="fieldset" fullWidth>
-              <FormLabel sx={{ mb: 1, fontWeight: 600, color:"black" }}>
+              <FormLabel sx={{ mb: 1, fontWeight: 600, color: "black" }}>
                 Payment Method
               </FormLabel>
 
@@ -112,11 +124,7 @@ const ProceedToPaymentPage = () => {
                 rules={{ required: "Please select payment method" }}
                 render={({ field }) => (
                   <RadioGroup {...field}>
-                    <FormControlLabel
-                      value="upi"
-                      control={<Radio />}
-                      label="UPI"
-                    />
+                    <FormControlLabel value="upi" control={<Radio />} label="UPI" />
                     <FormControlLabel
                       value="card"
                       control={<Radio />}
@@ -150,9 +158,18 @@ const ProceedToPaymentPage = () => {
               name="amount"
               label=""
               required
-              inputType="all"   
-              maxLength={10}
+              maxLength={4}
               placeholder="Enter total amount"
+              rules={{
+                pattern: {
+                  value: /^[0-9]{1,4}$/,
+                  message: "Only numbers allowed (max 4 digits)",
+                },
+              }}
+              inputProps={{
+                inputMode: "numeric",
+                onInput: handleAmountInput,
+              }}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#f4f4f4",

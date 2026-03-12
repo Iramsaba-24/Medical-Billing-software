@@ -9,7 +9,7 @@ import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
-import RetailInvoice from "@/containers/billing/RetailInvoice";
+import RetailInvoice from "@/containers/billing/NewInvoice";
 
 // Payprint button reuse sx
 const PayNPrint = {
@@ -536,3 +536,4 @@ function POSMaster() {
 }
 
 export default POSMaster;
+

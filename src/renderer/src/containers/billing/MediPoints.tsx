@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Paper,
-  Typography,
-  Button,
-} from "@mui/material";
+import {Box,Paper,Typography,Button,} from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import PrintIcon from "@mui/icons-material/Print";
 import NumericField from "@/components/controlled/NumericField";
@@ -334,3 +329,4 @@ const MediPoints: React.FC = () => {
 };
 
 export default MediPoints;
+

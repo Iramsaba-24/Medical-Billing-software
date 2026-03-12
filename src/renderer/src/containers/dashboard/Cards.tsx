@@ -199,18 +199,6 @@ const getTopSellingMedicine = (): string => {
   return topMedicine || "No Data";
 };
 
-//   let highestMedicine = "";
-//   let highestCount = 0;
-
-//   Object.entries(counts).forEach(([medicine, qty]) => {
-//     if (qty > highestCount) {
-//       highestCount = qty;
-//       highestMedicine = medicine;
-//     }
-//   });
-
-//   return highestMedicine || "No Data";
-// };
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
     1: "This Month",
@@ -304,7 +292,6 @@ const getTopSellingMedicine = (): string => {
                     <DropdownField
                       name="filter"
                       options={filterOptions}
-                     // isStatic={true}
                       onChangeCallback={handleFilterChange(index)}
                     />
                   </Box>
@@ -374,11 +361,6 @@ const getTopSellingMedicine = (): string => {
               ) : (
                 <Box display="flex" justifyContent="space-between">
                   <Box >
-                    {/* <Typography fontSize={24} fontWeight={800}>
-                      {card.title === "Inventory"
-                        ? totalMedicines()  
-                        : info?.leftValue}
-                    </Typography> */}
                     <Typography fontSize={24} fontWeight={800}>
                       {card.title === "Inventory"
                         ? totalMedicines()//function to get total medicines count from local storage
