@@ -27,7 +27,7 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-
+ 
 type Doctor = {
   id: number;
   doctorName: string;
@@ -72,13 +72,13 @@ function RetailInvoice() {
 
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
   const [isSubmitted, setIsSubmitted] = useState(false);
-
+ 
   const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>(
     {},
   );
-
+ 
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
-
+ 
   // Invoice button reusable sx
   const invoiceButtonSx = (isActive: boolean) => ({
     backgroundColor: isActive ? "#fff" : "#238878",
@@ -93,7 +93,7 @@ function RetailInvoice() {
       border: "2px solid #238878",
     },
   });
-
+ 
   // saved to local storage
  const onSubmit = (data: RetailInvoiceFormValues) => {
   setIsSubmitted(true);
@@ -145,14 +145,14 @@ function RetailInvoice() {
     qty: number | "";
     price: number | "";
   };
-
+ 
   type InvoiceData = {
     form: RetailInvoiceFormValues;
     rows: ItemRow[];
     gst: number;
     paymentMode: string;
   };
-
+ 
   type Customer = {
     name: string;
     age: string;
@@ -161,21 +161,21 @@ function RetailInvoice() {
     address: string;
     doctor: string;
   };
-
+ 
   const [rows, setRows] = useState<ItemRow[]>([
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
-
+ 
   const [gst, setGst] = useState(5);
-
+ 
   const [paymentMode, setPaymentMode] = useState("Cash");
-
+ 
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string }[]
   >([]);
-
+ 
   const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
-
+ 
   // when invoice button change
   useEffect(() => {
     const savedData = invoiceForms[activeInvoice];
@@ -200,11 +200,11 @@ function RetailInvoice() {
       setPaymentMode("Cash");
     }
   }, [activeInvoice, invoiceForms, methods]);
-
+ 
   // load doctor list
   useEffect(() => {
     const storedDoctors = localStorage.getItem("doctors");
-
+ 
     if (storedDoctors) {
       const parsedDoctors: Doctor[] = JSON.parse(storedDoctors); //string->obj
       setDoctorList(parsedDoctors);
@@ -212,11 +212,11 @@ function RetailInvoice() {
         label: `Dr. ${doc.doctorName}`,
         value: doc.doctorName,
       }));
-
+ 
       setDoctorOptions(options);
     }
   }, []);
-
+ 
   const selectedDoctorName = methods.watch("doctor");
 
   const nameOptions = [
@@ -228,7 +228,7 @@ function RetailInvoice() {
 ];
 
   const selectedCustomerName = methods.watch("name");
-
+ 
   // when name change
   useEffect(() => {
     if (!selectedCustomerName) return;
@@ -251,7 +251,7 @@ function RetailInvoice() {
       methods.setValue("doctor", "");
     }
   }, [selectedCustomerName, customerOptions, methods]);
-
+ 
   // data load
   useEffect(() => {
     const saved = localStorage.getItem("medical_customers");
@@ -259,20 +259,20 @@ function RetailInvoice() {
       setCustomerOptions(JSON.parse(saved));
     }
   }, []);
-
+ 
   // Doctor Address Autofill
   useEffect(() => {
     if (selectedDoctorName) {
       const selectedDoctor = doctorList.find(
         (doc) => doc.doctorName === selectedDoctorName,
       );
-
+ 
       if (selectedDoctor) {
         methods.setValue("addressRight", selectedDoctor.address);
       }
     }
   }, [selectedDoctorName, doctorList, methods]);
-
+ 
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
     0,
@@ -309,7 +309,7 @@ function RetailInvoice() {
             {Array.from({ length: 10 }, (_, i) => {
               const invoiceNumber = i + 1;
               const isActive = String(invoiceNumber) === activeInvoice;
-
+ 
               return (
                 <Button
                   key={invoiceNumber}
@@ -329,7 +329,7 @@ function RetailInvoice() {
                         paymentMode,
                       },
                     }));
-
+ 
                     navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
                   }}>
                 
@@ -338,7 +338,7 @@ function RetailInvoice() {
               );
             })}
           </Box>
-
+ 
           <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
             <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3}>
               {/* inner box */}
@@ -366,7 +366,7 @@ function RetailInvoice() {
 
 />
                     </Box>
-
+ 
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <NumericField name="age" label="Age" maxlength={3} />
                     </Box>
@@ -381,12 +381,12 @@ function RetailInvoice() {
                         required
                       />
                     </Box>
-
+ 
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <EmailField name="email" label="Email"/>
                     </Box>
                   </Box>
-
+ 
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
                     <TextInputField
                       name="addressLeft"
@@ -413,7 +413,7 @@ function RetailInvoice() {
                       placeholder="Select Dr"
                     />
                   </Box>
-
+ 
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <TextInputField
                       name="addressRight"
@@ -425,7 +425,7 @@ function RetailInvoice() {
                 </Box>
               </Box>
             </Paper>
-
+ 
             <Box mt={3}>
              
                <ItemsSection
@@ -436,7 +436,7 @@ function RetailInvoice() {
               /> 
               
             </Box>
-
+ 
             {/* Bottom pay print button */}
             <Box
               sx={{

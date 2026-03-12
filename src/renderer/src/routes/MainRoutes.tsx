@@ -2,10 +2,8 @@ import { RouteObject } from "react-router-dom";
 import Layout from "@/containers/layout/Header";
 import { URL_PATH } from "@/constants/UrlPath";
 import Invoices from "@/view/Invoices";
-//import CreateInvoice from "@/containers/Invoices/CreateInvoice";
 import InvoiceView from "@/containers/invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
-// import InventoryList from "@/containers/inventory/InvetoryList";
 import MedicineGroup from "@/containers/inventory/MedicineGroup";
 import MedicineGroupView from "@/containers/inventory/MedicineGroupView";
 import AddMedicineGroup from "@/containers/inventory/AddMedicineGroup";
@@ -37,6 +35,9 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
 import EditInvoice from "@/containers/invoices/EditInvoice";
+
+
+
 
 export const mainRoutes: RouteObject[] = [
   {

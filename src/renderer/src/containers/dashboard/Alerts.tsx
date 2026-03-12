@@ -1,7 +1,7 @@
 import { Box, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import WarningSign from "@/assets/warning-sign.svg";
-import { InventoryItem } from "@/containers/inventory/InvetoryList";
+import { InventoryItem } from "@/containers/inventory/InventoryList";
 
 const Alerts = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
@@ -53,7 +53,7 @@ const Alerts = () => {
 
       {/* Low Stock */}
       <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        🔴 Low Stock Alerts ({lowStock.length})
+         Low Stock Alerts ({lowStock.length})
       </Typography>
 
       {lowStock.length > 0 ? (
@@ -74,7 +74,7 @@ const Alerts = () => {
 
       {/* Out of Stock */}
       <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        ⛔ Out of Stock ({outOfStock.length})
+         Out of Stock ({outOfStock.length})
       </Typography>
 
       {outOfStock.length > 0 ? (
@@ -95,7 +95,7 @@ const Alerts = () => {
 
       {/* Reorder */}
       <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        🔁 Reorder Suggested ({reorderStock.length})
+         Reorder Suggested ({reorderStock.length})
       </Typography>
 
       {reorderStock.length > 0 ? (
