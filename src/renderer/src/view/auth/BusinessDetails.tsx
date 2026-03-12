@@ -8,7 +8,6 @@ import LogoImage from "@/assets/logoimg.svg";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
 
-
 type FormInputs = {
   BuisinessTypes: string;
   gstin: string;
@@ -25,16 +24,14 @@ const BusinessDetails = () => {
     mode: "onChange",
   });
 
-const navigate = useNavigate();
-  
+  const navigate = useNavigate();
 
- const onSubmit = (data: FormInputs) => {
-  console.log(data);
+  const onSubmit = (data: FormInputs) => {
+    console.log(data);
 
-  showToast("success", "Business details saved successfully!");
-   navigate(URL_PATH.ChoosePlan);
-   
-};
+    showToast("success", "Business details saved successfully!");
+    navigate(URL_PATH.ChoosePlan);
+  };
 
   return (
     <Box
@@ -59,7 +56,7 @@ const navigate = useNavigate();
             maxWidth: { xs: "100%", sm: 450 },
             display: "flex",
             flexDirection: "column",
-            alignItems: "flex-start",   //left alignment
+            alignItems: "flex-start", 
             p: { xs: 3, sm: 4 },
           }}
         >
@@ -101,26 +98,21 @@ const navigate = useNavigate();
               name="BuisinessTypes"
               label="Business Types"
               inputType="alphabet"
-              maxLength={60}
+              maxLength={40}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",
                 },
               }}
               required
-              rules={{
-                required: "Business Type is required",
-                pattern: {
-                  value: /^[A-Za-z\s]+$/,
-                  message: "Only alphabets allowed",
-                },
-              }}
             />
 
             <TextInputField
               name="gstin"
               label="GSTIN (Optional)"
               maxLength={15}
+              //inputProps={{ style: { textTransform: "uppercase" } }}
+
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",
@@ -149,7 +141,6 @@ const navigate = useNavigate();
               rows={1}
               minLength={15}
               maxLength={20}
-              
             />
           </Box>
 
@@ -177,8 +168,6 @@ const navigate = useNavigate();
           </Button>
         </Box>
       </FormProvider>
-
-    
     </Box>
   );
 };
