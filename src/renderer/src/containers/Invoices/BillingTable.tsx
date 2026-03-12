@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Paper, Button, Typography } from "@mui/material";
+import { Box, Paper,  Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   UniversalTable,
@@ -23,7 +23,7 @@ type Props = {
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ onCreate, invoices, setInvoices }: Props) => {
+const BillingTable = ({  invoices, setInvoices }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
   useEffect(() => {
@@ -160,25 +160,7 @@ const BillingTable = ({ onCreate, invoices, setInvoices }: Props) => {
                 size="small"
               />
             </Box>
-            <Button
-              variant="contained"
-              onClick={onCreate}
-              sx={{
-                backgroundColor: "#238878",
-                color: "#fff",
-                border: "2px solid #238878",
-                textTransform: "none",
-                height: 40,
-                mb: { xs: 0.5, sm: 0 },
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                  border: "2px solid #238878",
-                },
-              }}
-            >
-              + Create Invoice
-            </Button>
+           
           </Box>
         </Box>
 

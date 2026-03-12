@@ -90,7 +90,7 @@ const RetailInvoice = () => {
   const [distributors, setDistributors] = useState<Distributor[]>([]);
 
   const methods = useForm<FormData>({
-    mode: "onSubmit",
+    mode: "onChange",
     shouldUnregister: false,
     defaultValues: {
       gst: "5",
@@ -294,6 +294,8 @@ const inventoryOptions = inventory.map((item) => ({
                 <TextInputField
                   name="supplier"
                   label="Supplier"
+                  inputType="alphabet"
+                  maxLength={30}
                   required
                 />
               </Grid>

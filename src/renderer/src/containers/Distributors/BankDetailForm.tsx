@@ -20,10 +20,10 @@ const BankDetailsForm = () => {
         label="Account Number" 
         inputType="numbers"
         required
-        maxLength={11}
+        maxLength={15}
       />    
-        <TextInputField name="accountHolderName"  label="A/C Holder's Name" inputType='alphabet'  required  />
-        <TextInputField name="branch" label="Branch" inputType='alphabet' maxLength={20}  required  />
+        <TextInputField name="accountHolderName"  label="A/C Holder's Name" inputType='alphabet'  required    maxLength={30}/>
+        <TextInputField name="branch" label="Branch" inputType='alphabet' maxLength={20}   required  />
         
         <TextInputField
           name="ifsc" 
@@ -33,7 +33,7 @@ const BankDetailsForm = () => {
           rules={{
           pattern: {
           value: /^[A-Z]{4}0[A-Z0-9]{6}$/,
-          message: 'Invalid IFSC Code',
+          message: 'Invalid IFSC Code (SBIN0001234)',
             },
           }} 
         />    
@@ -47,7 +47,7 @@ const BankDetailsForm = () => {
          rules={{
         pattern: {
           value: /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z][a-zA-Z]{2,64}$/,
-          message: 'Invalid UPI ID',
+          message: 'Invalid UPI ID (abc@oksbi)',
             },         
   }}/>
       </Box>

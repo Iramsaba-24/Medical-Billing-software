@@ -33,12 +33,12 @@ const InventorySettings = () => {
   color: "#212529",
   mb: 1,
 };
-const paperStyle = {
-  p: { xs: 2, md: 4 },
-  borderRadius: "5px",
-  boxShadow: 3,
-  mb: 1,
-};
+// const paperStyle = {
+//   p: { xs: 2, md: 4 },
+//   borderRadius: "5px",
+//   boxShadow: 3,
+//   mb: 1,
+// };
 
  
   //  Save Function
@@ -70,7 +70,7 @@ const paperStyle = {
           <Stack spacing={2.5}>
            
             {/* Group & Expiry Control */}
-             <Paper sx={paperStyle}>
+             {/* <Paper sx={paperStyle}>
               <Typography sx={headingStyle}>Group & Expiry Control</Typography>
               <CheckboxGroup
                 name="groupExpiry"
@@ -80,10 +80,10 @@ const paperStyle = {
                   { label: 'Expiry date mandatory', value: 'expiryMandatory' },
                 ]}
               />
-            </Paper>
+            </Paper> */}
  
             {/* Pricing on Purchase */}
-            <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
+            {/* <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
               <Typography variant="subtitle1" sx={headingStyle}>Pricing on Purchase</Typography>
               <CheckboxGroup
                 name="pricing"
@@ -91,7 +91,7 @@ const paperStyle = {
                 options={[{ label: 'Allow MRP edit on purchase', value: 'mrpEdit' }]}
               />
             </Paper>
-  
+   */}
               <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
                  <Typography sx={headingStyle}>Stock Limits</Typography>
 
@@ -122,10 +122,24 @@ const paperStyle = {
                <Typography fontSize="14px" sx={{mb: 3}}>Units</Typography>
                </Box>
              </Box>
+
+             {/* Row 3 */}
+             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <Typography fontSize="14px" sx={{mb: 3}}> Out of stock </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                 <TextInputField 
+                        name="outOfStock" 
+                        label="" 
+                        inputType="numbers" 
+                        sx={{  width: '80px',  '& .MuiInputBase-root': { height: '25px' }  }} 
+                   />
+               <Typography fontSize="14px" sx={{mb: 3}}>Units</Typography>
+               </Box>
+             </Box>
          </Paper>
 
             {/* Barcode & Storage */}
-            <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
+            {/* <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
               <Typography variant="subtitle1" sx={headingStyle}>Barcode & Storage</Typography>
               <CheckboxGroup
                 name="barcodeStorage"
@@ -135,7 +149,7 @@ const paperStyle = {
                   { label: 'Rack / Shelf management', value: 'rackShelf' },
                 ]}
               />
-            </Paper>
+            </Paper> */}
  
             {/*  Returns & Auto Update */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>

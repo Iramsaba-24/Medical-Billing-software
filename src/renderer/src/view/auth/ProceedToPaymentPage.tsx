@@ -157,13 +157,14 @@ const ProceedToPaymentPage = () => {
             <TextInputField
               name="amount"
               label=""
-              required
+              required 
               maxLength={4}
               placeholder="Enter total amount"
               rules={{
                 pattern: {
                   value: /^[0-9]{1,4}$/,
                   message: "Only numbers allowed (max 4 digits)",
+                  
                 },
               }}
               inputProps={{

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Typography, Paper, SxProps, Theme } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
-import { Save, Payment, Print } from "@mui/icons-material";
+import { Save } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import { CustomerData } from "@/view/CustomerMaster";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
-import DateTimeField from "@/components/controlled/DateTimeField";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import DateField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
 
 export interface ItemRow {
@@ -37,13 +37,14 @@ interface Props {
 }
 
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
-  const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: "", price: "" },
-  ]);
 
-  const [gst, setGst] = useState(5);
-  const [paymentMode, setPaymentMode] = useState("Cash");
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const navigate = useNavigate();
+
+  const isEditMode = Boolean(initialData);
+
+  const [rows, setRows] = useState<ItemRow[]>([
+    { id: Date.now(), name: "", qty: "", price: "" }
+  ]);
 
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string; address: string }[]
@@ -58,20 +59,14 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       address: "",
       doctor: "",
       doctorAddress: "",
-      date: new Date().toISOString().split("T")[0],
+      date: ""
     },
     mode: "onChange"
   });
 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    let value = input.value.replace(/[^0-9]/g, "");
-
-    if (value !== "" && Number(value) > 100) {
-      value = "100";
-    }
-
-    input.value = value;
+    input.value = input.value.replace(/[^0-9]/g, "");
   };
 
   const buttonStyle: SxProps<Theme> = {
@@ -85,48 +80,73 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     "&:hover": {
       backgroundColor: "#fff",
       color: "#238878",
-      border: "2px solid #238878",
-    },
+      border: "2px solid #238878"
+    }
   };
 
   useEffect(() => {
+
     const storedDoctors: StoredDoctor[] = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
 
-    const options = storedDoctors.map((doc) => ({
+    const existingDoctors = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
-      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
+      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? ""
     }));
 
+    const options = [
+      {
+        label: "+ Add Doctor",
+        value: "__add_doctor__",
+        address: ""
+      },
+      ...existingDoctors
+    ];
+
     setDoctorOptions(options);
+
   }, []);
 
   const selectedDoctor = methods.watch("doctor");
 
   useEffect(() => {
+
+    if (selectedDoctor === "__add_doctor__") {
+      methods.setValue("doctor", "");
+      navigate("/add-doctor");
+      return;
+    }
+
     if (selectedDoctor) {
+
       const doctorData = doctorOptions.find(
         (doc) => doc.value === selectedDoctor
       );
 
       if (doctorData) {
         methods.setValue("doctorAddress", doctorData.address, {
-          shouldValidate: true,
+          shouldValidate: true
         });
       }
+
     }
-  }, [selectedDoctor, doctorOptions, methods]);
+
+  }, [selectedDoctor, doctorOptions, methods, navigate]);
 
   useEffect(() => {
+
     if (initialData) {
+
       methods.reset(initialData);
 
       if (initialData.itemsList) {
         setRows(initialData.itemsList);
       }
+
     }
+
   }, [initialData, methods]);
 
   const subTotal = rows.reduce(
@@ -134,38 +154,36 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     0
   );
 
-  const finalTotal = subTotal + (subTotal * gst) / 100;
+  const finalTotal = subTotal;
 
   const handleActualSave = (data: CustomerData) => {
-    setIsSubmitted(true);
 
-    const areItemsValid = rows.every(
-      (r) => r.name.trim() !== "" && Number(r.qty) > 0 && Number(r.price) > 0
+    onSave(
+      data,
+      finalTotal,
+      rows.map((r) => r.name).join(", "),
+      rows.length,
+      rows
     );
-
-    if (areItemsValid) {
-      onSave(
-        data,
-        finalTotal,
-        rows.map((r) => r.name).join(", "),
-        rows.length,
-        rows
-      );
-    }
   };
 
   return (
+
     <FormProvider {...methods}>
+
       <Box
         component="form"
         noValidate
         onSubmit={methods.handleSubmit(handleActualSave)}
         sx={{ bgcolor: "#f5f5f5", minHeight: "100vh", p: { xs: 1, md: 0 } }}
       >
+
         {/* Header */}
+
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+
           <Typography variant="h5" fontWeight="bold">
-            Edit Customer
+            {isEditMode ? "Edit Customer" : "Add Customer"}
           </Typography>
 
           <Button
@@ -175,31 +193,28 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               backgroundColor: "#238878",
               color: "#fff",
               border: "2px solid #238878",
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-              },
+              textTransform: "none"
             }}
           >
-            Back  
+            Back
           </Button>
+
         </Box>
 
-        {/* Form Section */}
-        <Paper
-          sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }}
-          elevation={3}
-        >
+        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3 }} elevation={3}>
+
           <Box
             sx={{
               display: "grid",
               gridTemplateColumns: { xs: "1fr", md: "1.5fr 1fr" },
-              gap: 4,
+              gap: 4
             }}
           >
-            {/* Customer Details */}
+
+            {/* Customer */}
+
             <Box>
+
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Customer Details
               </Typography>
@@ -208,9 +223,10 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                 sx={{
                   display: "grid",
                   gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                  gap: 2,
+                  gap: 2
                 }}
               >
+
                 <TextInputField
                   name="name"
                   label="Customer Name"
@@ -219,29 +235,38 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   maxLength={20}
                 />
 
-                <DateTimeField name="date" label="Date" required />
+                <DateField
+                  name="date"
+                  label="Date"
+                  required
+                  viewMode="date"
+                  useCurrentDate
+                />
 
                 <TextInputField
                   name="age"
                   label="Age"
                   required
                   maxLength={3}
-                  rules={{
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: "Only numbers allowed",
-                    },
-                  }}
                   inputProps={{
                     inputMode: "numeric",
                     maxLength: 3,
-                    onInput: handleAgeInput,
+                    onInput: handleAgeInput
                   }}
                 />
 
-                <MobileField name="mobile" label="Mobile" required />
+                <MobileField
+                  name="mobile"
+                  label="Mobile"
+                  countryCode
+                  required
+                />
 
-                <EmailField name="email" label="Email" required />
+                <EmailField
+                  name="email"
+                  label="Email"
+                  required
+                />
 
                 <TextInputField
                   name="address"
@@ -250,16 +275,21 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   rows={1}
                   required
                 />
+
               </Box>
+
             </Box>
 
-            {/* Doctor Info */}
+            {/* Doctor */}
+
             <Box>
+
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
               </Typography>
 
-              <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
+              <Box sx={{ display: "grid", gap: 2 }}>
+
                 <DropdownField
                   name="doctor"
                   label="Doctor Name"
@@ -273,45 +303,24 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   inputType="textarea"
                   rows={1}
                 />
+
               </Box>
+
             </Box>
+
           </Box>
+
         </Paper>
 
-        {/* Items Section */}
-        <ItemsSection
-          rows={rows}
-          setRows={setRows}
-          gst={gst}
-          setGst={setGst}
-          paymentMode={paymentMode}
-          setPaymentMode={setPaymentMode}
-          finalTotal={finalTotal}
-          isSubmitted={isSubmitted}
-        />
+        {/* Save */}
 
-        {/* Buttons */}
         <Box
           sx={{
             mt: 4,
             display: "flex",
-            flexWrap: "wrap",
-            justifyContent: { xs: "stretch", sm: "flex-end" },
-            gap: 2,
+            justifyContent: { xs: "stretch", sm: "flex-end" }
           }}
         >
-          <Button
-            variant="contained"
-            startIcon={<Print />}
-            sx={buttonStyle}
-            onClick={() => window.print()}
-          >
-            Print
-          </Button>
-
-          <Button variant="contained" startIcon={<Payment />} sx={buttonStyle}>
-            Pay Now
-          </Button>
 
           <Button
             variant="contained"
@@ -319,11 +328,15 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             startIcon={<Save />}
             sx={buttonStyle}
           >
-            Save
+            {isEditMode ? "Update" : "Save and Continue"}
           </Button>
+
         </Box>
+
       </Box>
+
     </FormProvider>
+
   );
 };
 
