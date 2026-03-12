@@ -1,22 +1,15 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-} from "@mui/material";
-
+import { Box, Card, CardContent, Typography, Button} from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-
 import TextInputField from "@/components/controlled/TextInputField";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
-
+import RadioField from "@/components/controlled/RadioField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
 
 type FormValues = {
+  paymentMethod: string;
   bankName: string;
   accountNumber: string;
   accountHolderName: string;
@@ -24,11 +17,21 @@ type FormValues = {
   ifsc: string;
 };
 
+const radioStyle = {
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
+};
+
 const NetBanking = () => {
   const navigate = useNavigate();
 
   const methods = useForm<FormValues>({
     defaultValues: {
+      paymentMethod: "netBanking",
       bankName: "",
       accountNumber: "",
       accountHolderName: "",
@@ -60,6 +63,7 @@ const NetBanking = () => {
       <FormProvider {...methods}>
         <Box
           component="form"
+          noValidate
           onSubmit={methods.handleSubmit(onSubmit)}
           sx={{ width: "100%", maxWidth: 800, textAlign: "center" }}
         >
@@ -90,10 +94,16 @@ const NetBanking = () => {
             }}
           >
             <CardContent sx={{ p: 2 }}>
-              {/* Net Banking */}
-              <Typography sx={{ textAlign: "left", mb: 1, fontSize: "15px" }}>
-                ○ Net Banking
-              </Typography>
+              
+              {/* Net Banking Radio */}
+              <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 1 }}>
+                <RadioField
+                  name="paymentMethod"
+                  options={[{ label: "Net Banking", value: "netBanking" }]}
+                  label=""
+                  sx={radioStyle}
+                />
+              </Box>
 
               {/* Bank Name */}
               <Box mb={1}>
@@ -112,6 +122,7 @@ const NetBanking = () => {
                   name="accountNumber"
                   label="Bank Account Number"
                   required
+                  inputType="numbers"
                   maxLength={13}
                   minLength={9}
                   rules={{
@@ -120,10 +131,15 @@ const NetBanking = () => {
                       message: "Only numbers allowed",
                     },
                   }}
+                  inputProps={{
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                    maxLength: 13,
+                  }}
                 />
               </Box>
 
-              {/* Holder Name */}
+              {/* Account Holder Name */}
               <Box mb={1}>
                 <TextInputField
                   name="accountHolderName"
@@ -134,7 +150,7 @@ const NetBanking = () => {
                 />
               </Box>
 
-              {/* Branch + IFSC */}
+              {/* Branch and IFSC */}
               <Box
                 sx={{
                   display: "flex",
@@ -172,7 +188,7 @@ const NetBanking = () => {
                 </Box>
               </Box>
 
-              {/* Button */}
+              {/* Next Button */}
               <Box textAlign="right">
                 <Button
                   type="submit"
@@ -192,6 +208,7 @@ const NetBanking = () => {
                   Next
                 </Button>
               </Box>
+
             </CardContent>
           </Card>
         </Box>

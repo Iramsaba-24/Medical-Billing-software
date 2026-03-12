@@ -18,9 +18,10 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import RedoRoundedIcon from '@mui/icons-material/RedoRounded';
 import { Home } from '@mui/icons-material';
-import PaymentsIcon from '@mui/icons-material/Payments';
+  import PaymentsIcon from '@mui/icons-material/Payments';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { URL_PATH } from '../../constants/UrlPath';
+// import Setting, { SettingRef } from './Setting';
 import { useEffect } from 'react';
  
 const MINI_WIDTH = 90;
@@ -59,11 +60,12 @@ const menuItems = [
 const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  // const settingRef = React.useRef<SettingRef>(null);
+  
 
   useEffect(() => {
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!event.ctrlKey) return;
+
     const key = event.key.toLowerCase(); 
 
     const shortcutMap: Record<string, string> = {
@@ -94,36 +96,36 @@ const Sidebar = ({ open }: { open: boolean }) => {
        
       return (
           <Tooltip key={item.text} title={!open ? item.text : ''} placement="right" arrow>
-            <ListItem disablePadding sx={{ mb: 2 }}>
-              <Button
-                fullWidth
-                startIcon={item.icon}
-                variant={active ? 'contained' : 'contained'}
-                onClick={() => navigate(item.path)}
-                sx={{
-                  justifyContent: open ? 'flex-start' : 'center',
-                  minHeight: 44,
-                  px: open ? 4 : 0,
-                  py: 2,
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  background: active ? '#238878' : '#D9D9D9',
-                  color: active ? '#fff' : 'black',
-                  '& .MuiButton-startIcon': {
-                    margin: open ? '0 12px 0 0' : 0,
-                  },
-                  '&:hover': {
-                    background: '#1FA38A'
-                  },
-                }}
-              >
-                {open && item.text}
-              </Button>
-            </ListItem>
+<ListItem disablePadding sx={{ mb: 2 }}>
+  <Button
+    fullWidth
+    startIcon={item.icon}
+    variant="contained"
+    onClick={() => navigate(item.path)}
+    sx={{
+      justifyContent: open ? "flex-start" : "center",
+      minHeight: 44,
+      px: open ? 4 : 0,
+      py: 2,
+      borderRadius: 2,
+      textTransform: "none",
+      background: active ? "#238878" : "#D9D9D9",
+      color: active ? "#fff" : "black",
+      "& .MuiButton-startIcon": {
+        margin: open ? "0 12px 0 0" : 0,
+      },
+      "&:hover": {
+        background: "#1FA38A",
+      },
+    }}
+  >
+    {open && item.text}
+  </Button>
+</ListItem>
           </Tooltip>
         );
       })}
-      {/* <Setting ref={settingRef} /> */}
+    
     </List>
   );
 };
@@ -132,12 +134,10 @@ const Header: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const isSettingsPage = location.pathname.startsWith('/settings');
-
   const [open, setOpen] = React.useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
+  const location = useLocation();
+const isSettingsPage = location.pathname.startsWith(URL_PATH.Setting);
  
   return (
     <Box sx={{ display: 'flex' }}>
@@ -225,48 +225,54 @@ const Header: React.FC = () => {
 )}
 
       </StyledAppBar>
-{!isSettingsPage && (
 <Drawer
-  variant={isMobile ? 'temporary' : 'permanent'}
-  open={isMobile ? open : true}
+  variant={isMobile ? "temporary" : "permanent"}
+  open={isMobile ? open : !isSettingsPage}
   onClose={() => setOpen(false)}
   sx={{
-    width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
+    width: isSettingsPage
+      ? 0
+      : isMobile
+      ? FULL_WIDTH
+      : open
+      ? FULL_WIDTH
+      : MINI_WIDTH,
+
     flexShrink: 0,
-    whiteSpace: 'nowrap',
-    '& .MuiDrawer-paper': {
-      width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
-      transition: 'width 0.3s',
-      boxSizing: 'border-box',
-      paddingTop: isMobile
-        ? showSearch
-          ? 10
-          : 5
-        : 0,
+    whiteSpace: "nowrap",
+
+    "& .MuiDrawer-paper": {
+      width: isSettingsPage
+        ? 0
+        : isMobile
+        ? FULL_WIDTH
+        : open
+        ? FULL_WIDTH
+        : MINI_WIDTH,
+
+      overflowX: "hidden",
+      transition: "width 0.3s",
+      boxSizing: "border-box",
+      paddingTop: isMobile ? (showSearch ? 10 : 5) : 0,
     },
   }}
 >
-  {!isMobile && <DrawerHeader />}
-  <Sidebar open={isMobile ? true : open} />
-</Drawer>
-)}
+        {!isMobile && <DrawerHeader />}
+        <Sidebar open={isMobile ? true : open} />
+      </Drawer>
      <Box
+
   component="main"
   sx={{
     flex: 1,
     bgcolor: "#f8f9fa",
     pt: { xs: showSearch ? 16 : 10, md: 10 },
     px: { xs: 1, sm: 3, md: 5 },
-    overflowY: "auto"
+    overflowY: "auto",
+    ml: isSettingsPage ? 0 : undefined
   }}
-> 
-<Box sx={{ display: "flex", width: "100%" }}>
-
-  <Box sx={{ flex: 1 }}>
-    <Outlet />
-  </Box>
-</Box>
-  
+>
+  <Outlet />
 </Box>
     </Box>
   );

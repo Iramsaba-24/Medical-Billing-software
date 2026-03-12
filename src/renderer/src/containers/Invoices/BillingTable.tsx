@@ -1,3 +1,4 @@
+ 
 import { useEffect, useState } from "react";
 import { Box, Paper,  Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -227,5 +228,4 @@ const BillingTable = ({  invoices, setInvoices }: Props) => {
     </FormProvider>
   );
 };
-
 export default BillingTable;

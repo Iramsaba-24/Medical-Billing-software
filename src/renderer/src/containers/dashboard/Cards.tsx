@@ -3,7 +3,7 @@ import { Box, Card, Typography, Divider } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
 import { InventoryItem } from "@/containers/inventory/AddInventoryItem";
-
+ 
 type FilterType = "Today" | "6 Days" | "This Month";
 interface PurchaseData {
   totalPrice: number;
@@ -27,11 +27,11 @@ interface Medicine {
   name: string;
   qty: number;
 }
-
+ 
 interface Invoice {
   medicines: Medicine[];
 }
-
+ 
 const cardsConfig: CardInfo[] = [
   {
     title: "Inventory",
@@ -82,13 +82,13 @@ const cardsConfig: CardInfo[] = [
     },
   },
 ];
-
+ 
 const filterOptions = [
   { label: "Today", value: "Today" },
   { label: "6 Days", value: "6 Days" },
   { label: "This Month", value: "This Month" },
 ];
-
+ 
 const getGridArea = (title: string) => {
   switch (title) {
     case "Inventory":
@@ -110,35 +110,35 @@ interface SalesData {
   date: string;
   time: string;
 }
-
+ 
 const Cards: React.FC = () => {
-
+ 
   // filter for the dropdown
   const getFilteredSalesData = (filter: FilterType): SalesData[] => {
   const stored = localStorage.getItem("invoices");
   if (!stored) return [];
-
+ 
   const sales: SalesData[] = JSON.parse(stored);
   const today = new Date();
-
+ 
   return sales.filter((sale) => {
     const date = new Date(sale.date);
     switch (filter) {
       case "Today":
         return date.toDateString() === today.toDateString();
-
+ 
 case "6 Days": {
   const sixDaysAgo = new Date();
   sixDaysAgo.setDate(today.getDate() - 6);
   return date >= sixDaysAgo && date <= today;
 }
-
+ 
       case "This Month":
         return (
           date.getMonth() === today.getMonth() &&
           date.getFullYear() === today.getFullYear()
         );
-
+ 
       default:
         return true;
     }
@@ -146,25 +146,25 @@ case "6 Days": {
 };
 const getDailyReportData = (filter: FilterType) => {
   const filteredSales = getFilteredSalesData(filter);
-
+ 
   const totalSales = filteredSales.reduce(
     (sum, sale) => sum + sale.totalPrice,
     0
   );
-
+ 
   // jar purchase data vegla localStorage madhe asel tar
   const storedPurchase = localStorage.getItem("purchaseData");
   let totalPurchase = 0;
-
+ 
   if (storedPurchase) {
   const purchases: PurchaseData[] = JSON.parse(storedPurchase);
-
+ 
   totalPurchase = purchases.reduce(
     (sum: number, p: PurchaseData) => sum + p.totalPrice,
     0
   );
   }
-
+ 
   return {
     sales: `₹ ${totalSales.toFixed(2)}`,
     purchase: `₹ ${totalPurchase.toFixed(2)}`,
@@ -173,51 +173,51 @@ const getDailyReportData = (filter: FilterType) => {
 const getTopSellingMedicine = (): string => {
   const stored = localStorage.getItem("invoices");
   if (!stored) return "No Data";
-
+ 
   const invoices: Invoice[] = JSON.parse(stored);
-
+ 
   const counts: Record<string, number> = {};
-
+ 
   invoices.forEach((sale) => {
     sale.medicines?.forEach((med) => {
       const name = med.name;
-
+ 
       counts[name] = (counts[name] || 0) + (med.qty || 1);
     });
   });
-
+ 
   let topMedicine = "";
   let highest = 0;
-
+ 
   Object.entries(counts).forEach(([name, qty]) => {
     if (qty > highest) {
       highest = qty;
       topMedicine = name;
     }
   });
-
+ 
   return topMedicine || "No Data";
 };
-
+ 
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
     1: "This Month",
     2: "This Month",
   });
-
+ 
   const methodsArray = [
     useForm({ defaultValues: { filter: "This Month" } }),
     useForm({ defaultValues: { filter: "This Month" } }),
     useForm({ defaultValues: { filter: "This Month" } }),
   ];
-
+ 
   const handleFilterChange = (index: number) => (value: string) => {
     setFilters((prev) => ({
       ...prev,
       [index]: value as FilterType,
     }));
   };
-
+ 
   // fetch total medicines from local storage
   const totalMedicines = (): string => {
   const data = localStorage.getItem("inventory");
@@ -227,7 +227,7 @@ const getTopSellingMedicine = (): string => {
   const parsedData: InventoryItem[] = JSON.parse(data);
   return parsedData.length.toString();
   };
-
+ 
   //fetch total medicine group from local storage
   const totalMedicineGroups =() : string =>
   {
@@ -265,11 +265,11 @@ const getTopSellingMedicine = (): string => {
           const filter = filters[index];
           const info = card.data[filter];
           const methods = methodsArray[index];
-
+ 
           return (
             <Card
               key={index}
-              
+             
               sx={{
                 gridArea: getGridArea(card.title),
                 p: 3,
@@ -286,7 +286,7 @@ const getTopSellingMedicine = (): string => {
               {/* Header */}
               <Box display="flex" justifyContent="space-between" mb={2} gap={2}>
                 <Typography fontWeight={600} fontSize={{xs:16, md:18}}>{card.title}</Typography>
-
+ 
                 <FormProvider {...methods}>
                   <Box width={200} height={50}>
                     <DropdownField
@@ -297,13 +297,13 @@ const getTopSellingMedicine = (): string => {
                   </Box>
                 </FormProvider>
               </Box>
-
+ 
               <Divider sx={{ mb: 2 }} />
-
+ 
               {/* Content */}
               {card.title === "Daily Report" ? (
                 <Box display="flex" flexDirection="column" gap={2}>
-
+ 
                   {/* Sales */}
                   <Box>
                     <Typography fontWeight={700}>
@@ -330,7 +330,7 @@ const getTopSellingMedicine = (): string => {
                       />
                     </Box>
                   </Box>
-
+ 
                   {/* Purchase */}
                   <Box>
                     <Typography fontWeight={700}>
@@ -372,7 +372,7 @@ const getTopSellingMedicine = (): string => {
                       {info?.leftLabel}
                     </Typography>
                   </Box>
-
+ 
                   <Box>
                     <Typography fontSize={24} fontWeight={700}>
                       {/* {info?.rightValue} */}
@@ -388,11 +388,12 @@ const getTopSellingMedicine = (): string => {
               )}
             </Card>
           );
-          
+         
         })}
       </Box>
     </Box>
   );
 };
-
+ 
 export default Cards;
+ 

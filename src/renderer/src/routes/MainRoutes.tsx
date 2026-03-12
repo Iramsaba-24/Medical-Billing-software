@@ -2,7 +2,7 @@ import { RouteObject } from "react-router-dom";
 import Layout from "@/containers/layout/Header";
 import { URL_PATH } from "@/constants/UrlPath";
 import Invoices from "@/view/Invoices";
-import CreateInvoice from "@/containers/Invoices/CreateInvoice";
+
 import InvoiceView from "@/containers/Invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
 // import InventoryList from "@/containers/inventory/InvetoryList";
@@ -36,6 +36,9 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
+
+import CreateInvoice from "@/containers/Invoices/CreateInvoice";
+
 
 export const mainRoutes: RouteObject[] = [
   {
