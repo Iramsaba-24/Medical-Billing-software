@@ -19,6 +19,7 @@ type TextInputFieldProps = TextFieldProps & {
   rows?: number;
   sx?: SxProps<Theme>;
   rules?: RegisterOptions;
+   pattern?: string;
 };
 
 const TextInputField: FC<TextInputFieldProps> = ({
