@@ -1,5 +1,5 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
-import { useFormContext, useWatch } from "react-hook-form"; 
+import { useFormContext} from "react-hook-form"; 
 import TextInputField from "@/components/controlled/TextInputField";
 import NumericField from "@/components/controlled/NumericField";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
@@ -28,42 +28,26 @@ const btnStyle = {
 
 type Props = {
   finalAmount: number;
+  onSuccess: () => void;
 };
 
-const CardPayment = ({ finalAmount }: Props) => {
+const CardPayment = ({ finalAmount, onSuccess }: Props) => {
 
-  const { handleSubmit, control } = useFormContext(); 
+  const { handleSubmit } = useFormContext();
 
-  const paymentMethod = useWatch({ 
-    control,
-    name: "paymentMethod",
-  });
-
-  const [status, setStatus] = useState<"default" | "loading" | "success">("default");
+  const [status, setStatus] =
+    useState<"default" | "loading" | "success">("default");
 
   const onPay = () => {
+
     setStatus("loading");
 
     setTimeout(() => {
+
       setStatus("success");
 
-      const storedInvoice = localStorage.getItem("currentInvoice");
-      if (storedInvoice) {
-        const invoice = JSON.parse(storedInvoice);
-        const existingSales = JSON.parse(localStorage.getItem("salesData") || "[]");
+      onSuccess();   // parent logic call
 
-        existingSales.push({
-          invoice: invoice.id?.toString() || Date.now().toString(),
-          patient: invoice.name,
-          date: invoice.date,
-          price: invoice.totalPrice,
-          status: "Paid",
-          medicines: invoice.medicines || [],
-        });
-
-        localStorage.setItem("salesData", JSON.stringify(existingSales));
-        localStorage.removeItem("currentInvoice");
-      }
     }, 1500);
   };
 
@@ -110,7 +94,7 @@ const CardPayment = ({ finalAmount }: Props) => {
             <TextInputField
               label="Card Number"
               name="CardNumber"
-              disabled={paymentMethod !== "credit-card"} 
+              // disabled={paymentMethod !== "credit-card"} 
               inputType="numbers"
               minLength={13}
               maxLength={19}
@@ -129,7 +113,7 @@ const CardPayment = ({ finalAmount }: Props) => {
             <TextInputField
               label="Card Holder Name"
               name="CardHolderName"
-              disabled={paymentMethod !== "credit-card"} 
+              // disabled={paymentMethod !== "credit-card"} 
               inputType="alphabet"
               minLength={3}
               maxLength={50}
@@ -146,7 +130,7 @@ const CardPayment = ({ finalAmount }: Props) => {
             <NumericField
               label="CVV"
               name="Cvv"
-              disabled={paymentMethod !== "credit-card"} 
+              // disabled={paymentMethod !== "credit-card"} 
               decimal={false}
               maxlength={3}
               max={999}
@@ -157,7 +141,7 @@ const CardPayment = ({ finalAmount }: Props) => {
             type="button"
             variant="contained"
             onClick={handleSubmit(onPay)}
-            disabled={paymentMethod !== "credit-card"} 
+            // disabled={paymentMethod !== "credit-card"} 
             sx={{
               ...btnStyle,
               width: { xs: "100%", sm: "auto" },

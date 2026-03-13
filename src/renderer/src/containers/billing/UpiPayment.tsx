@@ -28,10 +28,6 @@ const btnStyle = {
   },
 };
 
-type Props = {
-  finalAmount: number;
- 
-};
 
 const upiIcons: Record<string, string> = {
   gpay: gpayIcon,
@@ -57,43 +53,28 @@ const getUpiApp = (upiId?: string) => {
   return "upi";
 };
 
-const UpiPayment = ({ finalAmount }: Props) => {
-  const { handleSubmit, control } = useFormContext();
+type Props = {
+  finalAmount: number;
+  onSuccess: () => void;
+};
 
-  const paymentMethod = useWatch({
-    control,
-    name: "paymentMethod",
-  });
-
+const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
   const [status, setStatus] = useState<"default" | "loading" | "success">("default");
+  const { handleSubmit, control } = useFormContext();
+  const paymentMethod = useWatch({
+  control,
+  name: "paymentMethod",
+});
 
   const onPay = () => {
+
     setStatus("loading");
 
     setTimeout(() => {
+
       setStatus("success");
 
-      const storedInvoice = localStorage.getItem("currentInvoice");
-
-      if (storedInvoice) {
-        const invoice = JSON.parse(storedInvoice);
-
-        const existingSales = JSON.parse(
-          localStorage.getItem("salesData") || "[]"
-        );
-
-        existingSales.push({
-          invoice: invoice.id?.toString() || Date.now().toString(),
-          patient: invoice.name,
-          date: invoice.date,
-          price: invoice.totalPrice,
-          status: "Paid",
-          medicines: invoice.medicines || [],
-        });
-
-        localStorage.setItem("salesData", JSON.stringify(existingSales));
-        localStorage.removeItem("currentInvoice");
-      }
+      onSuccess(); 
 
     }, 2000);
   };

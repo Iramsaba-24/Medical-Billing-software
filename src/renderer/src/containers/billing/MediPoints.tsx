@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
-import PrintIcon from "@mui/icons-material/Print";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import TextInputField from "@/components/controlled/TextInputField";
+import InvoiceTabButtons from "./InvoiceTabButtons";
 
 type MediPointsForm = {
   totalAmount: string;
@@ -43,7 +43,7 @@ const MediPoints: React.FC = () => {
 
   const [used, setUsed] = useState(0);
   const [remains, setRemains] = useState(10);
-  const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
+
   const [isInvalid, setIsInvalid] = useState(false);
 
   const methods = useForm<MediPointsForm>({
@@ -118,45 +118,7 @@ const MediPoints: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <Box sx={{ display: "flex" }}>
-  <Button
-    onClick={() => {
-      setActiveTab("new");
-      navigate(URL_PATH.Invoices);
-    }}
-    sx={{
-      textTransform: "none",
-      width: { xs: "50%", md: "10%" },
-      height: "38px",
-      fontWeight: 500,
-      borderRadius: "0px 18px 0px 0px",
-      backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-      color: activeTab === "new" ? "#fff" : "#000",
-      border: activeTab === "new" ? "none" : "1px solid #ccc",
-    }}
-  >
-    New Invoice
-  </Button>
-
-  <Button
-    onClick={() => {
-      setActiveTab("retail");
-      navigate(URL_PATH.RetailInvoice);
-    }}
-    sx={{
-      textTransform: "none",
-      width: { xs: "50%", md: "10%" },
-      height: "38px",
-      fontWeight: 500,
-      borderRadius: "0px 18px 0px 0px",
-      backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-      color: activeTab === "retail" ? "#fff" : "#000",
-      border: activeTab === "retail" ? "none" : "1px solid #ccc",
-    }}
-  >
-    Retail Invoice
-  </Button>
-</Box>
+   <InvoiceTabButtons/>
 
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
         <Paper
@@ -269,13 +231,7 @@ const MediPoints: React.FC = () => {
               Save & Continue
             </Button>
 
-            <Button
-              startIcon={<PrintIcon />}
-              variant="contained"
-              sx={{ ...PayNPrint, minWidth: "140px" }}
-            >
-              PRINT
-            </Button>
+           
           </Box>
         </Paper>
       </form>

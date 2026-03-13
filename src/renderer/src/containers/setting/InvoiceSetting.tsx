@@ -2,6 +2,7 @@ import { useForm, FormProvider, FieldValues } from "react-hook-form";
 import { Paper, Typography, Box, Button } from "@mui/material";
 import RadioField from "@/components/controlled/RadioField";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
+import { useEffect } from "react";
 
 const SettingSection = ({
   title,
@@ -50,7 +51,16 @@ const InvoiceSettings = () => {
     },
   });
 
-  const { handleSubmit, reset, register } = methods;
+  
+
+useEffect(() => {
+  const savedSettings = localStorage.getItem("invoiceSettings");
+  if (savedSettings) {
+    methods.reset(JSON.parse(savedSettings));
+  }
+}, [methods]);
+
+  const { handleSubmit, reset } = methods;
 
   const radioSx = {
     width: "100%",
@@ -102,92 +112,6 @@ const InvoiceSettings = () => {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
 
-          <SettingSection title="Invoice Types">
-            <CheckboxGroup
-              name="invoice_types"
-              label=""
-              options={[
-                { label: "Retail", value: "retail" },
-                { label: "Wholesale", value: "wholesale" },
-                { label: "GST Invoice", value: "gst" },
-              ]}
-              sx={checkboxSx}
-            />
-          </SettingSection>
-
-          <SettingSection title="Invoice Numbering Series">
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, mb: 2 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <Typography fontSize="14px">Retail Series</Typography>
-                <input {...register("retail_series")} style={{ width: "120px", padding: "4px" }} />
-              </Box>
-
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <Typography fontSize="14px">Wholesales Series</Typography>
-                <input {...register("wholesale_series")} style={{ width: "120px", padding: "4px" }} />
-              </Box>
-
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <Typography fontSize="14px">GST Series</Typography>
-                <input {...register("gst_series")} style={{ width: "120px", padding: "4px" }} />
-              </Box>
-            </Box>
-
-            <CheckboxGroup
-              name="invoice_settings"
-              label=""
-              options={[
-                { label: "Auto-increment", value: "auto_increment" },
-                { label: "Lock series after first use", value: "lock_series" },
-              ]}
-              sx={checkboxSx}
-            />
-          </SettingSection>
-
-          <SettingSection title="Tax Mode">
-            <RadioField
-              name="tax_mode"
-              label=""
-              options={[
-                { label: "Inclusive of GST", value: "inclusive_gst" },
-                { label: "Exclusive of GST", value: "exclusive_gst" },
-              ]}
-              sx={radioSx}
-            />
-
-            <CheckboxGroup
-              name="tax_override"
-              label=""
-              options={[
-                { label: "Allow override per invoice", value: "override_per_invoice" },
-              ]}
-              sx={checkboxSx}
-            />
-
-          </SettingSection>
-
-          <SettingSection title="Discount Rules">
-            <RadioField
-              name="discount_rule"
-              label=""
-              options={[
-                { label: "Item-level discount", value: "item_level" },
-                { label: "Bill-level discount", value: "bill_level" },
-              ]}
-              sx={radioSx}
-            />
-
-            <CheckboxGroup
-              name="discount_options"
-              label=""
-              options={[
-                { label: "Allow both (with priority rules)", value: "allow_both" },
-              ]}
-              sx={checkboxSx}
-            />
-
-          </SettingSection>
-
           <SettingSection title="Default Payment Mode">
             <RadioField
               name="payment_method"
@@ -220,29 +144,6 @@ const InvoiceSettings = () => {
                 { label: "Show GST break-up", value: "show_gst_breakup" },
                 { label: "Show HSN code", value: "show_hsn_code" },
                 { label: "Print duplicate copy", value: "print_duplicate_copy" },
-              ]}
-              sx={checkboxSx}
-            />
-          </SettingSection>
-
-          <SettingSection title="Date Control">
-            <CheckboxGroup
-              name="date_control"
-              label=""
-              options={[
-                { label: "Allow back dated invoices", value: "allow_back_dated" },
-              ]}
-              sx={checkboxSx}
-            />
-          </SettingSection>
-
-          <SettingSection title="Cancel & Return Rules">
-            <CheckboxGroup
-              name="credit_control"
-              label=""
-              options={[
-                { label: "Allow invoice cancellation", value: "allow_cancellation" },
-                { label: "Allow sales return", value: "allow_sales_return" },
               ]}
               sx={checkboxSx}
             />

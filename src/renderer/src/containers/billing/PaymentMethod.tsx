@@ -1,15 +1,14 @@
-
 import { useForm, FormProvider, useWatch } from "react-hook-form";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
+
 import CardPayment from "@/containers/billing/CardPayment";
 import UpiPayment from "@/containers/billing/UpiPayment";
-import { URL_PATH } from "@/constants/UrlPath";
-import { useNavigate, useLocation } from "react-router-dom";
 import CashPayment from "@/containers/billing/CashPayment";
+import InvoiceTabButtons from "./InvoiceTabButtons";
 import RadioField from "@/components/controlled/RadioField";
 
-export type PaymentMethods = {
+type PaymentMethods = {
   paymentMethod: "credit-card" | "upi" | "cash";
   CardNumber?: string;
   CardHolderName?: string;
@@ -17,21 +16,18 @@ export type PaymentMethods = {
   UpiId?: string;
 };
 const radioStyle = {
-  "& .MuiRadio-root": {
+  "& .MuiRadio-root": {  
     color: "default.main",
-    "&.Mui-checked": {
+    "&.Mui-checked": {  
       color: "#238878",
     },
   },
 };
-
-export type RetailInvoiceItem = {
-  total: number;
-};
-
 const PaymentMethod = () => {
   const methods = useForm<PaymentMethods>({
-    defaultValues: { paymentMethod: "credit-card" },
+    defaultValues: {
+      paymentMethod: "credit-card",
+    },
   });
 
   const payment = useWatch({
@@ -39,153 +35,114 @@ const PaymentMethod = () => {
     name: "paymentMethod",
   });
 
-  const [finalAmount, setFinalAmount] = useState<number>(0);
-  const [activeTab, setActiveTab] = useState<"new" | "retail">("new");
+  const [finalAmount, setFinalAmount] = useState(0);
 
-  const navigate = useNavigate();
-  const location = useLocation();
 useEffect(() => {
+  const storedInvoice = localStorage.getItem("currentInvoice");
+  const storedRetail = localStorage.getItem("currentRetailInvoice");
 
-  const storedSettings = localStorage.getItem("distributorSettings");
+  //  currentInvoice 
+  if (storedInvoice) {
+    const invoice = JSON.parse(storedInvoice);
+    setFinalAmount(invoice.totalPrice || 0);
 
-  if (activeTab === "retail" && storedSettings) {
-
-    const settings = JSON.parse(storedSettings);
-
-    const method = settings.payment_method;
-
-    if (method === "UPI") {
-      methods.setValue("paymentMethod", "upi");
-    } 
-    else if (method === "Cash") {
-      methods.setValue("paymentMethod", "cash");
-    } 
-    else if (method === "Credit") {
-      methods.setValue("paymentMethod", "credit-card");
+    // DistributorSettings  payment method 
+    const distributorSettings = localStorage.getItem("distributorSettings");
+    if (distributorSettings) {
+      const settings = JSON.parse(distributorSettings);
+      if (settings.payment_method) {
+        methods.setValue("paymentMethod", settings.payment_method);
+      }
     }
-
-  } 
-  else if (activeTab === "new") {
-
-    methods.setValue("paymentMethod", "credit-card");
-
-  }
-}, [activeTab]);
-useEffect(() => {
-
-  if (location.pathname === URL_PATH.RetailInvoice) {
-    setActiveTab("retail");
   }
 
-  if (location.pathname === URL_PATH.Billing) {
-    setActiveTab("new");
-  }
+if (storedRetail) {
+  const retail = JSON.parse(storedRetail);
+  setFinalAmount(retail.totalPrice || 0);
+}
+}, []);
 
-}, [location.pathname]);
-
-  useEffect(() => {
+  // central save logic
+  const saveInvoice = () => {
     const storedInvoice = localStorage.getItem("currentInvoice");
-    const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+    const storedRetail = localStorage.getItem("currentRetailInvoice");
 
-    if (activeTab === "retail" && storedRetailInvoice) {
-      const retailInvoices: RetailInvoiceItem[] = JSON.parse(storedRetailInvoice);
-      const total = retailInvoices.reduce((sum, item) => sum + item.total, 0);
-      setFinalAmount(total);
-    } else if (storedInvoice) {
+    if (storedInvoice) {
       const invoice = JSON.parse(storedInvoice);
-      setFinalAmount(invoice.totalPrice);
-    } else {
-      setFinalAmount(0);
+
+      const existingSales = JSON.parse(
+        localStorage.getItem("salesData") || "[]",
+      );
+
+      existingSales.push({
+        invoice: invoice.id?.toString() || Date.now().toString(),
+        patient: invoice.name,
+        date: invoice.date,
+        price: invoice.totalPrice,
+        status: "Paid",
+        medicines: invoice.medicines || [],
+      });
+
+      localStorage.setItem("salesData", JSON.stringify(existingSales));
+      localStorage.removeItem("currentInvoice");
     }
-  }, [activeTab]); 
+
+    if (storedRetail) {
+      const retailInvoices = JSON.parse(storedRetail);
+
+      const existingRetail = JSON.parse(
+        localStorage.getItem("retailInvoices") || "[]",
+      );
+
+      const updatedRetail = [...existingRetail, ...retailInvoices];
+
+      localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
+
+      localStorage.removeItem("currentRetailInvoice");
+    }
+  };
 
   return (
     <FormProvider {...methods}>
-      <form noValidate>
-        {/* Invoice type buttons */}
-        <Button
-          onClick={() => {
-            setActiveTab("new");
-            if (location.pathname !== URL_PATH.Billing) navigate(URL_PATH.Billing);
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-            color: activeTab === "new" ? "#fff" : "#000",
-            border: activeTab === "new" ? "none" : "1px solid #ccc",
-            "&:hover": {
-              backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
-            },
-          }}
-        >
-          New Invoice
-        </Button>
 
-        <Button
-          onClick={() => {
-            setActiveTab("retail");
-            if (location.pathname !== URL_PATH.RetailInvoice)
-              navigate(URL_PATH.RetailInvoice);
-          }}
-          sx={{
-            textTransform: "none",
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-            color: activeTab === "retail" ? "#fff" : "#000",
-            border: activeTab === "retail" ? "none" : "1px solid #ccc",
-            "&:hover": {
-              backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-            },
-          }}
-        >
-          Retail Invoice
-        </Button>
+      {/* Top Buttons */}
+      <InvoiceTabButtons />
 
-        <Box
-          display="flex"
-          flexDirection="column"
-          sx={{
-            border: "1px solid #ccc",
-            gap: { xs: 2, sm: 3 },
-            backgroundColor: "#fff",
-            p: { xs: 2, sm: 3 },
-          }}
-        >
-                    <Box>
+      {/* Outer Box (same as old design) */}
+      <Box
+  display="flex"
+  flexDirection="column"
+  sx={{
+    border: "1px solid #ccc",
+    gap: { xs: 2, sm: 3 },
+    backgroundColor: "#fff",
+    p: { xs: 2, sm: 3 },
+  }}
+>
+        <Box display="flex" gap={2} mb={1}>
   <RadioField
     name="paymentMethod"
-    label=""
     options={[
-      { label: "Debit/Credit Card", value: "credit-card" },
-      { label: "UPI", value: "upi" },
+      { label: "Credit / Debit Card", value: "credit-card" },
+      { label: "UPI Payment", value: "upi" },
       { label: "Cash", value: "cash" },
     ]}
-    row
+    label=""
     sx={radioStyle}
   />
 </Box>
-
-          {/* Pass finalAmount & payment prop */}
-{payment === "credit-card" && (
-    <CardPayment finalAmount={finalAmount} />
+  {payment === "credit-card" && (
+    <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
   )}
 
   {payment === "upi" && (
-    <UpiPayment finalAmount={finalAmount} />
+    <UpiPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
   )}
 
   {payment === "cash" && (
-    <CashPayment payment={payment} />
+    <CashPayment payment={payment} finalAmount={finalAmount} onSuccess={saveInvoice} />
   )}
-        </Box>
-      </form>
+</Box>
     </FormProvider>
   );
 };

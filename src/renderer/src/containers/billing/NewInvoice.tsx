@@ -1,33 +1,34 @@
 import {
   Box,
   Grid,
-  Typography,
   Paper,
   Button,
-  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
+
 import {
   FormProvider,
   useForm,
-  useFieldArray,
-  FieldErrors,
+  FieldErrors
 } from "react-hook-form";
-import PrintIcon from "@mui/icons-material/Print";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+
+
 import { useState, useEffect } from "react";
+
 import EmailField from "@/components/controlled/EmailField";
 import MobileField from "@/components/controlled/MobileField";
 import TextInputField from "@/components/controlled/TextInputField";
-import DropdownField from "@/components/controlled/DropdownField";
-import { useNavigate, useLocation } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-import { FormControl,InputLabel,Select,MenuItem} from "@mui/material";
 
+import InvoiceTabButtons from "./InvoiceTabButtons";
+import ItemsSection from "@/containers/customer/ItemsSection";
 
-/* STYLES */
-const TEAL_COLOR = "#2D8B7A";
 const BORDER_COLOR = "#D1D5DB";
 
 const containerStyle = {
@@ -52,18 +53,6 @@ const PayNPrint = {
   },
 };
 
-type InventoryItem = {
-  itemName: string;
-  pricePerUnit: number;
-};
-
-
-type ItemRow = {
-  name: string;
-  qty: number;
-  mrp: number;
-  discount: number;
-};
 type Distributor = {
   id: string;
   companyName: string;
@@ -80,99 +69,94 @@ type FormData = {
   mobile: string;
   email: string;
   address: string;
-  gst: string;
-  items: ItemRow[];
 };
 
-const RetailInvoice = () => {
+type ItemRow = {
+  id: number;
+  name: string;
+  qty: number | "";
+  price: number | "";
+};
+
+const NewInvoice = () => {
+
   const navigate = useNavigate();
-  const location = useLocation();  
+
   const [distributors, setDistributors] = useState<Distributor[]>([]);
+
+
+  const [rows, setRows] = useState<ItemRow[]>([
+    { id: Date.now(), name: "", qty: 1, price: "" }
+  ]);
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  /*  GRAND TOTAL */
+
+  const finalTotal = rows.reduce((sum, r) => {
+    return sum + Number(r.qty || 0) * Number(r.price || 0);
+  }, 0);
 
   const methods = useForm<FormData>({
     mode: "onSubmit",
     shouldUnregister: false,
-    defaultValues: {
-      gst: "5",
-      items: [{ name: "", qty: 1, mrp: 0, discount: 0 }],
-    },
   });
 
-  const {
-    handleSubmit,
-    watch,
-    control,
-  } = methods;
+  const { handleSubmit, watch } = methods;
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "items",
-  });
-
-  const items = watch("items") || [];
-  const gst = Number(watch("gst") || 0);
-
-  const getRowAmount = (row: ItemRow) => {
-    const qty = Number(row.qty || 0);
-    const mrp = Number(row.mrp || 0);
-    const discount = Number(row.discount || 0);
-
-    const priceAfterDiscount = mrp - discount;
-    if (priceAfterDiscount <= 0) return 0;
-
-    return qty * priceAfterDiscount;
-  };
-   const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
-
-
-  const subTotal = items.reduce(
-    (sum, row) => sum + getRowAmount(row),
-    0
-  );
-
-const [inventory, setInventory] = useState<InventoryItem[]>([]);
-
-const inventoryOptions = inventory.map((item) => ({
-  label: item.itemName,
-  value: item.itemName,
-}));
-
-
+  /* LOAD DISTRIBUTORS */
 
   useEffect(() => {
-  const saved = localStorage.getItem("distributors");
-  if (saved) {
-    const parsed: Distributor[] = JSON.parse(saved);
-    setDistributors(parsed);
-  }
-}, []);
 
-  const gstAmount = (subTotal * gst) / 100;
-  const finalTotal = subTotal + gstAmount;
+    const saved = localStorage.getItem("distributors");
+
+    if (saved) {
+      const parsed: Distributor[] = JSON.parse(saved);
+      setDistributors(parsed);
+    }
+
+  }, []);
+
   const selectedCompany = watch("company");
 
+  
   const onSubmit = (data: FormData) => {
-    console.log("FORM SUBMITTED:", data);
 
-    const existingInvoices = JSON.parse(localStorage.getItem("currentRetailInvoice") || "[]");
+    setIsSubmitted(true);
 
-    // map each item in the invoice separately
-    const formattedInvoices = data.items.map((row) => ({
-      id: Date.now() + Math.random(), // unique ID
+    if (rows.some(r => !r.name || !r.qty || !r.price)) {
+      showToast("error", "Please fill all item details");
+      return;
+    }
+
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentNewInvoice") || "[]"
+    );
+
+    const newInvoice = {
+      id: Date.now(),
       company: data.company,
       supplier: data.supplier,
-      item: row.name,
-      quantity: row.qty,
-      mrp: row.mrp,
-      total: row.qty * (row.mrp - (row.discount || 0)),
-    }));
+      mobile: data.mobile,
+      email: data.email,
+      address: data.address,
+      items: rows,
+      totalPrice: finalTotal
+    };
 
-    const updatedInvoices = [...existingInvoices, ...formattedInvoices];
+    const updatedInvoices = [...existingInvoices, newInvoice];
 
-    localStorage.setItem("currentRetailInvoice", JSON.stringify(updatedInvoices));
+    localStorage.setItem(
+      "currentNewInvoice",
+      JSON.stringify(updatedInvoices)
+    );
 
     showToast("success", "Data saved successfully!");
-    navigate(URL_PATH.PaymentDetails);
+
+
+    navigate(URL_PATH.PaymentMethod, {
+      state: { totalFromInvoice: finalTotal }
+    });
   };
 
   const onError = (formErrors: FieldErrors<FormData>) => {
@@ -180,138 +164,93 @@ const inventoryOptions = inventory.map((item) => ({
     showToast("error", "Please fill all required fields");
   };
 
- const companyOptions = distributors
-  .filter((d) => d.status === "Active")
-  .map((d) => ({
-    label: d.companyName,
-    value: d.companyName,
-  }));
+  /* COMPANY OPTIONS */
 
+  const companyOptions = distributors
+    .filter((d) => d.status === "Active")
+    .map((d) => ({
+      label: d.companyName,
+      value: d.companyName,
+    }));
 
-  useEffect(() => {
-  const savedInventory = localStorage.getItem("inventory");
-  if (savedInventory) {
-    const parsed: InventoryItem[] = JSON.parse(savedInventory);
-    setInventory(parsed);
-  }
-}, []);
-
+  /* AUTO FILL */
 
   useEffect(() => {
-  if (selectedCompany) {
-    const selectedDistributor = distributors.find(
-      (d) => d.companyName === selectedCompany
-    );
 
-    if (selectedDistributor) {
-      methods.setValue("mobile", selectedDistributor.mobile || "");
-      methods.setValue("email", selectedDistributor.email || "");
-      methods.setValue("address", selectedDistributor.address || "");
-      methods.setValue("supplier", selectedDistributor.ownerName || "");
+    if (selectedCompany) {
+
+      const selectedDistributor = distributors.find(
+        (d) => d.companyName === selectedCompany
+      );
+
+      if (selectedDistributor) {
+
+        methods.setValue("mobile", selectedDistributor.mobile || "");
+        methods.setValue("email", selectedDistributor.email || "");
+        methods.setValue("address", selectedDistributor.address || "");
+        methods.setValue("supplier", selectedDistributor.ownerName || "");
+
+      }
+
     }
-  }
-}, [selectedCompany, distributors, methods]);
 
-
+  }, [selectedCompany, distributors, methods]);
 
   return (
-    <FormProvider {...methods}>
-         <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.Billing) {
-            navigate(URL_PATH.Billing);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-          color: activeTab === "new" ? "#fff" : "#000",
-          border: activeTab === "new" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        New Invoice
-      </Button>
 
-      {/* Retail Invoice */}
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.RetailInvoice) {
-            navigate(URL_PATH.RetailInvoice);
-          } 
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-          color: activeTab === "retail" ? "#fff" : "#000",
-          border: activeTab === "retail" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        Retail Invoice
-      </Button>
-      
+    <FormProvider {...methods}>
+
+      <InvoiceTabButtons />
+
       <Paper sx={{ p: 2 }}>
+
         <form
           onSubmit={handleSubmit(onSubmit, onError)}
           noValidate
         >
+
           <Box sx={containerStyle}>
+
             <Grid container spacing={3}>
+
               <Grid size={{ xs: 12, md: 6 }}>
+
                 <FormControl fullWidth>
-  <InputLabel>Company</InputLabel>
-  <Select
-    value={methods.watch("company") || ""}
-    label="Company"
-    onChange={(e) => {
-      methods.setValue("company", e.target.value);
-    }}
-  >
-    {companyOptions.map((option) => (
-      <MenuItem key={option.value} value={option.value}>
-        {option.label}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
+
+                  <InputLabel>Company</InputLabel>
+
+                  <Select
+                    value={methods.watch("company") || ""}
+                    label="Company"
+                    onChange={(e) => {
+                      methods.setValue("company", e.target.value);
+                    }}
+                  >
+
+                    {companyOptions.map((option) => (
+
+                      <MenuItem key={option.value} value={option.value}>
+                        {option.label}
+                      </MenuItem>
+
+                    ))}
+
+                  </Select>
+
+                </FormControl>
 
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextInputField
-                  name="supplier"
-                  label="Supplier"
-                  required
-                />
+                <TextInputField name="supplier" label="Supplier" required />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <MobileField
-                  name="mobile"
-                  label="Mobile Number"
-                  required
-                />
+                <MobileField name="mobile" label="Mobile Number" required countryCode/>
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <EmailField
-                  name="email"
-                  label="Email Address"
-                  required
-                />
+                <EmailField name="email" label="Email Address" required />
               </Grid>
 
               <Grid size={{ xs: 12 }}>
@@ -322,139 +261,19 @@ const inventoryOptions = inventory.map((item) => ({
                   rows={3}
                 />
               </Grid>
+
             </Grid>
+
           </Box>
 
           {/* ITEMS */}
-          <Box sx={containerStyle}>
-            <Box display="flex" justifyContent="space-between" mb={3}>
-              <Typography variant="h6">Item Name</Typography>
 
-              <Button
-                type="button"
-                startIcon={<AddIcon />}
-                onClick={() =>
-                  append({
-                    name: "",
-                    qty: 1,
-                    mrp: 0,
-                    discount: 0,
-                  })
-                }
-                sx={{ textTransform: "none", color: TEAL_COLOR }}
-              >
-                Add Item
-              </Button>
-            </Box>
-
-            {fields.map((field, index) => (
-              <Grid container spacing={2} mb={2} key={field.id}>
-                <Grid size={{ xs: 12, md: 3 }}>
-        
-<DropdownField
-  name={`items.${index}.name`}
-  label="Item"
-  options={inventoryOptions}
-  required
-  freeSolo={false}
-  onChangeCallback={(selectedValue) => {
-    const selectedItem = inventory.find(
-      (item) => item.itemName === selectedValue
-    );
-
-    if (selectedItem) {
-      methods.setValue(
-        `items.${index}.mrp`,
-        selectedItem.pricePerUnit
-      );
-    } else {
-      methods.setValue(`items.${index}.mrp`, 0);
-    }
-  }}
-/>
-
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 2 }}>
-                  <TextInputField
-                    name={`items.${index}.qty`}
-                    label="QTY"
-                    type="number"
-                    required
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 2 }}>
-                  <TextInputField
-                    name={`items.${index}.mrp`}
-                    label="MRP"
-                    type="number"
-                    required
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 2 }}>
-                  <TextInputField
-                    name={`items.${index}.discount`}
-                    label="DISCOUNT"
-                    type="number"
-                  />
-                </Grid>
-
-                <Grid size={{ xs: 12, md: 2 }}>
-                  <TextField
-                    fullWidth
-                    label="Amount"
-                    disabled
-                    value={getRowAmount(items[index]).toFixed(2)}
-                  />
-                </Grid>
- 
-                {/* <Grid size={{ xs: 12, md: 1 }}> */}
-                <Grid textAlign={{ xs: "right", md: "center" }} size={{ xs: 12, md: 1 }}>
-                  <Button
-                    type="button"
-                    onClick={() => remove(index)}
-                    disabled={fields.length === 1}
-                  >
-                    <RemoveIcon />
-                  </Button>
-                </Grid>
-              </Grid>
-            ))}
-
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, md: 3 }}>
-                <DropdownField
-                  name="gst"
-                  label="GST (%)"
-                  options={[
-                    { label: "5%", value: "5" },
-                    { label: "12%", value: "12" },
-                    { label: "18%", value: "18" },
-                  ]}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 3 }} ml="auto">
-                <Box
-                  sx={{
-                    height: 56,
-                    backgroundColor: "#E6F4F1",
-                    borderRadius: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 700,
-                    fontSize: "1.1rem",
-                    color: TEAL_COLOR,
-                  }}
-                >
-                  Total: ₹ {finalTotal.toFixed(2)}
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
+          <ItemsSection
+            rows={rows}
+            setRows={setRows}
+            finalTotal={finalTotal}
+            isSubmitted={isSubmitted}
+          />
 
           <Box
             display="flex"
@@ -465,30 +284,23 @@ const inventoryOptions = inventory.map((item) => ({
               flexWrap: "wrap",
             }}
           >
+
             <Button
               variant="contained"
               type="submit"
-              
-              sx={{...PayNPrint,minWidth: "140px"}}
+              sx={{ ...PayNPrint, minWidth: "140px" }}
             >
               Save And Submit
             </Button>
 
-            <Button
-              variant="contained"
-              startIcon={<PrintIcon />}
-              type="button"
-              onClick={() => window.print()}
-              sx={{...PayNPrint, minWidth: "140px"}}
-            >
-              Print
-            </Button>
           </Box>
 
         </form>
+
       </Paper>
+
     </FormProvider>
   );
 };
 
-export default RetailInvoice;
+export default NewInvoice;

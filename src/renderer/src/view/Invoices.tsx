@@ -2,9 +2,7 @@ import { Box, Divider, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState, useMemo } from "react";
-
-import BillingTable from "@/containers/Invoices/BillingTable";
-
+import BillingTable from "@/containers/invoices/BillingTable";
 import { URL_PATH } from "@/constants/UrlPath";
 
 import { Invoice } from "@/types/invoice";
@@ -300,7 +298,7 @@ useEffect(() => {
       <BillingTable
         invoices={invoices}
         setInvoices={setInvoices}
-        onCreate={() => navigate(URL_PATH.CreateInvoice)}
+        onCreate={() => navigate(URL_PATH.EditInvoice)}
         onView={(invoice: Invoice) =>
           navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
             state: invoice,

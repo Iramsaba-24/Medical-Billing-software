@@ -1,6 +1,6 @@
-import { Paper, Typography, Box } from '@mui/material';
+import { Paper, Typography } from '@mui/material';
 import RadioField from '@/components/controlled/RadioField';
-import DropdownField from '@/components/controlled/DropdownField';
+// import DropdownField from '@/components/controlled/DropdownField';
 
 const PaymentTerms = () => {
   const radioOptions = [
@@ -15,11 +15,11 @@ const PaymentTerms = () => {
     mb: 1,
   };
   
-  const creditDays = [
-    { label: "30 Months", value: "30" },
-    { label: "60 Months", value: "60" },
-    { label: "90 Months", value: "90" }
-  ]
+  // const creditDays = [
+  //   { label: "30 Months", value: "30" },
+  //   { label: "60 Months", value: "60" },
+  //   { label: "90 Months", value: "90" }
+  // ]
 
   return (
     // Payment Terms card style
@@ -46,16 +46,16 @@ const PaymentTerms = () => {
         }}
       />
       {/* dropdown - credit days */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
+      {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
         <Typography sx={{ fontSize: '16px' }}>Credit Days</Typography>
 
         <DropdownField
           name="creditDays"
           options={creditDays}
-          sx={{ width: 150, minWidth: 150 }}
-          //isStatic={true}
-        />
-      </Box>
+          sx={{ width: 150, minWidth: 150 }} */}
+          {/* //isStatic={true}
+        /> */}
+      {/* </Box> */}
     </Paper>
   );
 };

@@ -2,10 +2,22 @@ import { useLocation,  } from "react-router-dom";
 import { Box, Typography, Paper,} from "@mui/material";
 import BankInfo from "./BankInfo";
 import RetailInvoiceList from "./RetailInvoiceList";
+import { useEffect, useState } from "react";
 
 const DistributorDetails = () => {
   const { state } = useLocation();
   const data = state?.distributor;
+const [showBankDetails, setShowBankDetails] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("distributorSettings");
+
+    if (stored) {
+      const settings = JSON.parse(stored);
+
+      setShowBankDetails(settings.bank_details?.includes("bank_details"));
+    }
+  }, []);
 
   if (!data) return <Typography p={3}>Distributor not found!</Typography>;
 // fields for BankInfo and DistributorDetails
@@ -35,9 +47,11 @@ const DistributorDetails = () => {
         <BankInfo title="Distributor Details" details={distributorFields} />
       </Paper>
       {/* BankInfo  */}
-       <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 3 }}>
-        <BankInfo title="Bank Details" details={bankFields} />
-      </Paper>
+      {showBankDetails && (
+        <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 3 }}>
+          <BankInfo title="Bank Details" details={bankFields} />
+        </Paper>
+      )}
       {/* InventoryList call */}
         <RetailInvoiceList />
       

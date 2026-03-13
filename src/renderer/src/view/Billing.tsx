@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import ItemsSection from "@/containers/customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
-import RetailInvoice from "@/containers/billing/NewInvoice";
+import InvoiceTabButtons from "@/containers/billing/InvoiceTabButtons";
+import NewInvoice from "@/containers/billing/NewInvoice";
+import EmailField from "@/components/controlled/EmailField";
+
 
 // Payprint button reuse sx
 const PayNPrint = {
@@ -36,8 +38,8 @@ type Doctor = {
   address: string;
   status: "Active";
 };
- 
-type NewInvoiceFormValues = {
+
+type RetailInvoiceFormValues = {
   name: string;
   age: string;
   mobile: string;
@@ -47,12 +49,11 @@ type NewInvoiceFormValues = {
   addressLeft: string;
   addressRight: string;
 };
- 
-function POSMaster() {
+
+function RetailInvoice() {
   const navigate = useNavigate();
   const location = useLocation();
-  const methods = useForm<NewInvoiceFormValues>({
-  reValidateMode: "onChange",
+  const methods = useForm<RetailInvoiceFormValues>({
     defaultValues: {
       name: "",
       age: "",
@@ -65,14 +66,10 @@ function POSMaster() {
     },
     mode: "onChange",
   });
- 
-  const activeTab: "new" | "retail" = location.pathname.includes(
-    "retail-invoice",
-  )
-    ? "retail"
-    : "new";
-  const isRetail = activeTab === "retail";
- 
+
+ const isRetail = location.pathname.includes("retail-invoice");
+  
+
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
   const [isSubmitted, setIsSubmitted] = useState(false);
  
@@ -98,44 +95,51 @@ function POSMaster() {
   });
  
   // saved to local storage
-  const onSubmit = (data: NewInvoiceFormValues) => {
-    setIsSubmitted(true);
-    const hasInvalidItems = rows.some(
-      (row) =>
-        row.name.trim() === "" ||
-        row.qty === "" ||
-        Number(row.qty) <= 0 ||
-        row.price === "" ||
-        Number(row.price) <= 0,
-    );
-    if (hasInvalidItems) {
-      return;
-    }
- 
-    const now = new Date();
-    const invoiceData = {
-      invoice: `INV-${Date.now()}`,
-      name: data.name,
-      age: data.age,
-      mobile: data.mobile,
-      email: data.email,
-      doctor: data.doctor,
-      address: data.addressLeft,
-      medicines: rows.map((r) => ({
-        name: r.name,
-        qty: r.qty,
-        amount: Number(r.qty || 0) * Number(r.price || 0),
-      })),
-      totalPrice: finalTotal,
-      status: "Paid",
-      date: now.toLocaleDateString(),
-      time: now.toLocaleTimeString(),
-    };
-    localStorage.setItem("currentInvoice", JSON.stringify(invoiceData));
-    console.log("Saved Invoice:", invoiceData);
-    navigate(URL_PATH.MediPoints, { state: { totalFromInvoice: finalTotal } });
+ const onSubmit = (data: RetailInvoiceFormValues) => {
+  setIsSubmitted(true);
+
+  const hasInvalidItems = rows.some(
+    (row) =>
+      row.name.trim() === "" ||
+      row.qty === "" ||
+      Number(row.qty) <= 0 ||
+      row.price === "" ||
+      Number(row.price) <= 0
+  );
+
+  if (hasInvalidItems) return;
+
+  const now = new Date();
+
+  const invoiceData = {
+    invoice: `INV-${Date.now()}`,
+    name: data.name,
+    age: data.age,
+    mobile: data.mobile,
+    email: data.email,
+    doctor: data.doctor,
+    address: data.addressLeft,
+
+    medicines: rows.map((r) => ({
+      name: r.name,
+      qty: r.qty,
+      price: r.price,
+      amount: Number(r.qty || 0) * Number(r.price || 0),
+    })),
+
+    totalPrice: finalTotal,
+    status: "Paid",
+    date: now.toLocaleDateString(),
+    time: now.toLocaleTimeString(),
+    paymentMode,
   };
- 
+
+  localStorage.setItem("currentRetailPayment", paymentMode); // state save
+  localStorage.setItem("currentRetailInvoice", JSON.stringify(invoiceData));
+ navigate(URL_PATH.MediPoints, {
+  state: { totalFromInvoice: finalTotal }
+});
+};
   type ItemRow = {
     id: number;
     name: string;
@@ -144,7 +148,7 @@ function POSMaster() {
   };
  
   type InvoiceData = {
-    form: NewInvoiceFormValues;
+    form: RetailInvoiceFormValues;
     rows: ItemRow[];
     gst: number;
     paymentMode: string;
@@ -215,12 +219,15 @@ function POSMaster() {
   }, []);
  
   const selectedDoctorName = methods.watch("doctor");
- 
-  const nameOptions = customerOptions.map((customer) => ({
+
+  const nameOptions = [
+  { label: "+ Add Customer", value: "add_customer" },
+  ...customerOptions.map((customer) => ({
     label: customer.name,
     value: customer.name,
-  }));
- 
+  })),
+];
+
   const selectedCustomerName = methods.watch("name");
  
   // when name change
@@ -271,61 +278,16 @@ function POSMaster() {
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
     0,
   );
- 
-  const finalTotal = subTotal + (subTotal * gst) / 100;
- 
+
+ const finalTotal = subTotal;
+
   return (
     <FormProvider {...methods}>
-      {/* New Invoice */}
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.Billing) {
-            navigate(URL_PATH.Billing);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-          color: activeTab === "new" ? "#fff" : "#000",
-          border: activeTab === "new" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        New Invoice
-      </Button>
- 
-      {/* Retail Invoice */}
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.RetailInvoice) {
-            navigate(URL_PATH.RetailInvoice);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-          color: activeTab === "retail" ? "#fff" : "#000",
-          border: activeTab === "retail" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        Retail Invoice
-      </Button>
- 
-      {isRetail ? (
-        <RetailInvoice />
+      {/* invoice tab button */}
+     
+<InvoiceTabButtons/>
+      {!isRetail ? (
+        <NewInvoice />
       ) : (
         <Box
           sx={{
@@ -370,8 +332,8 @@ function POSMaster() {
                     }));
  
                     navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
-                  }}
-                >
+                  }}>
+                
                   Invoice {invoiceNumber}
                 </Button>
               );
@@ -394,29 +356,24 @@ function POSMaster() {
                     flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <DropdownField
-                        name="name"
-                        label="Name"
-                        options={nameOptions}
-                        required
-                        onlyAlphabet
-                        freeSolo // typing allowed
-                        editable={true}
-                       
-                        placeholder="Select or Type Name"
-                      />
+                     <DropdownField
+  name="name"
+  label="Name"
+  options={nameOptions}
+  required
+  onlyAlphabet
+  freeSolo
+  editable={true}
+
+/>
                     </Box>
  
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <NumericField name="age" label="Age" maxlength={3} />
                     </Box>
                   </Box>
- 
-                  <Box
-                    display="flex"
-                    gap={2}
-                    flexDirection={{ xs: "column", sm: "row" }}
-                  >
+
+                  <Box display="flex" gap={2} flexDirection={{ xs: "column", sm: "row" }}>
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <MobileField
                         name="mobile"
@@ -427,20 +384,7 @@ function POSMaster() {
                     </Box>
  
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <TextInputField
-                        name="email"
-                        label="Email"
-                        rules={{
-                          required: "Email is required",
-                          validate: (value: string) => {
-                            if (!/[@]/.test(value))
-                              return "Add special character (@)";
-                            if (!/[.]/.test(value))
-                              return "Add special character (.)";
-                            return true;
-                          },
-                        }}
-                      />
+                      <EmailField name="email" label="Email"/>
                     </Box>
                   </Box>
  
@@ -458,8 +402,8 @@ function POSMaster() {
                   flex={1}
                   display="flex"
                   flexDirection="column"
-                  gap={{ xs: 2, md: 1.5 }}
-                >
+                  gap={{ xs: 2, md: 1.5 }}>
+                
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <DropdownField
                       name="doctor"
@@ -476,24 +420,22 @@ function POSMaster() {
                       name="addressRight"
                       label="Address"
                       inputType="textarea"
-                      rows={3}
-                    />
+                      rows={3}/>
+                    
                   </Box>
                 </Box>
               </Box>
             </Paper>
  
             <Box mt={3}>
-              <ItemsSection
+             
+               <ItemsSection
                 rows={rows}
                 setRows={setRows}
-                gst={gst}
-                setGst={setGst}
-                paymentMode={paymentMode}
-                setPaymentMode={setPaymentMode}
                 finalTotal={finalTotal}
                 isSubmitted={isSubmitted}
-              />
+              /> 
+              
             </Box>
  
             {/* Bottom pay print button */}
@@ -517,17 +459,7 @@ function POSMaster() {
               >
                 Save & Continue
               </Button>
-              <Button
-                variant="outlined"
-                startIcon={<Print />}
-                sx={{
-                  ...PayNPrint,
-                  minWidth: "140px",
-                }}
-                onClick={() => window.print()}
-              >
-                Print
-              </Button>
+              
             </Box>
           </form>
         </Box>
@@ -535,7 +467,5 @@ function POSMaster() {
     </FormProvider>
   );
 }
- 
-export default POSMaster;
- 
- 
+
+export default RetailInvoice;

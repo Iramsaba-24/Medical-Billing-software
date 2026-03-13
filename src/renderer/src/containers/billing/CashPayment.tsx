@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Paper, Box, Button, TextField, Typography } from "@mui/material";
 import TextInputField from "@/components/controlled/TextInputField";
 
@@ -7,13 +7,11 @@ type CashRow = {
   qty: string;
 };
 
-type RetailInvoiceItem = {
-  total: number;
-};
+// type RetailInvoiceItem = {
+//   total: number;
+// };
 
-type Props = {
-  payment: string;
-};
+
 
 const PaperStyle = {
   borderRadius: 2,
@@ -30,8 +28,13 @@ const btnStyle = {
   textTransform: "none",
 };
 
+type Props = {
+  payment: "credit-card" | "upi" | "cash";
+  finalAmount: number;
+  onSuccess: () => void;
+};
 
-const CashPayment = ({ payment }: Props) => {
+const CashPayment = ({ payment, finalAmount}: Props) => {
   const paymentMethod = payment;
 
   const [cashRows, setCashRows] = useState<CashRow[]>(
@@ -41,26 +44,26 @@ const CashPayment = ({ payment }: Props) => {
     })),
   );
 
-  const [finalAmount, setFinalAmount] = useState<number>(0);
+  // const [finalAmount, setFinalAmount] = useState<number>(0);
 
-  useEffect(() => {
-    const storedInvoice = localStorage.getItem("currentInvoice");
-    const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+// useEffect(() => {
+//   const storedInvoice = localStorage.getItem("currentInvoice");
+//   const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
 
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
-      setFinalAmount(invoice.totalPrice);
-    }
+//   if (storedInvoice) {
+//     const invoice = JSON.parse(storedInvoice);
+//     setFinalAmount(invoice.totalPrice);
+//   }
 
-    if (storedRetailInvoice) {
-      const retailInvoices: RetailInvoiceItem[] =
-        JSON.parse(storedRetailInvoice);
+//   if (storedRetailInvoice) {
+//     const retailInvoices: RetailInvoiceItem[] =
+//       JSON.parse(storedRetailInvoice);
 
-      const total = retailInvoices.reduce((sum, item) => sum + item.total, 0);
+//     const total = retailInvoices.reduce((sum, item) => sum + item.total, 0);
 
-      setFinalAmount(total);
-    }
-  }, []);
+//     setFinalAmount(total);
+//   }
+// }, []);
 
   const updateCashRow = (index: number, value: string) => {
     setCashRows((prev) =>
