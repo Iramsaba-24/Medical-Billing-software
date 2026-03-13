@@ -10,6 +10,8 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import ItemsSection from "@/containers/customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
 
+import { useNavigate } from "react-router-dom";
+
 export interface ItemRow {
   id: number;
   name: string;
@@ -25,18 +27,21 @@ interface StoredDoctor {
 }
 
 interface Props {
-  onBack: () => void;
-  onSave: (
+  onBack?: () => void;
+  onSave?: (
     data: CustomerData,
     total: number,
     meds: string,
     qty: number,
     actualRows: ItemRow[]
   ) => void;
-  initialData: CustomerData | null;
+  initialData?: CustomerData | null;
 }
 
+
+
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<ItemRow[]>([
     { id: Date.now(), name: "", qty: "", price: "" },
   ]);
@@ -72,6 +77,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
 
     input.value = value;
   };
+
+    
 
   const buttonStyle: SxProps<Theme> = {
     backgroundColor: "#238878",
@@ -148,13 +155,17 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
 
     const meds = rows.map((r) => r.name).join(", ");
 
-    onSave(
+    onSave?.(
       data,
       total,
       meds,
       rows.length,
       rows
     );
+   
+if (!initialData) {
+  navigate("/billing/retail-invoice");
+}
   }
 };
 
@@ -174,7 +185,7 @@ const finalTotal = rows.reduce(
         {/* Header */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <Typography variant="h5" fontWeight="bold">
-            Edit Customer
+      {initialData ? "Edit Customer" : "Add Customer"}
           </Typography>
 
           <Button

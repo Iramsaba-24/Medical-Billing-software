@@ -12,6 +12,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useEffect, useState } from "react";
 import InvoiceTabButtons from "./InvoiceTabButtons";
+import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 // form fields
 type PaymentMethods = {
@@ -55,6 +57,7 @@ const btnStyle = {
 
 // component
 const PaymentMethod = () => {
+  const navigate = useNavigate();
   const methods = useForm<PaymentMethods>({
     defaultValues: {
       paymentMethod: "credit-card",
@@ -207,6 +210,9 @@ if (storedInvoice) {
         localStorage.setItem("newInvoices", JSON.stringify(updatedRetail));
         localStorage.removeItem("currentNewInvoice");
       }
+       setTimeout(() => {
+      navigate(URL_PATH.NewInvoiceBill);
+    }, 1000);
     }, 2000);
   };
 
@@ -239,31 +245,7 @@ if (storedInvoice) {
     return null;
   };
 
-  // get final amount from local storage
   const [finalAmount, setFinalAmount] = useState<number>(0);
-
-
-//  useEffect(() => {
-//   const storedInvoice = localStorage.getItem("currentInvoice");
-//   const storednewInvoice = localStorage.getItem("currentNewInvoice");
-
-//   if (storedInvoice) {
-//     const invoice = JSON.parse(storedInvoice);
-//     setFinalAmount(invoice.totalPrice || 0);
-//     return;
-//   }
-
-//   if (storednewInvoice) {
-//     const newInvoices: RetailInvoiceItem[] = JSON.parse(storednewInvoice);
-
-//     const total = newInvoices.reduce(
-//       (sum, item) => sum + item.total,
-//       0
-//     );
-
-//     setFinalAmount(total);
-//   }
-// }, []);
 
 
 useEffect(() => {

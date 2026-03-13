@@ -65,7 +65,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
 
-      // 🔹 First check settings
+      // First check settings
       const savedSettings = localStorage.getItem("generalSettings");
 
       if (!savedSettings) return;

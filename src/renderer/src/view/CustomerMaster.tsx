@@ -170,7 +170,7 @@ const CustomerMaster = () => {
       {view === "list" && (
         <CustomerListPage 
           data={customerList} 
-          onAdd={() => { setSelectedCustomer(null); setView("add"); }} 
+  
           onView={(cust) => { setSelectedCustomer(cust); setView("view"); }} 
           onEdit={(cust) => { setSelectedCustomer(cust); setView("add"); }}
           onDelete={handleDeleteCustomer}
