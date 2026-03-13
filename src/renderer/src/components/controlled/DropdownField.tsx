@@ -68,6 +68,15 @@ const DropdownField: FC<DropdownFieldProps> = ({
         validate: (value: string) => {
           if (!required && !value) return true;
           if (!value) return translations.dropdownField.emptyError;
+          if (!freeSolo && value) {
+  const exists = options.some(
+    (opt) => opt.value.toLowerCase() === value.toLowerCase()
+  );
+
+  if (!exists) {
+    return "Please select item from list";
+  }
+}
           if (onlyAlphabet && value.length < 3) {
             return "Minimum 3 characters required";
           }
@@ -126,7 +135,7 @@ const DropdownField: FC<DropdownFieldProps> = ({
                 onChangeCallback?.(newValueStr);
               }}
               onInputChange={(_e, newInputValue, reason) => {
-                if (!(freeSolo && editable && reason === "input")) return;
+  if (!(editable && reason === "input")) return;
 
                 let filteredValue = newInputValue;
 

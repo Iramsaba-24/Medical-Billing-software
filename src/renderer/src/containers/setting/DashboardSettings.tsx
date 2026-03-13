@@ -98,14 +98,17 @@ const DashboardSettings = () => {
  
   const onSubmit = (data: DashboardSettingsForm) => {
     console.log("Submitted", data);
-    showToast("success","saved");
+    // showToast("success","saved");
+ 
+    localStorage.setItem("dashboardSettings", JSON.stringify(data.visibleKpis));
+    showToast("success", "Saved");
   };
  
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box sx={{ maxWidth: "100%", overflowX: "hidden" }}>
-          
+         
           <Box mb={2}>
           <Typography
           sx={{
@@ -264,7 +267,7 @@ const DashboardSettings = () => {
                 >
                   Reset
                 </Button>
-      
+     
                 <Button
                   type="submit"
                   variant="contained"
@@ -291,3 +294,5 @@ const DashboardSettings = () => {
 };
  
 export default DashboardSettings;
+ 
+ 

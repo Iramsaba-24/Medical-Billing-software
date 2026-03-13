@@ -481,350 +481,350 @@
 
 
 
-import { Box, Grid, Paper, Button } from "@mui/material";
-import {
-  FormProvider,
-  useForm,
-  useFieldArray,
-  FieldErrors,
-} from "react-hook-form";
-import PrintIcon from "@mui/icons-material/Print";
-import { useState, useEffect } from "react";
-import EmailField from "@/components/controlled/EmailField";
-import MobileField from "@/components/controlled/MobileField";
-import TextInputField from "@/components/controlled/TextInputField";
-import { useNavigate, useLocation } from "react-router-dom";
-import { showToast } from "@/components/uncontrolled/ToastMessage";
-import { URL_PATH } from "@/constants/UrlPath";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+// import { Box, Grid, Paper, Button } from "@mui/material";
+// import {
+//   FormProvider,
+//   useForm,
+//   useFieldArray,
+//   FieldErrors,
+// } from "react-hook-form";
+// import PrintIcon from "@mui/icons-material/Print";
+// import { useState, useEffect } from "react";
+// import EmailField from "@/components/controlled/EmailField";
+// import MobileField from "@/components/controlled/MobileField";
+// import TextInputField from "@/components/controlled/TextInputField";
+// import { useNavigate, useLocation } from "react-router-dom";
+// import { showToast } from "@/components/uncontrolled/ToastMessage";
+// import { URL_PATH } from "@/constants/UrlPath";
+// import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
-/* STYLES */
-const BORDER_COLOR = "#D1D5DB";
+// /* STYLES */
+// const BORDER_COLOR = "#D1D5DB";
 
-const containerStyle = {
-  p: { xs: 2 },
-  backgroundColor: "#fff",
-  borderRadius: "12px",
-  border: `1px solid ${BORDER_COLOR}`,
-  mb: 2,
-};
+// const containerStyle = {
+//   p: { xs: 2 },
+//   backgroundColor: "#fff",
+//   borderRadius: "12px",
+//   border: `1px solid ${BORDER_COLOR}`,
+//   mb: 2,
+// };
 
-const PayNPrint = {
-  backgroundColor: "#238878",
-  color: "#fff",
-  border: "2px solid #238878",
-  textTransform: "none",
-  minWidth: "250px",
-  height: "36px",
-  "&:hover": {
-    backgroundColor: "#fff",
-    color: "#238878",
-    border: "2px solid #238878",
-  },
-};
+// const PayNPrint = {
+//   backgroundColor: "#238878",
+//   color: "#fff",
+//   border: "2px solid #238878",
+//   textTransform: "none",
+//   minWidth: "250px",
+//   height: "36px",
+//   "&:hover": {
+//     backgroundColor: "#fff",
+//     color: "#238878",
+//     border: "2px solid #238878",
+//   },
+// };
 
-type InventoryItem = {
-  itemName: string;
-  pricePerUnit: number;
-};
+// type InventoryItem = {
+//   itemName: string;
+//   pricePerUnit: number;
+// };
 
-type ItemRow = {
-  name: string;
-  qty: number;
-  mrp: number;
-  discount: number;
-};
-type Distributor = {
-  id: string;
-  companyName: string;
-  ownerName?: string;
-  mobile: string;
-  email: string;
-  address: string;
-  status: "Active" | "Inactive";
-};
+// type ItemRow = {
+//   name: string;
+//   qty: number;
+//   mrp: number;
+//   discount: number;
+// };
+// type Distributor = {
+//   id: string;
+//   companyName: string;
+//   ownerName?: string;
+//   mobile: string;
+//   email: string;
+//   address: string;
+//   status: "Active" | "Inactive";
+// };
 
-type FormData = {
-  company: string;
-  supplier: string;
-  mobile: string;
-  email: string;
-  address: string;
-  gst: string;
-  items: ItemRow[];
-};
+// type FormData = {
+//   company: string;
+//   supplier: string;
+//   mobile: string;
+//   email: string;
+//   address: string;
+//   gst: string;
+//   items: ItemRow[];
+// };
 
-const RetailInvoice = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [distributors, setDistributors] = useState<Distributor[]>([]);
+// const RetailInvoice = () => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+//   const [distributors, setDistributors] = useState<Distributor[]>([]);
 
-  const methods = useForm<FormData>({
-    mode: "onChange",
-    shouldUnregister: false,
-    defaultValues: {
-      gst: "5",
-      items: [{ name: "", qty: 1, mrp: 0, discount: 0 }],
-    },
-  });
+//   const methods = useForm<FormData>({
+//     mode: "onChange",
+//     shouldUnregister: false,
+//     defaultValues: {
+//       gst: "5",
+//       items: [{ name: "", qty: 1, mrp: 0, discount: 0 }],
+//     },
+//   });
 
-  const { handleSubmit, watch, control } = methods;
+//   const { handleSubmit, watch, control } = methods;
 
-  useFieldArray({
-    control,
-    name: "items",
-  });
+//   useFieldArray({
+//     control,
+//     name: "items",
+//   });
 
-  const items = watch("items") || [];
-  const gst = Number(watch("gst") || 0);
+//   const items = watch("items") || [];
+//   const gst = Number(watch("gst") || 0);
 
-  const getRowAmount = (row: ItemRow) => {
-    const qty = Number(row.qty || 0);
-    const mrp = Number(row.mrp || 0);
-    const discount = Number(row.discount || 0);
+//   const getRowAmount = (row: ItemRow) => {
+//     const qty = Number(row.qty || 0);
+//     const mrp = Number(row.mrp || 0);
+//     const discount = Number(row.discount || 0);
 
-    const priceAfterDiscount = mrp - discount;
-    if (priceAfterDiscount <= 0) return 0;
+//     const priceAfterDiscount = mrp - discount;
+//     if (priceAfterDiscount <= 0) return 0;
 
-    return qty * priceAfterDiscount;
-  };
-  const activeTab: "new" | "retail" = location.pathname.includes(
-    "retail-invoice",
-  )
-    ? "retail"
-    : "new";
+//     return qty * priceAfterDiscount;
+//   };
+//   const activeTab: "new" | "retail" = location.pathname.includes(
+//     "retail-invoice",
+//   )
+//     ? "retail"
+//     : "new";
 
-  const subTotal = items.reduce((sum, row) => sum + getRowAmount(row), 0);
+//   const subTotal = items.reduce((sum, row) => sum + getRowAmount(row), 0);
 
-  const [, setInventory] = useState<InventoryItem[]>([]);
+//   const [, setInventory] = useState<InventoryItem[]>([]);
 
 
-  useEffect(() => {
-    const saved = localStorage.getItem("distributors");
-    if (saved) {
-      const parsed: Distributor[] = JSON.parse(saved);
-      setDistributors(parsed);
-    }
-  }, []);
+//   useEffect(() => {
+//     const saved = localStorage.getItem("distributors");
+//     if (saved) {
+//       const parsed: Distributor[] = JSON.parse(saved);
+//       setDistributors(parsed);
+//     }
+//   }, []);
 
-  const gstAmount = (subTotal * gst) / 100;
-  
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const finalTotal = subTotal + gstAmount;
-  const selectedCompany = watch("company");
+//   const gstAmount = (subTotal * gst) / 100;
 
-  const onSubmit = (data: FormData) => {
-    console.log("FORM SUBMITTED:", data);
+//   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+//   const finalTotal = subTotal + gstAmount;
+//   const selectedCompany = watch("company");
 
-    const existingInvoices = JSON.parse(
-      localStorage.getItem("currentRetailInvoice") || "[]",
-    );
+//   const onSubmit = (data: FormData) => {
+//     console.log("FORM SUBMITTED:", data);
 
-    // map each item in the invoice separately
-    const formattedInvoices = data.items.map((row) => ({
-      id: Date.now() + Math.random(), // unique ID
-      company: data.company,
-      supplier: data.supplier,
-      item: row.name,
-      quantity: row.qty,
-      mrp: row.mrp,
-      total: row.qty * (row.mrp - (row.discount || 0)),
-    }));
+//     const existingInvoices = JSON.parse(
+//       localStorage.getItem("currentRetailInvoice") || "[]",
+//     );
 
-    const updatedInvoices = [...existingInvoices, ...formattedInvoices];
+//     // map each item in the invoice separately
+//     const formattedInvoices = data.items.map((row) => ({
+//       id: Date.now() + Math.random(), // unique ID
+//       company: data.company,
+//       supplier: data.supplier,
+//       item: row.name,
+//       quantity: row.qty,
+//       mrp: row.mrp,
+//       total: row.qty * (row.mrp - (row.discount || 0)),
+//     }));
 
-    localStorage.setItem(
-      "currentRetailInvoice",
-      JSON.stringify(updatedInvoices),
-    );
+//     const updatedInvoices = [...existingInvoices, ...formattedInvoices];
 
-    showToast("success", "Data saved successfully!");
-    navigate(URL_PATH.PaymentDetails);
-  };
+//     localStorage.setItem(
+//       "currentRetailInvoice",
+//       JSON.stringify(updatedInvoices),
+//     );
 
-  const onError = (formErrors: FieldErrors<FormData>) => {
-    console.log("FORM ERRORS:", formErrors);
-    showToast("error", "Please fill all required fields");
-  };
+//     showToast("success", "Data saved successfully!");
+//     navigate(URL_PATH.PaymentDetails);
+//   };
 
-  const companyOptions = distributors
-    .filter((d) => d.status === "Active")
-    .map((d) => ({
-      label: d.companyName,
-      value: d.companyName,
-    }));
+//   const onError = (formErrors: FieldErrors<FormData>) => {
+//     console.log("FORM ERRORS:", formErrors);
+//     showToast("error", "Please fill all required fields");
+//   };
 
-  useEffect(() => {
-    const savedInventory = localStorage.getItem("inventory");
-    if (savedInventory) {
-      const parsed: InventoryItem[] = JSON.parse(savedInventory);
-      setInventory(parsed);
-    }
-  }, []);
+//   const companyOptions = distributors
+//     .filter((d) => d.status === "Active")
+//     .map((d) => ({
+//       label: d.companyName,
+//       value: d.companyName,
+//     }));
 
-  useEffect(() => {
-    if (selectedCompany) {
-      const selectedDistributor = distributors.find(
-        (d) => d.companyName === selectedCompany,
-      );
+//   useEffect(() => {
+//     const savedInventory = localStorage.getItem("inventory");
+//     if (savedInventory) {
+//       const parsed: InventoryItem[] = JSON.parse(savedInventory);
+//       setInventory(parsed);
+//     }
+//   }, []);
 
-      if (selectedDistributor) {
-        methods.setValue("mobile", selectedDistributor.mobile || "");
-        methods.setValue("email", selectedDistributor.email || "");
-        methods.setValue("address", selectedDistributor.address || "");
-        methods.setValue("supplier", selectedDistributor.ownerName || "");
-      }
-    }
-  }, [selectedCompany, distributors, methods]);
+//   useEffect(() => {
+//     if (selectedCompany) {
+//       const selectedDistributor = distributors.find(
+//         (d) => d.companyName === selectedCompany,
+//       );
 
-  return (
-    <FormProvider {...methods}>
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.Billing) {
-            navigate(URL_PATH.Billing);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-          color: activeTab === "new" ? "#fff" : "#000",
-          border: activeTab === "new" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        New Invoice
-      </Button>
+//       if (selectedDistributor) {
+//         methods.setValue("mobile", selectedDistributor.mobile || "");
+//         methods.setValue("email", selectedDistributor.email || "");
+//         methods.setValue("address", selectedDistributor.address || "");
+//         methods.setValue("supplier", selectedDistributor.ownerName || "");
+//       }
+//     }
+//   }, [selectedCompany, distributors, methods]);
 
-      {/* Retail Invoice */}
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.RetailInvoice) {
-            navigate(URL_PATH.RetailInvoice);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-          color: activeTab === "retail" ? "#fff" : "#000",
-          border: activeTab === "retail" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        Retail Invoice
-      </Button>
+//   return (
+//     <FormProvider {...methods}>
+//       <Button
+//         onClick={() => {
+//           if (location.pathname !== URL_PATH.Billing) {
+//             navigate(URL_PATH.Billing);
+//           }
+//         }}
+//         sx={{
+//           textTransform: "none",
+//           width: { xs: "50%", md: "10%" },
+//           height: "38px",
+//           fontWeight: 500,
+//           borderRadius: "0px 18px 0px 0px",
+//           backgroundColor: activeTab === "new" ? "#238878" : "#fff",
+//           color: activeTab === "new" ? "#fff" : "#000",
+//           border: activeTab === "new" ? "none" : "1px solid #ccc",
+//           "&:hover": {
+//             backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
+//           },
+//         }}
+//       >
+//         New Invoice
+//       </Button>
 
-      <Paper sx={{ p: 2 }}>
-        <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
-          <Box sx={containerStyle}>
-            <Grid container spacing={3}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth>
-                  <InputLabel>Company</InputLabel>
-                  <Select
-                    value={methods.watch("company") || ""}
-                    label="Company"
-                    onChange={(e) => {
-                      methods.setValue("company", e.target.value);
-                    }}
-                  >
-                    {companyOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+//       {/* Retail Invoice */}
+//       <Button
+//         onClick={() => {
+//           if (location.pathname !== URL_PATH.RetailInvoice) {
+//             navigate(URL_PATH.RetailInvoice);
+//           }
+//         }}
+//         sx={{
+//           textTransform: "none",
+//           width: { xs: "50%", md: "10%" },
+//           height: "38px",
+//           fontWeight: 500,
+//           borderRadius: "0px 18px 0px 0px",
+//           backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
+//           color: activeTab === "retail" ? "#fff" : "#000",
+//           border: activeTab === "retail" ? "none" : "1px solid #ccc",
+//           "&:hover": {
+//             backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
+//           },
+//         }}
+//       >
+//         Retail Invoice
+//       </Button>
 
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextInputField
-                  name="supplier"
-                  label="Supplier"
-                  inputType="alphabet"
-                  maxLength={30}
-                  required
-                />
-              </Grid>
+//       <Paper sx={{ p: 2 }}>
+//         <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
+//           <Box sx={containerStyle}>
+//             <Grid container spacing={3}>
+//               <Grid size={{ xs: 12, md: 6 }}>
+//                 <FormControl fullWidth>
+//                   <InputLabel>Company</InputLabel>
+//                   <Select
+//                     value={methods.watch("company") || ""}
+//                     label="Company"
+//                     onChange={(e) => {
+//                       methods.setValue("company", e.target.value);
+//                     }}
+//                   >
+//                     {companyOptions.map((option) => (
+//                       <MenuItem key={option.value} value={option.value}>
+//                         {option.label}
+//                       </MenuItem>
+//                     ))}
+//                   </Select>
+//                 </FormControl>
+//               </Grid>
 
-              <Grid size={{ xs: 12, md: 6 }}>
-                <MobileField
-                  name="mobile"
-                  label="Mobile Number"
-                  placeholder="Mobile Number"
-                  countryCode
-                  required
-                />
-              </Grid>
+//               <Grid size={{ xs: 12, md: 6 }}>
+//                 <TextInputField
+//                   name="supplier"
+//                   label="Supplier"
+//                   inputType="alphabet"
+//                   maxLength={30}
+//                   required
+//                 />
+//               </Grid>
 
-              <Grid size={{ xs: 12, md: 6 }}>
-                <EmailField name="email" 
-                label="Email Address" 
-                required 
-                  inputProps={{ maxLength: 254 }}
-                  />
-              </Grid>
+//               <Grid size={{ xs: 12, md: 6 }}>
+//                 <MobileField
+//                   name="mobile"
+//                   label="Mobile Number"
+//                   placeholder="Mobile Number"
+//                   countryCode
+//                   required
+//                 />
+//               </Grid>
 
-              <Grid size={{ xs: 12 }}>
-                <TextInputField
-                  name="address"
-                  label="Address"
-                  inputType="textarea"
-                  rows={3}
-                />
-              </Grid>
-            </Grid>
-          </Box>
+//               <Grid size={{ xs: 12, md: 6 }}>
+//                 <EmailField name="email" 
+//                 label="Email Address" 
+//                 required 
+//                   inputProps={{ maxLength: 254 }}
+//                   />
+//               </Grid>
 
-          {/* ITEMS */}
+//               <Grid size={{ xs: 12 }}>
+//                 <TextInputField
+//                   name="address"
+//                   label="Address"
+//                   inputType="textarea"
+//                   rows={3}
+//                 />
+//               </Grid>
+//             </Grid>
+//           </Box>
 
-                    <Box
-            display="flex"
-            gap={2}
-            mt={3}
-            sx={{
-              justifyContent: { xs: "center", md: "flex-end" },
-              flexWrap: "wrap",
-            }}
-          >
+//           {/* ITEMS */}
+
+//                     <Box
+//             display="flex"
+//             gap={2}
+//             mt={3}
+//             sx={{
+//               justifyContent: { xs: "center", md: "flex-end" },
+//               flexWrap: "wrap",
+//             }}
+//           >
          
 
-            <Button
-              variant="contained"
-              type="submit"
-              sx={{ ...PayNPrint, minWidth: "140px" }}
-            >
-              Save And Submit
-            </Button>
+//             <Button
+//               variant="contained"
+//               type="submit"
+//               sx={{ ...PayNPrint, minWidth: "140px" }}
+//             >
+//               Save And Submit
+//             </Button>
 
-            <Button
-              variant="contained"
-              startIcon={<PrintIcon />}
-              type="button"
-              onClick={() => window.print()}
-              sx={{ ...PayNPrint, minWidth: "140px" }}
-            >
-              Print
-            </Button>
-            </Box>
+//             <Button
+//               variant="contained"
+//               startIcon={<PrintIcon />}
+//               type="button"
+//               onClick={() => window.print()}
+//               sx={{ ...PayNPrint, minWidth: "140px" }}
+//             >
+//               Print
+//             </Button>
+//             </Box>
           
-        </form>
-      </Paper>
-    </FormProvider>
-  );
-};
+//         </form>
+//       </Paper>
+//     </FormProvider>
+//   );
+// };
 
-export default RetailInvoice;
+// export default RetailInvoice;
 

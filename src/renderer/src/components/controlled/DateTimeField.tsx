@@ -204,7 +204,7 @@
 
 import { type FC } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-
+ 
 import {
   DatePicker,
   TimePicker,
@@ -240,9 +240,8 @@ const allowPastCurrentFuture = (): Dayjs => {
 const allowCurrentFutureOnly = (): Dayjs => {
   return dayjs().startOf("day");
 };
-
 type ViewMode = "date" | "time" | "datetime" | "month" | "year" | "month-year";
-
+ 
 type DateFieldProps = {
   name: string;
   label: string;
@@ -254,7 +253,7 @@ type DateFieldProps = {
 } & Partial<DatePickerProps> &
   Partial<TimePickerProps> &
   Partial<DateTimePickerProps>;
-
+ 
 const DateTimeField: FC<DateFieldProps> = ({
   name,
   label,
@@ -280,7 +279,7 @@ const DateTimeField: FC<DateFieldProps> = ({
     if (dayjs.isDayjs(value)) return value;
     if (value instanceof Date) return dayjs(value);
     if (typeof value !== "string") return null;
-
+ 
     switch (viewMode) {
       case "year":
         return dayjs(value, "YYYY", true);
@@ -329,7 +328,6 @@ const DateTimeField: FC<DateFieldProps> = ({
     }
     return allowCurrentFutureOnly(); // default fallback
   };
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Controller
@@ -347,10 +345,10 @@ const DateTimeField: FC<DateFieldProps> = ({
           if (useCurrentDate && !field.value) {
             field.onChange(toStoreValue(dayjs()));
           }
-
+ 
           const parsedValue = parseValue(field.value);
           const hasError = !!errors[name];
-
+ 
           const commonProps = {
             label,
             value: parsedValue,
@@ -394,7 +392,7 @@ const DateTimeField: FC<DateFieldProps> = ({
                 },
               },
             },
-
+ 
             ...pickerProps,
           };
 
@@ -404,22 +402,22 @@ const DateTimeField: FC<DateFieldProps> = ({
           switch (viewMode) {
             case "time":
               return <TimePicker {...commonProps} />;
-
+ 
             case "datetime":
               return (
                 <DateTimePicker {...commonProps} format="DD-MM-YYYY HH:mm" />
               );
-
+ 
             case "month":
               return (
                 <DatePicker {...commonProps} views={["month"]} format="MMMM" />
               );
-
+ 
             case "year":
               return (
                 <DatePicker {...commonProps} views={["year"]} format="YYYY" />
               );
-
+ 
             case "month-year":
               return (
                 <DatePicker
@@ -429,7 +427,7 @@ const DateTimeField: FC<DateFieldProps> = ({
                   format="MMMM YYYY"
                 />
               );
-
+ 
             case "date":
             default:
               return (
@@ -445,5 +443,7 @@ const DateTimeField: FC<DateFieldProps> = ({
     </LocalizationProvider>
   );
 };
-
+ 
 export default DateTimeField;
+ 
+ 
