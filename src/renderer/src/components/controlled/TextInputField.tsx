@@ -96,7 +96,7 @@ const TextInputField: FC<TextInputFieldProps> = ({
             
             multiline={inputType === 'textarea' || inputType === 'all'}
             rows={inputType === 'textarea' || inputType === 'all' ? rows : undefined}
-            value={field.value || ''}
+            value={field.value ?? rest.value ?? ''}
             onChange={(e) => {
               const raw = e.target.value;
               const sanitized = sanitizeValue(raw);

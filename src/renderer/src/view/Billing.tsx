@@ -131,10 +131,11 @@ function RetailInvoice() {
     status: "Paid",
     date: now.toLocaleDateString(),
     time: now.toLocaleTimeString(),
+    paymentMode,
   };
 
-  localStorage.setItem("currentInvoice", JSON.stringify(invoiceData));
-
+  localStorage.setItem("currentRetailPayment", paymentMode); // state save
+  localStorage.setItem("currentRetailInvoice", JSON.stringify(invoiceData));
  navigate(URL_PATH.MediPoints, {
   state: { totalFromInvoice: finalTotal }
 });

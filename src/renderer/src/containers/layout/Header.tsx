@@ -1,23 +1,3 @@
-
-
-import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
-import {
-  Box,
-  Drawer,
-  AppBar,
-  Toolbar,
-  List,
-  CssBaseline,
-  Typography,
-  IconButton,
-  ListItem,
-  Tooltip,
-  InputBase,
-  Button,
-  useMediaQuery,
-} from "@mui/material";
-
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -34,9 +14,26 @@ import { Home } from "@mui/icons-material";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "../../constants/UrlPath";
-import Setting, { SettingRef } from "./Setting";
-import { useEffect } from "react";
 import LogoImage from "@/assets/icons.svg";
+import { useEffect } from "react";
+import {
+  AppBar,
+  Box,
+  Button,
+  CssBaseline,
+  Drawer,
+  IconButton,
+  InputBase,
+  List,
+  ListItem,
+  styled,
+  Toolbar,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import React from "react";
 
 const MINI_WIDTH = 90;
 const FULL_WIDTH = 240;
@@ -78,52 +75,46 @@ const menuItems = [
 const Sidebar = ({ open }: { open: boolean }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const settingRef = React.useRef<SettingRef>(null);
 
-   useEffect(() => {
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
- 
       // First check settings
       const savedSettings = localStorage.getItem("generalSettings");
- 
+
       if (!savedSettings) return;
- 
+
       try {
         const settings = JSON.parse(savedSettings);
- 
- 
+
         if (!settings.keyboardShortcuts) return;
- 
       } catch (error) {
         console.error("Error parsing settings", error);
         return;
       }
- 
- 
+
       if (!event.ctrlKey) return;
- 
+
       const key = event.key.toLowerCase();
- 
+
       const shortcutMap: Record<string, string> = {
         b: URL_PATH.Billing,
         i: URL_PATH.Invoices,
         r: URL_PATH.ReportPage,
         c: URL_PATH.Customer,
       };
- 
+
       if (shortcutMap[key]) {
         event.preventDefault();
         navigate(shortcutMap[key]);
       }
     };
- 
+
     document.addEventListener("keydown", handleKeyDown);
- 
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [navigate]);
- 
 
   return (
     <List sx={{ px: 1, mt: { xs: 6, md: 2 } }}>
@@ -144,14 +135,8 @@ const Sidebar = ({ open }: { open: boolean }) => {
               <Button
                 fullWidth
                 startIcon={item.icon}
-                variant={active ? "contained" : "contained"}
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                  if (isSettings) {
-                    settingRef.current?.openDropdown(e);
-                  } else {
-                    navigate(item.path);
-                  }
-                }}
+                variant="contained"
+                onClick={() => navigate(item.path)}
                 sx={{
                   justifyContent: open ? "flex-start" : "center",
                   minHeight: 44,
@@ -175,15 +160,16 @@ const Sidebar = ({ open }: { open: boolean }) => {
           </Tooltip>
         );
       })}
-      <Setting ref={settingRef} />
     </List>
   );
 };
 
 const Header: React.FC = () => {
+  const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
+  const isSettingsPage = location.pathname.startsWith(URL_PATH.Setting);
   const [open, setOpen] = React.useState(false);
   const [showSearch, setShowSearch] = React.useState(false);
 
@@ -229,10 +215,10 @@ const Header: React.FC = () => {
                 mr: 1,
               }}
             >
-              {pharmacyName}  
+              {pharmacyName}
             </Typography>
             <img
-              src={pharmacyLogo || LogoImage}  
+              src={pharmacyLogo || LogoImage}
               alt="logo"
               style={{ width: 50 }}
             />
@@ -302,14 +288,30 @@ const Header: React.FC = () => {
       </StyledAppBar>
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
-        open={isMobile ? open : true}
+        open={isMobile ? open : !isSettingsPage}
         onClose={() => setOpen(false)}
         sx={{
-          width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
+          width: isSettingsPage
+            ? 0
+            : isMobile
+              ? FULL_WIDTH
+              : open
+                ? FULL_WIDTH
+                : MINI_WIDTH,
+
           flexShrink: 0,
           whiteSpace: "nowrap",
+
           "& .MuiDrawer-paper": {
-            width: isMobile ? FULL_WIDTH : open ? FULL_WIDTH : MINI_WIDTH,
+            width: isSettingsPage
+              ? 0
+              : isMobile
+                ? FULL_WIDTH
+                : open
+                  ? FULL_WIDTH
+                  : MINI_WIDTH,
+
+            overflowX: "hidden",
             transition: "width 0.3s",
             boxSizing: "border-box",
             paddingTop: isMobile ? (showSearch ? 10 : 5) : 0,
@@ -327,6 +329,7 @@ const Header: React.FC = () => {
           pt: { xs: showSearch ? 16 : 10, md: 10 },
           px: { xs: 1, sm: 3, md: 5 },
           overflowY: "auto",
+          ml: isSettingsPage ? 0 : undefined,
         }}
       >
         <Outlet />
