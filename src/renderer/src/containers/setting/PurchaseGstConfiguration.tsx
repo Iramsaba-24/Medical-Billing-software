@@ -8,6 +8,14 @@ const PurchaseGSTConfiguration = () => {
     { label: "Validate supplier GSTIN", value: "validate_gstin" },
   ];
 
+  const checkboxStyle = {
+  "& .MuiCheckbox-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
+};
   return (
     <Paper sx={{ p: 2, borderRadius: "10px", boxShadow: 4, mb: 1 }}>
       <Typography
@@ -21,7 +29,7 @@ const PurchaseGSTConfiguration = () => {
       >
         Purchase GST Configuration
       </Typography>
-      <CheckboxGroup name="gst_settings" label="" options={options} />
+      <CheckboxGroup name="gst_settings" label="" options={options} sx={{...checkboxStyle}}/> 
     </Paper>
   );
 };

@@ -118,7 +118,7 @@ const MediPoints: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-   <InvoiceTabButtons/>
+      <InvoiceTabButtons />
 
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
         <Paper
@@ -147,7 +147,11 @@ const MediPoints: React.FC = () => {
                 border: "1px solid #bdbdbd",
               }}
             >
-              <InfoRow label="Earned:" value={`${earned} Pts.`} color="#1f8f7a" />
+              <InfoRow
+                label="Earned:"
+                value={`${earned} Pts.`}
+                color="#1f8f7a"
+              />
               <InfoRow label="Used:" value={`${used} Pts.`} />
               <InfoRow label="Remains:" value={`${remains} Pts.`} color="red" />
 
@@ -157,7 +161,8 @@ const MediPoints: React.FC = () => {
 
               <Box component="ul" sx={{ pl: 2 }}>
                 <Typography component="li">
-                  Medi Points is a smart reward system designed to thank customers for their loyalty.
+                  Medi Points is a smart reward system designed to thank
+                  customers for their loyalty.
                 </Typography>
                 <Typography component="li">
                   Points can be redeemed during billing.
@@ -230,8 +235,6 @@ const MediPoints: React.FC = () => {
             >
               Save & Continue
             </Button>
-
-           
           </Box>
         </Paper>
       </form>
@@ -240,4 +243,3 @@ const MediPoints: React.FC = () => {
 };
 
 export default MediPoints;
-

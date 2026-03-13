@@ -5,7 +5,6 @@ import { useState } from "react";
 import SettingsMenu from "./SettingsMenu";
 
 const Setting = () => {
-
   const [open, setOpen] = useState(false);
 
   const toggleDrawer = () => setOpen(!open);
@@ -20,7 +19,6 @@ const Setting = () => {
         ml: { xs: 0, md: -3 },
       }}
     >
-
       {/* Mobile Header */}
       <Box
         sx={{
@@ -28,7 +26,7 @@ const Setting = () => {
           alignItems: "center",
           px: 1,
           mt: 0,
-          mb: -5
+          mb: -5,
         }}
       >
         <IconButton onClick={toggleDrawer}>
@@ -69,7 +67,6 @@ const Setting = () => {
       >
         <Outlet />
       </Box>
-
     </Box>
   );
 };

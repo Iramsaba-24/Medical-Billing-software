@@ -7,12 +7,6 @@ type CashRow = {
   qty: string;
 };
 
-// type RetailInvoiceItem = {
-//   total: number;
-// };
-
-
-
 const PaperStyle = {
   borderRadius: 2,
   p: { xs: 1, sm: 2 },
@@ -43,27 +37,6 @@ const CashPayment = ({ payment, finalAmount}: Props) => {
       qty: "",
     })),
   );
-
-  // const [finalAmount, setFinalAmount] = useState<number>(0);
-
-// useEffect(() => {
-//   const storedInvoice = localStorage.getItem("currentInvoice");
-//   const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
-
-//   if (storedInvoice) {
-//     const invoice = JSON.parse(storedInvoice);
-//     setFinalAmount(invoice.totalPrice);
-//   }
-
-//   if (storedRetailInvoice) {
-//     const retailInvoices: RetailInvoiceItem[] =
-//       JSON.parse(storedRetailInvoice);
-
-//     const total = retailInvoices.reduce((sum, item) => sum + item.total, 0);
-
-//     setFinalAmount(total);
-//   }
-// }, []);
 
   const updateCashRow = (index: number, value: string) => {
     setCashRows((prev) =>

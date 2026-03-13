@@ -13,22 +13,24 @@ type DistributorFormValues = {
   report_settings: string[];
   export_format: string;
   payment_method?: string;
-  gst_settings?: string;
+  gst_settings?: string[];
   creditDays: string;
+};
+
+const DEFAULT_VALUES: DistributorFormValues = {
+  supplier_details: [],
+  product_linking: [],
+  credit_control: [],
+  bank_details: [],
+  report_settings: [],
+  export_format: "",
+  payment_method: "cash",
+  creditDays: "30",
+  gst_settings: ["Regular GST"],
 };
 const DistributorSettings = () => {
   const methods = useForm<DistributorFormValues>({
-    defaultValues: {
-      supplier_details: [],
-      product_linking: [],
-      credit_control: [],
-      bank_details: [],
-      report_settings: [],
-      export_format: "",
-      payment_method: "",
-      creditDays: "30",
-      gst_settings: "Regular GST",
-    },
+defaultValues: DEFAULT_VALUES,
   });
 
   const { handleSubmit, reset } = methods;
@@ -49,6 +51,15 @@ const DistributorSettings = () => {
       reset(JSON.parse(storedSettings));
     }
   }, [reset]);
+
+    const checkboxStyle = {
+  "& .MuiCheckbox-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
+};
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
       <Typography
@@ -83,6 +94,7 @@ const DistributorSettings = () => {
             <CheckboxGroup
               name="bank_details"
               label=""
+              sx={{...checkboxStyle}}
               options={[
                 { label: "Distributor bank details", value: "bank_details" },
               ]}
@@ -96,7 +108,7 @@ const DistributorSettings = () => {
             <Button
               type="button"
               variant="outlined"
-              onClick={() => reset()}
+              onClick={() => reset(DEFAULT_VALUES)}
               sx={{
                 color: "#238878",
                 border: "2px solid #238878",

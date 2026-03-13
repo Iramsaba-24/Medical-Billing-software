@@ -16,9 +16,9 @@ type PaymentMethods = {
   UpiId?: string;
 };
 const radioStyle = {
-  "& .MuiRadio-root": {  
+  "& .MuiRadio-root": {
     color: "default.main",
-    "&.Mui-checked": {  
+    "&.Mui-checked": {
       color: "#238878",
     },
   },
@@ -37,30 +37,35 @@ const PaymentMethod = () => {
 
   const [finalAmount, setFinalAmount] = useState(0);
 
-useEffect(() => {
-  const storedInvoice = localStorage.getItem("currentInvoice");
-  const storedRetail = localStorage.getItem("currentRetailInvoice");
+  useEffect(() => {
+    const storedInvoice = localStorage.getItem("currentInvoice");
+    const storedRetail = localStorage.getItem("currentRetailInvoice");
 
-  //  currentInvoice 
-  if (storedInvoice) {
-    const invoice = JSON.parse(storedInvoice);
-    setFinalAmount(invoice.totalPrice || 0);
+    if (storedInvoice) {
+      const invoice = JSON.parse(storedInvoice);
+      setFinalAmount(invoice.totalPrice || 0);
+    }
 
-    // DistributorSettings  payment method 
+    if (storedRetail) {
+      const retail = JSON.parse(storedRetail);
+      setFinalAmount(retail.totalPrice || 0);
+    }
+
+    // distributor settings
     const distributorSettings = localStorage.getItem("distributorSettings");
+
     if (distributorSettings) {
       const settings = JSON.parse(distributorSettings);
-      if (settings.payment_method) {
+
+      if (
+        settings.payment_method === "cash" ||
+        settings.payment_method === "upi" ||
+        settings.payment_method === "credit-card"
+      ) {
         methods.setValue("paymentMethod", settings.payment_method);
       }
     }
-  }
-
-if (storedRetail) {
-  const retail = JSON.parse(storedRetail);
-  setFinalAmount(retail.totalPrice || 0);
-}
-}, []);
+  }, []);
 
   // central save logic
   const saveInvoice = () => {
@@ -104,45 +109,48 @@ if (storedRetail) {
 
   return (
     <FormProvider {...methods}>
-
       {/* Top Buttons */}
       <InvoiceTabButtons />
 
       {/* Outer Box (same as old design) */}
       <Box
-  display="flex"
-  flexDirection="column"
-  sx={{
-    border: "1px solid #ccc",
-    gap: { xs: 2, sm: 3 },
-    backgroundColor: "#fff",
-    p: { xs: 2, sm: 3 },
-  }}
->
+        display="flex"
+        flexDirection="column"
+        sx={{
+          border: "1px solid #ccc",
+          gap: { xs: 2, sm: 3 },
+          backgroundColor: "#fff",
+          p: { xs: 2, sm: 3 },
+        }}
+      >
         <Box display="flex" gap={2} mb={1}>
-  <RadioField
-    name="paymentMethod"
-    options={[
-      { label: "Credit / Debit Card", value: "credit-card" },
-      { label: "UPI Payment", value: "upi" },
-      { label: "Cash", value: "cash" },
-    ]}
-    label=""
-    sx={radioStyle}
-  />
-</Box>
-  {payment === "credit-card" && (
-    <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
-  )}
+          <RadioField
+            name="paymentMethod"
+            options={[
+              { label: "Credit / Debit Card", value: "credit-card" },
+              { label: "UPI Payment", value: "upi" },
+              { label: "Cash", value: "cash" },
+            ]}
+            label=""
+            sx={radioStyle}
+          />
+        </Box>
+        {payment === "credit-card" && (
+          <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
+        )}
 
-  {payment === "upi" && (
-    <UpiPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
-  )}
+        {payment === "upi" && (
+          <UpiPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
+        )}
 
-  {payment === "cash" && (
-    <CashPayment payment={payment} finalAmount={finalAmount} onSuccess={saveInvoice} />
-  )}
-</Box>
+        {payment === "cash" && (
+          <CashPayment
+            payment={payment}
+            finalAmount={finalAmount}
+            onSuccess={saveInvoice}
+          />
+        )}
+      </Box>
     </FormProvider>
   );
 };

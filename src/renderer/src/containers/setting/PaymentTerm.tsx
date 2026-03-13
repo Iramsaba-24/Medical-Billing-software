@@ -5,7 +5,7 @@ import RadioField from '@/components/controlled/RadioField';
 const PaymentTerms = () => {
   const radioOptions = [
     { label: 'Cash', value: 'cash' },
-    { label: 'Credit', value: 'credit' },
+    { label: 'Credit', value: 'credit-card' },
     { label: 'UPI', value: 'upi' },
   ];
   const headingStyle = {
@@ -14,12 +14,15 @@ const PaymentTerms = () => {
     color: "#212529",
     mb: 1,
   };
+  const radioStyle = {
+  "& .MuiRadio-root": {  
+    color: "default.main",
+    "&.Mui-checked": {  
+      color: "#238878",
+    },
+  },
+};
   
-  // const creditDays = [
-  //   { label: "30 Months", value: "30" },
-  //   { label: "60 Months", value: "60" },
-  //   { label: "90 Months", value: "90" }
-  // ]
 
   return (
     // Payment Terms card style
@@ -33,6 +36,7 @@ const PaymentTerms = () => {
         label=""
         options={radioOptions}
         sx={{
+          ...radioStyle,
           width: '100%',
           '& .MuiFormControlLabel-root': {   //radio fields label styling
             width: '100%',

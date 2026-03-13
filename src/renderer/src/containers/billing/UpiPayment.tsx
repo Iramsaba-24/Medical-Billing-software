@@ -28,7 +28,6 @@ const btnStyle = {
   },
 };
 
-
 const upiIcons: Record<string, string> = {
   gpay: gpayIcon,
   paytm: paytmIcon,
@@ -41,14 +40,14 @@ const getUpiApp = (upiId?: string) => {
 
   const id = upiId.toLowerCase();
 
-  if (["@okaxis", "@oksbi", "@okhdfcbank", "@okicici"].some((v) => id.includes(v)))
+  if (
+    ["@okaxis", "@oksbi", "@okhdfcbank", "@okicici"].some((v) => id.includes(v))
+  )
     return "gpay";
 
-  if (id.includes("@paytm"))
-    return "paytm";
+  if (id.includes("@paytm")) return "paytm";
 
-  if (["@ybl", "@axl", "@ibl"].some((v) => id.includes(v)))
-    return "phonepe";
+  if (["@ybl", "@axl", "@ibl"].some((v) => id.includes(v))) return "phonepe";
 
   return "upi";
 };
@@ -59,28 +58,26 @@ type Props = {
 };
 
 const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
-  const [status, setStatus] = useState<"default" | "loading" | "success">("default");
+  const [status, setStatus] = useState<"default" | "loading" | "success">(
+    "default",
+  );
   const { handleSubmit, control } = useFormContext();
   const paymentMethod = useWatch({
-  control,
-  name: "paymentMethod",
-});
+    control,
+    name: "paymentMethod",
+  });
 
   const onPay = () => {
-
     setStatus("loading");
 
     setTimeout(() => {
-
       setStatus("success");
 
-      onSuccess(); 
-
+      onSuccess();
     }, 2000);
   };
 
   const showPaymentStatus = () => {
-
     if (status === "loading") {
       return (
         <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
@@ -115,19 +112,15 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
     name: "UpiId",
   });
 
-  const detectedIcon = getUpiApp(upiId) || "upi"; 
+  const detectedIcon = getUpiApp(upiId) || "upi";
 
   return (
     <Paper sx={PaperStyle}>
-            <Typography 
-      fontSize={{xs:16, md:18}} 
-      mb={2}
-      fontWeight={600}>
+      <Typography fontSize={{ xs: 16, md: 18 }} mb={2} fontWeight={600}>
         UPI Payment
       </Typography>
 
       <Box display="flex" flexDirection="column" gap={1}>
-
         <Box display="flex" alignItems="center" gap={2}>
           <Box flex={1}>
             <TextInputField
@@ -136,7 +129,8 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
               disabled={paymentMethod !== "upi"}
               inputType="alphanumeric"
               rules={{
-                required: paymentMethod === "upi" ? "UPI ID is required" : false,
+                required:
+                  paymentMethod === "upi" ? "UPI ID is required" : false,
                 pattern: {
                   value:
                     /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ibl|phonepe)$/,
@@ -160,12 +154,8 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
                 mb: 3,
               }}
             >
-              <img
-                src={upiIcons[detectedIcon]}
-                width={28}
-                height={28}
-              />
-            </Box> 
+              <img src={upiIcons[detectedIcon]} width={28} height={28} />
+            </Box>
           )}
         </Box>
 
@@ -184,10 +174,7 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
           </Button>
         </Box>
 
-        <Box textAlign="center">
-          {showPaymentStatus()}
-        </Box>
-
+        <Box textAlign="center">{showPaymentStatus()}</Box>
       </Box>
     </Paper>
   );

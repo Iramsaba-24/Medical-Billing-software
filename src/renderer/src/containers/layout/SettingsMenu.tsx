@@ -6,7 +6,7 @@ import {
   ListItemIcon,
   ListItemText,
   Paper,
-  Typography
+  Typography,
 } from "@mui/material";
 
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -20,7 +20,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "../../constants/UrlPath";
 
 const SettingsMenu = ({ closeDrawer }: { closeDrawer?: () => void }) => {
-
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -83,7 +82,6 @@ const SettingsMenu = ({ closeDrawer }: { closeDrawer?: () => void }) => {
       <Paper sx={{ borderRadius: 3, overflow: "hidden" }}>
         <List sx={{ p: 0 }}>
           {menuItems.map((item) => {
-
             const active = location.pathname === item.path;
 
             return (
