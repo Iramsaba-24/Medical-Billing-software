@@ -9,6 +9,7 @@ export type MedicineItem = {
 };
 
 export type Invoice = {
+  customerName: ReactNode;
   invoice: string;
   patient: string;
   date: string;

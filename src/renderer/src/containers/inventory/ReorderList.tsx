@@ -30,16 +30,14 @@ const ReorderList = () => {
           ...item,
           stockQty: Number(item.stockQty),
         }))
-        .filter(
-          (item: InventoryItem) =>
-            item.stockQty < Reorder
-        )
+        .filter((item: InventoryItem) => item.stockQty < Reorder)
     );
   }, []);
   const handleReorderSubmit = (reorderQty: number) => {
     if (!openItem) return;
     const inventory =
       JSON.parse(localStorage.getItem("inventory") || "[]");
+
     const updatedInventory =
       inventory.map((item: InventoryItem) =>
         item.itemId === openItem.itemId
@@ -50,6 +48,7 @@ const ReorderList = () => {
             }
           : item
       );
+
     localStorage.setItem(
       "inventory",
       JSON.stringify(updatedInventory)
@@ -57,6 +56,7 @@ const ReorderList = () => {
     // IMPORTANT FIX
     const history =
       JSON.parse(localStorage.getItem("reorderHistory") || "[]");
+
     history.unshift({
       itemId: openItem.itemId,
       itemName: openItem.itemName,
@@ -67,21 +67,24 @@ const ReorderList = () => {
       expiryDate: "",
       purchasedAt:new Date().toISOString(),
     });
+
     localStorage.setItem(
       "reorderHistory",
       JSON.stringify(history)
     );
+
     setItems(
       updatedInventory.filter(
-        (item: InventoryItem) =>
-          item.stockQty < Reorder
+        (item: InventoryItem) => item.stockQty < Reorder
       )
     );
+
     setOpenItem(null);
  
     // NEW LINE ADDED
     setRefreshKey(prev => prev + 1);
   };
+
   const columns: Column<InventoryItem>[] = [
     { key: "itemName", label: "Item" },
     { key: "stockQty", label: "Stock" },
@@ -121,6 +124,7 @@ const ReorderList = () => {
       ),
     },
   ];
+
   return (
 <>
 <Box

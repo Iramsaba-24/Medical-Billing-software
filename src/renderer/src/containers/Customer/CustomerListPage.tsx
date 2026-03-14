@@ -6,25 +6,27 @@ import {
 } from "@/components/uncontrolled/UniversalTable";
 import { Box, Button, Typography, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-
+import { useNavigate } from "react-router-dom";
+ 
 // Define the properties required by the Customer List page
 interface CustomerListProps {
   data: CustomerData[];
-  onAdd: () => void;
+ 
   onView: (data: CustomerData) => void;
   onEdit: (data: CustomerData) => void;
   onDelete: (data: CustomerData) => void;
 }
-
+ 
 export const CustomerListPage = ({
   data,
-  onAdd,
+ 
   onView,
   onEdit,
   onDelete,
 }: CustomerListProps) => {
+  const navigate = useNavigate();
   const [searchTerm] = useState("");
-
+ 
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
     const lowerSearch = searchTerm.toLowerCase();
@@ -34,7 +36,7 @@ export const CustomerListPage = ({
         item.mobile?.toLowerCase().includes(lowerSearch)
     );
   }, [data, searchTerm]);
-
+ 
   const columns: readonly Column<CustomerData>[] = [
     { label: "Name", key: "name" },
     { label: "Mobile", key: "mobile" },
@@ -45,7 +47,7 @@ export const CustomerListPage = ({
     { label: "Date", key: "date" },
     { label: "Actions", key: "actionbutton" },
   ];
-
+ 
   return (
     <Box sx={{ bgcolor: "#f8f9fa" }}>
       {/* Page Heading */}
@@ -60,7 +62,7 @@ export const CustomerListPage = ({
           Customers
         </Typography>
       </Box>
-
+ 
       <Box
         sx={{
           bgcolor: "#fff",
@@ -81,10 +83,10 @@ export const CustomerListPage = ({
           <Typography fontSize={{ xs: 18, md: 20 }} fontWeight={600}>
             Customers List
           </Typography>
-
+ 
           <Button
             variant="contained"
-            onClick={onAdd}
+            onClick={() => navigate("/customers/add-customer")}
             startIcon={<AddIcon />}
             sx={{
               textTransform: "none",
@@ -100,9 +102,9 @@ export const CustomerListPage = ({
             Add Customer
           </Button>
         </Box>
-
+ 
         <Divider sx={{ mb: 1 }} />
-
+ 
         <Box sx={{ width: "100%", overflowX: "auto" }}>
           <UniversalTable<CustomerData & Record<string, unknown>>
             columns={columns}
@@ -120,5 +122,6 @@ export const CustomerListPage = ({
     </Box>
   );
 };
-
+ 
 export default CustomerListPage;
+ 

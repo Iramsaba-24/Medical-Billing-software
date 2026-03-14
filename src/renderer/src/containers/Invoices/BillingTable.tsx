@@ -1,5 +1,6 @@
+ 
 import { useEffect, useState } from "react";
-import { Box, Paper,  Typography } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   UniversalTable,
@@ -23,17 +24,22 @@ type Props = {
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({  invoices, setInvoices }: Props) => {
+const BillingTable = ({ invoices, setInvoices }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
-  useEffect(() => {
-    const storedSales = localStorage.getItem("invoices");
+  
+useEffect(() => {
+  const storedInvoices = localStorage.getItem("currentInvoice");
 
-    if (storedSales) {
-      const parsedSales = JSON.parse(storedSales);
-      setInvoices(parsedSales);
-    }
-  }, [setInvoices]);
+  if (storedInvoices) {
+    const parsedInvoices: Invoice[] = JSON.parse(storedInvoices);
+
+    setInvoices(parsedInvoices);
+  }
+}, [setInvoices]);
+
+
+
 
   // invoice local storage
   useEffect(() => {
@@ -46,7 +52,7 @@ const BillingTable = ({  invoices, setInvoices }: Props) => {
 
         const updated = [newInvoice, ...prev];
 
-        localStorage.setItem("invoices", JSON.stringify(updated));
+        localStorage.setItem("currentInvoice", JSON.stringify(updated));
 
         return updated;
       });
@@ -160,7 +166,7 @@ const BillingTable = ({  invoices, setInvoices }: Props) => {
                 size="small"
               />
             </Box>
-           
+
           </Box>
         </Box>
 
@@ -197,9 +203,7 @@ const BillingTable = ({  invoices, setInvoices }: Props) => {
               }),
 
             edit: (invoice) =>
-              navigate(URL_PATH.CreateInvoice, {
-                state: invoice,
-              }),
+              navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`),
 
             delete: (invoice) => handleDelete(invoice.invoice),
           }}
@@ -227,5 +231,6 @@ const BillingTable = ({  invoices, setInvoices }: Props) => {
     </FormProvider>
   );
 };
-
 export default BillingTable;
+
+

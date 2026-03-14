@@ -1,21 +1,15 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Typography, Paper, SxProps, Theme } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
-import { Save } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { Save, Payment, Print } from "@mui/icons-material";
 import { CustomerData } from "@/view/CustomerMaster";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
-import DateField from "@/components/controlled/DateTimeField";
+import DateTimeField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
 
-export interface ItemRow {
-  id: number;
-  name: string;
-  qty: number | "";
-  price: number | "";
-}
+import { useNavigate } from "react-router-dom";
 
 interface StoredDoctor {
   doctorName: string;
@@ -25,26 +19,13 @@ interface StoredDoctor {
 }
 
 interface Props {
-  onBack: () => void;
-  onSave: (
-    data: CustomerData,
-    total: number,
-    meds: string,
-    qty: number,
-    actualRows: ItemRow[]
-  ) => void;
-  initialData: CustomerData | null;
+  onBack?: () => void;
+  onSave?: (data: CustomerData) => void; 
+  initialData?: CustomerData | null;
 }
 
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
-
   const navigate = useNavigate();
-
-  const isEditMode = Boolean(initialData);
-
-  const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: "", price: "" }
-  ]);
 
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string; address: string }[]
@@ -59,14 +40,20 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       address: "",
       doctor: "",
       doctorAddress: "",
-      date: ""
+      date: new Date().toISOString().split("T")[0],
     },
-    mode: "onChange"
+    mode: "onChange",
   });
 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    input.value = input.value.replace(/[^0-9]/g, "");
+    let value = input.value.replace(/[^0-9]/g, "");
+
+    if (value !== "" && Number(value) > 100) {
+      value = "100";
+    }
+
+    input.value = value;
   };
 
   const buttonStyle: SxProps<Theme> = {
@@ -80,110 +67,66 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     "&:hover": {
       backgroundColor: "#fff",
       color: "#238878",
-      border: "2px solid #238878"
-    }
+      border: "2px solid #238878",
+    },
   };
 
   useEffect(() => {
-
     const storedDoctors: StoredDoctor[] = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
 
-    const existingDoctors = storedDoctors.map((doc) => ({
+    const options = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
-      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? ""
+      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
 
-    const options = [
-      {
-        label: "+ Add Doctor",
-        value: "__add_doctor__",
-        address: ""
-      },
-      ...existingDoctors
-    ];
-
     setDoctorOptions(options);
-
   }, []);
 
   const selectedDoctor = methods.watch("doctor");
 
   useEffect(() => {
-
-    if (selectedDoctor === "__add_doctor__") {
-      methods.setValue("doctor", "");
-      navigate("/add-doctor");
-      return;
-    }
-
     if (selectedDoctor) {
-
       const doctorData = doctorOptions.find(
         (doc) => doc.value === selectedDoctor
       );
 
       if (doctorData) {
         methods.setValue("doctorAddress", doctorData.address, {
-          shouldValidate: true
+          shouldValidate: true,
         });
       }
-
     }
-
-  }, [selectedDoctor, doctorOptions, methods, navigate]);
+  }, [selectedDoctor, doctorOptions, methods]);
 
   useEffect(() => {
-
     if (initialData) {
-
       methods.reset(initialData);
-
-      if (initialData.itemsList) {
-        setRows(initialData.itemsList);
-      }
-
     }
-
   }, [initialData, methods]);
 
-  const subTotal = rows.reduce(
-    (acc, r) => acc + Number(r.qty) * Number(r.price),
-    0
-  );
-
-  const finalTotal = subTotal;
-
   const handleActualSave = (data: CustomerData) => {
+    onSave?.(data);
 
-    onSave(
-      data,
-      finalTotal,
-      rows.map((r) => r.name).join(", "),
-      rows.length,
-      rows
-    );
+    if (!initialData) {
+      navigate("/billing/retail-invoice");
+    }
   };
 
   return (
-
     <FormProvider {...methods}>
-
       <Box
         component="form"
         noValidate
         onSubmit={methods.handleSubmit(handleActualSave)}
         sx={{ bgcolor: "#f5f5f5", minHeight: "100vh", p: { xs: 1, md: 0 } }}
       >
-
         {/* Header */}
-
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-
           <Typography variant="h5" fontWeight="bold">
-            {isEditMode ? "Edit Customer" : "Add Customer"}
+            {initialData ? "Edit Customer" : "Add Customer"}
           </Typography>
 
           <Button
@@ -193,28 +136,31 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               backgroundColor: "#238878",
               color: "#fff",
               border: "2px solid #238878",
-              textTransform: "none"
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+              },
             }}
           >
             Back
           </Button>
-
         </Box>
 
-        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3 }} elevation={3}>
-
+        {/* Form Section */}
+        <Paper
+          sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }}
+          elevation={3}
+        >
           <Box
             sx={{
               display: "grid",
               gridTemplateColumns: { xs: "1fr", md: "1.5fr 1fr" },
-              gap: 4
+              gap: 4,
             }}
           >
-
-            {/* Customer */}
-
+            {/* Customer Details */}
             <Box>
-
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Customer Details
               </Typography>
@@ -223,10 +169,9 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                 sx={{
                   display: "grid",
                   gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                  gap: 2
+                  gap: 2,
                 }}
               >
-
                 <TextInputField
                   name="name"
                   label="Customer Name"
@@ -235,38 +180,29 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   maxLength={20}
                 />
 
-                <DateField
-                  name="date"
-                  label="Date"
-                  required
-                  viewMode="date"
-                  useCurrentDate
-                />
+                <DateTimeField name="date" label="Date" required />
 
                 <TextInputField
                   name="age"
                   label="Age"
                   required
                   maxLength={3}
+                  rules={{
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: "Only numbers allowed",
+                    },
+                  }}
                   inputProps={{
                     inputMode: "numeric",
                     maxLength: 3,
-                    onInput: handleAgeInput
+                    onInput: handleAgeInput,
                   }}
                 />
 
-                <MobileField
-                  name="mobile"
-                  label="Mobile"
-                  countryCode
-                  required
-                />
+                <MobileField name="mobile" label="Mobile" required />
 
-                <EmailField
-                  name="email"
-                  label="Email"
-                  required
-                />
+                <EmailField name="email" label="Email" required />
 
                 <TextInputField
                   name="address"
@@ -275,21 +211,16 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   rows={1}
                   required
                 />
-
               </Box>
-
             </Box>
 
-            {/* Doctor */}
-
+            {/* Doctor Info */}
             <Box>
-
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
               </Typography>
 
-              <Box sx={{ display: "grid", gap: 2 }}>
-
+              <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
                 <DropdownField
                   name="doctor"
                   label="Doctor Name"
@@ -303,24 +234,33 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   inputType="textarea"
                   rows={1}
                 />
-
               </Box>
-
             </Box>
-
           </Box>
-
         </Paper>
 
-        {/* Save */}
-
+        {/* Buttons */}
         <Box
           sx={{
             mt: 4,
             display: "flex",
-            justifyContent: { xs: "stretch", sm: "flex-end" }
+            flexWrap: "wrap",
+            justifyContent: { xs: "stretch", sm: "flex-end" },
+            gap: 2,
           }}
         >
+          <Button
+            variant="contained"
+            startIcon={<Print />}
+            sx={buttonStyle}
+            onClick={() => window.print()}
+          >
+            Print
+          </Button>
+
+          <Button variant="contained" startIcon={<Payment />} sx={buttonStyle}>
+            Pay Now
+          </Button>
 
           <Button
             variant="contained"
@@ -328,16 +268,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             startIcon={<Save />}
             sx={buttonStyle}
           >
-            {isEditMode ? "Update" : "Save and Continue"}
+            Save
           </Button>
-
         </Box>
-
       </Box>
-
     </FormProvider>
-
-  );
-};
+  ); 
+}; 
 
 export default AddCustomerForm;

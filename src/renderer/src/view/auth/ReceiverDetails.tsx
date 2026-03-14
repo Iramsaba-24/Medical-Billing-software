@@ -12,10 +12,12 @@ import { useNavigate } from "react-router-dom";
 import TextInputField from "@/components/controlled/TextInputField";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
-
+import RadioField from "@/components/controlled/RadioField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
+import { URL_PATH } from "@/constants/UrlPath";
 
 type FormValues = {
+  paymentMethod: string;
   bankName: string;
   accountNumber: string;
   accountHolderName: string;
@@ -23,11 +25,21 @@ type FormValues = {
   ifsc: string;
 };
 
-const ReceiverDetails = () => {
+const radioStyle = {
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
+};
+
+const NetBanking = () => {
   const navigate = useNavigate();
 
   const methods = useForm<FormValues>({
     defaultValues: {
+      paymentMethod: "receiverdetails",   
       bankName: "",
       accountNumber: "",
       accountHolderName: "",
@@ -40,7 +52,7 @@ const ReceiverDetails = () => {
   const onSubmit = (data: FormValues) => {
     localStorage.setItem("paymentDetails", JSON.stringify(data));
     showToast("success", "Saved Successfully");
-    navigate(""); 
+    navigate(URL_PATH.NetPurchaseDetails);
   };
 
   return (
@@ -59,6 +71,7 @@ const ReceiverDetails = () => {
       <FormProvider {...methods}>
         <Box
           component="form"
+          noValidate
           onSubmit={methods.handleSubmit(onSubmit)}
           sx={{ width: "100%", maxWidth: 800, textAlign: "center" }}
         >
@@ -89,10 +102,18 @@ const ReceiverDetails = () => {
             }}
           >
             <CardContent sx={{ p: 2 }}>
-              {/* Receiver’s Details */}
-              <Typography sx={{ textAlign: "left", mb: 1, fontSize: "15px" }}>
-                Receiver's Details
-              </Typography>
+              
+              {/* Receiver Details Radio */}
+              <Box sx={{ display: "flex", justifyContent: "flex-start", mb: 1 }}>
+                <RadioField
+                  name="paymentMethod"
+                  options={[
+                    { label: "Receivers details", value: "receiverdetails" },
+                  ]}
+                  label=""
+                  sx={radioStyle}
+                />
+              </Box>
 
               {/* Bank Name */}
               <Box mb={1}>
@@ -111,6 +132,7 @@ const ReceiverDetails = () => {
                   name="accountNumber"
                   label="Bank Account Number"
                   required
+                  inputType="numbers"
                   maxLength={13}
                   minLength={9}
                   rules={{
@@ -119,10 +141,15 @@ const ReceiverDetails = () => {
                       message: "Only numbers allowed",
                     },
                   }}
+                  inputProps={{
+                    inputMode: "numeric",
+                    pattern: "[0-9]*",
+                    maxLength: 13,
+                  }}
                 />
               </Box>
 
-              {/* Holder Name */}
+              {/* Account Holder Name */}
               <Box mb={1}>
                 <TextInputField
                   name="accountHolderName"
@@ -133,7 +160,7 @@ const ReceiverDetails = () => {
                 />
               </Box>
 
-              {/* Branch and IFSC */}
+              {/* Branch + IFSC */}
               <Box
                 sx={{
                   display: "flex",
@@ -171,7 +198,7 @@ const ReceiverDetails = () => {
                 </Box>
               </Box>
 
-              {/* Button */}
+              {/* Next Button */}
               <Box textAlign="right">
                 <Button
                   type="submit"
@@ -188,9 +215,10 @@ const ReceiverDetails = () => {
                     },
                   }}
                 >
-                  Pay
+                  Next
                 </Button>
               </Box>
+
             </CardContent>
           </Card>
         </Box>
@@ -199,4 +227,4 @@ const ReceiverDetails = () => {
   );
 };
 
-export default ReceiverDetails;
+export default NetBanking;

@@ -101,7 +101,7 @@ const navigate = useNavigate();
               name="BuisinessTypes"
               label="Business Types"
               inputType="alphabet"
-              maxLength={60}
+              maxLength={30}
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",
