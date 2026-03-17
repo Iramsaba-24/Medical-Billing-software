@@ -1,11 +1,4 @@
-import {
-  Paper,
-  Button,
-  Stack,
-  Typography,
-  Box,
-  IconButton,
-} from "@mui/material";
+import {Paper,Button,Stack,Typography,Box,IconButton,} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
@@ -30,6 +23,7 @@ type StoredMedicine = {
   name: string;
   qty: string;
   amount: number;
+  price?: number;
 };
 
 type StoredInvoice = {
@@ -38,7 +32,8 @@ type StoredInvoice = {
   date: string;
   price: number;
   status: "Paid" | "Pending" | "Overdue";
-  medicines: StoredMedicine[];
+  medicines?: StoredMedicine[];
+  items?: InvoiceItem[];
 };
 
 type Customer = {
@@ -136,7 +131,7 @@ const EditInvoice = () => {
 
   // Load inventory
   useEffect(() => {
-    const stored = localStorage.getItem("inventory");
+    const stored = localStorage.getItem("inventory") || "[]";
     if (!stored) return;
 
     const parsed: InventoryItem[] = JSON.parse(stored);
@@ -151,31 +146,49 @@ const EditInvoice = () => {
   }, []);
 
   // Load invoice
-  useEffect(() => {
-    const stored = localStorage.getItem("invoices");
-    if (!stored || !invoiceNo) return;
+useEffect(() => {
+  if (!invoiceNo) return;
 
-    const invoices: StoredInvoice[] = JSON.parse(stored);
 
-    const found = invoices.find((inv) => inv.invoice === invoiceNo);
-    if (!found) return;
+  const storedInvoices = localStorage.getItem("currentInvoice");
+  if (!storedInvoices) return;
 
-    const items: InvoiceItem[] = found.medicines.map((m) => ({
+  const invoices: StoredInvoice[] = JSON.parse(storedInvoices);
+  const foundInvoice = invoices.find(
+    (inv) => String(inv.invoice) === String(invoiceNo)
+  );
+
+  if (!foundInvoice) return;
+
+  let items: InvoiceItem[] = [];
+
+  if (foundInvoice.medicines && foundInvoice.medicines.length > 0) {
+    items = foundInvoice.medicines.map((m) => ({
       item: m.name,
       qty: Number(m.qty),
-      price: m.amount,
+     price: Number(m.amount ?? m.price), 
     }));
+  } else if (foundInvoice.items && foundInvoice.items.length > 0) {
+    items = foundInvoice.items.map((i) => ({
+      item: i.item,
+      qty: Number(i.qty),
+      price: Number(i.price),
+    }));
+  }
 
-    reset({
-      name: found.name,
-      date: dayjs(found.date),
-      status: found.status,
-      items: items.length ? items : [{ item: "", qty: 1, price: 0 }],
-    });
-  }, [invoiceNo, reset]);
+  const finalItems = items.length > 0 ? items : [{ item: "", qty: 1, price: 0 }];
+
+  reset({
+    name: foundInvoice.name,
+    date: dayjs(foundInvoice.date, "DD/MM/YYYY"),
+    status: foundInvoice.status,
+    items: finalItems,
+  });
+}, [invoiceNo, reset]); 
+
 
   const onSubmit = (data: InvoiceFormData) => {
-    const stored = localStorage.getItem("invoices");
+    const stored = localStorage.getItem("currentInvoice");
     const invoices: StoredInvoice[] = stored ? JSON.parse(stored) : [];
 
     const totalPrice = data.items.reduce(
@@ -188,7 +201,7 @@ const EditInvoice = () => {
         ? {
           ...inv,
           name: data.name,
-          date: dayjs(data.date).format("YYYY-MM-DD"),
+          date: dayjs(data.date).format("DD/MM/YYYY"),
           price: totalPrice,
           status: data.status,
           medicines: data.items.map((i) => ({
@@ -200,7 +213,7 @@ const EditInvoice = () => {
         : inv
     );
 
-    localStorage.setItem("invoices", JSON.stringify(updated));
+    localStorage.setItem("currentInvoice", JSON.stringify(updated));
 
     navigate(URL_PATH.Invoices);
   };
@@ -221,12 +234,11 @@ const EditInvoice = () => {
           />
 
           <DateTimeField
-            name="date"
-            label="Invoice Date"
-            viewMode="date"
-            useCurrentDate={false}
-            dateRestriction="current-future-only"
-          />
+  name="date"
+  label="Invoice Date"
+  viewMode="date"
+  useCurrentDate={false}
+/>
 
           <DropdownField
             name="status"
@@ -272,7 +284,7 @@ const EditInvoice = () => {
               <TextInputField
                 name={`items.${index}.price`}
                 label="Price"
-                type="numeric"
+                type="number"
 
                 inputProps={{ readOnly: true }}
                 sx={{ width: 140 }}
@@ -337,3 +349,4 @@ const EditInvoice = () => {
 };
 
 export default EditInvoice;
+

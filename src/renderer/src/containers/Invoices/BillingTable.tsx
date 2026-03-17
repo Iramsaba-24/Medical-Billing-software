@@ -1,4 +1,3 @@
- 
 import { useEffect, useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -15,36 +14,28 @@ import {
   showToast,
   showConfirmation,
 } from "@/components/uncontrolled/ToastMessage.tsx";
+
 type Props = {
-  invoices: Invoice[];
-  setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
-  onCreate: () => void;
-  onView: (invoice: Invoice) => void;
+ invoices: Invoice[];
+  setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>
 };
+
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ invoices, setInvoices }: Props) => {
+const BillingTable =  ({
+  invoices,
+  setInvoices,
+}: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
-  
-useEffect(() => {
-  const storedInvoices = localStorage.getItem("currentInvoice");
 
-  if (storedInvoices) {
-    const parsedInvoices: Invoice[] = JSON.parse(storedInvoices);
-
-    setInvoices(parsedInvoices);
-  }
-}, [setInvoices]);
-
-
-
-
-  // invoice local storage
+  // add new invoice from navigation state
   useEffect(() => {
-    if (location.state) {
-      const newInvoice = (location.state as { invoice: Invoice }).invoice;
+    const state = location.state as { invoice?: Invoice } | null;
+
+    if (state?.invoice) {
+      const newInvoice = state.invoice;
 
       setInvoices((prev) => {
         const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
@@ -68,39 +59,53 @@ useEffect(() => {
     { label: "Yearly", value: "yearly" },
   ];
 
-  const filteredInvoices = invoices.filter((invoice) => {
-    if (filterType === "all") return true;
+ const filteredInvoices = invoices.filter((invoice) => {
+  if (!filterType || filterType === "all") return true;
 
-    const invoiceDate = new Date(invoice.date);
-    const today = new Date();
+  const parts = invoice.date.split("/");
+  const invoiceDate = new Date(
+    Number(parts[2]),
+    Number(parts[1]) - 1,
+    Number(parts[0])
+  );
 
-    if (filterType === "daily")
-      return invoiceDate.toDateString() === today.toDateString();
+  const today = new Date();
 
-    if (filterType === "monthly")
-      return (
-        invoiceDate.getMonth() === today.getMonth() &&
-        invoiceDate.getFullYear() === today.getFullYear()
-      );
+  if (filterType === "daily") {
+    return (
+      invoiceDate.getDate() === today.getDate() &&
+      invoiceDate.getMonth() === today.getMonth() &&
+      invoiceDate.getFullYear() === today.getFullYear()
+    );
+  }
 
-    if (filterType === "yearly")
-      return invoiceDate.getFullYear() === today.getFullYear();
+  if (filterType === "monthly") {
+    return (
+      invoiceDate.getMonth() === today.getMonth() &&
+      invoiceDate.getFullYear() === today.getFullYear()
+    );
+  }
 
-    return true;
-  });
+  if (filterType === "yearly") {
+    return invoiceDate.getFullYear() === today.getFullYear();
+  }
 
-  const columns: Column<Invoice>[] = [
-    { key: "invoice", label: "Invoice" },
-    { key: "name", label: "name" },
-    { key: "date", label: "Date" },
-    {
-      key: "price",
-      label: "Price",
-      render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
-    },
-    { key: "status", label: "Status" },
-    { key: "actionbutton", label: "Action" },
-  ];
+  return true;
+});
+  console.log("Filtered Invoices →", filteredInvoices);
+
+const columns: Column<Invoice>[] = [
+  { key: "invoice", label: "Invoice" },
+  { key: "name", label: "Name" },
+  { key: "date", label: "Date" },
+  {
+    key: "price",
+    label: "Price",
+    render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
+  },
+  { key: "status", label: "Status" },
+  { key: "actionbutton", label: "Action" },
+];
 
   const statusOptions: DropdownOption[] = [
     { value: "Paid", label: "Paid" },
@@ -113,7 +118,8 @@ useEffect(() => {
       filterType: "all",
     },
   });
-  //  DELETE
+
+  // delete invoice
   const handleDelete = async (invoiceNo: string) => {
     const confirmed = await showConfirmation(
       "Are you sure you want to delete this invoice?",
@@ -125,7 +131,7 @@ useEffect(() => {
     setInvoices((prev) => {
       const updated = prev.filter((inv) => inv.invoice !== invoiceNo);
 
-      localStorage.setItem("invoices", JSON.stringify(updated));
+      localStorage.setItem("currentInvoice", JSON.stringify(updated));
 
       return updated;
     });
@@ -144,12 +150,10 @@ useEffect(() => {
           mb={2}
           gap={2}
         >
-          {/* Heading */}
           <Typography fontSize={{ xs: 18, md: 22 }} fontWeight={600}>
             Invoice List
           </Typography>
 
-          {/* Filter + Create button */}
           <Box
             display="flex"
             flexDirection={{ xs: "column", sm: "row" }}
@@ -166,12 +170,11 @@ useEffect(() => {
                 size="small"
               />
             </Box>
-
           </Box>
         </Box>
 
         <UniversalTable<Invoice>
-          data={filteredInvoices}
+         data={filteredInvoices}
           columns={columns}
           showSearch
           showExport
@@ -188,25 +191,26 @@ useEffect(() => {
                     : inv,
                 );
 
-                localStorage.setItem("invoices", JSON.stringify(updated));
+                localStorage.setItem("currentInvoice", JSON.stringify(updated));
 
                 return updated;
               });
 
               showToast("success", "Status updated successfully");
             },
-          }}
-          actions={{
-            view: (invoice) =>
-              navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
-                state: { invoice },
-              }),
-
-            edit: (invoice) =>
-              navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`),
-
-            delete: (invoice) => handleDelete(invoice.invoice),
-          }}
+          }} 
+        
+actions={{
+  view: (invoice) =>
+    navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
+      state: { invoice },
+    }),
+  edit: (invoice) =>
+    navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
+      state: { invoice }, 
+    }),
+  delete: (invoice) => handleDelete(invoice.invoice),
+}}
           onDeleteSelected={async (rows) => {
             const confirmed = await showConfirmation(
               "Delete selected invoices?",
@@ -220,10 +224,11 @@ useEffect(() => {
                 (inv) => !rows.some((r) => r.invoice === inv.invoice),
               );
 
-              localStorage.setItem("invoices", JSON.stringify(updated));
+              localStorage.setItem("currentInvoice", JSON.stringify(updated));
 
               return updated;
             });
+
             showToast("success", "Selected invoices deleted");
           }}
         />
@@ -231,6 +236,5 @@ useEffect(() => {
     </FormProvider>
   );
 };
+
 export default BillingTable;
-
-

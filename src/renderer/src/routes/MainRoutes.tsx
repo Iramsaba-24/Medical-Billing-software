@@ -2,7 +2,7 @@ import { RouteObject } from "react-router-dom";
 import Layout from "@/containers/layout/Header";
 import { URL_PATH } from "@/constants/UrlPath";
 import Invoices from "@/view/Invoices";
-import InvoiceView from "@/containers/Invoices/InvoiceView";
+import InvoiceView from "@/containers/invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
 import MedicineGroup from "@/containers/inventory/MedicineGroup";
 import MedicineGroupView from "@/containers/inventory/MedicineGroupView";
@@ -16,12 +16,12 @@ import AddDoctor from "@/containers/doctors/AddDoctor";
 import DistributorsPage from "@/view/DistributorsPage";
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
-import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
+import DistributorDetails from "@/containers/distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 import Setting from "@/containers/layout/Setting";
-import DistributorsForm from "@/containers/Distributors/DistributorsForm";
+import DistributorsForm from "@/containers/distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 import MediPoints from "@/containers/billing/MediPoints";
 import Billing from "@/view/Billing";
@@ -31,10 +31,11 @@ import DoctorSettings from "@/containers/setting/DoctorSettings";
 import NewInvoice from "@/containers/billing/NewInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
-// import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
-import EditInvoice from "@/containers/Invoices/EditInvoice"
+import EditInvoice from "@/containers/invoices/EditInvoice"
+import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
 
 
 
@@ -61,6 +62,10 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.Doctors,
         element: <DoctorTable />,
       },
+       {
+        path: URL_PATH.NewInvoiceBill,
+        element: <NewInvoiceBill />,
+      },
       {
         path: URL_PATH.AddDoctor,
         element: <AddDoctor />,
@@ -75,6 +80,10 @@ export const mainRoutes: RouteObject[] = [
 },
       {
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
+        element: <InvoiceView />,
+      },
+       {
+        path: URL_PATH.InvoiceView,
         element: <InvoiceView />,
       },
 
@@ -134,6 +143,10 @@ export const mainRoutes: RouteObject[] = [
       {
         path: `${URL_PATH.Billing}/:invoiceNo`,
         element: <Billing />,
+      },
+      {
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
       },
       {
         path: URL_PATH.PaymentMethod,

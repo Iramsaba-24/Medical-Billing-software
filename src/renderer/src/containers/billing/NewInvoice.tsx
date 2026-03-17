@@ -3,29 +3,20 @@ import {
   Grid,
   Paper,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
 } from "@mui/material";
-
 import { FormProvider, useForm, FieldErrors } from "react-hook-form";
-
 import { useState, useEffect } from "react";
-
 import EmailField from "@/components/controlled/EmailField";
 import MobileField from "@/components/controlled/MobileField";
 import TextInputField from "@/components/controlled/TextInputField";
-
 import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-
 import InvoiceTabButtons from "./InvoiceTabButtons";
 import ItemsSection from "@/containers/customer/ItemsSection";
+import DropdownField from "@/components/controlled/DropdownField";
 
 const BORDER_COLOR = "#D1D5DB";
-
 const containerStyle = {
   p: { xs: 2 },
   backgroundColor: "#fff",
@@ -75,13 +66,12 @@ type ItemRow = {
 
 const NewInvoice = () => {
   const navigate = useNavigate();
-
   const [distributors, setDistributors] = useState<Distributor[]>([]);
-
   const [rows, setRows] = useState<ItemRow[]>([
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
 
+  const [gst, setGst] = useState<number>(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   /*  GRAND TOTAL */
@@ -101,7 +91,6 @@ const NewInvoice = () => {
 
   useEffect(() => {
     const saved = localStorage.getItem("distributors");
-
     if (saved) {
       const parsed: Distributor[] = JSON.parse(saved);
       setDistributors(parsed);
@@ -109,17 +98,25 @@ const NewInvoice = () => {
   }, []);
 
   const selectedCompany = watch("company");
+  useEffect(() => {
+    if (selectedCompany === "add_company") {
+      navigate(URL_PATH.DistributorsForm);
+    }
+  }, [selectedCompany, navigate]);
 
   const onSubmit = (data: FormData) => {
     setIsSubmitted(true);
-
     if (rows.some((r) => !r.name || !r.qty || !r.price)) {
       showToast("error", "Please fill all item details");
       return;
     }
 
+ 
+
+    const gstAmount = (finalTotal * gst) / 100;
+    const grandTotal = finalTotal + gstAmount;
     const existingInvoices = JSON.parse(
-      localStorage.getItem("currentNewInvoice") || "[]",
+      localStorage.getItem("currentNewInvoice") || "[]"
     );
 
     const newInvoice = {
@@ -129,19 +126,28 @@ const NewInvoice = () => {
       mobile: data.mobile,
       email: data.email,
       address: data.address,
-      items: rows,
-      totalPrice: finalTotal,
+      gst: gst,       
+      medicines: rows.map((r) => ({
+        name: r.name,
+        qty: r.qty,
+        amount: Number(r.qty || 0) * Number(r.price || 0),
+        batch: "",
+        expiry: "",
+      })),
+      totalPrice: grandTotal,
     };
 
     const updatedInvoices = [...existingInvoices, newInvoice];
-
     localStorage.setItem("currentNewInvoice", JSON.stringify(updatedInvoices));
-
     showToast("success", "Data saved successfully!");
 
+
     navigate(URL_PATH.PaymentMethod, {
-      state: { totalFromInvoice: finalTotal },
-    });
+  state: {
+    flow: "new",
+    totalFromInvoice: grandTotal,
+  },
+});
   };
 
   const onError = (formErrors: FieldErrors<FormData>) => {
@@ -149,14 +155,15 @@ const NewInvoice = () => {
     showToast("error", "Please fill all required fields");
   };
 
-  /* COMPANY OPTIONS */
-
-  const companyOptions = distributors
-    .filter((d) => d.status === "Active")
-    .map((d) => ({
-      label: d.companyName,
-      value: d.companyName,
-    }));
+  const companyOptions = [
+    { label: "+ Add Company", value: "add_company" },
+    ...distributors
+      .filter((d) => d.status === "Active")
+      .map((d) => ({
+        label: d.companyName,
+        value: d.companyName,
+      })),
+  ];
 
   /* AUTO FILL */
 
@@ -184,29 +191,19 @@ const NewInvoice = () => {
           <Box sx={containerStyle}>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 6 }}>
-                <FormControl fullWidth>
-                  <InputLabel>Company</InputLabel>
-
-                  <Select
-                    value={methods.watch("company") || ""}
-                    label="Company"
-                    onChange={(e) => {
-                      methods.setValue("company", e.target.value);
-                    }}
-                  >
-                    {companyOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                <DropdownField
+                  name="company"
+                  label="Company"
+                  options={companyOptions}
+                  required
+                  freeSolo
+                  editable={true}
+                />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextInputField name="supplier" label="Supplier" required />
               </Grid>
-
               <Grid size={{ xs: 12, md: 6 }}>
                 <MobileField
                   name="mobile"
@@ -237,6 +234,8 @@ const NewInvoice = () => {
             rows={rows}
             setRows={setRows}
             finalTotal={finalTotal}
+            gst={gst}
+            setGst={setGst}
             isSubmitted={isSubmitted}
           />
 
@@ -262,5 +261,4 @@ const NewInvoice = () => {
     </FormProvider>
   );
 };
-
 export default NewInvoice;

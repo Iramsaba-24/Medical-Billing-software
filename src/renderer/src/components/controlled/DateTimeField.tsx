@@ -226,17 +226,11 @@ import dayjs, { type Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 import { getComponentTranslations } from "@/helpers/useTranslations";
 
-
-
-
- //Allows past, current, and future dates (no restrictions)
-
 const allowPastCurrentFuture = (): Dayjs => {
   return dayjs("1900-01-01");
 };
 
 
-  //Allows only current date and future dates (blocks past dates)
 const allowCurrentFutureOnly = (): Dayjs => {
   return dayjs().startOf("day");
 };
@@ -340,7 +334,7 @@ const DateTimeField: FC<DateFieldProps> = ({
         }}
         render={({ field }) => {
           
-          // Auto-set current date if useCurrentDate is true
+        
          
           if (useCurrentDate && !field.value) {
             field.onChange(toStoreValue(dayjs()));
@@ -360,8 +354,7 @@ const DateTimeField: FC<DateFieldProps> = ({
               }
             },
 
-            
-            // APPLY MIN DATE BASED ON dateRestriction PROP
+          
            
             minDate: getMinDate(),
 
@@ -397,7 +390,6 @@ const DateTimeField: FC<DateFieldProps> = ({
           };
 
           
-          // Render correct picker based on viewMode
         
           switch (viewMode) {
             case "time":
