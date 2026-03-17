@@ -37,7 +37,7 @@ export const URL_PATH = {
 
   ReportPage: "/report",
   DistributorsPage: "/distributors",
-  DistributorsForm: "/distributors/add",
+  DistributorsForm: "/distributors/add-distributor",
   DistributorDetails: "/distributor-details",
 
   Inventory: "/inventory",
@@ -66,5 +66,5 @@ export const URL_PATH = {
 
   DoctorsSettings: "/settings/doctors-settings",
 
-  NewInvoiceBill:"/billing/invoice",
+  NewInvoiceBill:"/billing/invoice-bill",
 };

@@ -10,9 +10,19 @@ type EmailFieldProps = TextFieldProps & {
   name: string;
   required?: boolean;
   sx?: SxProps<Theme>;
+  maxLength?: number; 
+  minLength?: number; 
 };
  
-const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ...rest }) => {
+const EmailField: FC<EmailFieldProps> = ({
+  label,
+  name,
+  sx,
+  required = false,
+  maxLength,
+  minLength,
+  ...rest
+}) => {
   const { t } = useTranslation();
   const translations = getComponentTranslations(t);
   const {
@@ -26,10 +36,22 @@ const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ..
       control={control}
       rules={{
         required: required ? translations.emailField.requiredError(label) : undefined,
+        minLength: minLength
+          ? {
+              value: minLength,
+              message: `Email must be at least ${minLength} characters`
+            }
+          : undefined,
+        maxLength: maxLength
+          ? {
+              value: maxLength,
+              message: `Email must be at most ${maxLength} characters`
+            }
+          : undefined,
         validate: (value: string) => {
           if (!value) return true;
 
-           if (!emailRegex.test(value)) return "Please enter a proper email like abc@gmail.com";
+          if (!emailRegex.test(value)) return "Please enter a proper email like abc@gmail.com";
           if (!emailDomainRegex.test(value)) return "Email should be in gmail.com domain only";
  
           return true;
@@ -48,6 +70,10 @@ const EmailField: FC<EmailFieldProps> = ({ label, name, sx, required = false, ..
           error={!!errors[name]}
           helperText={String(errors[name]?.message || ' ')}
           onChange={(e) => field.onChange(SanitizeEmailRegex(e.target.value))}
+          inputProps={{
+            maxLength: maxLength, 
+            minLength: minLength, 
+          }}
           sx={{ '& .MuiInputLabel-asterisk': { color: 'error.main' }, ...sx }}
         />
       )}

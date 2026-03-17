@@ -54,7 +54,7 @@ const MediPoints: React.FC = () => {
     },
   });
 
-  const { watch, setValue } = methods;
+  const { watch, setValue } = methods; 
 
   const mediPointsValue = watch("mediPoints");
   const totalValue = watch("totalAmount");
@@ -103,22 +103,28 @@ const MediPoints: React.FC = () => {
   const onSubmit = (data: MediPointsForm) => {
     if (isInvalid) return;
 
-    const storedInvoice = localStorage.getItem("currentInvoice");
+    const storedInvoice = localStorage.getItem("currentRetailInvoice");
 
     if (storedInvoice) {
       const invoice = JSON.parse(storedInvoice);
 
       invoice.totalPrice = Number(data.discountedAmount);
 
-      localStorage.setItem("currentInvoice", JSON.stringify(invoice));
+      localStorage.setItem("currentRetailInvoice", JSON.stringify(invoice));
     }
 
-    navigate(URL_PATH.PaymentMethod);
+
+navigate(URL_PATH.PaymentMethod, {
+  state: {
+    flow: location.state?.flow || "retail",
+    totalFromInvoice: Number(data.discountedAmount),
+  }
+});
   };
 
   return (
     <FormProvider {...methods}>
-   <InvoiceTabButtons/>
+      <InvoiceTabButtons />
 
       <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
         <Paper
@@ -147,7 +153,11 @@ const MediPoints: React.FC = () => {
                 border: "1px solid #bdbdbd",
               }}
             >
-              <InfoRow label="Earned:" value={`${earned} Pts.`} color="#1f8f7a" />
+              <InfoRow
+                label="Earned:"
+                value={`${earned} Pts.`}
+                color="#1f8f7a"
+              />
               <InfoRow label="Used:" value={`${used} Pts.`} />
               <InfoRow label="Remains:" value={`${remains} Pts.`} color="red" />
 
@@ -157,7 +167,8 @@ const MediPoints: React.FC = () => {
 
               <Box component="ul" sx={{ pl: 2 }}>
                 <Typography component="li">
-                  Medi Points is a smart reward system designed to thank customers for their loyalty.
+                  Medi Points is a smart reward system designed to thank
+                  customers for their loyalty.
                 </Typography>
                 <Typography component="li">
                   Points can be redeemed during billing.
@@ -220,7 +231,7 @@ const MediPoints: React.FC = () => {
               gap: 2,
               mt: 3,
               flexWrap: "wrap",
-            }}
+            }} 
           >
             <Button
               variant="contained"
@@ -230,8 +241,6 @@ const MediPoints: React.FC = () => {
             >
               Save & Continue
             </Button>
-
-           
           </Box>
         </Paper>
       </form>

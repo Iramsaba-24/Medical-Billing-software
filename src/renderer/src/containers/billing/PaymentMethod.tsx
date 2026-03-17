@@ -1,37 +1,22 @@
 import { useForm, FormProvider, useWatch } from "react-hook-form";
-import { Paper, Box, Button } from "@mui/material";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import RadioField from "@/components/controlled/RadioField";
-import NumericField from "@/components/controlled/NumericField";
-import TextInputField from "@/components/controlled/TextInputField";
-import gpayIcon from "@/assets/icons/googlepay.svg";
-import paytmIcon from "@/assets/icons/paytm.svg";
-import upiIcon from "@/assets/icons/upi.svg";
-import phonepeIcon from "@/assets/icons/phonepe.svg";
-import CircularProgress from "@mui/material/CircularProgress";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
+import CardPayment from "@/containers/billing/CardPayment";
+import UpiPayment from "@/containers/billing/UpiPayment";
+import CashPayment from "@/containers/billing/CashPayment";
 import InvoiceTabButtons from "./InvoiceTabButtons";
-import { useNavigate } from "react-router-dom";
+import RadioField from "@/components/controlled/RadioField";
+import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 
-// form fields
 type PaymentMethods = {
-  paymentMethod: "credit-card" | "upi";
+  paymentMethod: "credit-card" | "upi" | "cash";
   CardNumber?: string;
   CardHolderName?: string;
   Cvv?: string;
-  UpiId?: string;
+  UpiId?: string; 
 };
 
-// paper style of card and upi
-const PaperStyle = {
-  borderRadius: 2,
-  p: { xs: 1, sm: 2 },
-  mb: { sx: 1 },
-};
-
-// radio btn style
 const radioStyle = {
   "& .MuiRadio-root": {
     color: "default.main",
@@ -41,428 +26,169 @@ const radioStyle = {
   },
 };
 
-//btn style
-const btnStyle = {
-  backgroundColor: "#238878",
-  height: 40,
-  minWidth: 150,
-  color: "#fff",
-  textTransform: "none",
-  "&:hover": {
-    backgroundColor: "#fff",
-    color: "#238878",
-    borderColor: "#238878",
-  },
-};
-
-// component
 const PaymentMethod = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const methods = useForm<PaymentMethods>({
     defaultValues: {
       paymentMethod: "credit-card",
     },
-    mode: "onChange",
   });
 
-  // UPI value watch 
-  const upiId = useWatch({
-    control: methods.control,
-    name: "UpiId",
-  });
-
-  // function to get UPI app icons
-  const getUpiApp = (upiId?: string) => {
-    if (!upiId) return null;
-
-    const id = upiId.toLowerCase();
-
-    // Google Pay
-    if (
-      id.includes("@okaxis") ||
-      id.includes("@oksbi") ||
-      id.includes("@okhdfcbank") ||
-      id.includes("@okicici")
-    ) {
-      return "gpay";
-    }
-
-    // Paytm
-    if (id.includes("@paytm")) {
-      return "paytm";
-    }
-
-    // phonepe
-    if (id.includes("@ybl") || id.includes("@axl") || id.includes("@ibl")) {
-      return "phonepe";
-    }
-    return null;
-  };
-
-  // detected icon
-  const detecteIcon = getUpiApp(upiId) || "upi";
-  //icon
-  const upiIcons: Record<string, string> = {
-    //utility object-keys type and values type
-    gpay: gpayIcon,
-    paytm: paytmIcon,
-    upi: upiIcon,
-    phonepe: phonepeIcon,
-  };
-
-  // payment method watch (instant update)
   const payment = useWatch({
     control: methods.control,
     name: "paymentMethod",
   });
 
-  const { handleSubmit } = methods;
-  // handle to card payment
-  const [CardPaymentStatus, setCardPaymentStatus] = useState<
-    "default" | "loading" | "success"
-  >("default");
-  // handle to upi payment
-  const [UpiPaymentStatus, setUpiPaymentStatus] = useState<
-    "default" | "loading" | "success"
-  >("default");
-
-  const onCardPay = () => {
-    setCardPaymentStatus("loading");
-
-    setTimeout(() => {
-      setCardPaymentStatus("success");
-
-      const storedInvoice = localStorage.getItem("currentInvoice");
-      const storedNewInvoice = localStorage.getItem("currentNewInvoice");
-
-if (storedInvoice) {
-  const invoice = JSON.parse(storedInvoice);
-
-  const existingInvoices = JSON.parse(
-    localStorage.getItem("invoices") || "[]"
-  );
-
-  const RetailInvoice = {
-    invoice: `INV-${Date.now()}`,
-    name: invoice.name || "Customer",
-    date: new Date().toISOString().split("T")[0],
-    price: invoice.totalPrice || 0,
-    status: "Paid",
-  };
-
-  const updated = [RetailInvoice, ...existingInvoices];
-
-  localStorage.setItem("invoices", JSON.stringify(updated));
-
- localStorage.removeItem("currentInvoice");
-}
-
-      if (storedNewInvoice) {
-        const newInvoices = JSON.parse(storedNewInvoice);
-
-        const existingRetail = JSON.parse(
-          localStorage.getItem("newInvoices") || "[]",
-        );
-
-        const updatedRetail = [...existingRetail, ...newInvoices];
-
-        localStorage.setItem("newInvoices", JSON.stringify(updatedRetail));
-        localStorage.removeItem("currentNewInvoice");
-      }
-    }, 1500);
-  };
-
-  const onUpiPay = () => {
-    setUpiPaymentStatus("loading");
-
-    setTimeout(() => {
-      setUpiPaymentStatus("success");
-
-      const storedInvoice = localStorage.getItem("currentInvoice");
-      const storednewInvoice = localStorage.getItem("currentNewInvoice");
-
-      if (storedInvoice) {
-        const invoice = JSON.parse(storedInvoice);
-
-        const existingSales = JSON.parse(
-          localStorage.getItem("invoices") || "[]",
-        );
-
-        existingSales.push({
-          ...invoice,
-          price: invoice.totalPrice,
-        });
-
-       localStorage.setItem("invoices", JSON.stringify(existingSales));
-
-        localStorage.removeItem("currentInvoice");
-      }
-
-      if (storednewInvoice) {
-        const newInvoices = JSON.parse(storednewInvoice);
-
-        const existingRetail = JSON.parse(
-          localStorage.getItem("newInvoices") || "[]",
-        );
-
-        const updatedRetail = [...existingRetail, ...newInvoices];
-
-        localStorage.setItem("newInvoices", JSON.stringify(updatedRetail));
-        localStorage.removeItem("currentNewInvoice");
-      }
-       setTimeout(() => {
-      navigate(URL_PATH.NewInvoiceBill);
-    }, 1000);
-    }, 2000);
-  };
-
-  // function to show the status of payment for upi and card
-  const showPaymentStatus = (status: "default" | "loading" | "success") => {
-    if (status === "loading") {
-      return (
-        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-          <CircularProgress />
-          <Box textAlign="center">
-            Waiting for payment confirmation…
-            <br />
-            Please complete the payment.
-          </Box>
-        </Box>
-      );
-    }
-
-    if (status === "success") {
-      return (
-        <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-          <CheckCircleIcon
-            sx={{ color: "success.main", fontSize: { xs: 44, sm: 60 } }}
-          />
-          <Box fontWeight={700}>Successful ₹{finalAmount}</Box>
-        </Box>
-      );
-    }
-
-    return null;
-  };
-
-  const [finalAmount, setFinalAmount] = useState<number>(0);
-
+  const [finalAmount, setFinalAmount] = useState(0);
 
 useEffect(() => {
 
-  const storedInvoice = localStorage.getItem("currentInvoice");
-  const storedNewInvoice = localStorage.getItem("currentNewInvoice");
 
-  if (storedInvoice) {
-    const invoice = JSON.parse(storedInvoice);
-    setFinalAmount(invoice.totalPrice || 0);
-    return;
+  const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
+  if (stateAmount && stateAmount > 0) {
+    setFinalAmount(stateAmount);
+  } else {
+
+    const storedRetail = localStorage.getItem("currentRetailInvoice");
+    const storedInvoice = localStorage.getItem("currentNewInvoice");
+    if (storedRetail) {
+      const retail = JSON.parse(storedRetail);
+      setFinalAmount(retail.totalPrice || 0);
+    } else if (storedInvoice) {
+      const invoices = JSON.parse(storedInvoice);
+      const lastInvoice = invoices[invoices.length - 1];
+      setFinalAmount(lastInvoice?.totalPrice || 0);
+    }
   }
+ 
+  // distributor default payment method
+  const distributorSettings = localStorage.getItem("distributorSettings");
+  if (distributorSettings) {
+    const settings = JSON.parse(distributorSettings);
+    if (
+      settings.payment_method === "cash" ||
+      settings.payment_method === "upi" ||
+      settings.payment_method === "credit-card"
+    ) {
+      methods.setValue("paymentMethod", settings.payment_method);
+    }
+  }
+}, [location.state, methods]);
 
-  if (storedNewInvoice) {
+  const saveInvoice = () => {
+    const storedRetail = localStorage.getItem("currentRetailInvoice");
+    const storedNew = localStorage.getItem("currentNewInvoice");
 
-    const newInvoices = JSON.parse(storedNewInvoice);
+    // Retail Flow
+    if (storedRetail) {
+      const existingInvoices = JSON.parse(
+        localStorage.getItem("currentInvoice") || "[]"
+      );
+      const retail = JSON.parse(storedRetail);
+     
+      const newInvoice = {
+  invoice: retail.invoice,
+  name: retail.name,
+  doctor: retail.doctor,                         
+  address: retail.address,  
+   doctorAddress: retail.doctorAddress,                      
+  date: new Date().toLocaleDateString("en-GB"),   
+  price: retail.totalPrice,
+  status: "Paid",
+  medicines: retail.medicines,
+  gst: retail.gst,                               
+  gstAmount: retail.gstAmount,                 
+  subTotal: retail.subTotal,              
+  totalPrice: retail.totalPrice,            
+};
 
-    if (newInvoices.length > 0) {
-
-      const lastInvoice = newInvoices[newInvoices.length - 1];
-
-      setFinalAmount(lastInvoice.totalPrice || 0);
-
+      const updated = [newInvoice, ...existingInvoices];
+      localStorage.setItem("currentInvoice", JSON.stringify(updated));
+      localStorage.removeItem("currentRetailInvoice");
+      console.log("Retail Saved Invoices → ", updated);
+  navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
+  state: { invoice: newInvoice },
+});
+      return;
     }
 
-  }
+    // New Invoice Flow 
+    if (storedNew) {
+      const existingInvoices = JSON.parse(
+        localStorage.getItem("currentInvoice") || "[]"
+      );
+      const invoices = JSON.parse(storedNew);
+      const lastInvoice = invoices[invoices.length - 1];
 
-}, []);
+      
+      const summaryInvoice = {
+        invoice: lastInvoice.id?.toString() || Date.now().toString(),
+        name: lastInvoice.company,
+        date: new Date().toLocaleDateString(),
+        price: lastInvoice.totalPrice,
+        status: "Paid",
+      };
+
+      const updated = [summaryInvoice, ...existingInvoices];
+      localStorage.setItem("currentInvoice", JSON.stringify(updated));
+
+      localStorage.setItem("currentInvoiceBill", JSON.stringify(lastInvoice));
+      localStorage.removeItem("currentNewInvoice");
+      console.log("Complete Invoice Saved → ", lastInvoice);
+
+  
+      navigate(URL_PATH.NewInvoiceBill, {
+        state: { invoice: lastInvoice }
+      });
+    }
+  };
 
   return (
     <FormProvider {...methods}>
-      <form noValidate>
-       <InvoiceTabButtons/>
-          {/* CARD PAYMENT */}
-          <Paper sx={PaperStyle}>
-            <RadioField
-              name="paymentMethod"
-              options={[{ label: "Debit / Credit Card", value: "credit-card" }]}
-              label=""
-              sx={radioStyle}
-            />
+      {/* Top Buttons */}
+      <InvoiceTabButtons />
 
-            <Box
-              display="flex"
-              flexDirection={{ xs: "row", sm: "row" }}
-              alignItems={{ xs: "stretch", sm: "center" }}
-              gap={2}
-            >
-              {/* Card Number */}
-              <Box flex={1}>
-                <TextInputField
-                  label="Card Number"
-                  name="CardNumber"
-                  disabled={payment === "upi"}
-                  inputType="numbers"
-                  minLength={13}
-                  maxLength={19}
-                  rules={{
-                    required:
-                      payment === "credit-card"
-                        ? "Card Number is required"
-                        : false,
-                  }}
-                />
-              </Box>
-
-              {/* Icon */}
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mb: 3,
-                }}
-              >
-                <CreditCardIcon />
-              </Box>
-            </Box>
-
-            {/* Card holder name */}
-            <Box display="flex" gap={2} alignItems="center">
-              <Box flex={1}>
-                <TextInputField
-                  label="Card Holder's Name"
-                  name="CardHolderName"
-                  disabled={payment === "upi"}
-                  inputType="alphabet"
-                  minLength={3}
-                  maxLength={50}
-                  rules={{
-                    required:
-                      payment === "credit-card"
-                        ? "Card Holder's Name is required"
-                        : false,
-                  }}
-                />
-              </Box>
-
-              {/* Empty box only for sm+ screens */}
-              <Box
-                sx={{
-                  width: 24,
-                  display: { xs: "none", sm: "block" },
-                }}
-              />
-            </Box>
-
-            {/* Cvv */}
-            <Box
-              display="flex"
-              flexDirection={{ xs: "column", sm: "row" }}
-              alignItems="flex-start"
-              justifyContent={{ xs: "flex-start", sm: "space-between" }}
-              gap={2}
-            >
-              <Box width={{ xs: "100%", sm: "auto" }}>
-                <NumericField
-                  label="CVV"
-                  name="Cvv"
-                  required={payment === "credit-card"}
-                  disabled={payment === "upi"}
-                  decimal={false}
-                  maxlength={3}
-                  max={999}
-                />
-              </Box>
-
-              {/* Pay Button */}
-              <Button
-                type="submit"
-                variant="contained"
-                onClick={handleSubmit(onCardPay)}
-                disabled={payment === "upi"}
-                sx={{
-                  ...btnStyle,
-                  width: { xs: "100%", sm: "auto" },
-                  mb: 1,
-                }}
-              >
-                Pay
-              </Button>
-            </Box>
-
-            <Box textAlign="center" alignItems={"center"}>
-              {showPaymentStatus(CardPaymentStatus)}
-            </Box>
-          </Paper>
-
-          {/* UPI PAYMENT SECTION */}
-          <Paper sx={PaperStyle}>
-            <RadioField
-              name="paymentMethod"
-              options={[{ label: "UPI Payment", value: "upi" }]}
-              label=""
-              sx={radioStyle}
-            />
-
-            <Box display="flex" flexDirection="column" gap={1}>
-              <Box display="flex" alignItems="center" gap={2}>
-                <Box flex={1}>
-                  <TextInputField
-                    label="Enter your UPI ID"
-                    name="UpiId"
-                    inputType="alphanumeric"
-                    maxLength={30}
-                    disabled={payment === "credit-card"}
-                    rules={{
-                      required:
-                        payment === "upi" ? "UPI ID is required" : false,
-                      pattern: {
-                        value:
-                          /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ibl|phonepe)$/,
-                        message: "Enter valid UPI ID",
-                      },
-                    }}
-                  />
-                </Box>
-
-                {detecteIcon && upiIcons[detecteIcon] && (
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: "50%",
-                      backgroundColor: "#fff",
-                      boxShadow: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mb: 3,
-                    }}
-                  >
-                    <img src={upiIcons[detecteIcon]} width={28} height={28} />
-                  </Box>
-                )}
-              </Box>
-
-              {/* UPi pay btn */}
-              <Box display="flex" justifyContent="flex-end" mt={0}>
-                <Button
-                  type="button"
-                  variant="contained"
-                  onClick={handleSubmit(onUpiPay)}
-                  disabled={payment === "credit-card"}
-                  sx={{ ...btnStyle, width: { xs: "100%", sm: "auto" } }}
-                >
-                  Pay
-                </Button>
-              </Box>
-              {/* Payment status circular progress*/}
-              <Box alignItems="center" textAlign={"center"}>
-                {showPaymentStatus(UpiPaymentStatus)}
-              </Box>
-            </Box>
-          </Paper>
+      {/* Outer Box */}
+      <Box
+        display="flex"
+        flexDirection="column"
+        sx={{
+          border: "1px solid #ccc",
+          gap: { xs: 2, sm: 3 },
+          backgroundColor: "#fff",
+          p: { xs: 2, sm: 3 },
+        }}
+      >
+        <Box display="flex" gap={2} mb={1}>
+          <RadioField
+            name="paymentMethod"
+            options={[
+              { label: "Credit / Debit Card", value: "credit-card" },
+              { label: "UPI Payment", value: "upi" },
+              { label: "Cash", value: "cash" },
+            ]}
+            label=""
+            sx={radioStyle}
+          />
+        </Box>
         
-      </form>
+        {payment === "credit-card" && (
+          <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
+        )}
+
+        {payment === "upi" && (
+          <UpiPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
+        )}
+
+        {payment === "cash" && (
+          <CashPayment
+            payment={payment}
+            finalAmount={finalAmount}
+            onSuccess={saveInvoice}
+          />
+        )}
+      </Box>
     </FormProvider>
   );
 };

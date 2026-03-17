@@ -108,6 +108,7 @@ const NetBanking_PurchaseDetails = () => {
             label="Amount"
             placeholder="Enter Amount"
             type="number"
+            maxLength={30}
             fullWidth
            required
             sx={{
@@ -135,6 +136,10 @@ const NetBanking_PurchaseDetails = () => {
             <EmailField
               name="email"
               label="Enter Email"
+
+              maxLength={50}
+              //inputProps={{ maxLength: 254 }}
+        
               required
               sx={{
                 mt: 1,

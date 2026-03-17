@@ -1,5 +1,14 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from "@mui/material";
-import { useEffect, useState } from "react";
+import MobileField from "@/components/controlled/MobileField";
+import TextInputField from "@/components/controlled/TextInputField";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
+import { useEffect } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 
 type Doctor = {
   id: string;
@@ -18,92 +27,98 @@ type Props = {
   onSave: (doctor: Doctor) => void;
 };
 
-const DoctorEdit = ({doctor, onClose, onSave}: Props) => {
-  const [formData, setFormData] = useState<Doctor | null>(null);
-
-  // update the doctor
+const DoctorEdit = ({ doctor, onClose, onSave }: Props) => {
+  const methods = useForm<Doctor>({
+    mode: "onChange",
+    defaultValues: doctor || undefined,
+  });
+  const handleSave = (data: Doctor) => {
+    onSave(data);
+  };
   useEffect(() => {
-    setFormData(doctor);
-  }, [doctor]);
-  if (!formData) return null;
-
+    if (doctor) {
+      methods.reset(doctor);
+    }
+  }, [doctor, methods]);
   return (
-    <Dialog open={Boolean(doctor)} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle >Edit Doctor</DialogTitle>
+    <FormProvider {...methods}>
+      <Dialog open={Boolean(doctor)} onClose={onClose} maxWidth="sm" fullWidth>
+        <form onSubmit={methods.handleSubmit(handleSave)}>
+          <DialogTitle >Edit Doctor</DialogTitle>
 
-      <DialogContent sx={{display: "flex", flexDirection: "column", gap: 2, }}>
-        <TextField
-          label="Doctor Name"
-          value={formData.doctorName}
-          onChange={(e) =>
-            setFormData({ ...formData, doctorName: e.target.value })
-          }
-          sx={{mt:1}}
-        />
+          <DialogContent
+            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+          >
+            <TextInputField sx={{mt:1}}
+              name="doctorName"
+              label="Doctor Name"
+              inputType="alphabet"
+              required
+              minLength={3}
+              maxLength={30}
+              rules={{ required: "Doctor Name is required" }}
+            />
 
-        <TextField
-          label="Degree"
-          value={formData.degree}
-          onChange={(e) =>
-            setFormData({ ...formData, degree: e.target.value })
-          }
-        />
+            <TextInputField
+              name="degree"
+              label="Degree"
+              inputType="alphabet"
+              required
+              rules={{ required: "Degree is required" }}
+            />
 
-        <TextField
-          label="Phone"
-          value={formData.phone}
-          onChange={(e) =>
-            setFormData({ ...formData, phone: e.target.value })
-          }
-        />
+            <MobileField name="phone" label="Phone" countryCode required />
 
-        <TextField
-          label="Address"
-          value={formData.address}
-          onChange={(e) =>
-            setFormData({ ...formData, address: e.target.value })
-          }
-        />
-      </DialogContent>
+            <TextInputField
+              name="address"
+              label="Address"
+              inputType="all"
+              required
+              rules={{ required: "Address is required" }}
+            />
+          </DialogContent>
 
           {/* save & cancel button */}
-      <DialogActions sx={{ gap: 2, px: 3, pb: 2 }}>
-        <Button 
-        onClick={onClose}
-         sx={{
-              px: 4,
-              width:"18%",
-              textTransform: "none",
-              border: "2px solid #1b7f6b",
-              color: "#1b7f6b",
-              "&:hover": {
-                backgroundColor: "#1b7f6b",
-                color: "#fff",
-              },
-            }}
-          >
-            Cancel
-        </Button>
-
-        <Button
-         variant="contained"
-          onClick={() => onSave(formData)}
-          sx={{
-              px: 4,
-              width:"18%",                  
-              textTransform: "none",
-              backgroundColor: "#1b7f6b",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#1b7f6b",
+          <DialogActions sx={{ gap: 2, px: 3, pb: 2 }}>
+            <Button
+              onClick={onClose}
+              sx={{
+                px: 4,
+                width: "18%",
+                textTransform: "none",
                 border: "2px solid #1b7f6b",
-              },
-            }}
-          >
-            Save
-        </Button>
-      </DialogActions>
-    </Dialog>
+                color: "#1b7f6b",
+                "&:hover": {
+                  backgroundColor: "#1b7f6b",
+                  color: "#fff",
+                },
+              }}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              variant="contained"
+              // onClick={() => onSave(formData)}
+              type="submit"
+              sx={{
+                px: 4,
+                width: "18%",
+                textTransform: "none",
+                backgroundColor: "#1b7f6b",
+                "&:hover": {
+                  backgroundColor: "#fff",
+                  color: "#1b7f6b",
+                  border: "2px solid #1b7f6b",
+                },
+              }}
+            >
+              Save
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </FormProvider>
   );
 };
 
