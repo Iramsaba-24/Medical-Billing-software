@@ -76,7 +76,7 @@ function DistributorCards() {
           mb: 2,
         }}
       >
-        Distributors Dashboard
+        Distributors 
       </Typography>
 
       {/* Cards */}

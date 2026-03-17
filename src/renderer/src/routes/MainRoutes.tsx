@@ -35,6 +35,7 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
 import EditInvoice from "@/containers/Invoices/EditInvoice"
+import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
 
 
 
@@ -138,6 +139,10 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
+      },
+      {
+        path: URL_PATH.NewInvoiceBill,
+        element: <NewInvoiceBill />,
       },
       {
         path: URL_PATH.Setting,
