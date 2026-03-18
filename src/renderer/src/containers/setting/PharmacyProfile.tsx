@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -13,6 +13,9 @@ import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 
+import LogoImage from "@/assets/icons.svg"; //  default logo image
+import { showToast } from "@/components/uncontrolled/ToastMessage";
+
 type PharmacyFormValues = {
   pharmacyName: string;
   address: string;
@@ -26,55 +29,102 @@ type PharmacyFormValues = {
   acHolderName: string;
 };
 
+/* DEFAULT VALUES */
+
+const defaultValues: PharmacyFormValues = {
+  pharmacyName: "ABC Medical Store",
+  address: "Main Road, City",
+  drugLicense: "DL-KA-2023-001245",
+  fssaiNo: "12345678901234",
+  contact: "9876543210",
+  email: "pharmacy@gmail.com",
+  bankName: "State Bank of India",
+  branchIfsc: "SBIN0001234",
+  acNumber: "123456789012",
+  acHolderName: "ABC Medical Store",
+};
+
 function PharmacyProfile() {
   const methods = useForm<PharmacyFormValues>({
     mode: "onChange",
-    defaultValues: {
-      pharmacyName: "",
-      address: "",
-      drugLicense: "",
-      fssaiNo: "",
-      contact: "",
-      email: "",
-      bankName: "",
-      branchIfsc: "",
-      acNumber: "",
-      acHolderName: "",
-    },
+    defaultValues: defaultValues,
   });
 
   const { handleSubmit, reset } = methods;
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Image preview state
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  // default preview logo
+  const [previewImage, setPreviewImage] = useState<string | null>(LogoImage);
+
+  /* LOAD SAVED DATA */
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("pharmacyProfile");
+    const savedLogo = localStorage.getItem("pharmacyLogo");
+
+    if (savedData) {
+      reset(JSON.parse(savedData));
+    }
+
+    if (savedLogo) {
+      setPreviewImage(savedLogo); //  show saved logo
+    } else {
+      setPreviewImage(LogoImage); // show default logo
+    }
+  }, [reset]);
+
+  /* SAVE */
 
   const onSubmit: SubmitHandler<PharmacyFormValues> = (data) => {
     console.log("Form submitted with:", data);
-    window.alert("Data saved successfully!");
-    handleReset();
+
+    localStorage.setItem("pharmacyProfile", JSON.stringify(data));
+    localStorage.setItem("pharmacyName", data.pharmacyName);
+
+    // ADD THIS   Drug License save
+    localStorage.setItem("drugLicense", data.drugLicense);
+
+    if (previewImage) {
+      localStorage.setItem("pharmacyLogo", previewImage);
+    }
+    showToast("success", "Data saved successfully!");
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 900);
   };
+
+  /* IMAGE CHANGE */
 
   const handleImageChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const file = event.target.files?.[0];
+
     if (file) {
-      setPreviewImage(URL.createObjectURL(file));
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+
+      reader.readAsDataURL(file);
     }
   };
 
-  /* Reset */
+  /* RESET → DEFAULT VALUES */
+
   const handleReset = (): void => {
-    reset();
-    setPreviewImage(null);
+    reset(defaultValues);
+
+    setPreviewImage(LogoImage); //  reset logo to default
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  /* Styles */
   const cardStyle = {
     p: { xs: 2, md: 4 },
     borderRadius: "5px",
@@ -98,18 +148,19 @@ function PharmacyProfile() {
             Pharmacy Profile
           </Typography>
         </Box>
+
         <Box sx={{ width: "100%" }}>
-          {/* CARD 1 : Pharmacy Profile */}
+          {/* CARD 1 */}
+
           <Paper sx={cardStyle}>
             <Grid container spacing={{ xs: 3, md: 12 }}>
-              {/* Left Column */}
               <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={{ xs: 2, md: 2 }}>
                   <TextInputField
                     name="pharmacyName"
                     label="Pharmacy Name"
                     placeholder="Pharmacy Name"
-                    maxLength={50}
+                    maxLength={30}
                     inputType="all"
                     rows={1}
                     required
@@ -123,6 +174,7 @@ function PharmacyProfile() {
                     rows={4}
                     required
                   />
+
                   <TextInputField
                     name="drugLicense"
                     label="Drug License No."
@@ -237,16 +289,16 @@ function PharmacyProfile() {
                     </Box>
                   </Box>
 
-                  {/* FSSAI No */}
                   <Box sx={{ mt: { xs: 0, md: 12 }, width: "100%" }}>
                     <TextInputField
                       name="fssaiNo"
                       label="FSSAI No."
                       placeholder="12345678901234"
                       type="number"
-                      maxLength={25}
-                      sx={{ mt: 8 }}
+                      minLength={14}
+                      maxLength={14}
                       required
+                      sx={{ mt: 8 }}
                     />
                   </Box>
                 </Stack>
@@ -254,11 +306,13 @@ function PharmacyProfile() {
             </Grid>
           </Paper>
 
-          {/* CARD 2 : Contact Details */}
+          {/* CARD 2 */}
+
           <Paper sx={cardStyle}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
               Contact Details
             </Typography>
+
             <Divider sx={{ my: 2 }} />
 
             <Grid container spacing={{ xs: 2, md: 9 }}>
@@ -267,71 +321,24 @@ function PharmacyProfile() {
                   name="contact"
                   label="Contact Number"
                   placeholder="9876543210"
+                  countryCode
                   required
                 />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <EmailField name="email" label="Email Address" required />
+                <EmailField
+                  name="email"
+                  label="Email Address"
+                  required
+                  maxLength={50}
+                />
               </Grid>
             </Grid>
           </Paper>
 
-          {/* CARD 3 : Bank Details */}
-          <Paper sx={cardStyle}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-              Bank Details
-            </Typography>
-            <Divider sx={{ my: 2 }} />
+          {/* BUTTONS */}
 
-            <Grid container spacing={{ xs: 3, md: 9 }}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Stack spacing={2}>
-                  <TextInputField
-                    name="bankName"
-                    label="Bank Name"
-                    inputType="alphabet"
-                    rows={1}
-                    required
-                  />
-
-                  <TextInputField
-                    name="acNumber"
-                    label="A/C Number"
-                    type="number"
-                    maxLength={15}
-                    placeholder="12345678912"
-                    required
-                  />
-                </Stack>
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Stack spacing={2}>
-                  <TextInputField
-                    name="branchIfsc"
-                    label="Branch / IFSC"
-                    placeholder="SBIN0000456 (11 characters)"
-                    minLength={11}
-                    maxLength={11}
-                    inputType="alphanumeric"
-                    required
-                    
-                  />
-
-                  <TextInputField
-                    name="acHolderName"
-                    label="A/C Holder Name"
-                    maxLength={50}
-                    inputType="alphabet"
-                    required
-                  />
-                </Stack>
-              </Grid>
-            </Grid>
-          </Paper>
-
-          {/* Buttons */}
           <Box
             sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}
           >
@@ -343,11 +350,6 @@ function PharmacyProfile() {
                 color: "#238878",
                 border: "2px solid #238878",
                 textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                  border: "2px solid #238878",
-                },
               }}
             >
               Reset
@@ -361,11 +363,6 @@ function PharmacyProfile() {
                 color: "#fff",
                 border: "2px solid #238878",
                 textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                  border: "2px solid #238878",
-                },
               }}
             >
               Save

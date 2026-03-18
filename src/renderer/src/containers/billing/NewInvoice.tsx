@@ -6,15 +6,10 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 
-import {
-  FormProvider,
-  useForm,
-  FieldErrors
-} from "react-hook-form";
-
+import { FormProvider, useForm, FieldErrors } from "react-hook-form";
 
 import { useState, useEffect } from "react";
 
@@ -79,14 +74,12 @@ type ItemRow = {
 };
 
 const NewInvoice = () => {
-
   const navigate = useNavigate();
 
   const [distributors, setDistributors] = useState<Distributor[]>([]);
 
-
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "" }
+    { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -107,30 +100,26 @@ const NewInvoice = () => {
   /* LOAD DISTRIBUTORS */
 
   useEffect(() => {
-
     const saved = localStorage.getItem("distributors");
 
     if (saved) {
       const parsed: Distributor[] = JSON.parse(saved);
       setDistributors(parsed);
     }
-
   }, []);
 
   const selectedCompany = watch("company");
 
-  
   const onSubmit = (data: FormData) => {
-
     setIsSubmitted(true);
 
-    if (rows.some(r => !r.name || !r.qty || !r.price)) {
+    if (rows.some((r) => !r.name || !r.qty || !r.price)) {
       showToast("error", "Please fill all item details");
       return;
     }
 
     const existingInvoices = JSON.parse(
-      localStorage.getItem("currentNewInvoice") || "[]"
+      localStorage.getItem("currentNewInvoice") || "[]",
     );
 
     const newInvoice = {
@@ -141,21 +130,17 @@ const NewInvoice = () => {
       email: data.email,
       address: data.address,
       items: rows,
-      totalPrice: finalTotal
+      totalPrice: finalTotal,
     };
 
     const updatedInvoices = [...existingInvoices, newInvoice];
 
-    localStorage.setItem(
-      "currentNewInvoice",
-      JSON.stringify(updatedInvoices)
-    );
+    localStorage.setItem("currentNewInvoice", JSON.stringify(updatedInvoices));
 
     showToast("success", "Data saved successfully!");
 
-
     navigate(URL_PATH.PaymentMethod, {
-      state: { totalFromInvoice: finalTotal }
+      state: { totalFromInvoice: finalTotal },
     });
   };
 
@@ -176,47 +161,30 @@ const NewInvoice = () => {
   /* AUTO FILL */
 
   useEffect(() => {
-
     if (selectedCompany) {
-
       const selectedDistributor = distributors.find(
-        (d) => d.companyName === selectedCompany
+        (d) => d.companyName === selectedCompany,
       );
 
       if (selectedDistributor) {
-
         methods.setValue("mobile", selectedDistributor.mobile || "");
         methods.setValue("email", selectedDistributor.email || "");
         methods.setValue("address", selectedDistributor.address || "");
         methods.setValue("supplier", selectedDistributor.ownerName || "");
-
       }
-
     }
-
   }, [selectedCompany, distributors, methods]);
 
   return (
-
     <FormProvider {...methods}>
-
       <InvoiceTabButtons />
 
       <Paper sx={{ p: 2 }}>
-
-        <form
-          onSubmit={handleSubmit(onSubmit, onError)}
-          noValidate
-        >
-
+        <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
           <Box sx={containerStyle}>
-
             <Grid container spacing={3}>
-
               <Grid size={{ xs: 12, md: 6 }}>
-
                 <FormControl fullWidth>
-
                   <InputLabel>Company</InputLabel>
 
                   <Select
@@ -226,19 +194,13 @@ const NewInvoice = () => {
                       methods.setValue("company", e.target.value);
                     }}
                   >
-
                     {companyOptions.map((option) => (
-
                       <MenuItem key={option.value} value={option.value}>
                         {option.label}
                       </MenuItem>
-
                     ))}
-
                   </Select>
-
                 </FormControl>
-
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
@@ -246,7 +208,12 @@ const NewInvoice = () => {
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
-                <MobileField name="mobile" label="Mobile Number" required countryCode/>
+                <MobileField
+                  name="mobile"
+                  label="Mobile Number"
+                  required
+                  countryCode
+                />
               </Grid>
 
               <Grid size={{ xs: 12, md: 6 }}>
@@ -261,9 +228,7 @@ const NewInvoice = () => {
                   rows={3}
                 />
               </Grid>
-
             </Grid>
-
           </Box>
 
           {/* ITEMS */}
@@ -284,7 +249,6 @@ const NewInvoice = () => {
               flexWrap: "wrap",
             }}
           >
-
             <Button
               variant="contained"
               type="submit"
@@ -292,13 +256,9 @@ const NewInvoice = () => {
             >
               Save And Submit
             </Button>
-
           </Box>
-
         </form>
-
       </Paper>
-
     </FormProvider>
   );
 };

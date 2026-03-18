@@ -201,15 +201,15 @@ const RegisterPage = () => {
               />
 
               <MobileField
-                name="mobile"
+                name="mobileNumber"
                 label="Mobile Number"
-                countryCode
+                countryCode 
                 required
                 sx={inputStyle("mobile")}
               />
 
               <TextInputField
-                name="company"
+                name="companyName"
                 label="Company / Clinic Name"
                 required
                 sx={inputStyle("company")}

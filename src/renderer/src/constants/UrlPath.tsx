@@ -1,5 +1,3 @@
-
-
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
@@ -21,7 +19,8 @@ export const URL_PATH = {
   Dashboard: "/dashboard",
   SalesView: "/dashboard/sales-view",
   Customer: "/customers",
-  AddCustomer: "/customers/Addcustomers", 
+  AddCustomerForm: "/customers/add-customers", 
+  
 
   Doctors: "/doctors",
   AddDoctor: "/add-doctor",

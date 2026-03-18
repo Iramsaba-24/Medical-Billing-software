@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Typography, Paper, SxProps, Theme } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
-import { Save, Payment, Print } from "@mui/icons-material";
+import { Save } from "@mui/icons-material";
 import { CustomerData } from "@/view/CustomerMaster";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
-
 import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 
 interface StoredDoctor {
   doctorName: string;
@@ -20,7 +20,7 @@ interface StoredDoctor {
 
 interface Props {
   onBack?: () => void;
-  onSave?: (data: CustomerData) => void; 
+  onSave?: (data: CustomerData) => void;
   initialData?: CustomerData | null;
 }
 
@@ -47,12 +47,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    let value = input.value.replace(/[^0-9]/g, "");
-
-    if (value !== "" && Number(value) > 100) {
-      value = "100";
-    }
-
+    const value = input.value.replace(/[^0-9]/g, "");
     input.value = value;
   };
 
@@ -79,27 +74,38 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     const options = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
-      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
+      address:
+        doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
 
-    setDoctorOptions(options);
+    const updatedOptions = [
+      { label: "+ Add Doctor", value: "add_doctor", address: "" },
+      ...options,
+    ];
+
+    setDoctorOptions(updatedOptions);
   }, []);
 
   const selectedDoctor = methods.watch("doctor");
 
   useEffect(() => {
-    if (selectedDoctor) {
-      const doctorData = doctorOptions.find(
-        (doc) => doc.value === selectedDoctor
-      );
+    if (!selectedDoctor) return;
 
-      if (doctorData) {
-        methods.setValue("doctorAddress", doctorData.address, {
-          shouldValidate: true,
-        });
-      }
+    if (selectedDoctor === "add_doctor") {
+      navigate(URL_PATH.AddDoctor);
+      return;
     }
-  }, [selectedDoctor, doctorOptions, methods]);
+
+    const doctorData = doctorOptions.find(
+      (doc) => doc.value === selectedDoctor
+    );
+
+    if (doctorData) {
+      methods.setValue("doctorAddress", doctorData.address, {
+        shouldValidate: true,
+      });
+    }
+  }, [selectedDoctor, doctorOptions, methods, navigate]);
 
   useEffect(() => {
     if (initialData) {
@@ -108,10 +114,26 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   }, [initialData, methods]);
 
   const handleActualSave = (data: CustomerData) => {
+    const existingCustomers: CustomerData[] = JSON.parse(
+      localStorage.getItem("customers") || "[]"
+    );
+
+    let updatedCustomers: CustomerData[];
+
+    if (initialData) {
+      updatedCustomers = existingCustomers.map((customer) =>
+        customer.mobile === initialData.mobile ? data : customer
+      );
+    } else {
+      updatedCustomers = [...existingCustomers, data];
+    }
+
+    localStorage.setItem("customers", JSON.stringify(updatedCustomers));
+
     onSave?.(data);
 
     if (!initialData) {
-      navigate("/billing/retail-invoice");
+      navigate(URL_PATH.Billing);
     }
   };
 
@@ -123,31 +145,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         onSubmit={methods.handleSubmit(handleActualSave)}
         sx={{ bgcolor: "#f5f5f5", minHeight: "100vh", p: { xs: 1, md: 0 } }}
       >
-        {/* Header */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <Typography variant="h5" fontWeight="bold">
             {initialData ? "Edit Customer" : "Add Customer"}
           </Typography>
-
-          <Button
-            variant="contained"
-            onClick={onBack}
-            sx={{
-              backgroundColor: "#238878",
-              color: "#fff",
-              border: "2px solid #238878",
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-              },
-            }}
-          >
-            Back
-          </Button>
         </Box>
 
-        {/* Form Section */}
         <Paper
           sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }}
           elevation={3}
@@ -159,7 +162,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               gap: 4,
             }}
           >
-            {/* Customer Details */}
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Customer Details
@@ -200,7 +202,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   }}
                 />
 
-                <MobileField name="mobile" label="Mobile" required />
+                <MobileField
+                  name="mobile"
+                  label="Mobile"
+                  countryCode
+                  required
+                />
 
                 <EmailField name="email" label="Email" required />
 
@@ -214,7 +221,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               </Box>
             </Box>
 
-            {/* Doctor Info */}
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
@@ -226,6 +232,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   label="Doctor Name"
                   options={doctorOptions}
                   placeholder="Select Doctors"
+                  required
                 />
 
                 <TextInputField
@@ -233,33 +240,35 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   label="Doctor Address/Clinic"
                   inputType="textarea"
                   rows={1}
+                  required
                 />
               </Box>
             </Box>
           </Box>
         </Paper>
 
-        {/* Buttons */}
         <Box
           sx={{
             mt: 4,
             display: "flex",
             flexWrap: "wrap",
-            justifyContent: { xs: "stretch", sm: "flex-end" },
+            justifyContent: "space-between",
+            alignItems: "center",
             gap: 2,
           }}
         >
           <Button
             variant="contained"
-            startIcon={<Print />}
+            onClick={() => {
+              if (onBack) {
+                onBack();
+              } else {
+                navigate(-1);
+              }
+            }}
             sx={buttonStyle}
-            onClick={() => window.print()}
           >
-            Print
-          </Button>
-
-          <Button variant="contained" startIcon={<Payment />} sx={buttonStyle}>
-            Pay Now
+            Back
           </Button>
 
           <Button
@@ -268,12 +277,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             startIcon={<Save />}
             sx={buttonStyle}
           >
-            Save
+            Save and continue
           </Button>
         </Box>
       </Box>
     </FormProvider>
-  ); 
-}; 
+  );
+};
 
 export default AddCustomerForm;

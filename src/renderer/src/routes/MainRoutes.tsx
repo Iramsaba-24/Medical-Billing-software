@@ -34,7 +34,7 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 // import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
-import EditInvoice from "@/containers/Invoices/EditInvoice";
+import EditInvoice from "@/containers/Invoices/EditInvoice"
 import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
 
 
@@ -44,13 +44,11 @@ export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-
       { path: URL_PATH.Landing, element: <Landing /> },
 
       { path: URL_PATH.Dashboard, element: <Dashboard /> },
 
       { path: URL_PATH.SalesView, element: <SalesView /> },
-
 
       {
         path: URL_PATH.Invoices,
@@ -80,7 +78,7 @@ export const mainRoutes: RouteObject[] = [
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
       },
-     
+
       {
         path: URL_PATH.Inventory,
         element: <Inventory />,
@@ -89,10 +87,6 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.NewInvoice,
         element: <NewInvoice />,
       },
-      // {
-      //   path: URL_PATH.InventoryList,
-      //   element: <InventoryList />,
-      // },
       {
         path: URL_PATH.Reorder,
         element: <Reorder />,
@@ -130,32 +124,6 @@ export const mainRoutes: RouteObject[] = [
         element: <ReportPage />,
       },
       {
-        path: URL_PATH.DistributorsSetting,
-        element: <DistributorsSetting />,
-      },
-      {
-        path: URL_PATH.ReportSettings,
-        element: <ReportSettings />,
-      },
-
-      {
-        path: URL_PATH.InvoiceSetting,
-        element: <InvoiceSettings />,
-      },
-      {
-        path: URL_PATH.GeneralSettings,
-        element: <GeneralSettings />,
-      },
-      {
-        path: URL_PATH.PharmacyProfile,
-        element: <PharmacyProfile />,
-      },
-      {
-        path: URL_PATH.CustomerSettings,
-        element: <CustomerSettings />,
-      },
-
-      {
         path: URL_PATH.MediPoints,
         element: <MediPoints />,
       },
@@ -169,38 +137,57 @@ export const mainRoutes: RouteObject[] = [
         element: <Billing />,
       },
       {
-        path: URL_PATH.InventorySettings,
-        element: <InventorySettings />,
-      },
-     
-   
-      {
-        path: URL_PATH.Setting,
-        element: <Setting />,
-      },
-      {
-        path: URL_PATH.DashboardSettings,
-        element: <DashboardSettings />,
-      },
-      {
-        path: URL_PATH.DoctorSettings,
-        element: <DoctorSettings />,
-      },
-
-      // {
-      //   path: URL_PATH.PaymentDetails,
-      //   element: <PaymentDetails />,
-      // },
-      {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
       },
-      
-      {
-        path: URL_PATH.AddCustomer,
+       {
+        path: URL_PATH.AddCustomerForm,
         element: <AddCustomerForm />,
       },
+      {
+        path: URL_PATH.Setting,
+        element: <Setting />,
+        children: [
+          { index: true, element: <GeneralSettings /> },
 
+          {
+            path: URL_PATH.GeneralSettings.replace("/settings/", ""),
+            element: <GeneralSettings />,
+          },
+          {
+            path: URL_PATH.PharmacyProfile.replace("/settings/", ""),
+            element: <PharmacyProfile />,
+          },
+          {
+            path: URL_PATH.DashboardSettings.replace("/settings/", ""),
+            element: <DashboardSettings />,
+          },
+          {
+            path: URL_PATH.CustomerSettings.replace("/settings/", ""),
+            element: <CustomerSettings />,
+          },
+          {
+            path: URL_PATH.DoctorSettings.replace("/settings/", ""),
+            element: <DoctorSettings />,
+          },
+          {
+            path: URL_PATH.DistributorsSetting.replace("/settings/", ""),
+            element: <DistributorsSetting />,
+          },
+          {
+            path: URL_PATH.InventorySettings.replace("/settings/", ""),
+            element: <InventorySettings />,
+          },
+          {
+            path: URL_PATH.InvoiceSetting.replace("/settings/", ""),
+            element: <InvoiceSettings />,
+          },
+          {
+            path: URL_PATH.ReportSettings.replace("/settings/", ""),
+            element: <ReportSettings />,
+          },
+        ],
+      },
     ],
   },
 ];
