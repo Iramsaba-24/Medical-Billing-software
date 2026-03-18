@@ -107,11 +107,11 @@ const AddDoctor = () => {
           mt={3}
         >
           <Box flex={1}>
-            <MobileField name="phone" label="Phone" countryCode required />
+            <MobileField name="phone" label="Phone" countryCode preventDuplicate required />
           </Box>
 
           <Box flex={1}>
-            <EmailField name="email" label="Email" />
+            <EmailField name="email" label="Email" preventDuplicate  />
           </Box>
         </Box>
 

@@ -1,4 +1,3 @@
-import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import CardPayment from "@/containers/billing/CardPayment";
@@ -8,15 +7,16 @@ import InvoiceTabButtons from "./InvoiceTabButtons";
 import RadioField from "@/components/controlled/RadioField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-
+import { FormProvider, useForm, useWatch } from "react-hook-form";
+ 
 type PaymentMethods = {
   paymentMethod: "credit-card" | "upi" | "cash";
   CardNumber?: string;
   CardHolderName?: string;
   Cvv?: string;
-  UpiId?: string; 
+  UpiId?: string;
 };
-
+ 
 const radioStyle = {
   "& .MuiRadio-root": {
     color: "default.main",
@@ -25,7 +25,7 @@ const radioStyle = {
     },
   },
 };
-
+ 
 const PaymentMethod = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,22 +34,22 @@ const PaymentMethod = () => {
       paymentMethod: "credit-card",
     },
   });
-
+ 
   const payment = useWatch({
     control: methods.control,
     name: "paymentMethod",
   });
-
+ 
   const [finalAmount, setFinalAmount] = useState(0);
-
+ 
 useEffect(() => {
-
-
+ 
+ 
   const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
   if (stateAmount && stateAmount > 0) {
     setFinalAmount(stateAmount);
   } else {
-
+ 
     const storedRetail = localStorage.getItem("currentRetailInvoice");
     const storedInvoice = localStorage.getItem("currentNewInvoice");
     if (storedRetail) {
@@ -75,12 +75,10 @@ useEffect(() => {
     }
   }
 }, [location.state, methods]);
-
+ 
   const saveInvoice = () => {
     const storedRetail = localStorage.getItem("currentRetailInvoice");
     const storedNew = localStorage.getItem("currentNewInvoice");
-
-    // Retail Flow
     if (storedRetail) {
       const existingInvoices = JSON.parse(
         localStorage.getItem("currentInvoice") || "[]"
@@ -90,65 +88,67 @@ useEffect(() => {
       const newInvoice = {
   invoice: retail.invoice,
   name: retail.name,
-  doctor: retail.doctor,                         
+  doctor: retail.doctor,                        
   address: retail.address,  
    doctorAddress: retail.doctorAddress,                      
-  date: new Date().toLocaleDateString("en-GB"),   
+  date: new Date().toLocaleDateString("en-GB"),  
   price: retail.totalPrice,
   status: "Paid",
   medicines: retail.medicines,
-  gst: retail.gst,                               
-  gstAmount: retail.gstAmount,                 
+  gst: retail.gst,                              
+  gstAmount: retail.gstAmount,                
   subTotal: retail.subTotal,              
   totalPrice: retail.totalPrice,            
 };
-
+ 
       const updated = [newInvoice, ...existingInvoices];
       localStorage.setItem("currentInvoice", JSON.stringify(updated));
       localStorage.removeItem("currentRetailInvoice");
       console.log("Retail Saved Invoices → ", updated);
-  navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
-  state: { invoice: newInvoice },
-});
+      navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
+      state: { invoice: newInvoice },
+    });
       return;
     }
-
-    // New Invoice Flow 
+ 
+    // New Invoice Flow
     if (storedNew) {
       const existingInvoices = JSON.parse(
         localStorage.getItem("currentInvoice") || "[]"
       );
       const invoices = JSON.parse(storedNew);
       const lastInvoice = invoices[invoices.length - 1];
-
-      
+ 
+     
       const summaryInvoice = {
         invoice: lastInvoice.id?.toString() || Date.now().toString(),
         name: lastInvoice.company,
         date: new Date().toLocaleDateString(),
         price: lastInvoice.totalPrice,
         status: "Paid",
+        medicines: lastInvoice.medicines,
+        totalPrice: lastInvoice.totalPrice,
       };
-
+ 
       const updated = [summaryInvoice, ...existingInvoices];
       localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
+ 
       localStorage.setItem("currentInvoiceBill", JSON.stringify(lastInvoice));
       localStorage.removeItem("currentNewInvoice");
       console.log("Complete Invoice Saved → ", lastInvoice);
-
-  
+ 
+ 
       navigate(URL_PATH.NewInvoiceBill, {
         state: { invoice: lastInvoice }
       });
     }
   };
-
+ 
   return (
     <FormProvider {...methods}>
       {/* Top Buttons */}
       <InvoiceTabButtons />
-
+ 
       {/* Outer Box */}
       <Box
         display="flex"
@@ -172,15 +172,15 @@ useEffect(() => {
             sx={radioStyle}
           />
         </Box>
-        
+       
         {payment === "credit-card" && (
           <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
         )}
-
+ 
         {payment === "upi" && (
           <UpiPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
         )}
-
+ 
         {payment === "cash" && (
           <CashPayment
             payment={payment}
@@ -192,5 +192,6 @@ useEffect(() => {
     </FormProvider>
   );
 };
-
+ 
 export default PaymentMethod;
+ 

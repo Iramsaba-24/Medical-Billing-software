@@ -206,6 +206,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="mobile"
                   label="Mobile"
                   countryCode
+                  preventDuplicate 
                   required
                 />
  
@@ -286,4 +287,4 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
 };
  
 export default AddCustomerForm;
- 
+

@@ -125,9 +125,7 @@ function RetailInvoice() {
         price: r.price,
         amount: Number(r.qty || 0) * Number(r.price || 0),
       })),
-      subTotal: subTotal,
-      gst: gst,
-      gstAmount: (subTotal * gst) / 100,
+  
       totalPrice: finalTotal,
       status: "Paid",
       date: now.toLocaleDateString(),
@@ -151,7 +149,7 @@ function RetailInvoice() {
   type InvoiceData = {
     form: RetailInvoiceFormValues;
     rows: ItemRow[];
-    gst: number;
+   
     paymentMode: string;
   };
 
@@ -168,7 +166,6 @@ function RetailInvoice() {
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
 
-  const [gst, setGst] = useState(5);
 
   const [paymentMode, setPaymentMode] = useState("Cash");
 
@@ -184,7 +181,7 @@ function RetailInvoice() {
     if (savedData) {
       methods.reset(savedData.form);
       setRows(savedData.rows);
-      setGst(savedData.gst);
+      
       setPaymentMode(savedData.paymentMode);
     } else {
       methods.reset({
@@ -198,7 +195,7 @@ function RetailInvoice() {
         addressRight: "",
       });
       setRows([{ id: Date.now(), name: "", qty: 1, price: "" }]);
-      setGst(5);
+    
       setPaymentMode("Cash");
     }
   }, [activeInvoice, invoiceForms, methods]);
@@ -257,7 +254,6 @@ function RetailInvoice() {
       methods.setValue("doctor", "");
     }
   }, [selectedCustomerName, customerOptions, methods, navigate]);
-
   // data load
   useEffect(() => {
     const saved = localStorage.getItem("medical_customers");
@@ -279,12 +275,10 @@ function RetailInvoice() {
     }
   }, [selectedDoctorName, doctorList, methods]);
 
-  const subTotal = rows.reduce(
-    (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
-    0,
-  );
-
-  const finalTotal = subTotal + (subTotal * gst) / 100;
+ const finalTotal = rows.reduce(
+  (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
+  0,
+);
 
   return (
     <FormProvider {...methods}>
@@ -331,7 +325,7 @@ function RetailInvoice() {
                       [activeInvoice]: {
                         form: methods.getValues(),
                         rows,
-                        gst,
+                        
                         paymentMode,
                       },
                     }));

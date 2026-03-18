@@ -1,8 +1,5 @@
-
-
 import { Box, Typography, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
-
 import TotalSalesReport from "@/assets/TotalSalesReport.svg";
 import TotalPurchaseReport from "@/assets/TotalPurchaseReport.svg";
 import ProfitReport from "@/assets/ProfitReport.svg";
@@ -23,6 +20,10 @@ type RetailInvoiceItem = {
 function ReportCards() {
   const [totalSales, setTotalSales] = useState<number>(0);
   const [totalPurchase, setTotalPurchase] = useState<number>(0);
+  //handle through setting
+  const settings = JSON.parse(localStorage.getItem("report_settings") || "{}");
+
+  const visibleCards: string[] = settings?.card_visibility_control || [];
 
   const calculateTotals = () => {
     
@@ -100,7 +101,9 @@ function ReportCards() {
       gap={3}
       mb={4}
     >
-      {cards.map((card) => (
+      {cards 
+      .filter((card) => visibleCards.includes(card.label))
+      .map((card) => (
         <Paper
           key={card.label}
           sx={{
