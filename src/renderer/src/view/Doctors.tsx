@@ -1,8 +1,6 @@
-// import SearchField from "@/components/controlled/SearchField";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { Box, Typography, Paper, MenuItem, Button, Select, Divider, Dialog, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
-// import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 import DoctorEdit from "@/containers/doctors/DoctorEdit";

@@ -49,30 +49,30 @@ const CashPayment = ({ payment, finalAmount, onSuccess }: Props) => {
   }, 0);
   const isAmountMatched = subTotal === finalAmount;
   const onCashPay = () => {
-    const storedInvoice = localStorage.getItem("currentInvoice");
-    const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
+    // const storedInvoice = localStorage.getItem("currentInvoice");
+    // const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
 
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
-      const existingSales = JSON.parse(
-        localStorage.getItem("salesData") || "[]",
-      );
+    // if (storedInvoice) {
+    //   const invoice = JSON.parse(storedInvoice);
+    //   const existingSales = JSON.parse(
+    //     localStorage.getItem("salesData") || "[]",
+    //   );
 
-      existingSales.push(invoice);
-      localStorage.setItem("salesData", JSON.stringify(existingSales));
-      localStorage.removeItem("currentInvoice");
-    }
+    //   existingSales.push(invoice);
+    //   localStorage.setItem("salesData", JSON.stringify(existingSales));
+    //   localStorage.removeItem("currentInvoice");
+    // }
 
-    if (storedRetailInvoice) {
-      const retailInvoices = JSON.parse(storedRetailInvoice);
-      const existingRetail = JSON.parse(
-        localStorage.getItem("retailInvoices") || "[]",
-      );
+    // if (storedRetailInvoice) {
+    //   const retailInvoices = JSON.parse(storedRetailInvoice);
+    //   const existingRetail = JSON.parse(
+    //     localStorage.getItem("retailInvoices") || "[]",
+    //   );
 
-      const updatedRetail = [...existingRetail, retailInvoices];
-      localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
-      localStorage.removeItem("currentRetailInvoice");
-    }
+    //   const updatedRetail = [...existingRetail, retailInvoices];
+    //   localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
+    //   localStorage.removeItem("currentRetailInvoice");
+    // }
     onSuccess();
   };
 
