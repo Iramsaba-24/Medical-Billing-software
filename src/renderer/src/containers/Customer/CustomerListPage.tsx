@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { CustomerData } from "@/view/CustomerMaster";
 import {
   UniversalTable,
@@ -7,11 +7,14 @@ import {
 import { Box, Button, Typography, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
+import {
+  showToast,
+  showConfirmation,
+} from "@/components/uncontrolled/ToastMessage.tsx";
 
-// Define the properties required by the Customer List page
 interface CustomerListProps {
   data: CustomerData[];
-
   onView: (data: CustomerData) => void;
   onEdit: (data: CustomerData) => void;
   onDelete: (data: CustomerData) => void;
@@ -19,38 +22,66 @@ interface CustomerListProps {
 
 export const CustomerListPage = ({
   data,
- 
   onView,
   onEdit,
-  onDelete,
 }: CustomerListProps) => {
   const navigate = useNavigate();
   const [searchTerm] = useState("");
+  const [customers, setCustomers] = useState<CustomerData[]>([]);
+
+  useEffect(() => {
+    const storedCustomers = localStorage.getItem("customers");
+
+    if (storedCustomers) {
+      setCustomers(JSON.parse(storedCustomers));
+    } else {
+      setCustomers(data);
+      localStorage.setItem("customers", JSON.stringify(data));
+    }
+  }, [data]);
 
   const filteredData = useMemo(() => {
-    if (!searchTerm) return data;
+    if (!searchTerm) return customers;
     const lowerSearch = searchTerm.toLowerCase();
-    return data.filter(
+    return customers.filter(
       (item) =>
         item.name?.toLowerCase().includes(lowerSearch) ||
         item.mobile?.toLowerCase().includes(lowerSearch)
     );
-  }, [data, searchTerm]);
+  }, [customers, searchTerm]);
 
   const columns: readonly Column<CustomerData>[] = [
     { label: "Name", key: "name" },
     { label: "Mobile", key: "mobile" },
-    { label: "Medicines", key: "medicines" },
-    { label: "Qty", key: "totalQty" },
-    { label: "Total", key: "totalPrice" },
     { label: "Doctor", key: "doctor" },
     { label: "Date", key: "date" },
     { label: "Actions", key: "actionbutton" },
   ];
 
+  const handleDelete = async (customer: CustomerData) => {
+    const confirmed = await showConfirmation(
+      "Are you sure you want to delete this customer?",
+      "Confirm Delete"
+    );
+
+    if (!confirmed) return;
+
+    const storedCustomers: CustomerData[] = JSON.parse(
+      localStorage.getItem("customers") || "[]"
+    );
+
+    const updatedCustomers = storedCustomers.filter(
+      (item) => item.mobile !== customer.mobile
+    );
+
+    localStorage.setItem("customers", JSON.stringify(updatedCustomers));
+    setCustomers(updatedCustomers);
+
+    showToast("success", "Customer deleted successfully");
+  };
+
   return (
     <Box sx={{ bgcolor: "#f8f9fa" }}>
-      {/* Page Heading */}
       <Box sx={{ mb: 2 }}>
         <Typography
           sx={{
@@ -71,7 +102,6 @@ export const CustomerListPage = ({
           border: "1px solid #e0e0e0",
         }}
       >
-        {/* Customers List Title + Add Button */}
         <Box
           sx={{
             display: "flex",
@@ -86,7 +116,7 @@ export const CustomerListPage = ({
 
           <Button
             variant="contained"
-            onClick={() => navigate("/customers/add-customer")}
+            onClick={() => navigate(URL_PATH.AddCustomerForm)}
             startIcon={<AddIcon />}
             sx={{
               textTransform: "none",
@@ -111,10 +141,11 @@ export const CustomerListPage = ({
             data={filteredData}
             showExport={true}
             showSearch={true}
+            getRowId={(row) => row.mobile}
             actions={{
-              view: onView,
-              edit: onEdit,
-              delete: onDelete,
+              view: (customer) => onView(customer),
+              edit: (customer) => onEdit(customer),
+              delete: (customer) => handleDelete(customer),
             }}
           />
         </Box>

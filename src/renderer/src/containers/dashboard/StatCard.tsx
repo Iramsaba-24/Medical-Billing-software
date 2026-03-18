@@ -11,7 +11,7 @@ import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
 import { InventoryItem } from '@/containers/inventory/InventoryList';
 type CustomerItem = {
-  qty: number;
+  qty: number; 
   price: number;
 };
  

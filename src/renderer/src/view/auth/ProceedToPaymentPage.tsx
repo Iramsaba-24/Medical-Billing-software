@@ -141,7 +141,7 @@ const ProceedToPaymentPage = () => {
             </FormControl>
           </Box>
 
-          {/* Total Amount Display */}
+          {/* Total Amount */}
           <Box sx={{ width: "100%", mb: 3 }}>
             <Typography
               sx={{
@@ -151,16 +151,15 @@ const ProceedToPaymentPage = () => {
                 mb: 1,
               }}
             >
-              Total Amount Display
+              Total Amount
             </Typography>
 
             <TextInputField
               name="amount"
               label=""
-              required
-              maxLength={4}
               placeholder="Enter total amount"
               rules={{
+                required: "Amount is required",
                 pattern: {
                   value: /^[0-9]{1,4}$/,
                   message: "Only numbers allowed (max 4 digits)",
@@ -169,6 +168,7 @@ const ProceedToPaymentPage = () => {
               inputProps={{
                 inputMode: "numeric",
                 onInput: handleAmountInput,
+                maxLength: 4,
               }}
               sx={{
                 "& .MuiOutlinedInput-root": {

@@ -1,10 +1,6 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Paper, Typography, Stack } from "@mui/material";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
-import TextInputField from "@/components/controlled/TextInputField";
-import { useEffect } from "react";
-import { showToast } from "@/components/uncontrolled/ToastMessage";
- 
 //  Define Form Types for Type Safety
 export interface InventoryFormValues {
   groupExpiry: string[];
@@ -29,30 +25,21 @@ const InventorySettings = () => {
       alertsVisibility: [],
     },
   });
- 
+
   const headingStyle = {
     fontWeight: 700,
     fontSize: "18px",
     color: "#212529",
     mb: 1,
   };
- 
   //  Save Function
   const { handleSubmit, reset } = methods;
   const onSubmit = (data: InventoryFormValues) => {
     console.log("Inventory Settings Saved ");
     console.log(data);
     localStorage.setItem("inventorySettings", JSON.stringify(data));
-    showToast("success", "Settings updated successfully!");
   };
-  useEffect(() => {
-      const storedSettings = localStorage.getItem("inventorySettings");
-  
-      if (storedSettings) {
-        reset(JSON.parse(storedSettings));
-      }
-    }, [reset]);
- 
+
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
       <Box mb={2}>
@@ -67,95 +54,10 @@ const InventorySettings = () => {
           Inventory Settings
         </Typography>
       </Box>
- 
+
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2.5}>
-            <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography sx={headingStyle}>Stock Limits</Typography>
- 
-              {/* Row 1 */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 0.5,
-                }}
-              >
-                <Typography fontSize="14px">Low Stock Threshold</Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <TextInputField
-                    name="lowStockThreshold"
-                    label=""
-                    inputType="numbers"
-                    sx={{
-                      width: "80px",
-                      "& .MuiInputBase-root": { height: "25px" },
-                    }}
-                  />
-                  <Typography fontSize="14px" sx={{ mb: 3 }}>
-                    Units
-                  </Typography>
-                </Box>
-              </Box>
- 
-              {/* Row 2 */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography fontSize="14px" sx={{ mb: 3 }}>
-                  Auto Reorder Quantity
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <TextInputField
-                    name="autoReorderQty"
-                    label=""
-                    inputType="numbers"
-                    sx={{
-                      width: "80px",
-                      "& .MuiInputBase-root": { height: "25px" },
-                    }}
-                  />
-                  <Typography fontSize="14px" sx={{ mb: 3 }}>
-                    Units
-                  </Typography>
-                </Box>
-              </Box>
- 
-              {/* Row 3 */}
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Typography fontSize="14px" sx={{ mb: 3 }}>
-                  {" "}
-                  Out of stock{" "}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <TextInputField
-                    name="outOfStock"
-                    label=""
-                    inputType="numbers"
-                    sx={{
-                      width: "80px",
-                      "& .MuiInputBase-root": { height: "25px" },
-                    }}
-                  />
-                  <Typography fontSize="14px" sx={{ mb: 3 }}>
-                    Units
-                  </Typography>
-                </Box>
-              </Box>
-            </Paper>
- 
             {/*  Returns & Auto Update */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
               <Typography variant="subtitle1" sx={headingStyle}>
@@ -172,7 +74,7 @@ const InventorySettings = () => {
                 ]}
               />
             </Paper>
- 
+
             {/*  Alerts & Visibility */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
               <Typography variant="subtitle1" sx={headingStyle}>
@@ -214,9 +116,8 @@ const InventorySettings = () => {
               >
                 Reset
               </Button>
- 
               <Button
-               type="submit"
+                type="submit"
                 variant="contained"
                 sx={{
                   backgroundColor: "#238878",
@@ -239,5 +140,5 @@ const InventorySettings = () => {
     </Box>
   );
 };
- 
+
 export default InventorySettings;

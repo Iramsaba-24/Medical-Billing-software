@@ -16,12 +16,12 @@ import AddDoctor from "@/containers/doctors/AddDoctor";
 import DistributorsPage from "@/view/DistributorsPage";
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
-import DistributorDetails from "@/containers/distributors/DistributorsDetails";
+import DistributorDetails from "@/containers/Distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 import Setting from "@/containers/layout/Setting";
-import DistributorsForm from "@/containers/distributors/DistributorsForm";
+import DistributorsForm from "@/containers/Distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
 import MediPoints from "@/containers/billing/MediPoints";
 import Billing from "@/view/Billing";
@@ -34,7 +34,7 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
 import EditInvoice from "@/containers/Invoices/EditInvoice"
-import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
 import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
 
 
@@ -151,6 +151,10 @@ export const mainRoutes: RouteObject[] = [
       {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
+      },
+       {
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
       },
       {
         path: URL_PATH.NewInvoiceBill,

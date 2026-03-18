@@ -28,9 +28,11 @@ const Billing = () => {
   }, []);
 
   // Memoized Calculations
+
   const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
     const revenue = invoices
       .filter(inv => inv.status === "Paid")
+
       .reduce((sum, inv) => sum + inv.price, 0);
     const pending = invoices
       .filter(inv => inv.status === "Pending")
@@ -64,7 +66,8 @@ const Billing = () => {
       >
 
         {/* Revenue Card */}
-        <Box
+<Box
+
           p={{ xs: 2, md: 5 }}
           bgcolor="#fff"
           borderRadius={2}
@@ -176,10 +179,13 @@ const Billing = () => {
 
       <BillingTable
         invoices={invoices}
+
         setInvoices={setInvoices}
       />
-    </Box>
+</Box>
+
   );
+
 };
 
 export default Billing;

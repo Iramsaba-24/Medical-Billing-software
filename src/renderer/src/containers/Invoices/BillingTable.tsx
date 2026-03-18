@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+
 import { Box, Paper, Typography } from "@mui/material";
+
 import { useLocation, useNavigate } from "react-router-dom";
+
 import {
   UniversalTable,
   Column,
@@ -8,27 +11,28 @@ import {
 } from "@/components/uncontrolled/UniversalTable";
 // import {  InvoiceStatus } from "@/types/invoice";
 import { Invoice, InvoiceStatus } from "@/types/invoice";
+
 import { FormProvider, useForm } from "react-hook-form";
+
 import DropdownField from "@/components/controlled/DropdownField";
+
 import { URL_PATH } from "@/constants/UrlPath";
+
 import {
   showToast,
   showConfirmation,
 } from "@/components/uncontrolled/ToastMessage.tsx";
 
 type Props = {
- invoices: Invoice[];
-  setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>
+  invoices: Invoice[];
+  setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
 };
-
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable =  ({
-  invoices,
-  setInvoices,
-}: Props) => {
+const BillingTable = ({ invoices, setInvoices }: Props) => {
   const location = useLocation();
+
   const navigate = useNavigate();
   // add new invoice from navigation state
   useEffect(() => {
@@ -39,6 +43,7 @@ const BillingTable =  ({
 
       setInvoices((prev) => {
         const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
+
         if (exists) return prev;
 
         const updated = [newInvoice, ...prev];
@@ -54,62 +59,67 @@ const BillingTable =  ({
 
   const filterOptions = [
     { label: "All", value: "all" },
+
     { label: "Daily", value: "daily" },
+
     { label: "Monthly", value: "monthly" },
+
     { label: "Yearly", value: "yearly" },
   ];
 
- const filteredInvoices = invoices.filter((invoice) => {
-  if (!filterType || filterType === "all") return true;
+  const filteredInvoices = invoices.filter((invoice) => {
+    if (!filterType || filterType === "all") return true;
 
-  const parts = invoice.date.split("/");
-  const invoiceDate = new Date(
-    Number(parts[2]),
-    Number(parts[1]) - 1,
-    Number(parts[0])
-  );
-
-  const today = new Date();
-
-  if (filterType === "daily") {
-    return (
-      invoiceDate.getDate() === today.getDate() &&
-      invoiceDate.getMonth() === today.getMonth() &&
-      invoiceDate.getFullYear() === today.getFullYear()
+    const parts = invoice.date.split("/");
+    const invoiceDate = new Date(
+      Number(parts[2]),
+      Number(parts[1]) - 1,
+      Number(parts[0])
     );
-  }
 
-  if (filterType === "monthly") {
-    return (
-      invoiceDate.getMonth() === today.getMonth() &&
-      invoiceDate.getFullYear() === today.getFullYear()
-    );
-  }
+    const today = new Date();
 
-  if (filterType === "yearly") {
-    return invoiceDate.getFullYear() === today.getFullYear();
-  }
+    if (filterType === "daily") {
+      return (
+        invoiceDate.getDate() === today.getDate() &&
+        invoiceDate.getMonth() === today.getMonth() &&
+        invoiceDate.getFullYear() === today.getFullYear()
+      );
+    }
 
-  return true;
-});
+    if (filterType === "monthly") {
+      return (
+        invoiceDate.getMonth() === today.getMonth() &&
+        invoiceDate.getFullYear() === today.getFullYear()
+      );
+    }
+
+    if (filterType === "yearly") {
+      return invoiceDate.getFullYear() === today.getFullYear();
+    }
+
+    return true;
+  });
   console.log("Filtered Invoices →", filteredInvoices);
 
-const columns: Column<Invoice>[] = [
-  { key: "invoice", label: "Invoice" },
-  { key: "name", label: "Name" },
-  { key: "date", label: "Date" },
-  {
-    key: "price",
-    label: "Price",
-    render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
-  },
-  { key: "status", label: "Status" },
-  { key: "actionbutton", label: "Action" },
-];
+  const columns: Column<Invoice>[] = [
+    { key: "invoice", label: "Invoice" },
+    { key: "name", label: "Name" },
+    { key: "date", label: "Date" },
+    {
+      key: "price",
+      label: "Price",
+      render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
+    },
+    { key: "status", label: "Status" },
+    { key: "actionbutton", label: "Action" },
+  ];
 
   const statusOptions: DropdownOption[] = [
     { value: "Paid", label: "Paid" },
+
     { value: "Pending", label: "Pending" },
+
     { value: "Overdue", label: "Overdue" },
   ];
 
@@ -123,7 +133,8 @@ const columns: Column<Invoice>[] = [
   const handleDelete = async (invoiceNo: string) => {
     const confirmed = await showConfirmation(
       "Are you sure you want to delete this invoice?",
-      "Confirm Delete",
+
+      "Confirm Delete"
     );
 
     if (!confirmed) return;
@@ -174,7 +185,7 @@ const columns: Column<Invoice>[] = [
         </Box>
 
         <UniversalTable<Invoice>
-         data={filteredInvoices}
+          data={filteredInvoices}
           columns={columns}
           showSearch
           showExport
@@ -182,13 +193,15 @@ const columns: Column<Invoice>[] = [
           getRowId={(row) => row.invoice}
           dropdown={{
             key: "status",
+
             options: statusOptions,
+
             onChange: (row, value) => {
               setInvoices((prev) => {
                 const updated = prev.map((inv) =>
                   inv.invoice === row.invoice
                     ? { ...inv, status: value as InvoiceStatus }
-                    : inv,
+                    : inv
                 );
 
                 localStorage.setItem("currentInvoice", JSON.stringify(updated));
@@ -198,30 +211,30 @@ const columns: Column<Invoice>[] = [
 
               showToast("success", "Status updated successfully");
             },
-          }} 
-        
-actions={{
-  view: (invoice) =>
-    navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
-      state: { invoice },
-    }),
-  edit: (invoice) =>
-    navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
-      state: { invoice }, 
-    }),
-  delete: (invoice) => handleDelete(invoice.invoice),
-}}
+          }}
+          actions={{
+            view: (invoice) =>
+              navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
+                state: { invoice },
+              }),
+            edit: (invoice) =>
+              navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
+                state: { invoice },
+              }),
+            delete: (invoice) => handleDelete(invoice.invoice),
+          }}
           onDeleteSelected={async (rows) => {
             const confirmed = await showConfirmation(
               "Delete selected invoices?",
-              "Confirm Delete",
+
+              "Confirm Delete"
             );
 
             if (!confirmed) return;
 
             setInvoices((prev) => {
               const updated = prev.filter(
-                (inv) => !rows.some((r) => r.invoice === inv.invoice),
+                (inv) => !rows.some((r) => r.invoice === inv.invoice)
               );
 
               localStorage.setItem("currentInvoice", JSON.stringify(updated));
