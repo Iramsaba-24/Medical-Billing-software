@@ -202,23 +202,35 @@ const InventoryList = () => {
         <DialogContent>
           {editItem && (
             <Box display="flex" flexDirection="column" gap={2} mt={2}>
-              
-              <TextField
-              label="Item Name"
-                value={editItem.itemName}
-                 inputProps={{ maxLength: 20 }}
-                   onChange={(e) => {
-                   const value = e.target.value;
 
-    
-               if (/^[A-Za-z0-9]*$/.test(value)) {
+<TextField
+
+  label="Item Name"
+
+  value={editItem.itemName}
+
+  inputProps={{ maxLength: 20 }}
+
+  onChange={(e) => {
+
+    const value = e.target.value;
+
+    if (/^[A-Za-z0-9 ]*$/.test(value)) {
+
       setEditItem({
+
         ...editItem,
+
         itemName: value,
+
       });
+
     }
+
   }}
+
 />
+ 
               <TextField
                 label="Stock Quantity"
                 type="number"

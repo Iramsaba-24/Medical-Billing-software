@@ -6,11 +6,12 @@ import {
 } from "@/components/uncontrolled/UniversalTable";
 import { Box, Button, Typography, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { useNavigate } from "react-router-dom";
 
 // Define the properties required by the Customer List page
 interface CustomerListProps {
   data: CustomerData[];
-  onAdd: () => void;
+
   onView: (data: CustomerData) => void;
   onEdit: (data: CustomerData) => void;
   onDelete: (data: CustomerData) => void;
@@ -18,11 +19,12 @@ interface CustomerListProps {
 
 export const CustomerListPage = ({
   data,
-  onAdd,
+ 
   onView,
   onEdit,
   onDelete,
 }: CustomerListProps) => {
+  const navigate = useNavigate();
   const [searchTerm] = useState("");
 
   const filteredData = useMemo(() => {
@@ -84,7 +86,7 @@ export const CustomerListPage = ({
 
           <Button
             variant="contained"
-            onClick={onAdd}
+            onClick={() => navigate("/customers/add-customer")}
             startIcon={<AddIcon />}
             sx={{
               textTransform: "none",

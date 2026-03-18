@@ -51,7 +51,7 @@ const EditDistributorForm = ({
 
   useEffect(() => {
     if (editingRow) {
-      reset(editingRow); // table madhla data same fill hoil
+      reset(editingRow); 
     }
   }, [editingRow, reset]);
 

@@ -504,7 +504,6 @@ import {
   Button,
   GlobalStyles
 } from "@mui/material";
-
 import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -561,7 +560,6 @@ const NewInvoiceBill = () => {
     if (!invoice && invoiceNo) {
       const savedInvoices = JSON.parse(localStorage.getItem("invoices") || "[]");
       const found = savedInvoices.find((inv: Invoice) => inv.invoice === invoiceNo);
-
       if (found) setInvoice(found);
       else navigate(-1);
     }
