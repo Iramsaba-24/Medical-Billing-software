@@ -10,27 +10,25 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-
 interface StoredDoctor {
   doctorName: string;
   doctorAddress?: string;
   address?: string;
   clinicAddress?: string;
 }
-
+ 
 interface Props {
   onBack?: () => void;
   onSave?: (data: CustomerData) => void;
   initialData?: CustomerData | null;
 }
-
+ 
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const navigate = useNavigate();
-
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string; address: string }[]
   >([]);
-
+ 
   const methods = useForm<CustomerData>({
     defaultValues: {
       name: "",
@@ -44,13 +42,13 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     },
     mode: "onChange",
   });
-
+ 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
     const value = input.value.replace(/[^0-9]/g, "");
     input.value = value;
   };
-
+ 
   const buttonStyle: SxProps<Theme> = {
     backgroundColor: "#238878",
     color: "#fff",
@@ -65,32 +63,29 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       border: "2px solid #238878",
     },
   };
-
+ 
   useEffect(() => {
     const storedDoctors: StoredDoctor[] = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
-
+ 
     const options = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
       address:
         doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
-
     const updatedOptions = [
       { label: "+ Add Doctor", value: "add_doctor", address: "" },
       ...options,
     ];
-
     setDoctorOptions(updatedOptions);
   }, []);
-
+ 
   const selectedDoctor = methods.watch("doctor");
-
+ 
   useEffect(() => {
     if (!selectedDoctor) return;
-
     if (selectedDoctor === "add_doctor") {
       navigate(URL_PATH.AddDoctor);
       return;
@@ -106,13 +101,11 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       });
     }
   }, [selectedDoctor, doctorOptions, methods, navigate]);
-
   useEffect(() => {
     if (initialData) {
       methods.reset(initialData);
     }
   }, [initialData, methods]);
-
   const handleActualSave = (data: CustomerData) => {
     const existingCustomers: CustomerData[] = JSON.parse(
       localStorage.getItem("customers") || "[]"
@@ -136,7 +129,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       navigate(URL_PATH.Billing);
     }
   };
-
   return (
     <FormProvider {...methods}>
       <Box
@@ -150,7 +142,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             {initialData ? "Edit Customer" : "Add Customer"}
           </Typography>
         </Box>
-
         <Paper
           sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }}
           elevation={3}
@@ -166,7 +157,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Customer Details
               </Typography>
-
+ 
               <Box
                 sx={{
                   display: "grid",
@@ -181,9 +172,9 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   required
                   maxLength={20}
                 />
-
+ 
                 <DateTimeField name="date" label="Date" required />
-
+ 
                 <TextInputField
                   name="age"
                   label="Age"
@@ -201,16 +192,14 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                     onInput: handleAgeInput,
                   }}
                 />
-
                 <MobileField
                   name="mobile"
                   label="Mobile"
                   countryCode
                   required
                 />
-
                 <EmailField name="email" label="Email" required />
-
+ 
                 <TextInputField
                   name="address"
                   label="Address"
@@ -220,12 +209,11 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                 />
               </Box>
             </Box>
-
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
               </Typography>
-
+ 
               <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
                 <DropdownField
                   name="doctor"
@@ -234,7 +222,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   placeholder="Select Doctors"
                   required
                 />
-
+ 
                 <TextInputField
                   name="doctorAddress"
                   label="Doctor Address/Clinic"
@@ -246,7 +234,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             </Box>
           </Box>
         </Paper>
-
         <Box
           sx={{
             mt: 4,
@@ -270,7 +257,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
           >
             Back
           </Button>
-
           <Button
             variant="contained"
             type="submit"

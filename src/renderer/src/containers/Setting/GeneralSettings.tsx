@@ -2,7 +2,7 @@ import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
 import { Button, Paper, Typography, Box } from "@mui/material";
 import DropdownField from "@/components/controlled/DropdownField";
 import SwitchToggle from "@/components/controlled/SwitchToggle";
-import { showToast, showConfirmation, } from "@/components/uncontrolled/ToastMessage";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { useEffect } from "react";
 
 
@@ -78,13 +78,6 @@ function GenralSettings() {
 
   const onSubmit: SubmitHandler<GeneralSettingsFormValues> = async (data) => {
     console.log("General Settings Data:", data);
-
-    const confirmed = await showConfirmation(
-      "Do you want to save these settings?",
-      "Confirm Save"
-    );
-
-    if (!confirmed) return;
 
     localStorage.setItem("generalSettings", JSON.stringify(data));
 

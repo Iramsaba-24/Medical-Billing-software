@@ -12,7 +12,7 @@ const Alerts = () => {
   const [expiryDays, setExpiryDays] = useState<number>(30);
   const [showAllExpiry, setShowAllExpiry] = useState(false);
 
-  // ✅ NEW STATE (LOW STOCK LIMIT)
+  //  NEW STATE (LOW STOCK LIMIT)
   const [lowStockLimit, setLowStockLimit] = useState(30);
 
   // load inventory
@@ -32,7 +32,7 @@ const Alerts = () => {
     setInventory(parsed);
   }, []);
 
-  // ✅ LOAD INVENTORY SETTINGS (MAIN CONNECTION)
+  //  LOAD INVENTORY SETTINGS (MAIN CONNECTION)
   useEffect(() => {
     const settingsStr = localStorage.getItem("inventorySettings");
 
@@ -40,7 +40,6 @@ const Alerts = () => {
 
     const settings = JSON.parse(settingsStr);
 
-    // 👉 agar user ne 30 dala hai → yaha set hoga
     setLowStockLimit(Number(settings.lowStockThreshold) || 30);
   }, []);
 

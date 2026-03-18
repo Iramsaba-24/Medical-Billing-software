@@ -31,11 +31,11 @@ import DoctorSettings from "@/containers/setting/DoctorSettings";
 import NewInvoice from "@/containers/billing/NewInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
-// import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
 import EditInvoice from "@/containers/Invoices/EditInvoice"
 import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
+import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
 
 
 
@@ -62,6 +62,10 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.Doctors,
         element: <DoctorTable />,
       },
+       {
+        path: URL_PATH.NewInvoiceBill,
+        element: <NewInvoiceBill />,
+      },
       {
         path: URL_PATH.AddDoctor,
         element: <AddDoctor />,
@@ -76,6 +80,10 @@ export const mainRoutes: RouteObject[] = [
 },
       {
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
+        element: <InvoiceView />,
+      },
+       {
+        path: URL_PATH.InvoiceView,
         element: <InvoiceView />,
       },
 
@@ -137,12 +145,20 @@ export const mainRoutes: RouteObject[] = [
         element: <Billing />,
       },
       {
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
+      },
+      {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
       },
        {
         path: URL_PATH.AddCustomerForm,
         element: <AddCustomerForm />,
+      },
+      {
+        path: URL_PATH.NewInvoiceBill,
+        element: <NewInvoiceBill />,
       },
       {
         path: URL_PATH.Setting,

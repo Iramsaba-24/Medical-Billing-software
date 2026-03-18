@@ -9,7 +9,7 @@ type CashRow = {
 
 const PaperStyle = {
   borderRadius: 2,
-  p: { xs: 1, sm: 2 },
+  p: { xs: 1, sm: 2 },  
 };
 
 const noteValues = [500, 200, 100, 50, 20, 10];
@@ -28,7 +28,7 @@ type Props = {
   onSuccess: () => void;
 };
 
-const CashPayment = ({ payment, finalAmount}: Props) => {
+const CashPayment = ({ payment, finalAmount, onSuccess }: Props) => {
   const paymentMethod = payment;
 
   const [cashRows, setCashRows] = useState<CashRow[]>(
@@ -69,10 +69,11 @@ const CashPayment = ({ payment, finalAmount}: Props) => {
         localStorage.getItem("retailInvoices") || "[]",
       );
 
-      const updatedRetail = [...existingRetail, ...retailInvoices];
+      const updatedRetail = [...existingRetail, retailInvoices];
       localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
       localStorage.removeItem("currentRetailInvoice");
     }
+    onSuccess();
   };
 
   return (

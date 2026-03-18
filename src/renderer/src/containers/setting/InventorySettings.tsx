@@ -1,8 +1,6 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Paper, Typography, Stack } from "@mui/material";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
-import TextInputField from "@/components/controlled/TextInputField";
-
 //  Define Form Types for Type Safety
 export interface InventoryFormValues {
   groupExpiry: string[];
@@ -34,7 +32,6 @@ const InventorySettings = () => {
     color: "#212529",
     mb: 1,
   };
-
   //  Save Function
   const { handleSubmit, reset } = methods;
   const onSubmit = (data: InventoryFormValues) => {
@@ -119,9 +116,8 @@ const InventorySettings = () => {
               >
                 Reset
               </Button>
-
               <Button
-               type="submit"
+                type="submit"
                 variant="contained"
                 sx={{
                   backgroundColor: "#238878",

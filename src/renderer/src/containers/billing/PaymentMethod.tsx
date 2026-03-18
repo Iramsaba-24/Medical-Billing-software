@@ -1,4 +1,4 @@
-import { useForm, FormProvider, useWatch } from "react-hook-form";
+// export default PaymentMethod;import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import CardPayment from "@/containers/billing/CardPayment";
@@ -6,6 +6,9 @@ import UpiPayment from "@/containers/billing/UpiPayment";
 import CashPayment from "@/containers/billing/CashPayment";
 import InvoiceTabButtons from "./InvoiceTabButtons";
 import RadioField from "@/components/controlled/RadioField";
+import { useNavigate, useLocation } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 
 type PaymentMethods = {
   paymentMethod: "credit-card" | "upi" | "cash";
@@ -30,6 +33,8 @@ const radioStyle = {
 };
 
 const PaymentMethod = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const methods = useForm<PaymentMethods>({
     defaultValues: {
       paymentMethod: "credit-card",
@@ -45,35 +50,30 @@ const PaymentMethod = () => {
   const [finalAmount, setFinalAmount] = useState(0);
 
   useEffect(() => {
-    const storedInvoice = localStorage.getItem("currentNewInvoice");
+    const stateAmount = (location.state as { totalFromInvoice?: number })
+      ?.totalFromInvoice;
+    if (stateAmount && stateAmount > 0) {
+      setFinalAmount(stateAmount);
+    } else {
+      const storedRetail = localStorage.getItem("currentRetailInvoice");
+      const storedInvoice = localStorage.getItem("currentNewInvoice");
+      if (storedRetail) {
+        console.log("Retail Invoice Found →", storedRetail);
 
-    const storedRetail = localStorage.getItem("currentRetailInvoice");
+        const retail = JSON.parse(storedRetail);
 
-    console.log("BillingTable Storage →", storedInvoice);
-
-    if (storedInvoice) {
-      const invoices = JSON.parse(storedInvoice);
-
-      const lastInvoice = invoices[invoices.length - 1];
-
-      setFinalAmount(lastInvoice?.totalPrice || 0);
+        setFinalAmount(retail.totalPrice || 0);
+      } else if (storedInvoice) {
+        const invoices = JSON.parse(storedInvoice);
+        const lastInvoice = invoices[invoices.length - 1];
+        setFinalAmount(lastInvoice?.totalPrice || 0);
+      }
     }
 
-    if (storedRetail) {
-      console.log("Retail Invoice Found →", storedRetail);
-
-      const retail = JSON.parse(storedRetail);
-
-      setFinalAmount(retail.totalPrice || 0);
-    }
-
-    // distributor settings
-
+    // distributor default payment method
     const distributorSettings = localStorage.getItem("distributorSettings");
-
     if (distributorSettings) {
       const settings = JSON.parse(distributorSettings);
-
       if (
         settings.payment_method === "cash" ||
         settings.payment_method === "upi" ||
@@ -82,38 +82,71 @@ const PaymentMethod = () => {
         methods.setValue("paymentMethod", settings.payment_method);
       }
     }
-  }, []);
+  }, [location.state, methods]);
 
-  // central save logic
   const saveInvoice = () => {
     const storedRetail = localStorage.getItem("currentRetailInvoice");
-
     const storedNew = localStorage.getItem("currentNewInvoice");
 
+    // Retail Flow
     if (storedRetail) {
       const existingInvoices = JSON.parse(
         localStorage.getItem("currentInvoice") || "[]"
       );
-
       const retail = JSON.parse(storedRetail);
 
       const newInvoice = {
         invoice: retail.invoice,
-
         name: retail.name,
-
-        date: retail.date,
-
+        doctor: retail.doctor,
+        address: retail.address,
+        doctorAddress: retail.doctorAddress,
+        date: new Date().toLocaleDateString("en-GB"),
         price: retail.totalPrice,
-
         status: "Paid",
+        medicines: retail.medicines,
+        gst: retail.gst,
+        gstAmount: retail.gstAmount,
+        subTotal: retail.subTotal,
+        totalPrice: retail.totalPrice,
       };
 
       const updated = [newInvoice, ...existingInvoices];
+      localStorage.setItem("currentInvoice", JSON.stringify(updated));
+      localStorage.removeItem("currentRetailInvoice");
+      console.log("Retail Saved Invoices → ", updated);
+      navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
+        state: { invoice: newInvoice },
+      });
+      return;
+    }
 
+    // New Invoice Flow
+    if (storedNew) {
+      const existingInvoices = JSON.parse(
+        localStorage.getItem("currentInvoice") || "[]"
+      );
+      const invoices = JSON.parse(storedNew);
+      const lastInvoice = invoices[invoices.length - 1];
+
+      const summaryInvoice = {
+        invoice: lastInvoice.id?.toString() || Date.now().toString(),
+        name: lastInvoice.company,
+        date: new Date().toLocaleDateString(),
+        price: lastInvoice.totalPrice,
+        status: "Paid",
+      };
+
+      const updated = [summaryInvoice, ...existingInvoices];
       localStorage.setItem("currentInvoice", JSON.stringify(updated));
 
-      localStorage.removeItem("currentRetailInvoice");
+      localStorage.setItem("currentInvoiceBill", JSON.stringify(lastInvoice));
+      localStorage.removeItem("currentNewInvoice");
+      console.log("Complete Invoice Saved → ", lastInvoice);
+
+      navigate(URL_PATH.NewInvoiceBill, {
+        state: { invoice: lastInvoice },
+      });
     }
 
     if (storedNew) {
@@ -152,7 +185,7 @@ const PaymentMethod = () => {
       {/* Top Buttons */}
       <InvoiceTabButtons />
 
-      {/* Outer Box (same as old design) */}
+      {/* Outer Box */}
       <Box
         display="flex"
         flexDirection="column"

@@ -147,10 +147,10 @@ const CustomerMaster = () => {
     <>
       {/* Conditionally render screens based on the 'view' state */}
       {view === "list" && (
-        <CustomerListPage
-          data={customerList}
- 
-          onView={(cust) => { setSelectedCustomer(cust); setView("view"); }}
+        <CustomerListPage 
+          data={customerList} 
+  
+          onView={(cust) => { setSelectedCustomer(cust); setView("view"); }} 
           onEdit={(cust) => { setSelectedCustomer(cust); setView("add"); }}
           onDelete={handleDeleteCustomer}
         />

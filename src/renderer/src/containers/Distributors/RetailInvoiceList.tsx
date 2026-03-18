@@ -56,30 +56,26 @@ export default function RetailInvoiceList() {
   const [tableData, setTableData] = useState<InvoiceItem[]>([]);
 
   useEffect(() => {
-    const storedData = localStorage.getItem("retailInvoices");
-    if (storedData) {
-const parsed: RetailInvoice[] = JSON.parse(storedData);
-      const normalized: InvoiceItem[] = parsed
-  .map((inv) => {
-    if (inv.items) {
-      return inv.items.map((row) => ({
-        id: inv.id ?? Date.now() + Math.random(),
-        company: inv.company,
-        supplier: inv.supplier,
-        item: row.name,
-        quantity: row.qty,
-        mrp: row.mrp,
-        total: row.qty * (row.mrp - (row.discount ?? 0)),
-      }));
-    }
-    return inv as unknown as InvoiceItem;
-  })
-  .flat();
+  const storedData = localStorage.getItem("currentRetailInvoice");
 
-      setTableData(normalized);
-      localStorage.setItem("retailInvoices", JSON.stringify(normalized));
-    }
-  }, []);
+  if (!storedData) return;
+
+const parsed: RetailInvoice[] = JSON.parse(storedData);
+
+const rows = parsed.flatMap((invoice: RetailInvoice) =>
+  (invoice.items || []).map((item: RetailRow) => ({
+    id: invoice.id!,
+    company: invoice.company,
+    supplier: invoice.supplier,
+    item: item.name,
+    quantity: item.qty,
+    mrp: item.mrp,
+    total: item.qty * (item.mrp - (item.discount ?? 0)),
+  }))
+);
+
+  setTableData(rows);
+}, []);
 
   return (
   <Paper
@@ -115,7 +111,9 @@ const parsed: RetailInvoice[] = JSON.parse(storedData);
         );
 
         setTableData(updatedData);
-        localStorage.setItem("retailInvoices", JSON.stringify(updatedData));
+        const stored = localStorage.getItem("currentRetailInvoice");
+
+if (!stored) return;
       }}
     />
   </Paper>
