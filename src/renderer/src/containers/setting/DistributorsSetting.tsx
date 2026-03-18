@@ -52,7 +52,7 @@ defaultValues: DEFAULT_VALUES,
     }
   }, [reset]);
 
-    const checkboxStyle = {
+  const checkboxStyle = {
   "& .MuiCheckbox-root": {
     color: "default.main",
     "&.Mui-checked": {
@@ -105,24 +105,28 @@ defaultValues: DEFAULT_VALUES,
           <Box
             sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}
           >
-            <Button
-              type="button"
-              variant="outlined"
-              onClick={() => reset(DEFAULT_VALUES)}
-              sx={{
-                color: "#238878",
+          <Button
+            type="button"
+            variant="outlined"
+            onClick={() => {
+              reset(DEFAULT_VALUES);
+              localStorage.setItem("distributorSettings", JSON.stringify(DEFAULT_VALUES));
+              localStorage.setItem("distributorPaymentMethod", DEFAULT_VALUES.payment_method || "cash");
+              showToast("success", "Settings reset to default");
+            }}
+            sx={{
+              color: "#238878",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#238878",
+                color: "#fff",
                 border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                  border: "2px solid #238878",
-                },
-              }}
-            >
-              Reset
-            </Button>
-
+              },
+            }}
+          >
+            Reset
+          </Button>
             <Button
               type="submit"
               variant="contained"

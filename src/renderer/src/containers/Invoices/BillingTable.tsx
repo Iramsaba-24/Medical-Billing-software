@@ -6,6 +6,7 @@ import {
   Column,
   DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
+// import {  InvoiceStatus } from "@/types/invoice";
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
@@ -29,7 +30,6 @@ const BillingTable =  ({
 }: Props) => {
   const location = useLocation();
   const navigate = useNavigate();
-
   // add new invoice from navigation state
   useEffect(() => {
     const state = location.state as { invoice?: Invoice } | null;
