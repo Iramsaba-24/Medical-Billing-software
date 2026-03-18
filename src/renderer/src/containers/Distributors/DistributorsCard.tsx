@@ -46,6 +46,7 @@ function DistributorCards() {
     setTotalPurchase(grandTotal);
 
     
+    
     // Supplier-wise Total
     
     const grouped = invoices.reduce((acc: Record<string, number>, item) => {
