@@ -1,4 +1,3 @@
-// export default PaymentMethod;import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import CardPayment from "@/containers/billing/CardPayment";
@@ -116,8 +115,8 @@ const PaymentMethod = () => {
       localStorage.removeItem("currentRetailInvoice");
       console.log("Retail Saved Invoices → ", updated);
       navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
-        state: { invoice: newInvoice },
-      });
+      state: { invoice: newInvoice },
+    });
       return;
     }
 
@@ -135,6 +134,8 @@ const PaymentMethod = () => {
         date: new Date().toLocaleDateString(),
         price: lastInvoice.totalPrice,
         status: "Paid",
+        medicines: lastInvoice.medicines,
+        totalPrice: lastInvoice.totalPrice,
       };
 
       const updated = [summaryInvoice, ...existingInvoices];
