@@ -10,14 +10,14 @@ import {
 import { Add, Remove } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import DropdownField from "@/components/controlled/DropdownField";
- 
+
 export interface ItemRow {
   id: number;
   name: string;
   qty: number | "";
   price: number | "";
 }
- 
+
 export type InventoryItem = {
   itemName: string;
   itemId: string;
@@ -27,7 +27,7 @@ export type InventoryItem = {
   expiryDate: string;
   supplier: string;
 };
- 
+
 interface ItemsSectionProps {
   rows: ItemRow[];
   setRows: (rows: ItemRow[]) => void;
@@ -36,45 +36,41 @@ interface ItemsSectionProps {
   gst?: number;
   setGst?: (value: number) => void;
 }
- 
+
 const ItemsSection = ({
   rows,
   setRows,
- 
+
   isSubmitted,
-  gst=0,
+  gst = 0,
   setGst,
 }: ItemsSectionProps) => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
- 
+
   useEffect(() => {
     const stored = localStorage.getItem("inventory");
     if (!stored) return setInventory([]);
- 
+
     const parsed: InventoryItem[] = JSON.parse(stored).map(
       (item: InventoryItem) => ({
         ...item,
         stockQty: Number(item.stockQty),
       })
     );
- 
+
     setInventory(parsed);
   }, []);
- 
+
   const itemOptions = inventory.map((item) => ({
     label: item.itemName,
     value: item.itemName,
   }));
- 
+
   const addRow = () =>
-    setRows([
-      ...rows,
-      { id: Date.now(), name: "", qty: "", price: "" },
-    ]);
- 
-  const removeRow = (id: number) =>
-    setRows(rows.filter((r) => r.id !== id));
- 
+    setRows([...rows, { id: Date.now(), name: "", qty: "", price: "" }]);
+
+  const removeRow = (id: number) => setRows(rows.filter((r) => r.id !== id));
+
   const updateRow = (
     id: number,
     field: keyof ItemRow,
@@ -89,21 +85,20 @@ const ItemsSection = ({
             Number(value) < 0
           )
             return r;
- 
+
           return { ...r, [field]: value };
         }
         return r;
       })
     );
   };
- 
+
   const handleNameChange = (id: number, selectedName: string) => {
     const item = inventory.find(
       (i) =>
-        i.itemName.trim().toLowerCase() ===
-        selectedName.trim().toLowerCase()
+        i.itemName.trim().toLowerCase() === selectedName.trim().toLowerCase()
     );
- 
+
     setRows(
       rows.map((r) => {
         if (r.id === id) {
@@ -117,14 +112,13 @@ const ItemsSection = ({
       })
     );
   };
- 
+
   const subTotal = rows.reduce((acc, row) => {
-  return acc + Number(row.qty) * Number(row.price);
-}, 0);
- 
- 
-const finalWithGst = subTotal + (subTotal * gst) / 100;
- 
+    return acc + Number(row.qty) * Number(row.price);
+  }, 0);
+
+  const finalWithGst = subTotal + (subTotal * gst) / 100;
+
   return (
     <Paper
       sx={{
@@ -143,7 +137,7 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
         <Typography variant="h6" fontWeight={600}>
           Items List
         </Typography>
- 
+
         <Button
           startIcon={<Add />}
           onClick={addRow}
@@ -152,18 +146,18 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
           ADD ITEM
         </Button>
       </Box>
- 
+
       <Divider sx={{ mb: 3 }} />
- 
+
       {rows.map((row) => {
         const qtyError =
           isSubmitted && (row.qty === "" || Number(row.qty) <= 0);
- 
+
         const priceError =
           isSubmitted && (row.price === "" || Number(row.price) <= 0);
- 
+
         const nameError = isSubmitted && row.name.trim() === "";
- 
+
         return (
           <Box
             key={row.id}
@@ -193,7 +187,7 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
                 handleNameChange(row.id, value);
               }}
             />
- 
+
             <TextField
               fullWidth
               label="Qty"
@@ -201,20 +195,17 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
               value={row.qty}
               error={qtyError}
               onKeyDown={(e) =>
-                ["e", "E", "-", "+"].includes(e.key) &&
-                e.preventDefault()
+                ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()
               }
               onChange={(e) =>
                 updateRow(
                   row.id,
                   "qty",
-                  e.target.value === ""
-                    ? ""
-                    : Number(e.target.value)
+                  e.target.value === "" ? "" : Number(e.target.value)
                 )
               }
             />
- 
+
             <TextField
               fullWidth
               label="Price"
@@ -224,21 +215,16 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
               value={row.price}
               error={priceError}
             />
- 
+
             <TextField
               label="Total"
-              value={(
-                Number(row.qty) * Number(row.price)
-              ).toFixed(2)}
+              value={(Number(row.qty) * Number(row.price)).toFixed(2)}
               disabled
             />
- 
+
             <Box display="flex" justifyContent="center">
               {rows.length > 1 && (
-                <IconButton
-                  onClick={() => removeRow(row.id)}
-                  color="error"
-                >
+                <IconButton onClick={() => removeRow(row.id)} color="error">
                   <Remove />
                 </IconButton>
               )}
@@ -246,7 +232,7 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
           </Box>
         );
       })}
- 
+
       <Box
         sx={{
           borderTop: "1px solid #eee",
@@ -257,22 +243,22 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
         }}
       >
         {/* GST Dropdown */}
-       {setGst && (
-  <Box sx={{ width: "150px" }}>
-    <DropdownField
-      name="gst"
-      label="GST (%)"
-      value={String(gst)}
-      options={[
-        { label: "5%", value: "5" },
-        { label: "12%", value: "12" },
-        { label: "18%", value: "18" },
-      ]}
-      onChangeCallback={(value) => setGst(Number(value))}
-    />
-  </Box>
-)}
- 
+        {setGst && (
+          <Box sx={{ width: "150px" }}>
+            <DropdownField
+              name="gst"
+              label="GST (%)"
+              value={String(gst)}
+              options={[
+                { label: "5%", value: "5" },
+                { label: "12%", value: "12" },
+                { label: "18%", value: "18" },
+              ]}
+              onChangeCallback={(value) => setGst(Number(value))}
+            />
+          </Box>
+        )}
+
         <Box
           sx={{
             display: "flex",
@@ -299,5 +285,5 @@ const finalWithGst = subTotal + (subTotal * gst) / 100;
     </Paper>
   );
 };
- 
+
 export default ItemsSection;
