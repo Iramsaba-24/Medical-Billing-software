@@ -1,137 +1,13 @@
-// import { type FC } from 'react';
-// import { TextField, type TextFieldProps, type SxProps, type Theme } from '@mui/material';
-// import { Controller, useFormContext, type RegisterOptions,get } from 'react-hook-form';
-
-// import { TextRegexPattern, removeEmojis, type InputType } from '@/utils/RegexPattern';
-// import { useTranslation } from 'react-i18next';
-// import { getComponentTranslations } from '@/helpers/useTranslations';
-
-
-
-
-// type TextInputFieldProps = TextFieldProps & {
-//   name: string;
-//   label: string;
-//   required?: boolean;
-//   inputType?: InputType;
-//   minLength?: number;
-//   maxLength?: number;
-//   rows?: number;
-//   sx?: SxProps<Theme>;
-//   rules?: RegisterOptions;
-//    pattern?: string;
-// };
-
-// const TextInputField: FC<TextInputFieldProps> = ({
-//   name,
-//   label,
-//   required = false,
-//   inputType = 'alphanumeric',
-//   minLength,
-//   maxLength,
-//   rows = 2,
-//   sx,
-//   rules,
-//   ...rest
-// }) => {
-//   const { t } = useTranslation();
-//   const trans = getComponentTranslations(t);
-
-//   const {
-//     control,
-//     formState: { errors },
-//     clearErrors
-//   } = useFormContext();
-
-//   const combineRules: RegisterOptions = {
-//     required: required ? trans.textInputField.requiredError(label) : undefined,
-//     ...(minLength !== undefined && {
-//       minLength: {
-//         value: minLength,
-//         message: trans.textInputField.minLength(minLength)
-//       }
-//     }),
-//     ...(maxLength !== undefined && {
-//       maxLength: {
-//         value: maxLength,
-//         message: trans.textInputField.maxLength(maxLength)
-//       }
-//     }),
-//     validate: (value: string) => {
-//       if (!value || inputType === 'all') return true;
-//       const config = TextRegexPattern[inputType];
-//       return config.regex.test(value) ? true : config.message;
-//     },
-//     ...rules
-//   };
-
-//   const sanitizeValue = (value: string) => {
-//     if (inputType === 'all') {
-//       return value;
-//     }
-//     const config = TextRegexPattern[inputType];
-//     const noEmoji = removeEmojis(value);
-//     return (noEmoji.match(config.allowed) || []).join('');
-//   };
-
-//   return (
-//     <Controller
-//       name={name}
-//       control={control}
-//       rules={combineRules}
-//       render={({ field }) => {
-       
-
-//         const error = get(errors, name);
-//         const hasError = !!error;
-//         const helperText = hasError ? String(error?.message) : ' ';
-
-//         return (
-//           <TextField
-//             {...field}
-//             {...rest}
-//             fullWidth
-//             required={required}
-//             label={label}
-            
-//             multiline={inputType === 'textarea' || inputType === 'all'}
-//             rows={inputType === 'textarea' || inputType === 'all' ? rows : undefined}
-//             value={field.value ?? rest.value ?? ''}
-//             onChange={(e) => {
-//               const raw = e.target.value;
-//               const sanitized = sanitizeValue(raw);
-//               const finalValue = maxLength ? sanitized.slice(0, maxLength) : sanitized;
-//               field.onChange(finalValue);
-//               if (finalValue.trim()) clearErrors(name);
-//             }}
-//             error={hasError}
-//             helperText={helperText}
-//             inputProps={{ ...rest.inputProps, maxLength }}
-//             sx={{
-//               '& .MuiInputLabel-asterisk': { color: 'error.main' },
-//               ...sx
-//             }}
-//           />
-//         );
-//       }}
-//     />
-//   );
-// };
-
-// export default TextInputField;
-
-
-
-
-
-
 import { type FC } from 'react';
 import { TextField, type TextFieldProps, type SxProps, type Theme } from '@mui/material';
-import { Controller, useFormContext, type RegisterOptions, get } from 'react-hook-form';
+import { Controller, useFormContext, type RegisterOptions,get } from 'react-hook-form';
 
 import { TextRegexPattern, removeEmojis, type InputType } from '@/utils/RegexPattern';
 import { useTranslation } from 'react-i18next';
 import { getComponentTranslations } from '@/helpers/useTranslations';
+
+
+
 
 type TextInputFieldProps = TextFieldProps & {
   name: string;
@@ -143,14 +19,7 @@ type TextInputFieldProps = TextFieldProps & {
   rows?: number;
   sx?: SxProps<Theme>;
   rules?: RegisterOptions;
-  pattern?: string;
-
-  preventDuplicate?: boolean; 
-};
-
-type Distributor = {
-  registrationNumber?: string;
-  gstIn?: string;
+   pattern?: string;
 };
 
 const TextInputField: FC<TextInputFieldProps> = ({
@@ -163,7 +32,6 @@ const TextInputField: FC<TextInputFieldProps> = ({
   rows = 2,
   sx,
   rules,
-  preventDuplicate, 
   ...rest
 }) => {
   const { t } = useTranslation();
@@ -174,26 +42,6 @@ const TextInputField: FC<TextInputFieldProps> = ({
     formState: { errors },
     clearErrors
   } = useFormContext();
-
-  // duplicate fetch
-  const getAllStoredValues = (): string[] => {
-    const values: string[] = [];
-
-    const distributors: Distributor[] = JSON.parse(
-      localStorage.getItem("distributors") || "[]"
-    );
-
-    distributors.forEach((d) => {
-      if (d.registrationNumber) {
-        values.push(d.registrationNumber.toLowerCase());
-      }
-      if (d.gstIn) {
-        values.push(d.gstIn.toLowerCase());
-      }
-    });
-
-    return values;
-  };
 
   const combineRules: RegisterOptions = {
     required: required ? trans.textInputField.requiredError(label) : undefined,
@@ -211,25 +59,8 @@ const TextInputField: FC<TextInputFieldProps> = ({
     }),
     validate: (value: string) => {
       if (!value || inputType === 'all') return true;
-
       const config = TextRegexPattern[inputType];
-
-      if (!config.regex.test(value)) {
-        return config.message;
-      }
-
-      // duplicate check
-      if (preventDuplicate) {
-        const allValues = getAllStoredValues();
-
-        const normalizedValue = value.trim().toLowerCase();
-
-if (allValues.includes(normalizedValue)) { 
-          return `${label} already exists`;
-        }
-      }
-
-      return true;
+      return config.regex.test(value) ? true : config.message;
     },
     ...rules
   };
@@ -240,8 +71,7 @@ if (allValues.includes(normalizedValue)) {
     }
     const config = TextRegexPattern[inputType];
     const noEmoji = removeEmojis(value);
-    
-    return (noEmoji.match(config.allowed) || []).join('').toUpperCase();
+    return (noEmoji.match(config.allowed) || []).join('');
   };
 
   return (
@@ -250,6 +80,8 @@ if (allValues.includes(normalizedValue)) {
       control={control}
       rules={combineRules}
       render={({ field }) => {
+       
+
         const error = get(errors, name);
         const hasError = !!error;
         const helperText = hasError ? String(error?.message) : ' ';
@@ -261,6 +93,7 @@ if (allValues.includes(normalizedValue)) {
             fullWidth
             required={required}
             label={label}
+            
             multiline={inputType === 'textarea' || inputType === 'all'}
             rows={inputType === 'textarea' || inputType === 'all' ? rows : undefined}
             value={field.value ?? rest.value ?? ''}
@@ -286,3 +119,170 @@ if (allValues.includes(normalizedValue)) {
 };
 
 export default TextInputField;
+
+
+
+
+
+
+// import { type FC } from 'react';
+// import { TextField, type TextFieldProps, type SxProps, type Theme } from '@mui/material';
+// import { Controller, useFormContext, type RegisterOptions, get } from 'react-hook-form';
+
+// import { TextRegexPattern, removeEmojis, type InputType } from '@/utils/RegexPattern';
+// import { useTranslation } from 'react-i18next';
+// import { getComponentTranslations } from '@/helpers/useTranslations';
+
+// type TextInputFieldProps = TextFieldProps & {
+//   name: string;
+//   label: string;
+//   required?: boolean;
+//   inputType?: InputType;
+//   minLength?: number;
+//   maxLength?: number;
+//   rows?: number;
+//   sx?: SxProps<Theme>;
+//   rules?: RegisterOptions;
+//   pattern?: string;
+
+//   preventDuplicate?: boolean; 
+// };
+
+// type Distributor = {
+//   registrationNumber?: string;
+//   gstIn?: string;
+// };
+
+// const TextInputField: FC<TextInputFieldProps> = ({
+//   name,
+//   label,
+//   required = false,
+//   inputType = 'alphanumeric',
+//   minLength,
+//   maxLength,
+//   rows = 2,
+//   sx,
+//   rules,
+//   preventDuplicate, 
+//   ...rest
+// }) => {
+//   const { t } = useTranslation();
+//   const trans = getComponentTranslations(t);
+
+//   const {
+//     control,
+//     formState: { errors },
+//     clearErrors
+//   } = useFormContext();
+
+//   // duplicate fetch
+//   const getAllStoredValues = (): string[] => {
+//     const values: string[] = [];
+
+//     const distributors: Distributor[] = JSON.parse(
+//       localStorage.getItem("distributors") || "[]"
+//     );
+
+//     distributors.forEach((d) => {
+//       if (d.registrationNumber) {
+//         values.push(d.registrationNumber.toLowerCase());
+//       }
+//       if (d.gstIn) {
+//         values.push(d.gstIn.toLowerCase());
+//       }
+//     });
+
+//     return values;
+//   };
+
+//   const combineRules: RegisterOptions = {
+//     required: required ? trans.textInputField.requiredError(label) : undefined,
+//     ...(minLength !== undefined && {
+//       minLength: {
+//         value: minLength,
+//         message: trans.textInputField.minLength(minLength)
+//       }
+//     }),
+//     ...(maxLength !== undefined && {
+//       maxLength: {
+//         value: maxLength,
+//         message: trans.textInputField.maxLength(maxLength)
+//       }
+//     }),
+//     validate: (value: string) => {
+//       if (!value || inputType === 'all') return true;
+
+//       const config = TextRegexPattern[inputType];
+
+//       if (!config.regex.test(value)) {
+//         return config.message;
+//       }
+
+//       // duplicate check
+//       if (preventDuplicate) {
+//         const allValues = getAllStoredValues();
+
+//         const normalizedValue = value.trim().toLowerCase();
+
+// if (allValues.includes(normalizedValue)) { 
+//           return `${label} already exists`;
+//         }
+//       }
+
+//       return true;
+//     },
+//     ...rules
+//   };
+
+//   const sanitizeValue = (value: string) => {
+//     if (inputType === 'all') {
+//       return value;
+//     }
+//     const config = TextRegexPattern[inputType];
+//     const noEmoji = removeEmojis(value);
+    
+//     return (noEmoji.match(config.allowed) || []).join('').toUpperCase();
+//   };
+
+//   return (
+//     <Controller
+//       name={name}
+//       control={control}
+//       rules={combineRules}
+//       render={({ field }) => {
+//         const error = get(errors, name);
+//         const hasError = !!error;
+//         const helperText = hasError ? String(error?.message) : ' ';
+
+//         return (
+//           <TextField
+//             {...field}
+//             {...rest}
+//             fullWidth
+//             required={required}
+//             label={label}
+//             multiline={inputType === 'textarea' || inputType === 'all'}
+//             rows={inputType === 'textarea' || inputType === 'all' ? rows : undefined}
+//             value={field.value ?? rest.value ?? ''}
+//             onChange={(e) => {
+//               const raw = e.target.value;
+//               const sanitized = sanitizeValue(raw);
+//               const finalValue = maxLength ? sanitized.slice(0, maxLength) : sanitized;
+//               field.onChange(finalValue);
+//               if (finalValue.trim()) clearErrors(name);
+//             }}
+//             error={hasError}
+//             helperText={helperText}
+//             inputProps={{ ...rest.inputProps, maxLength }}
+//             sx={{
+//               '& .MuiInputLabel-asterisk': { color: 'error.main' },
+//               ...sx
+//             }}
+//           />
+//         );
+//       }}
+//     />
+//   );
+// };
+
+// export default TextInputField;

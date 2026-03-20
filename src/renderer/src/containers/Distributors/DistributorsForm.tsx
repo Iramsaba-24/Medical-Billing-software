@@ -137,7 +137,7 @@ const DistributorsForm = () => {
                label="Email" 
                required 
                maxLength={50}
-             preventDuplicate 
+           //  preventDuplicate 
               />
 
               <DateTimeField 

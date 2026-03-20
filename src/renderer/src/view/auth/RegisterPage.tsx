@@ -10,7 +10,6 @@ import LogoImage from "@/assets/logoimg.svg";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 
-
 type RegisterFormInputs = {
   fullName: string;
   email: string;
@@ -74,14 +73,15 @@ const RegisterPage = () => {
   const handleLettersOnlyChange =
     (field: "fullName" | "city" | "state") =>
     (e: ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value.replace(/[^A-Za-z ]/g, "");
+      let value = e.target.value.replace(/[^A-Za-z ]/g, "");
+      value = value.slice(0, 20);
       setValue(field, value, { shouldValidate: true });
       if (value) clearErrors(field);
     };
 
   const handleLettersOnlyInput = (e: FormEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
-    input.value = input.value.replace(/[^A-Za-z ]/g, "");
+    input.value = input.value.replace(/[^A-Za-z ]/g, "").slice(0, 20);
   };
 
   const validateRequiredFields = (data: RegisterFormInputs) => {
@@ -110,9 +110,9 @@ const RegisterPage = () => {
     };
 
     console.log(cleanedData);
+
     navigate(URL_PATH.BusinessDetails);
-      showToast("success", "Registration successful!");
-    
+    showToast("success", "Registration successful!");
   };
 
   return (
@@ -129,181 +129,192 @@ const RegisterPage = () => {
         py: { xs: 4, sm: 5 },
       }}
     >
-      <FormProvider {...methods}>
-        <Box
-          component="form"
-          noValidate
-          onSubmit={handleSubmit(onSubmit)}
-          sx={{
-            width: "100%",
-            maxWidth: { xs: 360, sm: 420, md: 460 },
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Box mb={{ xs: 1, sm: 1.5 }}>
-            <img
-              src={LogoImage}
-              alt="Medi Logo"
-              style={{ width: "100%", maxWidth: "150px" }}
-            />
-          </Box>
-
-          <Typography
-            mb={{ xs: 2.5, sm: 3 }}
-            sx={{
-              color: "#333",
-              fontWeight: 600,
-              fontFamily: '"Poppins", sans-serif',
-              fontSize: { xs: "1.4rem", sm: "1.7rem", md: "1.9rem" },
-              textAlign: "center",
-            }}
-          >
-            Create Your Account
-          </Typography>
-
+        <FormProvider {...methods}>
           <Box
+            component="form"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
             sx={{
               width: "100%",
+              maxWidth: { xs: 360, sm: 420, md: 460 },
               display: "flex",
               flexDirection: "column",
-              gap: { xs: 1.8, sm: 2 },
+              alignItems: "center",
             }}
           >
-            <TextInputField
-              name="fullName"
-              label="Full Name"
-              required
-              sx={inputStyle("fullName")}
-              // inputProps={{ onInput: handleLettersOnlyInput }}
-              onChange={handleLettersOnlyChange("fullName")}
-              rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
-                pattern: {
-                  value: /^[A-Za-z ]+$/,
-                  message: "Only letters allowed",
-                },
-              }}
-            />
+            <Box mb={{ xs: 1, sm: 1.5 }}>
+              <img
+                src={LogoImage}
+                alt="Medi Logo"
+                style={{ width: "100%", maxWidth: "150px" }}
+              />
+            </Box>
 
-            <EmailField
-              name="email"
-              label="Email Address"
-              required
-              sx={inputStyle("email")}
-            />
-
-            <MobileField
-              name="mobile"
-              label="Mobile Number"
-              required
-              sx={inputStyle("mobile")}
-            />
-
-            <TextInputField
-              name="company"
-              label="Company / Clinic Name"
-              required
-              sx={inputStyle("company")}
-              rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
-              }}
-            />
-
-            <TextInputField
-              name="city"
-              label="City"
-              required
-              sx={inputStyle("city")}
-              inputProps={{ onInput: handleLettersOnlyInput }}
-              onChange={handleLettersOnlyChange("city")}
-              rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
-                pattern: {
-                  value: /^[A-Za-z ]+$/,
-                  message: "Only letters allowed",
-                },
-              }}
-            />
-
-            <TextInputField
-              name="state"
-              label="State"
-              required
-              sx={inputStyle("state")}
-              inputProps={{ onInput: handleLettersOnlyInput }}
-              onChange={handleLettersOnlyChange("state")}
-              rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
-                pattern: {
-                  value: /^[A-Za-z ]+$/,
-                  message: "Only letters allowed",
-                },
-              }}
-            />
-          </Box>
-
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{
-              mt: { xs: 2, sm: 5 },
-              fontWeight: "1000",
-              fontSize: { xs: "1rem", sm: "1.05rem" },
-              backgroundColor: "#1b7f6b",
-              textTransform: "none",
-              border: "2px solid #1b7f6b",
-              boxShadow: "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
-              transition: "all 0.25s ease",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#1b7f6b",
-              },
-            }}
-          >
-            Next step
-          </Button>
-
-          <Typography
-            mt={2}
-            sx={{ fontSize: "14px", color: "#555", textAlign: "center" }}
-          >
-            Already have an account?{" "}
-            <Box
-              component="span"
-              onClick={() => navigate(URL_PATH.LOGIN)}
+            <Typography
+              mb={{ xs: 2.5, sm: 3 }}
               sx={{
-                color: "black",
+                color: "#333",
                 fontWeight: 600,
-                cursor: "pointer",
-                display: "inline-block",
-                borderBottom: "2px solid transparent",
+                fontFamily: '"Poppins", sans-serif',
+                fontSize: { xs: "1.4rem", sm: "1.7rem", md: "1.9rem" },
+                textAlign: "center",
+              }}
+            >
+              Create Your Account
+            </Typography>
+
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: { xs: 1.8, sm: 2 },
+              }}
+            >
+              <TextInputField
+                name="fullName"
+                label="Full Name"
+                required
+                sx={inputStyle("fullName")}
+                inputProps={{
+                  maxLength: 20,
+                  onInput: handleLettersOnlyInput,
+                }}
+                onChange={handleLettersOnlyChange("fullName")}
+                rules={{
+                  minLength: {
+                    value: 3,
+                    message: "Minimum 3 characters required",
+                  },
+                  pattern: {
+                    value: /^[A-Za-z ]+$/,
+                    message: "Numbers are not allowed",
+                  },
+                }}
+              />
+
+              <EmailField
+                name="email"
+                label="Email Address"
+                required
+                sx={inputStyle("email")}
+              />
+
+              <MobileField
+                name="mobileNumber"
+                label="Mobile Number"
+                countryCode 
+                required
+                sx={inputStyle("mobile")}
+              />
+
+              <TextInputField
+                name="companyName"
+                label="Company / Clinic Name"
+                required
+                sx={inputStyle("company")}
+                inputProps={{ maxLength: 20 }}
+                rules={{
+                  minLength: {
+                    value: 3,
+                    message: "Minimum 3 characters required",
+                  },
+                }}
+              />
+
+              <TextInputField
+                name="city"
+                label="City"
+                required
+                sx={inputStyle("city")}
+                inputProps={{
+                  maxLength: 20,
+                  onInput: handleLettersOnlyInput,
+                }}
+                onChange={handleLettersOnlyChange("city")}
+                rules={{
+                  minLength: {
+                    value: 3,
+                    message: "Minimum 3 characters required",
+                  },
+                  pattern: {
+                    value: /^[A-Za-z ]+$/,
+                    message: "Only letters allowed",
+                  },
+                }}
+              />
+
+              <TextInputField
+                name="state"
+                label="State"
+                required
+                sx={inputStyle("state")}
+                inputProps={{
+                  maxLength: 20,
+                  onInput: handleLettersOnlyInput,
+                }}
+                onChange={handleLettersOnlyChange("state")}
+                rules={{
+                  minLength: {
+                    value: 3,
+                    message: "Minimum 3 characters required",
+                  },
+                  pattern: {
+                    value: /^[A-Za-z ]+$/,
+                    message: "Only letters allowed",
+                  },
+                }}
+              />
+            </Box>
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                mt: { xs: 2, sm: 5 },
+                fontWeight: "1000",
+                fontSize: { xs: "1rem", sm: "1.05rem" },
+                backgroundColor: "#1b7f6b",
+                textTransform: "none",
+                border: "2px solid #1b7f6b",
+                boxShadow: "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
+                transition: "all 0.25s ease",
                 "&:hover": {
-                  color: "#145c4d",
-                  borderBottom: "2px solid #145c4d",
-                  transform: "translateY(-1px)",
+                  backgroundColor: "#fff",
+                  color: "#1b7f6b",
                 },
               }}
             >
-              Login
-            </Box>
-          </Typography>
-        </Box>
-      </FormProvider>
+              Next step
+            </Button>
+
+            <Typography
+              mt={2}
+              sx={{ fontSize: "14px", color: "#555", textAlign: "center" }}
+            >
+              Already have an account?{" "}
+              <Box
+                component="span"
+                onClick={() => navigate(URL_PATH.LOGIN)}
+                sx={{
+                  color: "black",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-block",
+                  borderBottom: "2px solid transparent",
+                  "&:hover": {
+                    color: "#145c4d",
+                    borderBottom: "2px solid #145c4d",
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                Login
+              </Box>
+            </Typography>
+          </Box>
+        </FormProvider>
     </Box>
   );
 };

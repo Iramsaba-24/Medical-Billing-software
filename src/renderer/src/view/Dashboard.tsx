@@ -1,6 +1,5 @@
 import { Box } from "@mui/material";
 import React from "react";
-
 import StatCard from "@/containers/dashboard/StatCard";
 import StockDonutChart from "@/components/controlled/chart/StockDonutChart";
 import BarChart from "@/containers/dashboard/Barchart";

@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { SalesData } from "./SalesTable";
-import { InventoryItem } from "@/containers/inventory/InvetoryList";
+import { InventoryItem } from "@/containers/inventory/AddInventoryItem";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useForm, FormProvider } from "react-hook-form";
 import DateTimeField from "@/components/controlled/DateTimeField";

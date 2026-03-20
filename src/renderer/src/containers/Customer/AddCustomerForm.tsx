@@ -10,7 +10,6 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
- 
 interface StoredDoctor {
   doctorName: string;
   doctorAddress?: string;
@@ -26,7 +25,6 @@ interface Props {
  
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const navigate = useNavigate();
- 
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string; address: string }[]
   >([]);
@@ -77,12 +75,10 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       address:
         doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
- 
     const updatedOptions = [
       { label: "+ Add Doctor", value: "add_doctor", address: "" },
       ...options,
     ];
- 
     setDoctorOptions(updatedOptions);
   }, []);
  
@@ -90,36 +86,33 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
  
   useEffect(() => {
     if (!selectedDoctor) return;
- 
     if (selectedDoctor === "add_doctor") {
       navigate(URL_PATH.AddDoctor);
       return;
     }
- 
+
     const doctorData = doctorOptions.find(
       (doc) => doc.value === selectedDoctor
     );
- 
+
     if (doctorData) {
       methods.setValue("doctorAddress", doctorData.address, {
         shouldValidate: true,
       });
     }
   }, [selectedDoctor, doctorOptions, methods, navigate]);
- 
   useEffect(() => {
     if (initialData) {
       methods.reset(initialData);
     }
   }, [initialData, methods]);
- 
   const handleActualSave = (data: CustomerData) => {
     const existingCustomers: CustomerData[] = JSON.parse(
       localStorage.getItem("customers") || "[]"
     );
- 
+
     let updatedCustomers: CustomerData[];
- 
+
     if (initialData) {
       updatedCustomers = existingCustomers.map((customer) =>
         customer.mobile === initialData.mobile ? data : customer
@@ -127,16 +120,15 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     } else {
       updatedCustomers = [...existingCustomers, data];
     }
- 
+
     localStorage.setItem("customers", JSON.stringify(updatedCustomers));
- 
+
     onSave?.(data);
- 
+
     if (!initialData) {
       navigate(URL_PATH.Billing);
     }
   };
- 
   return (
     <FormProvider {...methods}>
       <Box
@@ -150,7 +142,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             {initialData ? "Edit Customer" : "Add Customer"}
           </Typography>
         </Box>
- 
         <Paper
           sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }}
           elevation={3}
@@ -201,7 +192,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                     onInput: handleAgeInput,
                   }}
                 />
- 
                 <MobileField
                   name="mobile"
                   label="Mobile"
@@ -209,7 +199,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   preventDuplicate 
                   required
                 />
- 
                 <EmailField name="email" label="Email" required />
  
                 <TextInputField
@@ -221,7 +210,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                 />
               </Box>
             </Box>
- 
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
@@ -247,7 +235,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
             </Box>
           </Box>
         </Paper>
- 
         <Box
           sx={{
             mt: 4,
@@ -271,7 +258,6 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
           >
             Back
           </Button>
- 
           <Button
             variant="contained"
             type="submit"
@@ -285,6 +271,5 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     </FormProvider>
   );
 };
- 
-export default AddCustomerForm;
 
+export default AddCustomerForm;
