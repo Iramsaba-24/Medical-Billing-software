@@ -35,6 +35,7 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
 import EditInvoice from "@/containers/Invoices/EditInvoice"
+import AddCustomerForm from "@/containers/customer/AddCustomerForm";
 
 
 
@@ -48,7 +49,15 @@ export const mainRoutes: RouteObject[] = [
       { path: URL_PATH.Dashboard, element: <Dashboard /> },
 
       { path: URL_PATH.SalesView, element: <SalesView /> },
+      
+      {
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
+       },
 
+
+      
+      
       {
         path: URL_PATH.Invoices,
         element: <Invoices />,

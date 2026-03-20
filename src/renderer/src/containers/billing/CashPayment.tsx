@@ -187,3 +187,4 @@ const CashPayment = ({ payment, finalAmount}: Props) => {
 };
 
 export default CashPayment;
+

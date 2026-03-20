@@ -330,4 +330,3 @@ return (
 
 export default InvoiceView
 
-

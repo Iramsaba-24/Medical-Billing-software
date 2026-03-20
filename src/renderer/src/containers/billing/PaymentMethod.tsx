@@ -38,15 +38,20 @@ const PaymentMethod = () => {
   const [finalAmount, setFinalAmount] = useState(0);
 
   useEffect(() => {
-    const storedInvoice = localStorage.getItem("currentInvoice");
+    const storedInvoice = localStorage.getItem("currentNewInvoice");
     const storedRetail = localStorage.getItem("currentRetailInvoice");
+    console.log("BillingTable Storage →", storedInvoice);
 
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
-      setFinalAmount(invoice.totalPrice || 0);
-    }
+  if (storedInvoice) {
+    const invoices = JSON.parse(storedInvoice);
+
+    const lastInvoice = invoices[invoices.length - 1];
+
+    setFinalAmount(lastInvoice?.totalPrice || 0);
+  }
 
     if (storedRetail) {
+      console.log("Retail Invoice Found →", storedRetail);
       const retail = JSON.parse(storedRetail);
       setFinalAmount(retail.totalPrice || 0);
     }
@@ -69,43 +74,56 @@ const PaymentMethod = () => {
 
   // central save logic
   const saveInvoice = () => {
-    const storedInvoice = localStorage.getItem("currentInvoice");
-    const storedRetail = localStorage.getItem("currentRetailInvoice");
+  const storedRetail = localStorage.getItem("currentRetailInvoice");
+  const storedNew = localStorage.getItem("currentNewInvoice");
 
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
 
-      const existingSales = JSON.parse(
-        localStorage.getItem("salesData") || "[]",
-      );
+ if (storedRetail) {
+  const existingInvoices = JSON.parse(
+    localStorage.getItem("currentInvoice") || "[]"
+  );
 
-      existingSales.push({
-        invoice: invoice.id?.toString() || Date.now().toString(),
-        patient: invoice.name,
-        date: invoice.date,
-        price: invoice.totalPrice,
-        status: "Paid",
-        medicines: invoice.medicines || [],
-      });
+  const retail = JSON.parse(storedRetail);
 
-      localStorage.setItem("salesData", JSON.stringify(existingSales));
-      localStorage.removeItem("currentInvoice");
-    }
 
-    if (storedRetail) {
-      const retailInvoices = JSON.parse(storedRetail);
-
-      const existingRetail = JSON.parse(
-        localStorage.getItem("retailInvoices") || "[]",
-      );
-
-      const updatedRetail = [...existingRetail, ...retailInvoices];
-
-      localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
-
-      localStorage.removeItem("currentRetailInvoice");
-    }
+  const newInvoice = {
+    invoice: retail.invoice,
+    name: retail.name,
+    date: retail.date,
+    price: retail.totalPrice,
+    status: "Paid",
   };
+
+  const updated = [newInvoice, ...existingInvoices];
+
+  localStorage.setItem("currentInvoice", JSON.stringify(updated));
+
+  localStorage.removeItem("currentRetailInvoice");
+}
+
+  if (storedNew) {
+    const existingInvoices = JSON.parse(
+  localStorage.getItem("currentInvoice") || "[]"
+);
+    const invoices = JSON.parse(storedNew);
+    const lastInvoice = invoices[invoices.length - 1];
+
+    const newInvoice = {
+      invoice: lastInvoice.id?.toString() || Date.now().toString(),
+      name: lastInvoice.company,
+      date: new Date().toLocaleDateString(),
+      price: lastInvoice.totalPrice,
+      status: "Paid",
+    };
+
+    const updated = [newInvoice, ...existingInvoices];
+
+    localStorage.setItem("currentInvoice", JSON.stringify(updated));
+
+    localStorage.removeItem("currentNewInvoice");
+  }
+    console.log("Saved Invoices → ", localStorage.getItem("currentInvoice"));
+};
 
   return (
     <FormProvider {...methods}>
@@ -156,3 +174,4 @@ const PaymentMethod = () => {
 };
 
 export default PaymentMethod;
+

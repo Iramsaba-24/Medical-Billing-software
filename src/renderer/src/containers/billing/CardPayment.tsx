@@ -160,3 +160,5 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
 };
 
 export default CardPayment;
+
+
