@@ -116,8 +116,6 @@ const SalesTable: React.FC = () => {
     setSalesList(formatted);
   }, []);
 
-  // ================= SAVE DATA ================= //
-
   const saveToLocalStorage = (data: SalesData[]) => {
     const formatted: StoredSale[] = data.map(item => ({
       invoice: String(item.id),

@@ -47,7 +47,7 @@ const CashPayment = ({ payment, finalAmount, onSuccess }: Props) => {
   const subTotal = cashRows.reduce((sum, row) => {
     return sum + Number(row.note) * Number(row.qty || 0);
   }, 0);
-  const isAmountMatched = subTotal === finalAmount;
+  const isAmountMatched = subTotal >= finalAmount;
   const onCashPay = () => {
     // const storedInvoice = localStorage.getItem("currentInvoice");
     // const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
