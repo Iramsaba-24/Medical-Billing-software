@@ -8,13 +8,13 @@ import gpayIcon from "@/assets/icons/googlepay.svg";
 import paytmIcon from "@/assets/icons/paytm.svg";
 import upiIcon from "@/assets/icons/upi.svg";
 import phonepeIcon from "@/assets/icons/phonepe.svg";
-
+ 
 const PaperStyle = {
   borderRadius: 2,
   p: { xs: 1, sm: 2 },
   mb: 1,
 };
-
+ 
 const btnStyle = {
   backgroundColor: "#238878",
   height: 40,
@@ -27,36 +27,36 @@ const btnStyle = {
     borderColor: "#238878",
   },
 };
-
+ 
 const upiIcons: Record<string, string> = {
   gpay: gpayIcon,
   paytm: paytmIcon,
   upi: upiIcon,
   phonepe: phonepeIcon,
 };
-
+ 
 const getUpiApp = (upiId?: string) => {
   if (!upiId) return null;
-
+ 
   const id = upiId.toLowerCase();
-
+ 
   if (
     ["@okaxis", "@oksbi", "@okhdfcbank", "@okicici"].some((v) => id.includes(v))
   )
     return "gpay";
-
+ 
   if (id.includes("@paytm")) return "paytm";
-
+ 
   if (["@ybl", "@axl", "@ibl"].some((v) => id.includes(v))) return "phonepe";
-
+ 
   return "upi";
 };
-
+ 
 type Props = {
   finalAmount: number;
   onSuccess: () => void;
 };
-
+ 
 const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
   const [status, setStatus] = useState<"default" | "loading" | "success">(
     "default",
@@ -66,23 +66,23 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
     control,
     name: "paymentMethod",
   });
-
+ 
   const onPay = () => {
     setStatus("loading");
-
+ 
     setTimeout(() => {
       setStatus("success");
-
+ 
       onSuccess();
     }, 2000);
   };
-
+ 
   const showPaymentStatus = () => {
     if (status === "loading") {
       return (
         <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
           <CircularProgress />
-
+ 
           <Box textAlign="center">
             Waiting for payment confirmation…
             <br />
@@ -91,35 +91,35 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
         </Box>
       );
     }
-
+ 
     if (status === "success") {
       return (
         <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
           <CheckCircleIcon
             sx={{ color: "success.main", fontSize: { xs: 44, sm: 60 } }}
           />
-
+ 
           <Box fontWeight={700}>Successful ₹{finalAmount}</Box>
         </Box>
       );
     }
-
+ 
     return null;
   };
-
+ 
   const upiId = useWatch({
     control,
     name: "UpiId",
   });
-
+ 
   const detectedIcon = getUpiApp(upiId) || "upi";
-
+ 
   return (
     <Paper sx={PaperStyle}>
       <Typography fontSize={{ xs: 16, md: 18 }} mb={2} fontWeight={600}>
         UPI Payment
       </Typography>
-
+ 
       <Box display="flex" flexDirection="column" gap={1}>
         <Box display="flex" alignItems="center" gap={2}>
           <Box flex={1}>
@@ -139,7 +139,7 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
               }}
             />
           </Box>
-
+ 
           {upiIcons[detectedIcon] && (
             <Box
               sx={{
@@ -158,7 +158,7 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
             </Box>
           )}
         </Box>
-
+ 
         <Box display="flex" justifyContent="flex-end">
           <Button
             type="button"
@@ -173,11 +173,13 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
             Pay ₹{finalAmount}
           </Button>
         </Box>
-
+ 
         <Box textAlign="center">{showPaymentStatus()}</Box>
       </Box>
     </Paper>
   );
 };
-
+ 
 export default UpiPayment;
+ 
+ 

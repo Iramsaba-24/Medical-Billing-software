@@ -1,7 +1,7 @@
 import { useLocation,  } from "react-router-dom";
 import { Box, Typography, Paper,} from "@mui/material";
-import BankInfo from "./BankInfo";
-import RetailInvoiceList from "./NewInvoiceList";
+import BankInfo from "@/containers/distributors/BankInfo";
+import NewInvoiceList from "@/containers/distributors/NewInvoiceList";
 import { useEffect, useState } from "react";
 
 const DistributorDetails = () => {
@@ -53,7 +53,7 @@ const [showBankDetails, setShowBankDetails] = useState(false);
         </Paper>
       )}
       {/* InventoryList call */}
-        <RetailInvoiceList />
+        <NewInvoiceList/>
       
     </Box>
   );

@@ -375,7 +375,7 @@ const getTopSellingMedicine = (): string => {
  
                   <Box>
                     <Typography fontSize={24} fontWeight={700}>
-                      {/* {info?.rightValue} */}
+                      
                       {card.title === "Inventory"
                         ? totalMedicineGroups() //function to get total medicine groups count from local storage
                         : info?.rightValue}

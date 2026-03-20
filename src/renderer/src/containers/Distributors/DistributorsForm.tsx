@@ -30,7 +30,6 @@ type DistributorFormInput = {
 };
 
 const DistributorsForm = () => {
-  // Initialize the form with default empty values
 
   const methods = useForm<DistributorFormInput>({
     defaultValues: {
@@ -67,7 +66,7 @@ const DistributorsForm = () => {
       ...data,
       id: Date.now().toString(),
       status: "Active",
-      //date: new Date().toLocaleDateString(), //curent date on table
+      
     };
 
     //  Add new entry to the list and save it back to storage
@@ -130,6 +129,7 @@ const DistributorsForm = () => {
               label="Phone" 
               placeholder="Mobile Number"
               countryCode
+              preventDuplicate
               required />
 
               <EmailField 
@@ -137,7 +137,7 @@ const DistributorsForm = () => {
                label="Email" 
                required 
                maxLength={50}
-              // inputProps={{ maxLength: 254 }}
+           //  preventDuplicate 
               />
 
               <DateTimeField 
@@ -146,13 +146,13 @@ const DistributorsForm = () => {
               viewMode="date"
               useCurrentDate={false}
               dateRestriction="current-future-only"
-             //dateRestriction="past-current-future"
-               />
+             />
 
               <TextInputField
                 name="registrationNumber"
                 label="Registration Number"
                 type="number"
+                preventDuplicate
                 required
                 maxLength={14}
               />
@@ -173,6 +173,7 @@ const DistributorsForm = () => {
                 name="gstIn"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"
+                preventDuplicate
                 maxLength={15}
                 rows={1}
                 rules={{

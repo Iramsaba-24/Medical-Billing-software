@@ -67,7 +67,7 @@ const ItemsSection = ({
   }));
 
   const addRow = () =>
-    setRows([...rows, { id: Date.now(), name: "", qty: "", price: "" }]);
+    setRows([...rows, { id: Date.now(), name: "", qty: 1, price: "" }]);
 
   const removeRow = (id: number) => setRows(rows.filter((r) => r.id !== id));
 

@@ -238,14 +238,7 @@ const NewInvoiceBill = () => {
                 </TableCell>
               </TableRow>
 
-              {/* CGST */}
-              {/* <TableRow>
-                <TableCell colSpan={6}></TableCell>
-                <TableCell colSpan={2}> */}
-                  {/* <strong>Total CGST ({invoiceGst}%)</strong> */}
-                {/* </TableCell> */}
-              {/* </TableRow> */}
-
+         
               {/* SGST */}
               <TableRow>
                 <TableCell colSpan={6}></TableCell>
