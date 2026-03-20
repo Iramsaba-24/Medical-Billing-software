@@ -48,6 +48,7 @@ type Distributor = {
   email: string;
   address: string;
   status: "Active" | "Inactive";
+  gstIn?: string;
 };
  
 type FormData = {
@@ -64,13 +65,14 @@ type ItemRow = {
   name: string;
   qty: number | "";
   price: number | "";
+  expiry?: string;
 };
  
 const NewInvoice = () => {
   const navigate = useNavigate();
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "" },
+    { id: Date.now(), name: "", qty: 1, price: "", expiry: "" },
   ]);
  
   const [gst, setGst] = useState<number>(5);
@@ -108,6 +110,9 @@ const NewInvoice = () => {
       navigate(URL_PATH.DistributorsForm);
     }
   }, [selectedCompany, navigate]);
+  const selectedDistributor = distributors.find(
+  (d) => d.companyName === selectedCompany
+);
  
   const onSubmit = (data: FormData) => {
     setIsSubmitted(true);
@@ -129,13 +134,15 @@ const NewInvoice = () => {
       mobile: data.mobile,
       email: data.email,
       address: data.address,
-      gst: gst,      
+      gst: gst, 
+        gstIn: selectedDistributor?.gstIn || "",     
+  distributorId: selectedDistributor?.id || "",      
       medicines: rows.map((r) => ({
-        name: r.name,
+      name: r.name,
         qty: r.qty,
         amount: Number(r.qty || 0) * Number(r.price || 0),
         batch: "",
-        expiry: "",
+        expiry: r.expiry || "",
       })),
       totalPrice: grandTotal,
     };

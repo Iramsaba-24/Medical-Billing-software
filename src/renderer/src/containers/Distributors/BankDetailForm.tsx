@@ -23,6 +23,7 @@ const BankDetailsForm = () => {
           label="Bank Name"
           inputType="alphabet"
           maxLength={25}
+          minLength={3}
           required
         />
         <TextInputField
@@ -38,6 +39,7 @@ const BankDetailsForm = () => {
           label="A/C Holder's Name"
           inputType="alphabet"
           required
+          minLength={3}
           maxLength={30}
         />
         <TextInputField
@@ -45,6 +47,7 @@ const BankDetailsForm = () => {
           label="Branch"
           inputType="alphabet"
           maxLength={20}
+          minLength={3}
           required
         />
 

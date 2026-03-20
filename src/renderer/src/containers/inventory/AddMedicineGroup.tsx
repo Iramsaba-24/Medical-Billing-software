@@ -91,6 +91,8 @@ const AddMedicineGroup = () => {
                   { label: "Supplies", value: "Supplies" },
                   { label: "Other", value: "Other" },
                 ]}
+                editable={true}
+                freeSolo={false}
                 
               />
 
