@@ -12,6 +12,20 @@ const Alerts = () => {
   const [expiryDays, setExpiryDays] = useState<number>(30);
   const [showAllExpiry, setShowAllExpiry] = useState(false);
 
+  const [returnsUpdateCount, setReturnsUpdateCount] = useState(0);
+  const [lowStockAlertCount, setLowStockAlertCount] = useState(0);
+  const [reorderAlertCount, setReorderAlertCount] = useState(0);
+
+useEffect(() => {
+  const count = Number(localStorage.getItem("returnsUpdateCount")) || 0;
+  setReturnsUpdateCount(count);
+   const lowStock = Number(localStorage.getItem("lowStockAlertCount")) || 0;
+  const reorder = Number(localStorage.getItem("reorderAlertCount")) || 0;
+
+  setLowStockAlertCount(lowStock);
+  setReorderAlertCount(reorder);
+}, []);
+
   //  NEW STATE (LOW STOCK LIMIT)
   const [lowStockLimit, setLowStockLimit] = useState(30);
 
@@ -32,27 +46,18 @@ const Alerts = () => {
     setInventory(parsed);
   }, []);
 
-  //  LOAD INVENTORY SETTINGS (MAIN CONNECTION)
   useEffect(() => {
     const settingsStr = localStorage.getItem("inventorySettings");
-
     if (!settingsStr) return;
-
     const settings = JSON.parse(settingsStr);
-
     setLowStockLimit(Number(settings.lowStockThreshold) || 30);
   }, []);
 
-  // load dashboard settings (same)
   useEffect(() => {
     const settingsStr = localStorage.getItem("dashboardSettings");
-
     if (!settingsStr) return;
-
     const settings = JSON.parse(settingsStr);
-
     if (!settings.expiryAlerts) return;
-
     if (settings.expiryAlerts.includes("Show Expiry Alert on Dashboard")) {
       setShowAllExpiry(true);
       return;
@@ -63,13 +68,8 @@ const Alerts = () => {
     else if (settings.expiryAlerts.includes("30")) setExpiryDays(30);
   }, []);
 
-  // ✅ UPDATED LOW STOCK LOGIC
-  const lowStock = inventory.filter(
-    (item) => item.stockQty <= lowStockLimit
-  );
+  const lowStock = inventory.filter((item) => item.stockQty <= lowStockLimit);
 
-  // ❗ बाकी SAME (as you said)
-  const outOfStock = inventory.filter((item) => item.stockQty === 0);
   const reorderStock = inventory.filter((item) => item.stockQty <= 10);
 
   const today = new Date();
@@ -102,8 +102,24 @@ const Alerts = () => {
       <hr />
 
       {/* Low Stock */}
+    <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
+  Stock on returns (Sales & Purchase) ({returnsUpdateCount})
+</Typography>
+
+{lowStock.length > 0 &&
+  lowStock.map((item) => (
+    <Box key={item.itemId}>
+      <Typography>
+        {item.itemName} is running low — only {item.stockQty} left.
+      </Typography>
+    </Box>
+  ))}
+
+<hr />
+     
+      {/* Low Stock */}
       <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        Low Stock Alerts ({lowStock.length})
+        Low Stock Alerts ({lowStockAlertCount})
       </Typography>
 
       {lowStock.length > 0 ? (
@@ -115,31 +131,14 @@ const Alerts = () => {
           </Box>
         ))
       ) : (
-        <Typography color="text.secondary">No low stock items.</Typography>
-      )}
-
-      <hr />
-
-      {/* Out of Stock */}
-      <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        Out of Stock ({outOfStock.length})
-      </Typography>
-
-      {outOfStock.length > 0 ? (
-        outOfStock.map((item) => (
-          <Box key={item.itemId}>
-            <Typography>{item.itemName} is currently out of stock.</Typography>
-          </Box>
-        ))
-      ) : (
-        <Typography color="text.secondary">No out of stock items.</Typography>
+        <Typography color="text.secondary"></Typography>
       )}
 
       <hr />
 
       {/* Reorder */}
       <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        Reorder Suggested ({reorderStock.length})
+       Reorder Suggested ({reorderAlertCount})
       </Typography>
 
       {reorderStock.length > 0 ? (
@@ -152,7 +151,7 @@ const Alerts = () => {
           </Box>
         ))
       ) : (
-        <Typography color="text.secondary">No reorder alerts.</Typography>
+        <Typography color="text.secondary"></Typography>
       )}
 
       <hr />

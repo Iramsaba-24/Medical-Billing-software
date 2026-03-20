@@ -35,10 +35,36 @@ const InventorySettings = () => {
   //  Save Function
   const { handleSubmit, reset } = methods;
   const onSubmit = (data: InventoryFormValues) => {
-    console.log("Inventory Settings Saved ");
-    console.log(data);
-    localStorage.setItem("inventorySettings", JSON.stringify(data));
-  };
+  console.log("Inventory Settings Saved ");
+  console.log(data);
+
+  // localStorage.setItem("inventorySettings", JSON.stringify(data));
+
+  // increment counter if checkbox selected
+  if (data.returnsUpdate.includes("autoUpdate")) {
+    const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
+    localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
+  }
+  localStorage.setItem("inventorySettings", JSON.stringify(data));
+
+  // Returns counter
+  if (data.returnsUpdate.includes("autoUpdate")) {
+    const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
+    localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
+  }
+
+  // Low Stock Alert counter
+  if (data.alertsVisibility.includes("alert1")) {
+    const prevLowStock = Number(localStorage.getItem("lowStockAlertCount")) || 0;
+    localStorage.setItem("lowStockAlertCount", String(prevLowStock + 1));
+  }
+
+  // Reorder Alert counter
+  if (data.alertsVisibility.includes("alert2")) {
+    const prevReorder = Number(localStorage.getItem("reorderAlertCount")) || 0;
+    localStorage.setItem("reorderAlertCount", String(prevReorder + 1));
+  }
+};
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>

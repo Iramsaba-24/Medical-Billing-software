@@ -1,158 +1,207 @@
-import { useForm, FormProvider } from "react-hook-form";
-import { Box, Button, Paper, Typography, Stack } from "@mui/material";
-import CheckboxGroup from "@/components/controlled/CheckboxGroup";
-import { useEffect } from "react";
-import { showToast } from "@/components/uncontrolled/ToastMessage";
+import { Box, Paper, Typography, Button, Divider } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
+import TotalItems from "@/assets/TotalItems.svg";
+import LowStock from "@/assets/warningsign.svg";
+import TotalValue from "@/assets/TotalValue.svg";
+import type { InventoryItem } from "@/containers/inventory/AddInventoryItem";
+import InventoryList from "@/containers/inventory/InventoryList";
+import GroupSummary from "@/containers/inventory/GroupSummary";
  
-//  Define Form Types for Type Safety
-export interface InventoryFormValues {
-  groupExpiry: string[];
-  pricing: string[];
-  lowStockThreshold: string;
-  autoReorderQty: string;
-  outOfStock: string;
-  barcodeStorage: string[];
-  returnsUpdate: string[];
-  alertsVisibility: string[];
-}
-const InventorySettings = () => {
-  const methods = useForm<InventoryFormValues>({
-    defaultValues: {
-      groupExpiry: [],
-      pricing: [],
-      lowStockThreshold: "",
-      autoReorderQty: "",
-      outOfStock: "",
-      barcodeStorage: [],
-      returnsUpdate: [],
-      alertsVisibility: [],
-    },
-  });
+export default function InventoryPage() {
+  const navigate = useNavigate();
  
-  const headingStyle = {
-    fontWeight: 700,
-    fontSize: "18px",
-    color: "#212529",
-    mb: 1,
-  };
+   const inventory: InventoryItem[] = JSON.parse(
+  localStorage.getItem("inventory") || "[]"
+ );
  
-  //  Save Function
-  const { handleSubmit, reset } = methods;
-  const onSubmit = (data: InventoryFormValues) => {
-    console.log("Inventory Settings Saved ");
-    console.log(data);
-    localStorage.setItem("inventorySettings", JSON.stringify(data));
-    showToast("success", "Settings updated successfully!");
-  };
-  useEffect(() => {
-      const storedSettings = localStorage.getItem("inventorySettings");
+  const totalItems = inventory.length;
  
-      if (storedSettings) {
-        reset(JSON.parse(storedSettings));
-      }
-    }, [reset]);
+  const lowStockItems = inventory.filter(
+  (item) => item.stockQty > 0 && item.stockQty < 10
+  ).length;
+  length;
  
-  return (
-    <Box sx={{ backgroundColor: "#f9f9f9" }}>
-      <Box mb={2}>
-        <Typography
-          sx={{
-            fontSize: { xs: 20, sm: 22, md: 24 },
-            fontWeight: 700,
-            color: "#111827",
-            mt: { xs: 1, md: 0.5 },
-          }}
-        >
-          Inventory Settings
-        </Typography>
+  const totalValue = inventory.reduce(
+    (sum, item) => sum + item.stockQty * item.pricePerUnit,
+    0
+  );
+ 
+return (
+    <Box>
+      <Box>
+          <Typography
+            sx={{
+              fontSize: { xs: 20, sm: 24, md: 28 },  
+              fontWeight: 700,
+              color: '#111827',
+              mt: {xs:1 , md:0.5},
+              mb: 0.5,
+            }}
+          >
+            Inventory
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
       </Box>
  
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={2.5}> 
-            {/*  Returns & Auto Update */}
-            <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={headingStyle}>
-                Returns & Auto Update
+      <Box
+        display="grid"
+        gridTemplateColumns={{ xs: "1fr", md: "repeat(3, 1fr)" }}
+        gap={2}
+        mb={3}
+      >
+        {[
+          { label: "Total Items", value: totalItems, img: TotalItems },
+          { label: "Low Stock Items", value: lowStockItems, img: LowStock },
+          { label: "Total Value", value: `₹ ${totalValue}`, img: TotalValue },
+        ].map((card) => (
+          <Paper
+            key={card.label}
+            sx={{
+              p: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderRadius: 2,
+              cursor: "pointer",
+              transition: "0.3s",
+              "&:hover": {
+                transform: "translateY(-4px)",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Box>
+              <Typography fontWeight={600} fontSize={18}>
+                {card.value}
               </Typography>
-              <CheckboxGroup
-                name="returnsUpdate"
-                label=""
-                options={[
-                  {
-                    label: "Auto-update stock on returns (Sales & Purchase)",
-                    value: "autoUpdate",
-                  },
-                ]}
-              />
-            </Paper>
+              <Typography color="text.secondary">
+                {card.label}
+              </Typography>
+            </Box>
  
-            {/*  Alerts & Visibility */}
-            <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={headingStyle}>
-                Alerts & Visibility
-              </Typography>
-              <CheckboxGroup
-                name="alertsVisibility"
-                label=""
-                options={[
-                  {
-                    label: "Show low-stock alerts on dashboard",
-                    value: "alert1",
-                  },
-                  {
-                    label: "Show auto recorder alerts on dashboard",
-                    value: "alert2",
-                  },
-                ]}
-              />
-            </Paper>
-            {/*  Buttons- save reset*/}
             <Box
-              sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}
-            >
-              <Button
-                type="button"
-                variant="outlined"
-                onClick={() => reset()}
-                sx={{
+              component="img"
+              src={card.img}
+              sx={{ width: 70, height: 70 }}
+            />
+          </Paper>
+        ))}
+      </Box>
+      <Box
+        display="grid"
+        gridTemplateColumns={{ xs: "1fr", md: "2fr 1fr" }}
+        gap={3}
+        mb={3}
+      >
+        <Paper sx={{ p: 2 }}>
+          <Box display="flex" justifyContent="space-between" mb={2}>
+            <Typography fontWeight={600}>
+              Medicine Groups
+            </Typography>
+ 
+            <Button
+              size="small"
+              variant="contained"
+              sx={{  
+                px: 2.5,
+                py: 1,
+                minWidth: 100,
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+                fontSize: "0.95rem",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#fff",
                   color: "#238878",
                   border: "2px solid #238878",
-                  textTransform: "none",
-                  "&:hover": {
-                    backgroundColor: "#238878",
-                    color: "#fff",
-                    border: "2px solid #238878",
-                  },
-                }}
-              >
-                Reset
-              </Button>
+                }
+             }}
+              onClick={() => navigate(URL_PATH.MedicineGroup)}
+            >
+              View Details
+            </Button>
+          </Box>
  
-              <Button
-               type="submit"
-                variant="contained"
-                sx={{
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                  border: "2px solid #238878",
-                  textTransform: "none",
-                  "&:hover": {
-                    backgroundColor: "#fff",
-                    color: "#238878",
-                    border: "2px solid #238878",
-                  },
-                }}
-              >
-                Save
-              </Button>
-            </Box>
-          </Stack>
-        </form>
-      </FormProvider>
+             <GroupSummary />
+ 
+        </Paper>
+ 
+        <Box display="flex" flexDirection="column" gap={2}>
+ 
+          <Button
+            fullWidth
+            sx={{
+            px: 2.5,
+            py: 1,
+            minWidth: 100,
+            backgroundColor: "#238878",
+            color: "#fff",
+            border: "2px solid #238878",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
+              border: "2px solid #238878",
+            }
+          }}
+            onClick={() => navigate(URL_PATH.AddMedicineGroup)}
+          >
+            + Add New Group
+          </Button>
+ 
+          <Button
+            fullWidth
+            sx={{
+            px: 2.5,
+            py: 1,
+            minWidth: 100,
+            backgroundColor: "#238878",
+            color: "#fff",
+            border: "2px solid #238878",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
+              border: "2px solid #238878",
+            }
+          }}
+            onClick={() => navigate(URL_PATH.AddInventoryItem)}
+          >
+            + Add New Medicine
+          </Button>
+ 
+         
+ 
+           <Button
+            fullWidth
+           sx={{
+            px: 2.5,
+            py: 1,
+            minWidth: 100,
+            backgroundColor: "#238878",
+            color: "#fff",
+            border: "2px solid #238878",
+            fontSize: "0.95rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
+              border: "2px solid #238878",
+            }
+          }}
+            onClick={() => navigate(URL_PATH.Reorder)}
+          >
+            Reorder Medicines
+          </Button>
+        </Box>
+      </Box>
+ 
+      <InventoryList />
     </Box>
   );
-};
- 
-export default InventorySettings;
+}
  
