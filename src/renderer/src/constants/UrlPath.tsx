@@ -1,26 +1,23 @@
-
 export const URL_PATH = {
   LOGIN: "/login",
   REGISTER: "/register",
-  ChoosePlan:"/chooseplan",
- AccountSetup:"/accountsetup",
+  ChoosePlan: "/chooseplan",
+  AccountSetup: "/accountsetup",
   PaymentSuccess: "/payment-success",
   UpiPayment: "/upi-payment",
   CardPayment: "/card-payment",
 
-  
   ProceedToPaymentPage: "/proceed-to-payment",
-  BusinessDetails:"/businessdetails",
-  NetPurchaseDetails:"/netbanking-purchasedetails",
-  NetBanking:"/netbanking",
-  ReceiverDetails:"/receiver-details",
+  BusinessDetails: "/businessdetails",
+  NetPurchaseDetails: "/netbanking-purchasedetails",
+  NetBanking: "/netbanking",
+  ReceiverDetails: "/receiver-details",
 
- 
   Landing: "/landing",
   Dashboard: "/dashboard",
   SalesView: "/dashboard/sales-view",
   Customer: "/customers",
-  AddCustomerForm:"/customers/add-customer",
+  AddCustomerForm: "/customers/add-customer",
 
   Doctors: "/doctors",
   AddDoctor: "/add-doctor",
@@ -40,7 +37,7 @@ export const URL_PATH = {
   DistributorDetails: "/distributor-details",
 
   Inventory: "/inventory",
-  
+
   Reorder: "/inventory/reorder",
   MedicineGroup: "/inventory/medicine-group",
   AddMedicineGroup: "/inventory/add-medicine-group",
@@ -64,5 +61,5 @@ export const URL_PATH = {
   PaymentDetails: "/billing/payment-details",
 
   DoctorsSettings: "/settings/doctors-settings",
-  NewInvoiceBill:"/billing/invoice-bill"
+  NewInvoiceBill: "/billing/invoice-bill",
 };

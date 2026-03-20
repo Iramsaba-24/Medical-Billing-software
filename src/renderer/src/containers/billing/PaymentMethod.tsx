@@ -11,15 +11,20 @@ import { FormProvider, useForm, useWatch } from "react-hook-form";
 
 type PaymentMethods = {
   paymentMethod: "credit-card" | "upi" | "cash";
+
   CardNumber?: string;
+
   CardHolderName?: string;
+
   Cvv?: string;
+
   UpiId?: string;
 };
 
 const radioStyle = {
   "& .MuiRadio-root": {
     color: "default.main",
+
     "&.Mui-checked": {
       color: "#238878",
     },
@@ -39,6 +44,7 @@ const PaymentMethod = () => {
 
   const payment = useWatch({
     control: methods.control,
+
     name: "paymentMethod",
   });
 
@@ -153,6 +159,7 @@ const PaymentMethod = () => {
         state: { invoice: lastInvoice },
       });
     }
+    console.log("Saved Invoices → ", localStorage.getItem("currentInvoice"));
   };
 
   return (
@@ -164,8 +171,11 @@ const PaymentMethod = () => {
         flexDirection="column"
         sx={{
           border: "1px solid #ccc",
+
           gap: { xs: 2, sm: 3 },
+
           backgroundColor: "#fff",
+
           p: { xs: 2, sm: 3 },
         }}
       >
@@ -174,7 +184,9 @@ const PaymentMethod = () => {
             name="paymentMethod"
             options={[
               { label: "Credit / Debit Card", value: "credit-card" },
+
               { label: "UPI Payment", value: "upi" },
+
               { label: "Cash", value: "cash" },
             ]}
             label=""

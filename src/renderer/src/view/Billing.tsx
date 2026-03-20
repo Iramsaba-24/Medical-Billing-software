@@ -13,7 +13,6 @@ import InvoiceTabButtons from "@/containers/billing/InvoiceTabButtons";
 import NewInvoice from "@/containers/billing/NewInvoice";
 import EmailField from "@/components/controlled/EmailField";
 
-
 // Payprint button reuse sx
 const PayNPrint = {
   backgroundColor: "#238878",
@@ -28,7 +27,6 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-
 type Doctor = {
   id: number;
   doctorName: string;
@@ -75,7 +73,7 @@ function RetailInvoice() {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>(
-    {},
+    {}
   );
 
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
@@ -94,7 +92,6 @@ function RetailInvoice() {
       border: "2px solid #238878",
     },
   });
-
   // saved to local storage
   const onSubmit = (data: RetailInvoiceFormValues) => {
     setIsSubmitted(true);
@@ -148,14 +145,12 @@ function RetailInvoice() {
     qty: number | "";
     price: number | "";
   };
-
   type InvoiceData = {
     form: RetailInvoiceFormValues;
     rows: ItemRow[];
     gst: number;
     paymentMode: string;
   };
-
   type Customer = {
     name: string;
     age: string;
@@ -231,7 +226,6 @@ function RetailInvoice() {
   ];
 
   const selectedCustomerName = methods.watch("name");
-
   // when name change
   useEffect(() => {
     if (selectedCustomerName === "add_customer") {
@@ -240,7 +234,7 @@ function RetailInvoice() {
     }
     if (!selectedCustomerName) return;
     const selectedCustomer = customerOptions.find(
-      (c) => c.name === selectedCustomerName,
+      (c) => c.name === selectedCustomerName
     );
     if (selectedCustomer) {
 
@@ -270,18 +264,16 @@ function RetailInvoice() {
   useEffect(() => {
     if (selectedDoctorName) {
       const selectedDoctor = doctorList.find(
-        (doc) => doc.doctorName === selectedDoctorName,
+        (doc) => doc.doctorName === selectedDoctorName
       );
-
       if (selectedDoctor) {
         methods.setValue("addressRight", selectedDoctor.address);
       }
     }
   }, [selectedDoctorName, doctorList, methods]);
-
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
-    0,
+    0
   );
 
   const finalTotal = subTotal + (subTotal * gst) / 100;
@@ -289,7 +281,6 @@ function RetailInvoice() {
   return (
     <FormProvider {...methods}>
       {/* invoice tab button */}
-
       <InvoiceTabButtons />
       {!isRetail ? (
         <NewInvoice />
@@ -315,7 +306,6 @@ function RetailInvoice() {
             {Array.from({ length: 10 }, (_, i) => {
               const invoiceNumber = i + 1;
               const isActive = String(invoiceNumber) === activeInvoice;
-
               return (
                 <Button
                   key={invoiceNumber}
@@ -346,7 +336,6 @@ function RetailInvoice() {
               );
             })}
           </Box>
-
           <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
             <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3}>
               {/* inner box */}
@@ -380,7 +369,11 @@ function RetailInvoice() {
                     </Box>
                   </Box>
 
-                  <Box display="flex" gap={2} flexDirection={{ xs: "column", sm: "row" }}>
+                  <Box
+                    display="flex"
+                    gap={2}
+                    flexDirection={{ xs: "column", sm: "row" }}
+                  >
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <MobileField
                         name="mobile"
@@ -389,12 +382,10 @@ function RetailInvoice() {
                         required
                       />
                     </Box>
-
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <EmailField name="email" label="Email" />
                     </Box>
                   </Box>
-
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
                     <TextInputField
                       name="addressLeft"
@@ -421,7 +412,6 @@ function RetailInvoice() {
                       placeholder="Select Dr"
                     />
                   </Box>
-
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <TextInputField
                       name="addressRight"
@@ -466,7 +456,6 @@ function RetailInvoice() {
               >
                 Save & Continue
               </Button>
-
             </Box>
           </form>
         </Box>
