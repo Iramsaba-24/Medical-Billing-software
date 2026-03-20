@@ -47,32 +47,8 @@ const CashPayment = ({ payment, finalAmount, onSuccess }: Props) => {
   const subTotal = cashRows.reduce((sum, row) => {
     return sum + Number(row.note) * Number(row.qty || 0);
   }, 0);
-  const isAmountMatched = subTotal === finalAmount;
+  const isAmountMatched = subTotal >= finalAmount;
   const onCashPay = () => {
-    const storedInvoice = localStorage.getItem("currentInvoice");
-    const storedRetailInvoice = localStorage.getItem("currentRetailInvoice");
-
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
-      const existingSales = JSON.parse(
-        localStorage.getItem("salesData") || "[]",
-      );
-
-      existingSales.push(invoice);
-      localStorage.setItem("salesData", JSON.stringify(existingSales));
-      localStorage.removeItem("currentInvoice");
-    }
-
-    if (storedRetailInvoice) {
-      const retailInvoices = JSON.parse(storedRetailInvoice);
-      const existingRetail = JSON.parse(
-        localStorage.getItem("retailInvoices") || "[]",
-      );
-
-      const updatedRetail = [...existingRetail, retailInvoices];
-      localStorage.setItem("retailInvoices", JSON.stringify(updatedRetail));
-      localStorage.removeItem("currentRetailInvoice");
-    }
     onSuccess();
   };
 

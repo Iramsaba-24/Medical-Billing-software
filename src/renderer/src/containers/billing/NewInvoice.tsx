@@ -13,7 +13,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-import InvoiceTabButtons from "@/containers/billing/InvoiceTabButtons";
+import InvoiceTabButtons from "./InvoiceTabButtons";
 import ItemsSection from "@/containers/customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
  
@@ -56,6 +56,7 @@ type FormData = {
   mobile: string;
   email: string;
   address: string;
+  gst:string;
 };
  
 type ItemRow = {
@@ -72,7 +73,7 @@ const NewInvoice = () => {
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
  
-  const [gst, setGst] = useState<number>(0);
+  const [gst, setGst] = useState<number>(5);
   const [isSubmitted, setIsSubmitted] = useState(false);
  
   /*  GRAND TOTAL */
@@ -82,8 +83,11 @@ const NewInvoice = () => {
   }, 0);
  
   const methods = useForm<FormData>({
-    mode: "onSubmit",
+    mode: "onChange",
     shouldUnregister: false,
+    defaultValues: {
+    gst: "5",
+  },
   });
  
   const { handleSubmit, watch } = methods;
@@ -111,8 +115,6 @@ const NewInvoice = () => {
       showToast("error", "Please fill all item details");
       return;
     }
- 
- 
  
     const gstAmount = (finalTotal * gst) / 100;
     const grandTotal = finalTotal + gstAmount;
@@ -197,13 +199,13 @@ const NewInvoice = () => {
                   label="Company"
                   options={companyOptions}
                   required
-                  freeSolo
+                  freeSolo={false}
                   editable={true}
                 />
               </Grid>
  
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextInputField name="supplier" label="Supplier" required />
+                <TextInputField name="supplier" label="Supplier" minLength={3} required />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <MobileField
@@ -211,6 +213,7 @@ const NewInvoice = () => {
                   label="Mobile Number"
                   required
                   countryCode
+                  
                 />
               </Grid>
  
@@ -224,6 +227,8 @@ const NewInvoice = () => {
                   label="Address"
                   inputType="textarea"
                   rows={3}
+                  minLength={10}
+                  maxLength={50}
                 />
               </Grid>
             </Grid>

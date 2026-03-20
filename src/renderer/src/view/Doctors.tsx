@@ -1,8 +1,6 @@
-// import SearchField from "@/components/controlled/SearchField";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { Box, Typography, Paper, MenuItem, Button, Select, Divider, Dialog, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
-// import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 import DoctorEdit from "@/containers/doctors/DoctorEdit";
@@ -20,14 +18,14 @@ type Doctor = {
 };
 
 const Doctors = () => {
-  // const methods = useForm({ defaultValues: { search: "" } });
+
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [viewItem, setViewItem] = useState<Doctor | null>(null);
   const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
 
 
   const navigate = useNavigate();
-  // const searchValue = methods.watch("search");
+  
 
   useEffect(() => {
     setDoctors(JSON.parse(localStorage.getItem("doctors") || "[]"));

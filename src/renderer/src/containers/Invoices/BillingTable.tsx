@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 
 import { Box, Paper, Typography } from "@mui/material";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 
 import {
   UniversalTable,
@@ -31,30 +31,10 @@ type Props = {
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
 const BillingTable = ({ invoices, setInvoices }: Props) => {
-  const location = useLocation();
+ // const location = useLocation();
 
   const navigate = useNavigate();
-  // add new invoice from navigation state
-  useEffect(() => {
-    const state = location.state as { invoice?: Invoice } | null;
-
-    if (state?.invoice) {
-      const newInvoice = state.invoice;
-
-      setInvoices((prev) => {
-        const exists = prev.some((inv) => inv.invoice === newInvoice.invoice);
-
-        if (exists) return prev;
-
-        const updated = [newInvoice, ...prev];
-
-        localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-        return updated;
-      });
-    }
-  }, [location.state, setInvoices]);
-
+  
   const [filterType, setFilterType] = useState<FilterType>("all");
 
   const filterOptions = [

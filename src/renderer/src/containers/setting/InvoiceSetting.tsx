@@ -24,7 +24,6 @@ const headingStyle = {
   color: "#212529",
   mb: 1,
 };
-
 const paperStyle = {
   p: { xs: 2, md: 4 },
   borderRadius: "5px",

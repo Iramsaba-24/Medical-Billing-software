@@ -111,7 +111,7 @@ const AddDoctor = () => {
           </Box>
 
           <Box flex={1}>
-            <EmailField name="email" label="Email" preventDuplicate  />
+            <EmailField name="email" label="Email"   />
           </Box>
         </Box>
 

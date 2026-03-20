@@ -1,6 +1,14 @@
-
 import React, { useMemo, useState, useEffect } from 'react';
-import {Box,Card,CardContent,Typography,TextField,InputAdornment,Chip,Slide} from '@mui/material';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  InputAdornment,
+  Chip,
+  Slide
+} from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useForm, FormProvider } from 'react-hook-form';
 import DropdownField from '@/components/controlled/DropdownField';
@@ -8,8 +16,9 @@ import { UniversalTable, type Column, ACTION_KEY } from '@/components/uncontroll
 import EditSalesForm from './EditSalesForm';
 import ViewSalesDialog from './ViewSalesTable';
 
-// table data
-export interface SalesData {
+
+
+export interface SalesData extends Record<string, unknown> {
   id: number;
   name: string;
   medicine: string;
@@ -17,20 +26,17 @@ export interface SalesData {
   totalPrice: number;
   date: string;
   time: string;
-  [key: string]: string | number;
 }
-// local storage
+
 type StoredSale = {
   name: string;
   totalPrice: number;
   invoice: string;
-  patient: string;
   date: string;
-  price: number;
-  medicines: {
-    qty: number; name: string 
-}[];
+  medicines: { name: string; qty: number }[];
 };
+
+
 
 const filterOptions = [
   { value: 'Today', label: 'Today' },
@@ -39,94 +45,103 @@ const filterOptions = [
   { value: 'All', label: 'All' },
 ];
 
-const getFilteredDataByDate = (data: SalesData[], filter: string) => {
+const getFilteredDataByDate = (data: SalesData[], filter: string): SalesData[] => {
   const today = new Date();
 
   switch (filter) {
     case 'Today':
-      return data.filter(d =>
-        new Date(d.date).toDateString() === today.toDateString()
-      );
+      return data.filter(d => new Date(d.date).toDateString() === today.toDateString());
 
-    case '6 Days':
+    case '6 Days': {
+      const sixDaysAgo = new Date();
+      sixDaysAgo.setDate(today.getDate() - 6);
       return data.filter(d => {
         const date = new Date(d.date);
-        const sixDaysAgo = new Date();
-        sixDaysAgo.setDate(today.getDate() - 6);
         return date >= sixDaysAgo && date <= today;
       });
+    }
 
     case 'This Month':
       return data.filter(d => {
         const date = new Date(d.date);
-        return (
-          date.getMonth() === today.getMonth() &&
-          date.getFullYear() === today.getFullYear()
-        );
+        return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
       });
 
-    case 'All':
     default:
       return data;
   }
 };
 
+
+
 const SalesTable: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('This Month');
-
-  //  Only one state needed for dialog
-  const [editingRow, setEditingRow] = useState<SalesData | null>(null);
-
-  const methods = useForm({
-    defaultValues: {
-      filter: 'This Month',
-    },
-  });
-  // local storage function
-  const saveToLocalStorage = (data: SalesData[]) => {
-    const formatted = data.map(item => ({
-      invoice: String(item.id),
-      patient: item.name,
-      date: item.date,
-      price: Number(item.totalPrice) || 0,
-      medicines:
-        item.medicine && item.medicine !== "-"
-          ? item.medicine.split(", ").map(name => ({ name }))
-          : []
-    }));
-
-    localStorage.setItem("salesData", JSON.stringify(formatted));
-  };
-  
   const [salesList, setSalesList] = useState<SalesData[]>([]);
+  const [editingRow, setEditingRow] = useState<SalesData | null>(null);
+  const [viewRow, setViewRow] = useState<SalesData | null>(null);
 
-useEffect(() => {
-  const storedSales = localStorage.getItem("invoices");
-  if (!storedSales) return;
+  const methods = useForm({ defaultValues: { filter: 'This Month' } });
 
-  const parsed: StoredSale[] = JSON.parse(storedSales);
 
-  const formatted: SalesData[] = parsed.map((item, index) => ({
-    id: index + 1,
-    name: item.name || "-",
-    medicine:
-      item.medicines?.length
-        ? item.medicines.map((m) => m.name).join(", ")
-        : "-",
+  useEffect(() => {
+  const storedRetail = localStorage.getItem('currentInvoice');
+  const storedDistributor = localStorage.getItem('currentNewInvoiceList');
 
-    quantity:
-      item.medicines?.reduce((sum, m) => sum + (m.qty || 0), 0) || 1,
+  const retailParsed: StoredSale[] = storedRetail ? JSON.parse(storedRetail) : [];
+  const distributorParsed: StoredSale[] = storedDistributor ? JSON.parse(storedDistributor) : [];
 
-    totalPrice: item.totalPrice || 0,
-    date: item.date || new Date().toISOString().split("T")[0],
-    time: new Date().toLocaleTimeString(),
-  }));
+ 
+  const combined = [...retailParsed, ...distributorParsed];
+
+  if (combined.length === 0) return;
+
+  const formatted: SalesData[] = combined.map((item, index) => {
+    const medicineNames =
+      item.medicines && item.medicines.length > 0
+        ? item.medicines.map(m => m.name).join(', ')
+        : '-';
+
+    const totalQty =
+      item.medicines && item.medicines.length > 0
+        ? item.medicines.reduce((sum, m) => sum + (m.qty || 0), 0)
+        : 1;
+
+    return {
+      id: index + 1,
+      name: item.name || '-',
+      medicine: medicineNames,
+      quantity: totalQty,
+      totalPrice: item.totalPrice || 0,
+      date: item.date || new Date().toISOString().split('T')[0],
+      time: new Date().toLocaleTimeString(),
+    };
+  });
+
   setSalesList(formatted);
 }, []);
 
+  const saveToLocalStorage = (data: SalesData[]) => {
+    const formatted: StoredSale[] = data.map(item => ({
+      invoice: String(item.id),
+      name: item.name as string,
+      totalPrice: item.totalPrice as number,
+      date: item.date as string,
+      medicines:
+        item.medicine !== '-'
+          ? (item.medicine as string).split(', ').map(name => ({
+              name,
+              qty: 1, 
+            }))
+          : [],
+    }));
+
+    localStorage.setItem('currentInvoice', JSON.stringify(formatted));
+  };
+
   const filteredSalesData = useMemo(() => {
-  const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
+    const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
+
     if (!searchQuery.trim()) return dateFiltered;
 
     return dateFiltered.filter(
@@ -134,7 +149,8 @@ useEffect(() => {
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.medicine.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery, selectedMonth, salesList]);
+  }, [salesList, selectedMonth, searchQuery]);
+
 
   const columns: Column<SalesData>[] = [
     { key: 'name', label: 'Name' },
@@ -143,39 +159,29 @@ useEffect(() => {
     {
       key: 'totalPrice',
       label: 'Price',
-      render: (row) => {
-        const price = Number(row.totalPrice) || 0;
-        return `₹ ${price.toFixed(2)}`;
-      },
+      render: row => `₹ ${(row.totalPrice as number).toFixed(2)}`,
     },
     { key: 'date', label: 'Date' },
     { key: 'time', label: 'Time' },
     { key: ACTION_KEY, label: 'Actions' },
   ];
 
-  const handleEdit = (row: SalesData) => {
-    setEditingRow(row); // opens dialog
-  };
+  
 
-  const handleCloseEditDialog = () => {
-    setEditingRow(null); // closes dialog
-  };
-  //edit
+  const handleEdit = (row: SalesData) => setEditingRow(row);
+  const handleCloseEditDialog = () => setEditingRow(null);
+
   const handleSaveEdit = (data: SalesData) => {
     setSalesList(prev => {
       const updated = prev.map(item =>
-        item.id === data.id
-          ? { ...item, ...data, totalPrice: Number(data.totalPrice) || 0 }
-          : item
+        item.id === data.id ? { ...item, ...data } : item
       );
-
       saveToLocalStorage(updated);
       return updated;
     });
-
     handleCloseEditDialog();
   };
-  // delete single row
+
   const handleDelete = (row: SalesData) => {
     if (!window.confirm(`Delete ${row.name}?`)) return;
 
@@ -186,7 +192,6 @@ useEffect(() => {
     });
   };
 
-  // delete selected rows
   const handleDeleteSelected = (rows: SalesData[]) => {
     if (!window.confirm(`Delete ${rows.length} records?`)) return;
 
@@ -198,8 +203,8 @@ useEffect(() => {
       return updated;
     });
   };
-  // view row
-  const [viewRow, setViewRow] = useState<SalesData | null>(null);
+
+ 
 
   return (
     <>
@@ -215,20 +220,11 @@ useEffect(() => {
                 gap={2}
                 mb={3}
               >
-                <Typography
-                  variant="h6"
-                  fontWeight={600}
-                  textAlign={{ xs: 'left', md: 'left' }}
-                >
+                <Typography variant="h6" fontWeight={600}>
                   Recent Sales List
                 </Typography>
 
-                <Box
-                  display="flex"
-                  flexDirection={{ xs: 'column', sm: 'row' }}
-                  gap={2}
-                  width={{ xs: '100%', md: 'auto' }}
-                >
+                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
                   <TextField
                     size="small"
                     placeholder="Search"
@@ -241,12 +237,6 @@ useEffect(() => {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{
-                      width: { xs: '100%', sm: 250, md: 300 },
-                      '& .MuiOutlinedInput-root': {
-                        height: 50,
-                      },
-                    }}
                   />
 
                   <Box sx={{ width: { xs: '100%', sm: 180 } }}>
@@ -254,22 +244,13 @@ useEffect(() => {
                       name="filter"
                       options={filterOptions}
                       onChangeCallback={value => setSelectedMonth(value)}
-                      sx={{
-                        '& .MuiFormHelperText-root': {
-                          display: 'none',
-                        },
-                      }}
                     />
                   </Box>
                 </Box>
               </Box>
             </FormProvider>
 
-            <Chip
-              label={`Filter: ${selectedMonth}`}
-              sx={{ mb: 2 }}
-              color="primary"
-            />
+            <Chip label={`Filter: ${selectedMonth}`} sx={{ mb: 2 }} />
 
             <UniversalTable
               data={filteredSalesData}
@@ -283,30 +264,17 @@ useEffect(() => {
                 edit: handleEdit,
                 delete: handleDelete,
               }}
-              paperSx={{
-                boxShadow: 'none',
-                borderRadius: 0,
-              }}
-              headerSx={{
-                fontWeight: 600,
-              }}
-              rowHoverSx={{
-                '&:hover': {
-                  bgcolor: 'rgba(0, 0, 0, 0.04)',
-                },
-              }}
-              caption={undefined}
             />
           </CardContent>
         </Card>
       </Slide>
 
-    
-      <EditSalesForm  
+      <EditSalesForm
         editingRow={editingRow}
         onClose={handleCloseEditDialog}
         onSave={handleSaveEdit}
       />
+
       <ViewSalesDialog
         viewRow={viewRow}
         onClose={() => setViewRow(null)}

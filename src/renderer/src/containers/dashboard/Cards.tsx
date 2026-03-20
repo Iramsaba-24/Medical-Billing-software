@@ -115,7 +115,7 @@ const Cards: React.FC = () => {
  
   // filter for the dropdown
   const getFilteredSalesData = (filter: FilterType): SalesData[] => {
-  const stored = localStorage.getItem("invoices");
+  const stored = localStorage.getItem("currentInvoice");
   if (!stored) return [];
  
   const sales: SalesData[] = JSON.parse(stored);
@@ -171,7 +171,7 @@ const getDailyReportData = (filter: FilterType) => {
   };
 };
 const getTopSellingMedicine = (): string => {
-  const stored = localStorage.getItem("invoices");
+  const stored = localStorage.getItem("currentInvoice");
   if (!stored) return "No Data";
  
   const invoices: Invoice[] = JSON.parse(stored);
@@ -375,7 +375,7 @@ const getTopSellingMedicine = (): string => {
  
                   <Box>
                     <Typography fontSize={24} fontWeight={700}>
-                      {/* {info?.rightValue} */}
+                      
                       {card.title === "Inventory"
                         ? totalMedicineGroups() //function to get total medicine groups count from local storage
                         : info?.rightValue}

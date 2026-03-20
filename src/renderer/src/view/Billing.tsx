@@ -122,7 +122,8 @@ function RetailInvoice() {
         price: r.price,
         amount: Number(r.qty || 0) * Number(r.price || 0),
       })),
-  
+      subTotal: subTotal,
+      
       totalPrice: finalTotal,
       status: "Paid",
       date: now.toLocaleDateString(),
@@ -161,6 +162,7 @@ function RetailInvoice() {
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
 
+ 
 
   const [paymentMode, setPaymentMode] = useState("Cash");
 
@@ -176,7 +178,7 @@ function RetailInvoice() {
     if (savedData) {
       methods.reset(savedData.form);
       setRows(savedData.rows);
-      
+     
       setPaymentMode(savedData.paymentMode);
     } else {
       methods.reset({
@@ -190,7 +192,7 @@ function RetailInvoice() {
         addressRight: "",
       });
       setRows([{ id: Date.now(), name: "", qty: 1, price: "" }]);
-    
+     
       setPaymentMode("Cash");
     }
   }, [activeInvoice, invoiceForms, methods]);
@@ -250,7 +252,7 @@ function RetailInvoice() {
   }, [selectedCustomerName, customerOptions, methods, navigate]);
   // data load
   useEffect(() => {
-    const saved = localStorage.getItem("medical_customers");
+    const saved = localStorage.getItem("customers");
     if (saved) {
       setCustomerOptions(JSON.parse(saved));
     }
@@ -267,11 +269,12 @@ function RetailInvoice() {
       }
     }
   }, [selectedDoctorName, doctorList, methods]);
+  const subTotal = rows.reduce(
+    (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
+    0
+  );
 
- const finalTotal = rows.reduce(
-  (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
-  0,
-);
+  const finalTotal = subTotal;
 
   return (
     <FormProvider {...methods}>
@@ -353,8 +356,9 @@ function RetailInvoice() {
                         options={nameOptions}
                         required
                         onlyAlphabet
-                        freeSolo
+                        // freeSolo
                         editable={true}
+                        
 
                       />
                     </Box>
@@ -386,6 +390,8 @@ function RetailInvoice() {
                       name="addressLeft"
                       label="Address"
                       inputType="textarea"
+                       minLength={10}
+                      maxLength={50}
                       rows={3}
                     />
                   </Box>
@@ -402,7 +408,7 @@ function RetailInvoice() {
                       name="doctor"
                       label="Doctor"
                       options={doctorOptions}
-                      freeSolo
+                     freeSolo={false}
                       editable={true}
                       placeholder="Select Dr"
                     />
@@ -412,6 +418,8 @@ function RetailInvoice() {
                       name="addressRight"
                       label="Address"
                       inputType="textarea"
+                      minLength={10}
+                      maxLength={50}
                       rows={3} />
 
                   </Box>
