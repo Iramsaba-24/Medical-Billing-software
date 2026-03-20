@@ -143,22 +143,28 @@ const NewInvoiceBill = () => {
                   </Typography>
 
                   <Box
-                    sx={{
-                      mt: 1,
-                      pt: 1,
-                      borderTop: "1px solid #000",
-                      display: "flex",
-                      justifyContent: "space-between"
-                    }}
-                  >
-                    <Typography>
-                      <strong>Invoice No:</strong> {invoice?.invoice}
-                    </Typography>
+  sx={{
+    mt: 1,
+    pt: 1,
+    borderTop: "1px solid #000",
+    display: "flex",
+    justifyContent: "space-between"
+  }}
+>
+  <Box>
+    <Typography>
+      <strong>Invoice No:</strong> {invoice?.invoice}
+    </Typography>
 
-                    <Typography>
-                      <strong>Date:</strong> {displayDate}
-                    </Typography>
-                  </Box>
+    <Typography>
+      <strong>GSTIN:</strong> ABC12345SDGFJK789
+    </Typography>
+  </Box>
+
+  <Typography>
+    <strong>Date:</strong> {displayDate}
+  </Typography>
+</Box>
                 </TableCell>
               </TableRow>
 
@@ -233,18 +239,18 @@ const NewInvoiceBill = () => {
               </TableRow>
 
               {/* CGST */}
-              <TableRow>
+              {/* <TableRow>
                 <TableCell colSpan={6}></TableCell>
-                <TableCell colSpan={2}>
-                  <strong>Total CGST ({invoiceGst}%)</strong>
-                </TableCell>
-              </TableRow>
+                <TableCell colSpan={2}> */}
+                  {/* <strong>Total CGST ({invoiceGst}%)</strong> */}
+                {/* </TableCell> */}
+              {/* </TableRow> */}
 
               {/* SGST */}
               <TableRow>
                 <TableCell colSpan={6}></TableCell>
                 <TableCell>
-                  <strong>Total SGST ({invoiceGst}%)</strong>
+                  <strong>Total GST ({invoiceGst}%)</strong>
                 </TableCell>
                 <TableCell>
                   ₹ {gstAmount.toFixed(2)}
