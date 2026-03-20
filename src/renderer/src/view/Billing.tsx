@@ -254,7 +254,7 @@ function RetailInvoice() {
   }, [selectedCustomerName, customerOptions, methods, navigate]);
   // data load
   useEffect(() => {
-    const saved = localStorage.getItem("medical_customers");
+    const saved = localStorage.getItem("customers");
     if (saved) {
       setCustomerOptions(JSON.parse(saved));
     }

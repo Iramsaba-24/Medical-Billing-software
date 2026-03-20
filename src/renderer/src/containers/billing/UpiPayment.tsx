@@ -128,6 +128,8 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
               name="UpiId"
               disabled={paymentMethod !== "upi"}
               inputType="alphanumeric"
+              minLength={3}
+              maxLength={30}
               rules={{
                 required:
                   paymentMethod === "upi" ? "UPI ID is required" : false,

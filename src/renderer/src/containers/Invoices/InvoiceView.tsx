@@ -1,17 +1,17 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, Box, TableRow, Typography, Button, GlobalStyles } from "@mui/material"
+import { Paper, Table, TableBody, TableCell, TableContainer, Box, TableRow, Typography, Button, GlobalStyles, useMediaQuery, useTheme } from "@mui/material"
 import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoImage from "@/assets/logoimg.svg";
-
-
-
+ 
+ 
+ 
 export interface Invoice {
   name: string;
   doctor: string;
   address: string;
-    doctorAddress?: string; 
+    doctorAddress?: string;
   invoice: string;
   date: string;
   medicines: {
@@ -44,7 +44,9 @@ const InvoiceView = () => {
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
   const navigate = useNavigate();
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+ 
  
   const columns = [
     { label: "Sr No.", width: "7%" },
@@ -54,7 +56,7 @@ const InvoiceView = () => {
     { label: "Quantity", width: "10%" },
     { label: "Amount", width: "15%" },
   ];
-
+ 
   useEffect(() => {
     if (!invoice && invoiceNo) {
       const savedInvoices = JSON.parse(localStorage.getItem("currentInvoice") || "[]");
@@ -62,7 +64,7 @@ const InvoiceView = () => {
       if (found) setInvoice(found);
       else navigate(-1);
     }
-
+ 
     const invoiceSettings = localStorage.getItem("invoiceSettings");
     if (invoiceSettings) {
       const parsed = JSON.parse(invoiceSettings);
@@ -71,17 +73,163 @@ const InvoiceView = () => {
       setShowHsn(printOptions.includes("show_hsn_code"));
     }
   }, [invoice, invoiceNo, navigate]);
-
-
+ 
+ 
   const subTotal = invoice?.medicines?.reduce(
     (sum, med) => sum + Number(med.amount), 0) || 0;
-
+ 
   const gstAmount = invoice?.gst ? (subTotal * invoice.gst) / 100 : 0;
-
+ 
   const netTotal = subTotal + gstAmount;
-
+ 
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
-
+ 
+  // Mobile view card style
+  if (isMobile) {
+    return (
+      <>
+        <GlobalStyles
+          styles={{
+            "@media print": {
+              "body *": { visibility: "hidden" },
+              "#invoice, #invoice *": { visibility: "visible" },
+              "#invoice": { position: "absolute", left: 0, top: 0, width: "100%" },
+            },
+          }}
+        />
+ 
+        <Paper sx={{ p: 2, mx: 0 }} id="invoice">
+          <Typography textAlign="center" mb={2} fontSize={14} sx={{
+            textDecoration: "underline", textUnderlineOffset: 4
+          }}>Tax Invoice / Cash Memo</Typography>
+ 
+          {/* Header — Shop Info */}
+          <Box sx={{ border: "1.5px solid #000", p: 1.5, mb: 0 }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              {showLogo && (
+                <Box
+                  component="img"
+                  src={(() => {
+                    const savedLogo = localStorage.getItem("pharmacyLogo");
+                    return savedLogo || LogoImage;
+                  })()}
+                  alt="logo"
+                  sx={{ width: 36, height: 36, objectFit: "contain" }}
+                />
+              )}
+              <Box>
+                <Typography fontSize={13} fontWeight={600}>MEDIPLUS MEDICAL & GENERAL</Typography>
+                <Typography fontSize={11}>Shinoli, Tal: Ambegaon, Dist: Pune</Typography>
+              </Box>
+            </Box>
+          </Box>
+ 
+          {/* Customer Info */}
+          <Box sx={{ border: "1.5px solid #000", borderTop: "none", p: 1.5, mb: 0 }}>
+            <Typography fontSize={12}><strong>Name:</strong> {invoice?.name}</Typography>
+            <Typography fontSize={12} mt={0.5}>
+              <strong>Doctor:</strong> {invoice?.doctor}
+              {invoice?.doctor && invoice?.doctorAddress ? ' - ' : ''}
+              {invoice?.doctorAddress}
+            </Typography>
+            <Box sx={{ mt: 1, pt: 1, borderTop: "1px solid #000", display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <Typography fontSize={12}><strong>Invoice No.:</strong> {invoice?.invoice}</Typography>
+              <Typography fontSize={12}><strong>Date:</strong> {currentDate}</Typography>
+            </Box>
+          </Box>
+ 
+          {/* Column Headers */}
+          <Box sx={{ border: "1.5px solid #000", borderTop: "none", display: "grid", gridTemplateColumns: "30px 1fr 50px 55px 55px", p: "6px 8px", backgroundColor: "#f5f5f5" }}>
+            <Typography fontSize={10} fontWeight={700}>#</Typography>
+            <Typography fontSize={10} fontWeight={700}>Particulars</Typography>
+            <Typography fontSize={10} fontWeight={700} textAlign="center">Expiry</Typography>
+            <Typography fontSize={10} fontWeight={700} textAlign="center">Qty</Typography>
+            <Typography fontSize={10} fontWeight={700} textAlign="center">Amt</Typography>
+          </Box>
+ 
+          {/* Medicine Rows */}
+          {invoice?.medicines?.map((med: Medicine, index: number) => (
+            <Box
+              key={index}
+              sx={{
+                border: "1.5px solid #000",
+                borderTop: "none",
+                display: "grid",
+                gridTemplateColumns: "30px 1fr 50px 55px 55px",
+                p: "5px 8px",
+                backgroundColor: index % 2 === 0 ? "#fff" : "#fafafa",
+              }}
+            >
+              <Typography fontSize={11}>{index + 1}</Typography>
+              <Typography fontSize={11}>{med.name}</Typography>
+              <Typography fontSize={11} textAlign="center">{med.expiry}</Typography>
+              <Typography fontSize={11} textAlign="center">{med.qty}</Typography>
+              <Typography fontSize={11} textAlign="center">₹{med.amount.toFixed(2)}</Typography>
+            </Box>
+          ))}
+ 
+          {/* Totals */}
+          <Box sx={{ border: "1.5px solid #000", borderTop: "none", p: "6px 8px" }}>
+            <Box display="flex" justifyContent="space-between">
+              <Typography fontSize={12} fontWeight={600}>Sub Total</Typography>
+              <Typography fontSize={12}>₹ {subTotal.toFixed(2)}</Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between" mt={0.5}>
+              <Typography fontSize={12} fontWeight={600}>GST {invoice?.gst ?? 0}%</Typography>
+              <Typography fontSize={12}>₹ {gstAmount.toFixed(2)}</Typography>
+            </Box>
+            <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
+              <Typography fontSize={13} fontWeight={700}>NET</Typography>
+              <Typography fontSize={13} fontWeight={700}>₹ {netTotal.toFixed(2)}</Typography>
+            </Box>
+          </Box>
+ 
+          {/* Footer */}
+          <Box sx={{ border: "1.5px solid #000", borderTop: "none", p: 1.5 }}>
+            <Typography fontSize={10} color="text.secondary">
+              Vat Tin No. :<br />
+              Drug Lic No. : MH-PZ4-115478,115479,115480<br />
+              I/We hereby certify that my/our registration certificate under the Maharashtra Value Added Tax Act 2002 is in force on the date on the which sales of the goods specified in this tax invoice is made by me/us and that the transaction of the sale covered by this tax invoice has been effected by me/us and it shall be accounted for in the turnover of sales while filling of return and the due tax, if any, payble on the sales has been paid or shall be paid.
+            </Typography>
+            <Box display="flex" flexDirection="column" alignItems="center" mt={1.5}>
+              <Typography fontSize={11} fontWeight={600}>For MEDIPLUS MEDICAL & GENERAL STORE</Typography>
+              <Box component="img" src={Sign} alt="Store Sign" sx={{ width: 80, py: 1 }} />
+              <Typography fontSize={11}>Pharmacist</Typography>
+            </Box>
+          </Box>
+        </Paper>
+ 
+        <Box m={2} display="flex" justifyContent="flex-end" gap={2}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate(-1)}
+            sx={{
+              px: 3, textTransform: "none", fontSize: 13,
+              color: "#238878", border: "2px solid #238878",
+              "&:hover": { backgroundColor: "#238878", color: "#fff" },
+            }}
+          >
+            Cancel
+          </Button>
+ 
+          <Button
+            startIcon={<PrintIcon />}
+            variant="contained"
+            onClick={() => window.print()}
+            sx={{
+              px: 3, fontSize: 13, backgroundColor: "#238878",
+              color: "#fff", border: "2px solid #238878", textTransform: "none",
+              "&:hover": { backgroundColor: "#fff", color: "#238878", border: "2px solid #238878" },
+            }}
+          >
+            Print
+          </Button>
+        </Box>
+      </>
+    );
+  }
+ 
+  // Desktop view
   return (
     <>
       <GlobalStyles
@@ -93,7 +241,7 @@ const InvoiceView = () => {
           },
         }}
       />
-
+ 
       <Paper sx={{ p: { xs: 2, md: 4 }, mx: { xs: 0, md: 3 } }} id="invoice">
         <Typography textAlign="center" mb={2} sx={{
           textDecoration: "underline", textUnderlineOffset: 4
@@ -121,7 +269,7 @@ const InvoiceView = () => {
                     </Box>
                   </Box>
                 </TableCell>
-
+ 
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   <Typography><strong>Name:</strong> {invoice?.name}</Typography>
                  <Typography sx={{ mt: 0.5 }}><strong>Doctor:</strong> {invoice?.doctor} {invoice?.doctor && invoice?.doctorAddress ? '- ' : ''}{invoice?.doctorAddress}</Typography>
@@ -131,7 +279,7 @@ const InvoiceView = () => {
                   </Box>
                 </TableCell>
               </TableRow>
-
+ 
               <TableRow>
                 {columns.map((col) => (
                   <TableCell
@@ -142,7 +290,7 @@ const InvoiceView = () => {
                   </TableCell>
                 ))}
               </TableRow>
-
+ 
               {invoice?.medicines?.map((med: Medicine, index: number) => (
                 <TableRow key={index} sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
                   <TableCell align="center">{index + 1}</TableCell>
@@ -153,24 +301,22 @@ const InvoiceView = () => {
                   <TableCell align="center">₹ {med.amount.toFixed(2)}</TableCell>
                 </TableRow>
               ))}
-
+ 
               <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
                 <TableCell /><TableCell /><TableCell /><TableCell />
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Sub Total</strong></TableCell>
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
-
+ 
               <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
                 <TableCell /><TableCell /><TableCell /><TableCell />
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">
                   <strong>GST {invoice?.gst ?? 0}%</strong>
                 </TableCell>
-
+ 
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {gstAmount.toFixed(2)}</TableCell>
               </TableRow>
-
-
-
+ 
               <TableRow sx={{ borderTop: "2px solid #000" }}>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   Get Well Soon..
@@ -182,7 +328,7 @@ const InvoiceView = () => {
                   <Typography fontWeight={600}>₹ {netTotal.toFixed(2)}</Typography>
                 </TableCell>
               </TableRow>
-
+ 
               <TableRow>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   Vat Tin No. :
@@ -201,12 +347,12 @@ const InvoiceView = () => {
                   </Box>
                 </TableCell>
               </TableRow>
-
+ 
             </TableBody>
           </Table>
         </TableContainer>
       </Paper>
-
+ 
       <Box m={3} display="flex" justifyContent="flex-end" gap={2}>
         <Button
           variant="outlined"
@@ -219,7 +365,7 @@ const InvoiceView = () => {
         >
           Cancel
         </Button>
-
+ 
         <Button
           startIcon={<PrintIcon />}
           variant="contained"
@@ -236,5 +382,5 @@ const InvoiceView = () => {
     </>
   )
 }
-
+ 
 export default InvoiceView

@@ -158,6 +158,8 @@ export default function AddInventoryItem() {
                 { label: "Boxes", value: "boxes" },
                 { label: "Pairs", value: "pairs" },
               ]}
+              freeSolo={false}
+              editable={true}
             />
 
             <NumericField
@@ -172,6 +174,8 @@ export default function AddInventoryItem() {
               placeholder="Medicine Group"
               required
               options={groupOptions}
+              freeSolo={false}
+              editable={true}
             />
 
             <NumericField
@@ -186,7 +190,7 @@ export default function AddInventoryItem() {
               label="Expiry Date"
               viewMode="date"
               required
-              
+
               useCurrentDate={false}
               dateRestriction="current-future-only"
             />
@@ -197,6 +201,8 @@ export default function AddInventoryItem() {
               placeholder="Supplier"
               required
               options={supplierOptions}
+              freeSolo={false}
+              editable={true}
             />
 
             <Box
