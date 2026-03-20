@@ -22,8 +22,7 @@ export interface Invoice {
     expiry: string;
   }[];
   subTotal?: number;
-  gst?: number;
-  gstAmount?: number;
+  
   totalPrice?: number;
   total?: number;
 }
@@ -46,7 +45,6 @@ const InvoiceView = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
- 
  
   const columns = [
     { label: "Sr No.", width: "7%" },
@@ -77,14 +75,14 @@ const InvoiceView = () => {
  
   const subTotal = invoice?.medicines?.reduce(
     (sum, med) => sum + Number(med.amount), 0) || 0;
- 
-  const gstAmount = invoice?.gst ? (subTotal * invoice.gst) / 100 : 0;
- 
-  const netTotal = subTotal + gstAmount;
- 
+
+  // const gstAmount = invoice?.gst ? (subTotal * invoice.gst) / 100 : 0;
+
+  const netTotal = subTotal ;
+
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
- 
-  // Mobile view card style
+
+  // Mobile view card style 
   if (isMobile) {
     return (
       <>
@@ -97,12 +95,10 @@ const InvoiceView = () => {
             },
           }}
         />
- 
         <Paper sx={{ p: 2, mx: 0 }} id="invoice">
           <Typography textAlign="center" mb={2} fontSize={14} sx={{
             textDecoration: "underline", textUnderlineOffset: 4
           }}>Tax Invoice / Cash Memo</Typography>
- 
           {/* Header — Shop Info */}
           <Box sx={{ border: "1.5px solid #000", p: 1.5, mb: 0 }}>
             <Box display="flex" alignItems="center" gap={1}>
@@ -123,7 +119,6 @@ const InvoiceView = () => {
               </Box>
             </Box>
           </Box>
- 
           {/* Customer Info */}
           <Box sx={{ border: "1.5px solid #000", borderTop: "none", p: 1.5, mb: 0 }}>
             <Typography fontSize={12}><strong>Name:</strong> {invoice?.name}</Typography>
@@ -137,7 +132,6 @@ const InvoiceView = () => {
               <Typography fontSize={12}><strong>Date:</strong> {currentDate}</Typography>
             </Box>
           </Box>
- 
           {/* Column Headers */}
           <Box sx={{ border: "1.5px solid #000", borderTop: "none", display: "grid", gridTemplateColumns: "30px 1fr 50px 55px 55px", p: "6px 8px", backgroundColor: "#f5f5f5" }}>
             <Typography fontSize={10} fontWeight={700}>#</Typography>
@@ -146,7 +140,6 @@ const InvoiceView = () => {
             <Typography fontSize={10} fontWeight={700} textAlign="center">Qty</Typography>
             <Typography fontSize={10} fontWeight={700} textAlign="center">Amt</Typography>
           </Box>
- 
           {/* Medicine Rows */}
           {invoice?.medicines?.map((med: Medicine, index: number) => (
             <Box
@@ -167,23 +160,18 @@ const InvoiceView = () => {
               <Typography fontSize={11} textAlign="center">₹{med.amount.toFixed(2)}</Typography>
             </Box>
           ))}
- 
           {/* Totals */}
           <Box sx={{ border: "1.5px solid #000", borderTop: "none", p: "6px 8px" }}>
             <Box display="flex" justifyContent="space-between">
               <Typography fontSize={12} fontWeight={600}>Sub Total</Typography>
               <Typography fontSize={12}>₹ {subTotal.toFixed(2)}</Typography>
             </Box>
-            <Box display="flex" justifyContent="space-between" mt={0.5}>
-              <Typography fontSize={12} fontWeight={600}>GST {invoice?.gst ?? 0}%</Typography>
-              <Typography fontSize={12}>₹ {gstAmount.toFixed(2)}</Typography>
-            </Box>
+           
             <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
               <Typography fontSize={13} fontWeight={700}>NET</Typography>
               <Typography fontSize={13} fontWeight={700}>₹ {netTotal.toFixed(2)}</Typography>
             </Box>
           </Box>
- 
           {/* Footer */}
           <Box sx={{ border: "1.5px solid #000", borderTop: "none", p: 1.5 }}>
             <Typography fontSize={10} color="text.secondary">
@@ -198,7 +186,6 @@ const InvoiceView = () => {
             </Box>
           </Box>
         </Paper>
- 
         <Box m={2} display="flex" justifyContent="flex-end" gap={2}>
           <Button
             variant="outlined"
@@ -211,7 +198,6 @@ const InvoiceView = () => {
           >
             Cancel
           </Button>
- 
           <Button
             startIcon={<PrintIcon />}
             variant="contained"
@@ -228,8 +214,8 @@ const InvoiceView = () => {
       </>
     );
   }
- 
-  // Desktop view
+
+  // Desktop view 
   return (
     <>
       <GlobalStyles
@@ -307,16 +293,8 @@ const InvoiceView = () => {
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Sub Total</strong></TableCell>
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
- 
-              <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
-                <TableCell /><TableCell /><TableCell /><TableCell />
-                <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">
-                  <strong>GST {invoice?.gst ?? 0}%</strong>
-                </TableCell>
- 
-                <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {gstAmount.toFixed(2)}</TableCell>
-              </TableRow>
- 
+
+
               <TableRow sx={{ borderTop: "2px solid #000" }}>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   Get Well Soon..

@@ -134,7 +134,7 @@ const PaymentMethod = () => {
     // New Invoice Flow
     if (storedNew) {
       const existingInvoices = JSON.parse(
-        localStorage.getItem("currentInvoice") || "[]"
+        localStorage.getItem("currentNewInvoiceList") || "[]"
       );
       const invoices = JSON.parse(storedNew);
       const lastInvoice = invoices[invoices.length - 1];
@@ -151,7 +151,7 @@ const PaymentMethod = () => {
       };
 
       const updated = [summaryInvoice, ...existingInvoices];
-      localStorage.setItem("currentInvoice", JSON.stringify(updated));
+      localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
       localStorage.setItem("currentInvoiceBill", JSON.stringify(lastInvoice));
       localStorage.removeItem("currentNewInvoice");
 

@@ -1,11 +1,10 @@
-
 import { Box, Button, Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import ItemsSection from "@/containers/customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -124,8 +123,7 @@ function RetailInvoice() {
         amount: Number(r.qty || 0) * Number(r.price || 0),
       })),
       subTotal: subTotal,
-      gst: gst,
-      gstAmount: (subTotal * gst) / 100,
+      
       totalPrice: finalTotal,
       status: "Paid",
       date: now.toLocaleDateString(),
@@ -148,7 +146,7 @@ function RetailInvoice() {
   type InvoiceData = {
     form: RetailInvoiceFormValues;
     rows: ItemRow[];
-    gst: number;
+   
     paymentMode: string;
   };
   type Customer = {
@@ -164,7 +162,7 @@ function RetailInvoice() {
     { id: Date.now(), name: "", qty: 1, price: "" },
   ]);
 
-  const [gst, setGst] = useState(5);
+ 
 
   const [paymentMode, setPaymentMode] = useState("Cash");
 
@@ -180,7 +178,7 @@ function RetailInvoice() {
     if (savedData) {
       methods.reset(savedData.form);
       setRows(savedData.rows);
-      setGst(savedData.gst);
+     
       setPaymentMode(savedData.paymentMode);
     } else {
       methods.reset({
@@ -194,7 +192,7 @@ function RetailInvoice() {
         addressRight: "",
       });
       setRows([{ id: Date.now(), name: "", qty: 1, price: "" }]);
-      setGst(5);
+     
       setPaymentMode("Cash");
     }
   }, [activeInvoice, invoiceForms, methods]);
@@ -276,7 +274,7 @@ function RetailInvoice() {
     0
   );
 
-  const finalTotal = subTotal + (subTotal * gst) / 100;
+  const finalTotal = subTotal;
 
   return (
     <FormProvider {...methods}>
@@ -321,7 +319,7 @@ function RetailInvoice() {
                       [activeInvoice]: {
                         form: methods.getValues(),
                         rows,
-                        gst,
+                        
                         paymentMode,
                       },
                     }));
@@ -358,8 +356,9 @@ function RetailInvoice() {
                         options={nameOptions}
                         required
                         onlyAlphabet
-                        freeSolo
+                        // freeSolo
                         editable={true}
+                        
 
                       />
                     </Box>
@@ -391,6 +390,8 @@ function RetailInvoice() {
                       name="addressLeft"
                       label="Address"
                       inputType="textarea"
+                       minLength={10}
+                      maxLength={50}
                       rows={3}
                     />
                   </Box>
@@ -407,7 +408,7 @@ function RetailInvoice() {
                       name="doctor"
                       label="Doctor"
                       options={doctorOptions}
-                      freeSolo
+                     freeSolo={false}
                       editable={true}
                       placeholder="Select Dr"
                     />
@@ -417,6 +418,8 @@ function RetailInvoice() {
                       name="addressRight"
                       label="Address"
                       inputType="textarea"
+                      minLength={10}
+                      maxLength={50}
                       rows={3} />
 
                   </Box>

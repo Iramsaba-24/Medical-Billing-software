@@ -3,7 +3,7 @@ import {
   UniversalTable,
   Column,
 } from "@/components/uncontrolled/UniversalTable";
-import ShareMenu from "./ShareMenu";
+import ShareMenu from "@/containers/distributors/ShareMenu";
 import { useEffect, useState } from "react";
 
 type InvoiceItem = {
@@ -34,7 +34,7 @@ const columns: Column<InvoiceItem>[] = [
 export default function NewInvoiceList() {
   const [tableData, setTableData] = useState<InvoiceItem[]>([]);
   useEffect(() => {
-  const storedInvoices = localStorage.getItem("currentInvoice");
+  const storedInvoices = localStorage.getItem("currentNewInvoiceList");
 
   if (storedInvoices) {
     const parsed = JSON.parse(storedInvoices);
@@ -78,7 +78,7 @@ export default function NewInvoiceList() {
   );
 
   setTableData(updatedData);
-  localStorage.setItem("currentInvoice", JSON.stringify(updatedData));
+  localStorage.setItem("currentNewInvoiceList", JSON.stringify(updatedData));
 }}
     />
   </Paper>

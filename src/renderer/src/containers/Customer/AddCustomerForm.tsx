@@ -196,9 +196,10 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="mobile"
                   label="Mobile"
                   countryCode
+                  preventDuplicate 
                   required
                 />
-                <EmailField name="email" label="Email" required />
+                <EmailField name="email" label="Email" required preventDuplicate/>
  
                 <TextInputField
                   name="address"
