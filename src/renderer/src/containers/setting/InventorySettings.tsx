@@ -51,7 +51,7 @@ const InventorySettings = () => {
   const { handleSubmit, reset } = methods;
  
   const onSubmit = (data: InventoryFormValues) => {
-    showToast("success", "Saved Successfully");
+    showToast("success", "Settings updated successfully");
     console.log("Inventory Settings Saved ");
     console.log(data);
  
