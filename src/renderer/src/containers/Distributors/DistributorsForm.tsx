@@ -173,8 +173,7 @@ const DistributorsForm = () => {
                 name="gstIn"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"
-                preventDuplicate
-                maxLength={15}
+                
                 rows={1}
                 rules={{
                   pattern: {
