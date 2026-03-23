@@ -49,7 +49,15 @@ export const mainRoutes: RouteObject[] = [
       { path: URL_PATH.Dashboard, element: <Dashboard /> },
 
       { path: URL_PATH.SalesView, element: <SalesView /> },
+      
+      {
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
+       },
 
+
+      
+      
       {
         path: URL_PATH.Invoices,
         element: <Invoices />,

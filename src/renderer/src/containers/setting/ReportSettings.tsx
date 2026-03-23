@@ -16,7 +16,7 @@ const DEFAULT_VALUES: ReportFormValues = {
 
 const ReportSettings = () => {
   const methods = useForm<ReportFormValues>({
-defaultValues: DEFAULT_VALUES
+  defaultValues: DEFAULT_VALUES
   });
   
   const headingStyle = {
@@ -65,7 +65,7 @@ defaultValues: DEFAULT_VALUES
           </Box>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-        {/*  Exports format */}
+          {/* card visibility control */}
         <Paper sx={{p: { xs: 2, md: 4 }, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
           <Typography sx={headingStyle}>Card Visibility Control</Typography>
           <CheckboxGroup
@@ -79,8 +79,8 @@ defaultValues: DEFAULT_VALUES
             ]}
           />
         </Paper>
-        {/* price Visibility Control */}
-        <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
+        {/* Other Visibility Control */}
+        <Paper sx={{p: { xs: 2, md: 4 }, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
           <Typography sx={headingStyle}>Other Visibility Control</Typography>
           <CheckboxGroup
             sx={checkboxStyle}

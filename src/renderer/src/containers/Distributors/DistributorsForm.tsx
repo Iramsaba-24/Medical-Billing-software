@@ -110,6 +110,7 @@ const DistributorsForm = () => {
               <TextInputField
                 name="companyName"
                 label="Company Name"
+                minLength={3}
                 maxLength={30}
                 inputType="textarea"
                 rows={1}
@@ -120,6 +121,7 @@ const DistributorsForm = () => {
                 name="ownerName"
                 label="Owner Name"
                 inputType="alphabet"
+                minLength={3}
                 maxLength={30}
                 required
               />
@@ -137,7 +139,7 @@ const DistributorsForm = () => {
                label="Email" 
                required 
                maxLength={50}
-           //  preventDuplicate 
+               preventDuplicate 
               />
 
               <DateTimeField 
@@ -198,7 +200,7 @@ const DistributorsForm = () => {
                 rows={2}
                 required
                 maxLength={50}
-                minLength={5}
+                minLength={10}
               />
             </Box>
           </Paper>

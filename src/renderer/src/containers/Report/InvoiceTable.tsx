@@ -1,5 +1,4 @@
 
-
 import { useState, useMemo, useEffect } from "react";
 import {
   Paper,
@@ -43,20 +42,31 @@ const InvoiceTable = () => {
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  // LOAD DATA FROM LOCAL STORAGE (BillingTable data)
+  //  FIXED SYNC LOGIC
   useEffect(() => {
     const loadInvoices = () => {
-      const stored = localStorage.getItem("invoices");
+      const stored = localStorage.getItem("currentInvoice");
       const parsed: InvoiceData[] = stored ? JSON.parse(stored) : [];
       setInvoices(parsed);
     };
 
     loadInvoices();
 
-    window.addEventListener("invoiceUpdated", loadInvoices);
+    // cross-tab sync
+    const handleStorageChange = () => {
+      loadInvoices();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // same-tab fallback sync
+    const interval = setInterval(() => {
+      loadInvoices();
+    }, 1000);
 
     return () => {
-      window.removeEventListener("invoiceUpdated", loadInvoices);
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
     };
   }, []);
 
@@ -66,7 +76,13 @@ const InvoiceTable = () => {
       const matchesStatus =
         statusFilter === "All" || inv.status === statusFilter;
 
-      const invDate = new Date(inv.date);
+      const parts = inv.date.split("/");
+      const invDate = new Date(
+        Number(parts[2]),
+        Number(parts[1]) - 1,
+        Number(parts[0])
+      );
+
       const today = new Date();
 
       let matchesTime = true;
@@ -80,6 +96,7 @@ const InvoiceTable = () => {
       if (timeFilter === "Last 7 Days") {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
+
         matchesTime = invDate >= sevenDaysAgo && invDate <= today;
       }
 
@@ -97,12 +114,9 @@ const InvoiceTable = () => {
     setInvoices(updatedInvoices);
 
     localStorage.setItem(
-      "invoices",
+      "currentInvoice",
       JSON.stringify(updatedInvoices)
     );
-
-    window.dispatchEvent(new Event("invoiceUpdated"));
-    window.dispatchEvent(new Event("reportUpdated"));
   };
 
   const statusOptions = [
@@ -120,38 +134,29 @@ const InvoiceTable = () => {
 
   const columns: Column<InvoiceData>[] = [
     { key: "invoice", label: "Invoice" },
-
     { key: "name", label: "Patient Name" },
-
     { key: "date", label: "Date" },
-
     {
       key: "price",
       label: "Price",
       render: (row) => `₹ ${row.price?.toFixed(2)}`,
     },
-
     {
       key: "gst",
       label: "GST(%)",
       render: (row) => `${row.gst ?? 0}%`,
     },
-
     {
       key: "total",
       label: "Total",
       render: (row) =>
         `₹ ${row.total?.toFixed(2) ?? row.price?.toFixed(2)}`,
     },
-
     {
       key: "status",
       label: "Status",
       render: (row) => {
-        const styles: Record<
-          string,
-          { bg: string; color: string }
-        > = {
+        const styles: Record<string, { bg: string; color: string }> = {
           Paid: { bg: "#E8F5E9", color: "#2E7D32" },
           Pending: { bg: "#FFF9C4", color: "#F9A825" },
           Overdue: { bg: "#FFEBEE", color: "#D32F2F" },
@@ -184,34 +189,21 @@ const InvoiceTable = () => {
 
         <Divider sx={{ mb: 3 }} />
 
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          spacing={2}
-          sx={{ mb: 2 }}
-        >
+        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
           <DropdownField
             name="statusFilter"
             label="Status"
             options={statusOptions}
-            freeSolo={false}
           />
 
           <DropdownField
             name="timeFilter"
             label="Time Filter"
             options={timeOptions}
-            freeSolo={false}
           />
         </Stack>
 
-        <div
-          style={{
-            width: "100%",
-            maxWidth: "100%",
-            overflowX: "auto",
-          }}
-        >
+        <div style={{ width: "100%", overflowX: "auto" }}>
           <UniversalTable<InvoiceData>
             data={filteredData}
             columns={columns}
@@ -228,11 +220,3 @@ const InvoiceTable = () => {
 };
 
 export default InvoiceTable;
-
-
-
-
-
-
-
-

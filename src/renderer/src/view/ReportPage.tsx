@@ -1,3 +1,5 @@
+
+
 import ReportCards from '@/containers/Report/ReportCards';
 import SalesGraph from '@/containers/Report/SalesGraph';
 import InvoiceTable from '@/containers/Report/InvoiceTable';
@@ -8,8 +10,16 @@ import { Box, Typography } from "@mui/material";
 
 const ReportPage = () => {
   //settings
-  const settings = JSON.parse(localStorage.getItem("report_settings") || "{}");
-const visibleTables: string[] = settings?.other_visibility_control || [];
+const DEFAULT_SETTINGS = {
+  card_visibility_control: ["Total Sales Report"],
+  other_visibility_control: ["Sales Report", "Invoice Report Table"],
+};
+
+const stored = localStorage.getItem("report_settings");
+
+const settings = stored ? JSON.parse(stored) : DEFAULT_SETTINGS;
+
+const visibleTables: string[] = settings.other_visibility_control;
   return (
    
     <Box className="container"  >

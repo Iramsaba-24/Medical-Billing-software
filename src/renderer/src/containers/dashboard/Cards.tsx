@@ -423,14 +423,14 @@ interface CardInfo {
     >
   >;
 }
-interface Medicine {
-  name: string;
-  qty: number;
-}
+// interface Medicine {
+//   name: string;
+//   qty: number;
+// }
  
-interface Invoice {
-  medicines: Medicine[];
-}
+// interface Invoice {
+//   medicines: Medicine[];
+// }
  
 const cardsConfig: CardInfo[] = [
   {
@@ -643,6 +643,15 @@ const getTopSellingMedicine = (): string => {
     const parsedData = JSON.parse(data);
     return parsedData.length.toString();
   }
+
+
+//top delling medicine
+
+const getSelectedTopMedicine = (): string => {
+  const stored = localStorage.getItem("topSellingMedicine");
+  return stored || "No Medicine Selected";
+};
+
   return (
     <Box width="100%">
       <Box
@@ -770,7 +779,8 @@ const getTopSellingMedicine = (): string => {
                       {card.title === "Inventory"
                         ? totalMedicines()//function to get total medicines count from local storage
                         : card.title === "Top Selling Medicine"
-                        ? getTopSellingMedicine() //function to get top selling medicine from local storage
+                       // ? getTopSellingMedicine() //function to get top selling medicine from local storage
+                         ? getSelectedTopMedicine()   
                         : info?.leftValue}
                     </Typography>
                     <Typography fontSize={12} color="text.secondary">

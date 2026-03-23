@@ -94,73 +94,81 @@ const PaymentMethod = () => {
   }, [location.state, setValue]); 
 
 
-  const saveInvoice = () => {
-    const storedRetail = localStorage.getItem("currentRetailInvoice");
-    const storedNew = localStorage.getItem("currentNewInvoice");
+ const saveInvoice = () => {
+  const storedRetail = localStorage.getItem("currentRetailInvoice");
+  const storedNew = localStorage.getItem("currentNewInvoice");
 
-    // Retail Flow
-    if (storedRetail) {
-      const existingInvoices = JSON.parse(
-        localStorage.getItem("currentInvoice") || "[]"
-      );
-      const retail = JSON.parse(storedRetail);
+  // Retail Flow
+  if (storedRetail) {
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentInvoice") || "[]"
+    );
+    const retail = JSON.parse(storedRetail);
 
-      const newInvoice = {
-        invoice: retail.invoice,
-        name: retail.name,
-        doctor: retail.doctor,
-        address: retail.address,
-        doctorAddress: retail.doctorAddress,
-        date: new Date().toLocaleDateString("en-GB"),
-        price: retail.totalPrice,
-        status: "Paid",
-        medicines: retail.medicines,
-        gst: retail.gst,
-        type: "retail",
-        gstAmount: retail.gstAmount,
-        subTotal: retail.subTotal,
-        totalPrice: retail.totalPrice,
-      };
+    const newInvoice = {
+      invoice: retail.invoice,
+      name: retail.name,
+      doctor: retail.doctor,
+      address: retail.address,
+      doctorAddress: retail.doctorAddress,
+      date: new Date().toLocaleDateString("en-GB"),
+      price: retail.totalPrice,
+      status: "Paid",
+      medicines: retail.medicines,
+      gst: retail.gst,
+      type: "retail",
+      gstAmount: retail.gstAmount,
+      subTotal: retail.subTotal,
+      totalPrice: retail.totalPrice,
+    };
 
-      const updated = [newInvoice, ...existingInvoices];
-      localStorage.setItem("currentInvoice", JSON.stringify(updated));
-      localStorage.removeItem("currentRetailInvoice");
-      navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
-        state: { invoice: newInvoice },
-      });
-      return;
-    }
+    const updated = [newInvoice, ...existingInvoices];
+    localStorage.setItem("currentInvoice", JSON.stringify(updated));
+    localStorage.removeItem("currentRetailInvoice");
+    navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
+      state: { invoice: newInvoice },
+    });
+    return;
+  }
 
-    // New Invoice Flow
-    if (storedNew) {
-      const existingInvoices = JSON.parse(
-        localStorage.getItem("currentNewInvoiceList") || "[]"
-      );
-      const invoices = JSON.parse(storedNew);
-      const lastInvoice = invoices[invoices.length - 1];
+  // New Invoice Flow
+  if (storedNew) {
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentNewInvoiceList") || "[]"
+    );
+    const invoices = JSON.parse(storedNew);
+    const lastInvoice = invoices[invoices.length - 1];
 
-      const summaryInvoice = {
-        invoice: lastInvoice.id?.toString() || Date.now().toString(),
-        name: lastInvoice.company,
-        date: new Date().toLocaleDateString(),
-        price: lastInvoice.totalPrice,
-        status: "Paid",
-        type: "distributor",
-        medicines: lastInvoice.medicines || [],
-        totalPrice: lastInvoice.totalPrice,
-      };
+    const invoiceNumber = `INV-${lastInvoice.id || Date.now()}`;
 
-      const updated = [summaryInvoice, ...existingInvoices];
-      localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
-      localStorage.setItem("currentInvoiceBill", JSON.stringify(lastInvoice));
-      localStorage.removeItem("currentNewInvoice");
+    const summaryInvoice = {
+      invoice: invoiceNumber,
+      name: lastInvoice.company,
+      date: new Date().toLocaleDateString(),
+      price: lastInvoice.totalPrice,
+      status: "Paid",
+      type: "distributor",
+      medicines: lastInvoice.medicines || [],
+      totalPrice: lastInvoice.totalPrice,
+    };
 
-      navigate(URL_PATH.NewInvoiceBill, {
-        state: { invoice: lastInvoice },
-      });
-    }
-    console.log("Saved Invoices → ", localStorage.getItem("currentInvoice"));
-  };
+    const billInvoice = {
+      ...lastInvoice,
+      invoice: invoiceNumber,
+      date: new Date().toLocaleDateString(),
+    };
+
+    const updated = [summaryInvoice, ...existingInvoices];
+    localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
+    localStorage.removeItem("currentNewInvoice");
+
+    navigate(URL_PATH.NewInvoiceBill, {
+      state: { invoice: billInvoice },
+    });
+  }
+};
+   
+  
 
   return (
     <FormProvider {...methods}>
