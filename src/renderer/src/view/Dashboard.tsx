@@ -1,57 +1,3 @@
-// import { Box } from "@mui/material";
-// import React from "react";
-// import StatCard from "@/containers/dashboard/StatCard";
-// import StockDonutChart from "@/components/controlled/chart/StockDonutChart";
-// import BarChart from "@/containers/dashboard/Barchart";
-// import SalesTable from "@/containers/dashboard/SalesTable";
-// import Cards from "@/containers/dashboard/Cards";
-// import Alerts from "@/containers/dashboard/Alerts";
-
-// const Dashboard: React.FC = () => {
-
-//   return (
-//     <Box sx={{ minHeight: "100vh" }}>
-
-//       <Box sx={{ mb: { xs: 2, md: 3 } }}>
-//         <StatCard />
-//       </Box>
-
-//       <Alerts />
-
-//       <Box
-//         sx={{
-//           display: "grid",
-//           gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-//           gap: { xs: 2, md: 3 },
-//           mb: 3,
-//         }}
-//       >
-//         <Box sx={{ width: "100%" }}>
-//           <StockDonutChart title="Graph Report" />
-//         </Box>
-
-//         <Box sx={{ width: "100%" }}>
-//           <BarChart />
-//         </Box>
-//       </Box>
-
-//       <Box sx={{ mb: 3 }}>
-//         <Cards />
-//       </Box>
-
-//       <Box sx={{ width: "100%", overflowX: "auto" }}>
-//         <SalesTable />
-//       </Box>
-
-//     </Box>
-//   );
-// };
-
-// export default Dashboard;
-
-
-
-
 
 import { Box } from "@mui/material";
 import React from "react";
@@ -61,95 +7,108 @@ import BarChart from "@/containers/dashboard/Barchart";
 import SalesTable from "@/containers/dashboard/SalesTable";
 import Cards from "@/containers/dashboard/Cards";
 import Alerts from "@/containers/dashboard/Alerts";
+import LineChart from "@/containers/dashboard/LineChart";
 
 const Dashboard: React.FC = () => {
 
+  const getChartPreferences = (): string[] => {
+    const data = localStorage.getItem("chartPreferences");
+    if (!data) return ["bar"];
 
+    try {
+      return JSON.parse(data);
+    } catch {
+      return ["bar"];
+    }
+  };
 
-  
+  const chartPreferences = getChartPreferences();
 
-const getChartPreferences = (): string[] => {
-  const data = localStorage.getItem("chartPreferences");
+  //  visibility flags
+  const showLine = chartPreferences.includes("line");
+  const showDonut = chartPreferences.includes("donut");
+  const showBar = chartPreferences.includes("bar");
 
-  if (!data) return ["bar"]; // default
-
-  try {
-    return JSON.parse(data);
-  } catch {
-    return ["bar"];
-  }
-};
-
-const chartPreferences = getChartPreferences();
+  //  count visible charts
+  const chartCount =
+    (showDonut ? 1 : 0) +
+    (showBar ? 1 : 0);
 
   return (
     <Box sx={{ minHeight: "100vh" }}>
 
+      {/* Top Stats */}
       <Box sx={{ mb: { xs: 2, md: 3 } }}>
         <StatCard />
       </Box>
 
       <Alerts />
 
-      {/* <Box
+      {/* DONUT + BAR GRID (DYNAMIC FIX) */}
+      {(showDonut || showBar) && (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns:
+              chartCount === 2
+                ? { xs: "1fr", md: "1fr 1fr" } 
+                : { xs: "1fr", md: "1fr" },   // single full width
+            gap: { xs: 2, md: 3 },
+            mb: 3,
+          }}
+        >
+          {showDonut && (
+            <Box sx={{ width: "100%" }}>
+              <StockDonutChart title="Graph Report" />
+            </Box>
+          )}
+
+          {showBar && (
+            <Box sx={{ width: "100%" }}>
+              <BarChart />
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {/* CARDS + LINE CHART GRID  */}
+      <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-          gap: { xs: 2, md: 3 },
+          gridTemplateAreas: showLine
+            ? {
+                xs: `
+                  "inventory"
+                  "top"
+                  "daily"
+                `,
+                md: `
+                  "inventory daily"
+                  "top daily"
+                `,
+              }
+            : {
+                xs: `
+                  "inventory"
+                  "top"
+                `,
+                md: `
+                  "inventory"
+                  "top"
+                `,
+              },
+          gridTemplateColumns: showLine
+            ? { xs: "1fr", md: "1fr 1fr" }
+            : { xs: "1fr", md: "1fr" },
+          gap: 2,
           mb: 3,
         }}
       >
-        <Box sx={{ width: "100%" }}>
-          <StockDonutChart title="Graph Report" />
-        </Box>
-
-        <Box sx={{ width: "100%" }}>
-          <BarChart />
-        </Box>
-      </Box> */}
-
-      {(chartPreferences.includes("bar") ||
-  chartPreferences.includes("line") ||
-  chartPreferences.includes("donut")) && (
-  <Box
-    sx={{
-      display: "grid",
-      gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-      gap: { xs: 2, md: 3 },
-      mb: 3,
-    }}
-  >
-    {/* Donut Chart */}
-    {chartPreferences.includes("donut") && (
-      <Box sx={{ width: "100%" }}>
-        <StockDonutChart title="Graph Report" />
-      </Box>
-    )}
-
-    {/* Bar Chart */}
-    {chartPreferences.includes("bar") && (
-      <Box sx={{ width: "100%" }}>
-        <BarChart />
-      </Box>
-    )}
-
-    
-  </Box>
-  
-)}
-
-{/* Line */}
-    {chartPreferences.includes("line") && (
-      <Box sx={{ width: "100%" }}>
-    
         <Cards />
+        {showLine && <LineChart filter="This Month" />}
       </Box>
-    )}
-{/* 
-      <Box sx={{ mb: 3 }}>
-        <Cards />
-      </Box> */}
 
+      {/* Table */}
       <Box sx={{ width: "100%", overflowX: "auto" }}>
         <SalesTable />
       </Box>
@@ -159,4 +118,3 @@ const chartPreferences = getChartPreferences();
 };
 
 export default Dashboard;
-
