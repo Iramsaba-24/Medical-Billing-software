@@ -1,3 +1,4 @@
+
 import { Box, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import WarningSign from "@/assets/warning-sign.svg";
@@ -9,16 +10,17 @@ type InventoryWithDate = Omit<InventoryItem, "expiryDate"> & {
 
 const Alerts = () => {
   const [inventory, setInventory] = useState<InventoryWithDate[]>([]);
-  const [expiryDays, setExpiryDays] = useState<number>(30);
-  const [showAllExpiry, setShowAllExpiry] = useState(false);
 
-  //  NEW STATE (LOW STOCK LIMIT)
+  const [expiryDays, setExpiryDays] = useState<number>(90);
+  const [showAllExpiry, setShowAllExpiry] = useState(false);
+  const [showLowStock, setShowLowStock] = useState(false);
+  const [showReorder, setShowReorder] = useState(false);
   const [lowStockLimit, setLowStockLimit] = useState(30);
 
-  // load inventory
+  
+
   useEffect(() => {
     const storedInventory = localStorage.getItem("inventory");
-
     if (!storedInventory) return;
 
     const parsed: InventoryWithDate[] = JSON.parse(storedInventory).map(
@@ -32,61 +34,89 @@ const Alerts = () => {
     setInventory(parsed);
   }, []);
 
-  //  LOAD INVENTORY SETTINGS (MAIN CONNECTION)
+  //  INVENTORY SETTINGS (low stock / reorder)
   useEffect(() => {
     const settingsStr = localStorage.getItem("inventorySettings");
-
     if (!settingsStr) return;
 
-    const settings = JSON.parse(settingsStr);
+    // const settings = JSON.parse(settingsStr);
+
+    const settings = settingsStr ? JSON.parse(settingsStr) : {};
 
     setLowStockLimit(Number(settings.lowStockThreshold) || 30);
+
+    setShowLowStock(settings.alertsVisibility?.includes("alert1"));
+    setShowReorder(settings.alertsVisibility?.includes("alert2"));
   }, []);
 
-  // load dashboard settings (same)
+  //  DASHBOARD SETTINGS 
   useEffect(() => {
-    const settingsStr = localStorage.getItem("dashboardSettings");
+  const settingsStr = localStorage.getItem("dashboardSettings");
+  if (!settingsStr) return;
 
-    if (!settingsStr) return;
+  const settings = JSON.parse(settingsStr);
 
-    const settings = JSON.parse(settingsStr);
+  const expirySelections: string[] = settings.expiryAlerts || [];
 
-    if (!settings.expiryAlerts) return;
+  // Show all
+  //if (expirySelections.includes("showAll")) {
+  if (expirySelections.includes("showExpiryOnDashboard")) {
+    setShowAllExpiry(true);
+    setExpiryDays(0);
+    return;
+  }
 
-    if (settings.expiryAlerts.includes("Show Expiry Alert on Dashboard")) {
-      setShowAllExpiry(true);
-      return;
-    }
+  //  Selected days logic
+  const selectedDays = expirySelections
+    .filter((v) => ["30", "60", "90"].includes(v))
+    .map(Number);
 
-    if (settings.expiryAlerts.includes("90")) setExpiryDays(90);
-    else if (settings.expiryAlerts.includes("60")) setExpiryDays(60);
-    else if (settings.expiryAlerts.includes("30")) setExpiryDays(30);
-  }, []);
-
-  // ✅ UPDATED LOW STOCK LOGIC
+  if (selectedDays.length > 0) {
+    setShowAllExpiry(false);
+    setExpiryDays(Math.max(...selectedDays));
+  } else {
+    setShowAllExpiry(false);
+    setExpiryDays(90);
+  }
+}, []);
+  // FILTERS
   const lowStock = inventory.filter(
     (item) => item.stockQty <= lowStockLimit
   );
 
-  // ❗ बाकी SAME (as you said)
-  const outOfStock = inventory.filter((item) => item.stockQty === 0);
-  const reorderStock = inventory.filter((item) => item.stockQty <= 10);
+  const reorderStock = inventory.filter(
+    (item) => item.stockQty <= 10
+  );
 
   const today = new Date();
 
-  const expiryAlerts = inventory.filter((item) => {
-    const diffDays =
-      (item.expiryDate.getTime() - today.getTime()) / (1000 * 3600 * 24);
+  
 
-    if (showAllExpiry) return true;
+  //  EXPIRY COUNTDOWN FUNCTION
+  const getExpiryText = (date: Date) => {
+    const diffDays = Math.ceil(
+      (date.getTime() - today.getTime()) / (1000 * 3600 * 24)
+    );
 
-    return diffDays >= 0 && diffDays <= expiryDays;
-  });
+    if (diffDays < 0) return "Expired";
+    if (diffDays === 0) return "Expires today";
+    if (diffDays === 1) return "Expires in 1 day";
+
+    return `Expires in ${diffDays} days`;
+  };const expiryAlerts = inventory.filter((item) => {
+  const diffDays =
+    (item.expiryDate.getTime() - today.getTime()) /
+    (1000 * 3600 * 24);
+
+  if (diffDays < 0) return false;
+
+  if (showAllExpiry) return true;
+
+  return diffDays <= expiryDays;
+});
 
   return (
-    <Paper
-      sx={{ py: 2, px: 4, pb: 8, mb: 4, maxHeight: 400, overflowY: "auto" }}
-    >
+    <Paper sx={{ py: 2, px: 4, pb: 8, mb: 4, maxHeight: 400, overflowY: "auto" }}>
       <Typography
         fontSize={18}
         fontWeight={700}
@@ -101,63 +131,57 @@ const Alerts = () => {
 
       <hr />
 
-      {/* Low Stock */}
-      <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        Low Stock Alerts ({lowStock.length})
-      </Typography>
+      {/* LOW STOCK */}
+      {showLowStock && (
+        <>
+          <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
+            Low Stock Alerts ({lowStock.length})
+          </Typography>
 
-      {lowStock.length > 0 ? (
-        lowStock.map((item) => (
-          <Box key={item.itemId}>
-            <Typography>
-              {item.itemName} is running low — only {item.stockQty} left.
+          {lowStock.length > 0 ? (
+            lowStock.map((item) => (
+              <Box key={item.itemId}>
+                <Typography>
+                  {item.itemName} is running low — only {item.stockQty} left.
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography color="text.secondary">
+              No low stock items.
             </Typography>
-          </Box>
-        ))
-      ) : (
-        <Typography color="text.secondary">No low stock items.</Typography>
+          )}
+
+          <hr />
+        </>
       )}
 
-      <hr />
+      {/* REORDER */}
+      {showReorder && (
+        <>
+          <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
+            Reorder Suggested ({reorderStock.length})
+          </Typography>
 
-      {/* Out of Stock */}
-      <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        Out of Stock ({outOfStock.length})
-      </Typography>
-
-      {outOfStock.length > 0 ? (
-        outOfStock.map((item) => (
-          <Box key={item.itemId}>
-            <Typography>{item.itemName} is currently out of stock.</Typography>
-          </Box>
-        ))
-      ) : (
-        <Typography color="text.secondary">No out of stock items.</Typography>
-      )}
-
-      <hr />
-
-      {/* Reorder */}
-      <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-        Reorder Suggested ({reorderStock.length})
-      </Typography>
-
-      {reorderStock.length > 0 ? (
-        reorderStock.map((item) => (
-          <Box key={item.itemId}>
-            <Typography>
-              Based on current stock levels, {item.itemName} should be
-              reordered.
+          {reorderStock.length > 0 ? (
+            reorderStock.map((item) => (
+              <Box key={item.itemId}>
+                <Typography>
+                  {item.itemName} should be reordered.
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography color="text.secondary">
+              No reorder alerts.
             </Typography>
-          </Box>
-        ))
-      ) : (
-        <Typography color="text.secondary">No reorder alerts.</Typography>
+          )}
+
+          <hr />
+        </>
       )}
 
-      <hr />
-
-      {/* Expiry Alerts */}
+      {/* EXPIRY */}
       <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
         Expiry Alerts ({expiryAlerts.length})
       </Typography>
@@ -167,7 +191,8 @@ const Alerts = () => {
           <Box key={item.itemId}>
             <Typography>
               {item.itemName} will expire on{" "}
-              {item.expiryDate.toLocaleDateString()}.
+              {item.expiryDate.toLocaleDateString()} —{" "}
+              <strong>{getExpiryText(item.expiryDate)}</strong>
             </Typography>
           </Box>
         ))
@@ -181,3 +206,5 @@ const Alerts = () => {
 };
 
 export default Alerts;
+ 
+ 

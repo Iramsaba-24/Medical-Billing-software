@@ -107,7 +107,7 @@ const checkboxSx = {
   const onSubmit = (data: FieldValues) => {
     localStorage.setItem("invoiceSettings", JSON.stringify(data));
     console.log("Form Data:", data);
-    showToast("success","Setting Saved Successfully")
+    showToast("success","Settings updated successfully")
   };
 
   return (

@@ -14,6 +14,15 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 
 
+
+const radioStyle = {
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": { color: "#238878" },
+  },
+};
+
+
 type FormInputs = {
   amount: string;
   billType: "email" | "whatsapp";
@@ -41,7 +50,6 @@ const NetBanking_PurchaseDetails = () => {
     showToast("success", "Payment initiated successfully!");
     navigate(URL_PATH.PaymentSuccess);
   };
-
 
 
   return (
@@ -124,11 +132,12 @@ const NetBanking_PurchaseDetails = () => {
             name="billType"
             label=""
             
+            //sx={radioStyle}
             options={[
               { value: "email", label: "Send E-Bill on your Email ID" },
               { value: "whatsapp", label: "Send E-Bill on your WhatsApp" },
             ]}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2 , ...radioStyle}}
           />
 
           {/* Conditional Email Field */}
@@ -142,11 +151,13 @@ const NetBanking_PurchaseDetails = () => {
         
               required
               sx={{
-                mt: 1,
+            radioStyle,
+                 mt: 1,
                 mb: 3,
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#f9f9f9",
                 },
+              
               }}
             />
           )}

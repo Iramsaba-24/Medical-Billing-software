@@ -16,7 +16,7 @@ import EmailField from "@/components/controlled/EmailField";
 import LogoImage from "@/assets/icons.svg"; //  default logo image
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 
-type PharmacyFormValues = {
+export type PharmacyFormValues = {
   pharmacyName: string;
   address: string;
   drugLicense: string;
@@ -88,7 +88,7 @@ function PharmacyProfile() {
     if (previewImage) {
       localStorage.setItem("pharmacyLogo", previewImage);
     }
-    showToast("success", "Data saved successfully!");
+    showToast("success", "Settings updated successfully!");
 
     setTimeout(() => {
       window.location.reload();
@@ -160,8 +160,9 @@ function PharmacyProfile() {
                     name="pharmacyName"
                     label="Pharmacy Name"
                     placeholder="Pharmacy Name"
+                    minLength={3}
                     maxLength={30}
-                    inputType="all"
+                    inputType="textarea"
                     rows={1}
                     required
                   />
@@ -171,6 +172,8 @@ function PharmacyProfile() {
                     label="Address"
                     placeholder="Address"
                     inputType="textarea"
+                    minLength={10}
+                    maxLength={50}
                     rows={4}
                     required
                   />
