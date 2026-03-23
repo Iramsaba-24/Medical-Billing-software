@@ -18,14 +18,14 @@ type Doctor = {
 };
 
 const Doctors = () => {
-  // const methods = useForm({ defaultValues: { search: "" } });
+
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [viewItem, setViewItem] = useState<Doctor | null>(null);
   const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
 
 
   const navigate = useNavigate();
-  // const searchValue = methods.watch("search");
+  
 
   useEffect(() => {
     setDoctors(JSON.parse(localStorage.getItem("doctors") || "[]"));

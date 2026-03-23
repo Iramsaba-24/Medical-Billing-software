@@ -16,7 +16,7 @@ import { UniversalTable, type Column, ACTION_KEY } from '@/components/uncontroll
 import EditSalesForm from './EditSalesForm';
 import ViewSalesDialog from './ViewSalesTable';
 
-// ================= TYPES ================= //
+
 
 export interface SalesData extends Record<string, unknown> {
   id: number;
@@ -36,7 +36,7 @@ type StoredSale = {
   medicines: { name: string; qty: number }[];
 };
 
-// ================= FILTER ================= //
+
 
 const filterOptions = [
   { value: 'Today', label: 'Today' },
@@ -72,7 +72,7 @@ const getFilteredDataByDate = (data: SalesData[], filter: string): SalesData[] =
   }
 };
 
-// ================= COMPONENT ================= //
+
 
 const SalesTable: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -83,38 +83,43 @@ const SalesTable: React.FC = () => {
 
   const methods = useForm({ defaultValues: { filter: 'This Month' } });
 
-  // ================= LOAD DATA ================= //
 
   useEffect(() => {
-    const storedSales = localStorage.getItem('currentInvoice');
-    if (!storedSales) return;
+  const storedRetail = localStorage.getItem('currentInvoice');
+  const storedDistributor = localStorage.getItem('currentNewInvoiceList');
 
-    const parsed: StoredSale[] = JSON.parse(storedSales);
+  const retailParsed: StoredSale[] = storedRetail ? JSON.parse(storedRetail) : [];
+  const distributorParsed: StoredSale[] = storedDistributor ? JSON.parse(storedDistributor) : [];
 
-    const formatted: SalesData[] = parsed.map((item, index) => {
-      const medicineNames =
-        item.medicines && item.medicines.length > 0
-          ? item.medicines.map(m => m.name).join(', ')
-          : '-';
+ 
+  const combined = [...retailParsed, ...distributorParsed];
 
-      const totalQty =
-        item.medicines && item.medicines.length > 0
-          ? item.medicines.reduce((sum, m) => sum + (m.qty || 0), 0)
-          : 1;
+  if (combined.length === 0) return;
 
-      return {
-        id: index + 1,
-        name: item.name || '-',
-        medicine: medicineNames,
-        quantity: totalQty,
-        totalPrice: item.totalPrice || 0,
-        date: item.date || new Date().toISOString().split('T')[0],
-        time: new Date().toLocaleTimeString(),
-      };
-    });
+  const formatted: SalesData[] = combined.map((item, index) => {
+    const medicineNames =
+      item.medicines && item.medicines.length > 0
+        ? item.medicines.map(m => m.name).join(', ')
+        : '-';
 
-    setSalesList(formatted);
-  }, []);
+    const totalQty =
+      item.medicines && item.medicines.length > 0
+        ? item.medicines.reduce((sum, m) => sum + (m.qty || 0), 0)
+        : 1;
+
+    return {
+      id: index + 1,
+      name: item.name || '-',
+      medicine: medicineNames,
+      quantity: totalQty,
+      totalPrice: item.totalPrice || 0,
+      date: item.date || new Date().toISOString().split('T')[0],
+      time: new Date().toLocaleTimeString(),
+    };
+  });
+
+  setSalesList(formatted);
+}, []);
 
   const saveToLocalStorage = (data: SalesData[]) => {
     const formatted: StoredSale[] = data.map(item => ({
@@ -126,15 +131,13 @@ const SalesTable: React.FC = () => {
         item.medicine !== '-'
           ? (item.medicine as string).split(', ').map(name => ({
               name,
-              qty: 1, // simple logic
+              qty: 1, 
             }))
           : [],
     }));
 
     localStorage.setItem('currentInvoice', JSON.stringify(formatted));
   };
-
-  // ================= FILTER ================= //
 
   const filteredSalesData = useMemo(() => {
     const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
@@ -148,7 +151,6 @@ const SalesTable: React.FC = () => {
     );
   }, [salesList, selectedMonth, searchQuery]);
 
-  // ================= TABLE ================= //
 
   const columns: Column<SalesData>[] = [
     { key: 'name', label: 'Name' },
@@ -164,7 +166,7 @@ const SalesTable: React.FC = () => {
     { key: ACTION_KEY, label: 'Actions' },
   ];
 
-  // ================= ACTIONS ================= //
+  
 
   const handleEdit = (row: SalesData) => setEditingRow(row);
   const handleCloseEditDialog = () => setEditingRow(null);
@@ -202,7 +204,7 @@ const SalesTable: React.FC = () => {
     });
   };
 
-  // ================= UI ================= //
+ 
 
   return (
     <>

@@ -23,14 +23,14 @@ interface CardInfo {
     >
   >;
 }
-interface Medicine {
-  name: string;
-  qty: number;
-}
+// interface Medicine {
+//   name: string;
+//   qty: number;
+// }
  
-interface Invoice {
-  medicines: Medicine[];
-}
+// interface Invoice {
+//   medicines: Medicine[];
+// }
  
 const cardsConfig: CardInfo[] = [
   {
@@ -170,34 +170,34 @@ const getDailyReportData = (filter: FilterType) => {
     purchase: `₹ ${totalPurchase.toFixed(2)}`,
   };
 };
-const getTopSellingMedicine = (): string => {
-  const stored = localStorage.getItem("currentInvoice");
-  if (!stored) return "No Data";
+// const getTopSellingMedicine = (): string => {
+//   const stored = localStorage.getItem("currentInvoice");
+//   if (!stored) return "No Data";
  
-  const invoices: Invoice[] = JSON.parse(stored);
+//   const invoices: Invoice[] = JSON.parse(stored);
  
-  const counts: Record<string, number> = {};
+//   const counts: Record<string, number> = {};
  
-  invoices.forEach((sale) => {
-    sale.medicines?.forEach((med) => {
-      const name = med.name;
+//   invoices.forEach((sale) => {
+//     sale.medicines?.forEach((med) => {
+//       const name = med.name;
  
-      counts[name] = (counts[name] || 0) + (med.qty || 1);
-    });
-  });
+//       counts[name] = (counts[name] || 0) + (med.qty || 1);
+//     });
+//   });
  
-  let topMedicine = "";
-  let highest = 0;
+//   let topMedicine = "";
+//   let highest = 0;
  
-  Object.entries(counts).forEach(([name, qty]) => {
-    if (qty > highest) {
-      highest = qty;
-      topMedicine = name;
-    }
-  });
+//   Object.entries(counts).forEach(([name, qty]) => {
+//     if (qty > highest) {
+//       highest = qty;
+//       topMedicine = name;
+//     }
+//   });
  
-  return topMedicine || "No Data";
-};
+//   return topMedicine || "No Data";
+// };
  
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
@@ -385,7 +385,7 @@ const getSelectedTopMedicine = (): string => {
  
                   <Box>
                     <Typography fontSize={24} fontWeight={700}>
-                      {/* {info?.rightValue} */}
+                      
                       {card.title === "Inventory"
                         ? totalMedicineGroups() //function to get total medicine groups count from local storage
                         : info?.rightValue}
