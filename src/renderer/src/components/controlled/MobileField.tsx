@@ -19,6 +19,15 @@ type MobileFieldProps = TextFieldProps & {
   required?: boolean;
   sx?: SxProps<Theme>;
   countryCode?: boolean;
+  preventDuplicate?: boolean;
+};
+
+type Customer = {
+  mobile?: string;
+};
+
+type Doctor = {
+  phone?: string;
 };
 
 const countryCodes = [
@@ -38,6 +47,7 @@ const MobileField: React.FC<MobileFieldProps> = ({
   required = false,
   sx = {},
   countryCode,
+  preventDuplicate,
   ...rest
 }) => {
   const {
@@ -48,9 +58,36 @@ const MobileField: React.FC<MobileFieldProps> = ({
   const { t } = useTranslation();
   const trans = getComponentTranslations(t);
 
-  const [selectedCode, setSelectedCode] = React.useState( "+91");
+  const [selectedCode, setSelectedCode] = React.useState("+91");
 
   const selectedCountry = countryCodes.find((c) => c.code === selectedCode);
+
+  // numbers fetch
+  const getAllStoredNumbers = (): string[] => {
+    const numbers: string[] = [];
+
+    const customers: Customer[] = JSON.parse(
+      localStorage.getItem("customers") || "[]"
+    );
+
+    customers.forEach((c) => {
+      if (c.mobile) {
+        numbers.push(c.mobile.replace(/\D/g, ""));
+      }
+    });
+
+    const doctors: Doctor[] = JSON.parse(
+      localStorage.getItem("doctors") || "[]"
+    );
+
+    doctors.forEach((d) => {
+      if (d.phone) {
+        numbers.push(d.phone.replace(/\D/g, ""));
+      }
+    });
+
+    return numbers;
+  };
 
   return (
     <Controller
@@ -63,8 +100,18 @@ const MobileField: React.FC<MobileFieldProps> = ({
 
           const sanitized = value.replace(/\D/g, "");
 
+          // digit validation
           if (selectedCountry && sanitized.length !== selectedCountry.digits) {
             return `Mobile number must be ${selectedCountry.digits} digits`;
+          }
+
+          // duplicate check
+          if (preventDuplicate) {
+            const allNumbers = getAllStoredNumbers();
+
+            if (allNumbers.includes(sanitized)) {
+              return "Mobile number already exists";
+            }
           }
 
           return true;
@@ -90,7 +137,6 @@ const MobileField: React.FC<MobileFieldProps> = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-
                 {!countryCode && (
                   <span style={{ fontWeight: 500, paddingRight: 8 }}>
                     +91
@@ -112,7 +158,6 @@ const MobileField: React.FC<MobileFieldProps> = ({
                     ))}
                   </Select>
                 )}
-
               </InputAdornment>
             )
           }}

@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
 import InvoiceTabButtons from "./InvoiceTabButtons";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import ItemsSection from "@/containers/customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
  
 const BORDER_COLOR = "#D1D5DB";
@@ -48,6 +48,7 @@ type Distributor = {
   email: string;
   address: string;
   status: "Active" | "Inactive";
+  gstIn?: string;
 };
  
 type FormData = {
@@ -56,6 +57,7 @@ type FormData = {
   mobile: string;
   email: string;
   address: string;
+  gst:string;
 };
  
 type ItemRow = {
@@ -63,16 +65,17 @@ type ItemRow = {
   name: string;
   qty: number | "";
   price: number | "";
+  expiry?: string;
 };
  
 const NewInvoice = () => {
   const navigate = useNavigate();
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "" },
+    { id: Date.now(), name: "", qty: 1, price: "", expiry: "" },
   ]);
  
-  const [gst, setGst] = useState<number>(0);
+  const [gst, setGst] = useState<number>(5);
   const [isSubmitted, setIsSubmitted] = useState(false);
  
   /*  GRAND TOTAL */
@@ -82,8 +85,11 @@ const NewInvoice = () => {
   }, 0);
  
   const methods = useForm<FormData>({
-    mode: "onSubmit",
+    mode: "onChange",
     shouldUnregister: false,
+    defaultValues: {
+    gst: "5",
+  },
   });
  
   const { handleSubmit, watch } = methods;
@@ -104,6 +110,9 @@ const NewInvoice = () => {
       navigate(URL_PATH.DistributorsForm);
     }
   }, [selectedCompany, navigate]);
+  const selectedDistributor = distributors.find(
+  (d) => d.companyName === selectedCompany
+);
  
   const onSubmit = (data: FormData) => {
     setIsSubmitted(true);
@@ -111,8 +120,6 @@ const NewInvoice = () => {
       showToast("error", "Please fill all item details");
       return;
     }
- 
- 
  
     const gstAmount = (finalTotal * gst) / 100;
     const grandTotal = finalTotal + gstAmount;
@@ -127,13 +134,15 @@ const NewInvoice = () => {
       mobile: data.mobile,
       email: data.email,
       address: data.address,
-      gst: gst,      
+      gst: gst, 
+        gstIn: selectedDistributor?.gstIn || "",     
+  distributorId: selectedDistributor?.id || "",      
       medicines: rows.map((r) => ({
-        name: r.name,
+      name: r.name,
         qty: r.qty,
         amount: Number(r.qty || 0) * Number(r.price || 0),
         batch: "",
-        expiry: "",
+        expiry: r.expiry || "",
       })),
       totalPrice: grandTotal,
     };
@@ -197,13 +206,13 @@ const NewInvoice = () => {
                   label="Company"
                   options={companyOptions}
                   required
-                  freeSolo
+                  freeSolo={false}
                   editable={true}
                 />
               </Grid>
  
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextInputField name="supplier" label="Supplier" required />
+                <TextInputField name="supplier" label="Supplier" minLength={3} required />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <MobileField
@@ -211,6 +220,7 @@ const NewInvoice = () => {
                   label="Mobile Number"
                   required
                   countryCode
+                  
                 />
               </Grid>
  
@@ -224,6 +234,8 @@ const NewInvoice = () => {
                   label="Address"
                   inputType="textarea"
                   rows={3}
+                  minLength={10}
+                  maxLength={50}
                 />
               </Grid>
             </Grid>

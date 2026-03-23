@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogTitle,
@@ -10,6 +9,7 @@ import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
 import DropdownField from "@/components/controlled/DropdownField";
+import DateTimeField from "@/components/controlled/DateTimeField";
 
 export type Distributor = {
   id: string;
@@ -28,12 +28,7 @@ type Props = {
   onSave: (data: Distributor) => void;
 };
 
-const EditDistributorForm = ({
-  editingRow,
-  onClose,
-  onSave,
-}: Props) => {
-
+const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
   const methods = useForm<Distributor>({
     defaultValues: {
       id: "",
@@ -51,7 +46,7 @@ const EditDistributorForm = ({
 
   useEffect(() => {
     if (editingRow) {
-      reset(editingRow); 
+      reset(editingRow);
     }
   }, [editingRow, reset]);
 
@@ -63,12 +58,18 @@ const EditDistributorForm = ({
   ];
 
   return (
-    <Dialog open={Boolean(editingRow)} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={Boolean(editingRow)}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+    >
       <DialogTitle>Edit Distributor</DialogTitle>
 
       <FormProvider {...methods}>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
           <TextInputField
             name="companyName"
             label="Company Name"
@@ -83,18 +84,13 @@ const EditDistributorForm = ({
             maxLength={15}
           />
 
-          <TextInputField
-            name="mobile"
-            label="Mobile Number"
-            maxLength={10}
-          />
+          <TextInputField name="mobile" label="Mobile Number" maxLength={10} />
 
-          <TextInputField
-            name="email"
-            label="Email"
-          />
+          <TextInputField name="email" label="Email" />
 
-          <TextInputField
+          <DateTimeField
+            useCurrentDate={true}
+            disabled
             name="date"
             label="Date"
           />
@@ -113,7 +109,6 @@ const EditDistributorForm = ({
             options={statusOptions}
             required
           />
-
         </DialogContent>
 
         <DialogActions sx={{ gap: 2, px: 3, pb: 2 }}>
@@ -155,7 +150,6 @@ const EditDistributorForm = ({
             Save
           </Button>
         </DialogActions>
-
       </FormProvider>
     </Dialog>
   );

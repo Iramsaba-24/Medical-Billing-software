@@ -16,19 +16,19 @@ interface StoredDoctor {
   address?: string;
   clinicAddress?: string;
 }
- 
+
 interface Props {
   onBack?: () => void;
   onSave?: (data: CustomerData) => void;
   initialData?: CustomerData | null;
 }
- 
+
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const navigate = useNavigate();
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string; address: string }[]
   >([]);
- 
+
   const methods = useForm<CustomerData>({
     defaultValues: {
       name: "",
@@ -42,13 +42,13 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     },
     mode: "onChange",
   });
- 
+
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
     const value = input.value.replace(/[^0-9]/g, "");
     input.value = value;
   };
- 
+
   const buttonStyle: SxProps<Theme> = {
     backgroundColor: "#238878",
     color: "#fff",
@@ -63,17 +63,16 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       border: "2px solid #238878",
     },
   };
- 
+
   useEffect(() => {
     const storedDoctors: StoredDoctor[] = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
- 
+
     const options = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
-      address:
-        doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
+      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
     const updatedOptions = [
       { label: "+ Add Doctor", value: "add_doctor", address: "" },
@@ -81,9 +80,9 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     ];
     setDoctorOptions(updatedOptions);
   }, []);
- 
+
   const selectedDoctor = methods.watch("doctor");
- 
+
   useEffect(() => {
     if (!selectedDoctor) return;
     if (selectedDoctor === "add_doctor") {
@@ -157,7 +156,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Customer Details
               </Typography>
- 
+
               <Box
                 sx={{
                   display: "grid",
@@ -173,9 +172,9 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   required
                   maxLength={20}
                 />
- 
+
                 <DateTimeField name="date" label="Date" disabled required />
- 
+
                 <TextInputField
                   name="age"
                   label="Age"
@@ -187,6 +186,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                       value: /^[0-9]+$/,
                       message: "Only numbers allowed",
                     },
+                    validate: (value) =>
+                      Number(value) >= 15 || "Age should be 15 or above",
                   }}
                   inputProps={{
                     inputMode: "numeric",
@@ -198,10 +199,16 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="mobile"
                   label="Mobile"
                   countryCode
+                  preventDuplicate
                   required
                 />
-                <EmailField name="email" label="Email" required />
- 
+                <EmailField
+                  name="email"
+                  label="Email"
+                  required
+                  preventDuplicate
+                />
+
                 <TextInputField
                   name="address"
                   label="Address"
@@ -217,18 +224,18 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
               </Typography>
- 
+
               <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
                 <DropdownField
                   name="doctor"
                   label="Doctor Name"
-                  options={doctorOptions} 
-                  freeSolo = {false}
-                  editable = {true}
+                  options={doctorOptions}
+                  freeSolo={false}
+                  editable={true}
                   placeholder="Select Doctors"
                   required
                 />
- 
+
                 <TextInputField
                   name="doctorAddress"
                   label="Doctor Address/Clinic"

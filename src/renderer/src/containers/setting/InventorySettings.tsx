@@ -16,7 +16,6 @@ export interface InventoryFormValues {
 }
 
 const InventorySettings = () => {
-
   const savedData = (() => {
     try {
       const data = localStorage.getItem("inventorySettings");
@@ -27,16 +26,17 @@ const InventorySettings = () => {
   })();
 
   const methods = useForm<InventoryFormValues>({
-    defaultValues: savedData ?? {
-      groupExpiry: [],
-      pricing: [],
-      lowStockThreshold: "",
-      autoReorderQty: "",
-      outOfStock: "",
-      barcodeStorage: [],
-      returnsUpdate: [],
-      alertsVisibility: [],
-    },
+    defaultValues:
+      savedData ?? {
+        groupExpiry: [],
+        pricing: [],
+        lowStockThreshold: "",
+        autoReorderQty: "",
+        outOfStock: "",
+        barcodeStorage: [],
+        returnsUpdate: [],
+        alertsVisibility: [],
+      },
   });
 
   const headingStyle = {
@@ -44,6 +44,15 @@ const InventorySettings = () => {
     fontSize: "18px",
     color: "#212529",
     mb: 1,
+  };
+
+  const checkboxStyle = {
+    "& .MuiCheckbox-root": {
+      color: "default.main",
+      "&.Mui-checked": {
+        color: "#238878",
+      },
+    },
   };
 
   // Save Function
@@ -102,7 +111,6 @@ const InventorySettings = () => {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2.5}>
-
             {/* Alerts & Visibility */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
               <Typography variant="subtitle1" sx={headingStyle}>
@@ -112,6 +120,7 @@ const InventorySettings = () => {
               <CheckboxGroup
                 name="alertsVisibility"
                 label=""
+                sx={{ ...checkboxStyle }}
                 options={[
                   {
                     label: "Show low-stock alerts on dashboard",
@@ -176,7 +185,6 @@ const InventorySettings = () => {
                 Save
               </Button>
             </Box>
-
           </Stack>
         </form>
       </FormProvider>
