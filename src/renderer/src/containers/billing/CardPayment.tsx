@@ -1,7 +1,6 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { useFormContext} from "react-hook-form"; 
 import TextInputField from "@/components/controlled/TextInputField";
-import NumericField from "@/components/controlled/NumericField";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -127,13 +126,13 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
         <Box display="flex" flexDirection={{ xs: "column", sm: "row" }} alignItems="flex-start" justifyContent={{ xs: "flex-start", sm: "space-between" }} gap={2}>
 
           <Box width={{ xs: "100%", sm: "auto" }}>
-            <NumericField
+            <TextInputField 
               label="CVV"
               name="Cvv"
-
-              decimal={false}
-              maxlength={3}
-              max={999}
+              inputType="numbers"
+              maxLength={3}
+              minLength={3}
+ 
             />
           </Box>
 

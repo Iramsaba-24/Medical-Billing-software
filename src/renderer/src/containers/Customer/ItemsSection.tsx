@@ -16,6 +16,7 @@ export interface ItemRow {
   name: string;
   qty: number | "";
   price: number | "";
+  expiry?: string;
 }
 
 export type InventoryItem = {
@@ -67,7 +68,7 @@ const ItemsSection = ({
   }));
 
   const addRow = () =>
-    setRows([...rows, { id: Date.now(), name: "", qty: 1, price: "" }]);
+    setRows([...rows, { id: Date.now(), name: "", qty: "", price: "", expiry: "" }]);
 
   const removeRow = (id: number) => setRows(rows.filter((r) => r.id !== id));
 
@@ -106,6 +107,7 @@ const ItemsSection = ({
             ...r,
             name: selectedName,
             price: item ? Number(item.pricePerUnit) : "",
+            expiry: item ? item.expiryDate : "",
           };
         }
         return r;

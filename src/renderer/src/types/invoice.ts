@@ -19,4 +19,6 @@ export type Invoice = {
   status: InvoiceStatus;
   medicines: MedicineItem[];
   type?: "retail" | "distributor";
+  gstIn?: string;        
+  distributorId?: string;
 };

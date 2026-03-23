@@ -146,7 +146,9 @@ const DistributorsForm = () => {
               viewMode="date"
               useCurrentDate={false}
               dateRestriction="current-future-only"
-             />
+              required
+             //dateRestriction="past-current-future"
+               />
 
               <TextInputField
                 name="registrationNumber"
@@ -175,6 +177,7 @@ const DistributorsForm = () => {
                 placeholder=" e.g 27AAAAA0000A1ZS"
                 
                 rows={1}
+                required
                 rules={{
                   pattern: {
                     value:
@@ -191,6 +194,9 @@ const DistributorsForm = () => {
                 label="Address"
                 inputType="textarea"
                 rows={2}
+                required
+                maxLength={50}
+                minLength={5}
               />
             </Box>
           </Paper>
