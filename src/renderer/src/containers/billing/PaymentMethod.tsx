@@ -1,143 +1,189 @@
-import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
-
 import CardPayment from "@/containers/billing/CardPayment";
 import UpiPayment from "@/containers/billing/UpiPayment";
 import CashPayment from "@/containers/billing/CashPayment";
 import InvoiceTabButtons from "./InvoiceTabButtons";
 import RadioField from "@/components/controlled/RadioField";
+import { useNavigate, useLocation } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 
 type PaymentMethods = {
   paymentMethod: "credit-card" | "upi" | "cash";
+
   CardNumber?: string;
+
   CardHolderName?: string;
+
   Cvv?: string;
+
   UpiId?: string;
 };
+
 const radioStyle = {
   "& .MuiRadio-root": {
     color: "default.main",
+
     "&.Mui-checked": {
       color: "#238878",
     },
   },
 };
+
 const PaymentMethod = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const methods = useForm<PaymentMethods>({
+    
     defaultValues: {
-      paymentMethod: "credit-card",
+      paymentMethod: "credit-card",    
     },
+    mode: "onChange",
   });
 
   const payment = useWatch({
     control: methods.control,
+
     name: "paymentMethod",
   });
 
   const [finalAmount, setFinalAmount] = useState(0);
 
+  const { setValue } = methods;
+
   useEffect(() => {
-    const storedInvoice = localStorage.getItem("currentNewInvoice");
-    const storedRetail = localStorage.getItem("currentRetailInvoice");
-    console.log("BillingTable Storage →", storedInvoice);
-
-  if (storedInvoice) {
-    const invoices = JSON.parse(storedInvoice);
-
-    const lastInvoice = invoices[invoices.length - 1];
-
-    setFinalAmount(lastInvoice?.totalPrice || 0);
-  }
-
-    if (storedRetail) {
-      console.log("Retail Invoice Found →", storedRetail);
-      const retail = JSON.parse(storedRetail);
-      setFinalAmount(retail.totalPrice || 0);
-    }
-
-    // distributor settings
-    const distributorSettings = localStorage.getItem("distributorSettings");
-
-    if (distributorSettings) {
-      const settings = JSON.parse(distributorSettings);
-
-      if (
-        settings.payment_method === "cash" ||
-        settings.payment_method === "upi" ||
-        settings.payment_method === "credit-card"
-      ) {
-        methods.setValue("paymentMethod", settings.payment_method);
+   
+    const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
+    if (stateAmount && stateAmount > 0) {
+      setFinalAmount(stateAmount);
+    } else {
+      const storedRetail = localStorage.getItem("currentRetailInvoice");
+      const storedInvoice = localStorage.getItem("currentNewInvoice");
+      if (storedRetail) {
+        const retail = JSON.parse(storedRetail);
+        setFinalAmount(retail.totalPrice || 0);
+      } else if (storedInvoice) {
+        const invoices = JSON.parse(storedInvoice);
+        const lastInvoice = invoices[invoices.length - 1];
+        setFinalAmount(lastInvoice?.totalPrice || 0);
       }
     }
-  }, []);
 
-  // central save logic
-  const saveInvoice = () => {
+    
+    const flow = (location.state as { flow?: string })?.flow;
+
+    if (flow === "retail") {
+      const invoiceSettings = localStorage.getItem("invoiceSettings");
+      if (invoiceSettings) {
+        const settings = JSON.parse(invoiceSettings);
+        if (["cash", "upi", "credit-card"].includes(settings.payment_method)) {
+          setValue("paymentMethod", settings.payment_method);
+        }
+      }
+    } else if (flow === "new") {
+      const distributorSettings = localStorage.getItem("distributorSettings");
+      if (distributorSettings) {
+        const settings = JSON.parse(distributorSettings);
+        if (["cash", "upi", "credit-card"].includes(settings.payment_method)) {
+          setValue("paymentMethod", settings.payment_method);
+        }
+      }
+    }
+
+  }, [location.state, setValue]); 
+
+
+ const saveInvoice = () => {
   const storedRetail = localStorage.getItem("currentRetailInvoice");
   const storedNew = localStorage.getItem("currentNewInvoice");
 
+  // Retail Flow
+  if (storedRetail) {
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentInvoice") || "[]"
+    );
+    const retail = JSON.parse(storedRetail);
 
- if (storedRetail) {
-  const existingInvoices = JSON.parse(
-    localStorage.getItem("currentInvoice") || "[]"
-  );
+    const newInvoice = {
+      invoice: retail.invoice,
+      name: retail.name,
+      doctor: retail.doctor,
+      address: retail.address,
+      doctorAddress: retail.doctorAddress,
+      date: new Date().toLocaleDateString("en-GB"),
+      price: retail.totalPrice,
+      status: "Paid",
+      medicines: retail.medicines,
+      gst: retail.gst,
+      type: "retail",
+      gstAmount: retail.gstAmount,
+      subTotal: retail.subTotal,
+      totalPrice: retail.totalPrice,
+    };
 
-  const retail = JSON.parse(storedRetail);
+    const updated = [newInvoice, ...existingInvoices];
+    localStorage.setItem("currentInvoice", JSON.stringify(updated));
+    localStorage.removeItem("currentRetailInvoice");
+    navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
+      state: { invoice: newInvoice },
+    });
+    return;
+  }
 
-
-  const newInvoice = {
-    invoice: retail.invoice,
-    name: retail.name,
-    date: retail.date,
-    price: retail.totalPrice,
-    status: "Paid",
-  };
-
-  const updated = [newInvoice, ...existingInvoices];
-
-  localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-  localStorage.removeItem("currentRetailInvoice");
-}
-
+  // New Invoice Flow
   if (storedNew) {
     const existingInvoices = JSON.parse(
-  localStorage.getItem("currentInvoice") || "[]"
-);
+      localStorage.getItem("currentNewInvoiceList") || "[]"
+    );
     const invoices = JSON.parse(storedNew);
     const lastInvoice = invoices[invoices.length - 1];
 
-    const newInvoice = {
-      invoice: lastInvoice.id?.toString() || Date.now().toString(),
+    const invoiceNumber = `INV-${lastInvoice.id || Date.now()}`;
+
+    const summaryInvoice = {
+      invoice: invoiceNumber,
       name: lastInvoice.company,
       date: new Date().toLocaleDateString(),
       price: lastInvoice.totalPrice,
       status: "Paid",
+      type: "distributor",
+      medicines: lastInvoice.medicines || [],
+      totalPrice: lastInvoice.totalPrice,
     };
 
-    const updated = [newInvoice, ...existingInvoices];
+    const billInvoice = {
+      ...lastInvoice,
+      invoice: invoiceNumber,
+      date: new Date().toLocaleDateString(),
+    };
 
-    localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
+    const updated = [summaryInvoice, ...existingInvoices];
+    localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
     localStorage.removeItem("currentNewInvoice");
+
+    navigate(URL_PATH.NewInvoiceBill, {
+      state: { invoice: billInvoice },
+    });
   }
-    console.log("Saved Invoices → ", localStorage.getItem("currentInvoice"));
 };
+   
+  
 
   return (
     <FormProvider {...methods}>
-      {/* Top Buttons */}
       <InvoiceTabButtons />
 
-      {/* Outer Box (same as old design) */}
       <Box
         display="flex"
         flexDirection="column"
         sx={{
           border: "1px solid #ccc",
+
           gap: { xs: 2, sm: 3 },
+
           backgroundColor: "#fff",
+
           p: { xs: 2, sm: 3 },
         }}
       >
@@ -146,13 +192,16 @@ const PaymentMethod = () => {
             name="paymentMethod"
             options={[
               { label: "Credit / Debit Card", value: "credit-card" },
+
               { label: "UPI Payment", value: "upi" },
+
               { label: "Cash", value: "cash" },
             ]}
             label=""
             sx={radioStyle}
           />
         </Box>
+
         {payment === "credit-card" && (
           <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
         )}
@@ -174,4 +223,3 @@ const PaymentMethod = () => {
 };
 
 export default PaymentMethod;
-

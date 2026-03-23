@@ -273,7 +273,7 @@ import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
 import { InventoryItem } from '@/containers/inventory/InventoryList';
 type CustomerItem = {
-  qty: number;
+  qty: number; 
   price: number;
 };
  
@@ -342,6 +342,7 @@ const totalRevenue = (): string => {
   return `₹ ${sales.toLocaleString()}`;
 };
  
+ 
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
     "totalRevenue",
@@ -349,30 +350,24 @@ const getVisibleKpis = (): string[] => {
     "medicinesAvailable",
     "medicinesShortage",
   ];
- 
+
   const data = localStorage.getItem("dashboardSettings");
- 
-  if (!data) {
-    // Save default KPIs to localStorage
-    localStorage.setItem("dashboardSettings", JSON.stringify(defaultKpis));
-    return defaultKpis;
-  }
- 
+
+  if (!data) return defaultKpis;
+
   try {
     const parsed = JSON.parse(data);
- 
-    if (!Array.isArray(parsed)) {
-      localStorage.setItem("dashboardSettings", JSON.stringify(defaultKpis));
-      return defaultKpis;
-    }
- 
-    return parsed;
+
+    //  handle BOTH formats
+    if (Array.isArray(parsed)) return parsed;
+
+    return parsed.visibleKpis || defaultKpis;
+
   } catch {
-    localStorage.setItem("dashboardSettings", JSON.stringify(defaultKpis));
     return defaultKpis;
   }
 };
- 
+
 const visibleKpis = getVisibleKpis();
  
   return (

@@ -133,7 +133,7 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
                   paymentMethod === "upi" ? "UPI ID is required" : false,
                 pattern: {
                   value:
-                    /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ibl|phonepe)$/,
+                    /^[a-z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ibl|phonepe)$/,
                   message: "Enter valid UPI ID",
                 },
               }}

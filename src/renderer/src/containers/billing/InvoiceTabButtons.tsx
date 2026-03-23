@@ -6,8 +6,17 @@ function InvoiceTabButtons() {
   const navigate = useNavigate();
   const location = useLocation();
 
- const isRetailPage = location.pathname.startsWith(URL_PATH.Billing);
-  const isNewInvoicePage = location.pathname === URL_PATH.NewInvoice;
+
+const flow = location.state?.flow;
+
+const isRetailPage =
+  flow === "retail" ||
+  location.pathname.startsWith(URL_PATH.Billing) ||
+  location.pathname === URL_PATH.MediPoints;
+
+const isNewInvoicePage =
+  flow === "new" ||
+  location.pathname === URL_PATH.NewInvoice;
 
   const buttonStyle = (active: boolean) => ({
     textTransform: "none",

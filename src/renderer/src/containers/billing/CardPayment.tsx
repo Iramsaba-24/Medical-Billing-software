@@ -14,7 +14,7 @@ const PaperStyle = {
 };
 
 const btnStyle = {
-  backgroundColor: "#238878",
+  backgroundColor: "#238878",  
   height: 40,
   minWidth: 150,
   color: "#fff",
@@ -94,7 +94,7 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
             <TextInputField
               label="Card Number"
               name="CardNumber"
-              // disabled={paymentMethod !== "credit-card"} 
+ 
               inputType="numbers"
               minLength={13}
               maxLength={19}
@@ -113,7 +113,7 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
             <TextInputField
               label="Card Holder Name"
               name="CardHolderName"
-              // disabled={paymentMethod !== "credit-card"} 
+
               inputType="alphabet"
               minLength={3}
               maxLength={50}
@@ -128,20 +128,20 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
 
           <Box width={{ xs: "100%", sm: "auto" }}>
             <NumericField
-              label="CVV"
-              name="Cvv"
-              // disabled={paymentMethod !== "credit-card"} 
-              decimal={false}
-              maxlength={3}
-              max={999}
-            />
+                    label="CVV"
+                    name="Cvv"
+                    required={true}
+                    decimal={false}
+                    maxlength={3}
+                    max={999}
+                    min={100}
+                  />
           </Box>
 
           <Button
             type="button"
             variant="contained"
             onClick={handleSubmit(onPay)}
-            // disabled={paymentMethod !== "credit-card"} 
             sx={{
               ...btnStyle,
               width: { xs: "100%", sm: "auto" },

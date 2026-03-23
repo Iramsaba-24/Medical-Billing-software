@@ -1,7 +1,7 @@
 import { useLocation,  } from "react-router-dom";
 import { Box, Typography, Paper,} from "@mui/material";
 import BankInfo from "./BankInfo";
-import RetailInvoiceList from "./RetailInvoiceList";
+import RetailInvoiceList from "./NewInvoiceList";
 import { useEffect, useState } from "react";
 
 const DistributorDetails = () => {

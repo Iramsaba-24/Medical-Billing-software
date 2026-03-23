@@ -1,53 +1,34 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Typography, Paper, SxProps, Theme } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
-import { Save, Payment, Print } from "@mui/icons-material";
+import { Save } from "@mui/icons-material";
 import { CustomerData } from "@/view/CustomerMaster";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
-import ItemsSection from "@/containers/customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
-
-export interface ItemRow {
-  id: number;
-  name: string;
-  qty: number | "";
-  price: number | "";
-}
-
+import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 interface StoredDoctor {
   doctorName: string;
   doctorAddress?: string;
   address?: string;
   clinicAddress?: string;
 }
-
+ 
 interface Props {
-  onBack: () => void;
-  onSave: (
-    data: CustomerData,
-    total: number,
-    meds: string,
-    qty: number,
-    actualRows: ItemRow[]
-  ) => void;
-  initialData: CustomerData | null;
+  onBack?: () => void;
+  onSave?: (data: CustomerData) => void;
+  initialData?: CustomerData | null;
 }
-
+ 
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
-  const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: "", price: "" },
-  ]);
-
-
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
+  const navigate = useNavigate();
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string; address: string }[]
   >([]);
-
+ 
   const methods = useForm<CustomerData>({
     defaultValues: {
       name: "",
@@ -59,20 +40,15 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       doctorAddress: "",
       date: new Date().toISOString().split("T")[0],
     },
-    mode: "onChange"
+    mode: "onChange",
   });
-
+ 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    let value = input.value.replace(/[^0-9]/g, "");
-
-    if (value !== "" && Number(value) > 100) {
-      value = "100";
-    }
-
+    const value = input.value.replace(/[^0-9]/g, "");
     input.value = value;
   };
-
+ 
   const buttonStyle: SxProps<Theme> = {
     backgroundColor: "#238878",
     color: "#fff",
@@ -87,82 +63,72 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       border: "2px solid #238878",
     },
   };
-
+ 
   useEffect(() => {
     const storedDoctors: StoredDoctor[] = JSON.parse(
       localStorage.getItem("doctors") || "[]"
     );
-
+ 
     const options = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
-      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
+      address:
+        doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
-
-    setDoctorOptions(options);
+    const updatedOptions = [
+      { label: "+ Add Doctor", value: "add_doctor", address: "" },
+      ...options,
+    ];
+    setDoctorOptions(updatedOptions);
   }, []);
-
+ 
   const selectedDoctor = methods.watch("doctor");
-
+ 
   useEffect(() => {
-    if (selectedDoctor) {
-      const doctorData = doctorOptions.find(
-        (doc) => doc.value === selectedDoctor
-      );
-
-      if (doctorData) {
-        methods.setValue("doctorAddress", doctorData.address, {
-          shouldValidate: true,
-        });
-      }
+    if (!selectedDoctor) return;
+    if (selectedDoctor === "add_doctor") {
+      navigate(URL_PATH.AddDoctor);
+      return;
     }
-  }, [selectedDoctor, doctorOptions, methods]);
 
+    const doctorData = doctorOptions.find(
+      (doc) => doc.value === selectedDoctor
+    );
+
+    if (doctorData) {
+      methods.setValue("doctorAddress", doctorData.address, {
+        shouldValidate: true,
+      });
+    }
+  }, [selectedDoctor, doctorOptions, methods, navigate]);
   useEffect(() => {
     if (initialData) {
       methods.reset(initialData);
-
-      if (initialData.itemsList) {
-        setRows(initialData.itemsList);
-      }
     }
   }, [initialData, methods]);
-
-
-
-
-
- const handleActualSave = (data: CustomerData) => {
-  setIsSubmitted(true);
-
-  const areItemsValid = rows.every(
-    (r) => r.name.trim() !== "" && Number(r.qty) > 0 && Number(r.price) > 0
-  );
-
-  if (areItemsValid) {
-
-    const total = rows.reduce(
-      (acc, r) => acc + Number(r.qty) * Number(r.price),
-      0
+  const handleActualSave = (data: CustomerData) => {
+    const existingCustomers: CustomerData[] = JSON.parse(
+      localStorage.getItem("customers") || "[]"
     );
 
-    const meds = rows.map((r) => r.name).join(", ");
+    let updatedCustomers: CustomerData[];
 
-    onSave(
-      data,
-      total,
-      meds,
-      rows.length,
-      rows
-    );
-  }
-};
+    if (initialData) {
+      updatedCustomers = existingCustomers.map((customer) =>
+        customer.mobile === initialData.mobile ? data : customer
+      );
+    } else {
+      updatedCustomers = [...existingCustomers, data];
+    }
 
-const finalTotal = rows.reduce(
-  (acc, r) => acc + Number(r.qty) * Number(r.price),
-  0
-);
+    localStorage.setItem("customers", JSON.stringify(updatedCustomers));
 
+    onSave?.(data);
+
+    if (!initialData) {
+      navigate(URL_PATH.Billing);
+    }
+  };
   return (
     <FormProvider {...methods}>
       <Box
@@ -171,31 +137,11 @@ const finalTotal = rows.reduce(
         onSubmit={methods.handleSubmit(handleActualSave)}
         sx={{ bgcolor: "#f5f5f5", minHeight: "100vh", p: { xs: 1, md: 0 } }}
       >
-        {/* Header */}
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <Typography variant="h5" fontWeight="bold">
-            Edit Customer
+            {initialData ? "Edit Customer" : "Add Customer"}
           </Typography>
-
-          <Button
-            variant="contained"
-            onClick={onBack}
-            sx={{
-              backgroundColor: "#238878",
-              color: "#fff",
-              border: "2px solid #238878",
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#238878",
-              },
-            }}
-          >
-            Back  
-          </Button>
         </Box>
-
-        {/* Form Section */}
         <Paper
           sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }}
           elevation={3}
@@ -207,12 +153,11 @@ const finalTotal = rows.reduce(
               gap: 4,
             }}
           >
-            {/* Customer Details */}
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Customer Details
               </Typography>
-
+ 
               <Box
                 sx={{
                   display: "grid",
@@ -227,9 +172,9 @@ const finalTotal = rows.reduce(
                   required
                   maxLength={20}
                 />
-
+ 
                 <DateTimeField name="date" label="Date" required />
-
+ 
                 <TextInputField
                   name="age"
                   label="Age"
@@ -247,11 +192,14 @@ const finalTotal = rows.reduce(
                     onInput: handleAgeInput,
                   }}
                 />
-
-                <MobileField name="mobile" label="Mobile" required />
-
+                <MobileField
+                  name="mobile"
+                  label="Mobile"
+                  countryCode
+                  required
+                />
                 <EmailField name="email" label="Email" required />
-
+ 
                 <TextInputField
                   name="address"
                   label="Address"
@@ -261,70 +209,61 @@ const finalTotal = rows.reduce(
                 />
               </Box>
             </Box>
-
-            {/* Doctor Info */}
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
               </Typography>
-
+ 
               <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
                 <DropdownField
                   name="doctor"
                   label="Doctor Name"
                   options={doctorOptions}
                   placeholder="Select Doctors"
+                  required
                 />
-
+ 
                 <TextInputField
                   name="doctorAddress"
                   label="Doctor Address/Clinic"
                   inputType="textarea"
                   rows={1}
+                  required
                 />
               </Box>
             </Box>
           </Box>
         </Paper>
-
-        {/* Items Section */}
-        <ItemsSection
-          rows={rows}
-          setRows={setRows}
-          finalTotal={finalTotal}
-          isSubmitted={isSubmitted}
-        />
-
-        {/* Buttons */}
         <Box
           sx={{
             mt: 4,
             display: "flex",
             flexWrap: "wrap",
-            justifyContent: { xs: "stretch", sm: "flex-end" },
+            justifyContent: "space-between",
+            alignItems: "center",
             gap: 2,
           }}
         >
           <Button
             variant="contained"
-            startIcon={<Print />}
+            onClick={() => {
+              if (onBack) {
+                onBack();
+              } else {
+                navigate(-1);
+              }
+            }}
             sx={buttonStyle}
-            onClick={() => window.print()}
           >
-            Print
+            Back
           </Button>
-
-          <Button variant="contained" startIcon={<Payment />} sx={buttonStyle}>
-            Pay Now
-          </Button>
-
           <Button
             variant="contained"
             type="submit"
             startIcon={<Save />}
             sx={buttonStyle}
           >
-            Save
+            Save and continue
           </Button>
         </Box>
       </Box>

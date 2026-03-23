@@ -1,10 +1,7 @@
 import { Grid, Box } from '@mui/material';
 import ReusableTable, { type TableColumn, type FooterRow } from '@/components/uncontrolled/ReusableTable';
 
-
-  //  STOCK OVERVIEW TABLE
-
-
+//  STOCK OVERVIEW TABLE
 type StockOverviewRow = {
   stock: string;
   nos: number;

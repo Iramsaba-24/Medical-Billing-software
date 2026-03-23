@@ -6,9 +6,9 @@ import EmailField from "@/components/controlled/EmailField";
 import MobileField from "@/components/controlled/MobileField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useState } from "react";
-import AppToast from "@/containers/Distributors/AppToast";
+import AppToast from "@/containers/distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
-import BankDetailsForm from "@/containers/Distributors/BankDetailForm";
+import BankDetailsForm from "@/containers/distributors/BankDetailForm";
 
 // Define the structure of the data
 type DistributorFormInput = {
@@ -38,8 +38,7 @@ const DistributorsForm = () => {
       ownerName: "",
       mobile: "",
       email: "",
-      //date: "today",
-      //date: new Date().toISOString().split("T")[0],
+   
 
       registrationNumber: "",
       website: "",

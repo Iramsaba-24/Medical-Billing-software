@@ -3,6 +3,7 @@ import { Paper, Typography, Box, Button } from "@mui/material";
 import RadioField from "@/components/controlled/RadioField";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 import { useEffect } from "react";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 const SettingSection = ({
   title,
@@ -16,21 +17,20 @@ const SettingSection = ({
     {children}
   </Paper>
 );
-
+ 
 const headingStyle = {
   fontWeight: 700,
   fontSize: "18px",
   color: "#212529",
   mb: 1,
 };
-
 const paperStyle = {
   p: { xs: 2, md: 4 },
   borderRadius: "5px",
   boxShadow: 3,
   mb: 1,
 };
-
+ 
 const InvoiceSettings = () => {
   const methods = useForm({
     defaultValues: {
@@ -50,53 +50,69 @@ const InvoiceSettings = () => {
       credit_control: [],
     },
   });
-
-  
-
 useEffect(() => {
   const savedSettings = localStorage.getItem("invoiceSettings");
   if (savedSettings) {
     methods.reset(JSON.parse(savedSettings));
   }
 }, [methods]);
-
+ 
   const { handleSubmit, reset } = methods;
 
-  const radioSx = {
-    width: "100%",
-    "& .MuiFormGroup-root": { width: "100%" },
-    "& .MuiFormControlLabel-root": {
-      width: "100%",
-      display: "flex",
-      justifyContent: "space-between",
-      flexDirection: "row-reverse",
-      ml: 0,
-      mr: 0,
-      mb: 0.5,
-    },
-  };
+const radioSx = {
+  width: "100%",
+  "& .MuiFormGroup-root": { width: "100%" },
 
-  const checkboxSx = {
-    width: "100%",
-    "& .MuiFormGroup-root": { width: "100%" },
-    "& .MuiFormControlLabel-root": {
-      width: "100%",
-      display: "flex",
-      justifyContent: "flex-start",
-      ml: 0,
-      mr: 0,
-      mb: 0.5,
-
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
     },
-  };
+  },
+
+  "& .MuiFormControlLabel-root": {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+    flexDirection: "row-reverse",
+    ml: 0,
+    mr: 0,
+    mb: 0.5,
+  },
+};
+
+
+const checkboxSx = {
+  width: "100%",
+  "& .MuiFormGroup-root": { width: "100%" },
+
+  "& .MuiCheckbox-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
+
+  "& .MuiFormControlLabel-root": {
+    width: "100%",
+    display: "flex",
+    justifyContent: "flex-start",
+    ml: 0,
+    mr: 0,
+    mb: 0.5,
+  },
+};
+
 
   const onSubmit = (data: FieldValues) => {
+    localStorage.setItem("invoiceSettings", JSON.stringify(data));
     console.log("Form Data:", data);
+    showToast("success","Setting Saved Successfully")
   };
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
-          <Box mb={2}> 
+          <Box mb={2}>
           <Typography
           sx={{
             fontSize: { xs: 20, sm: 22, md: 24 },  
@@ -108,35 +124,28 @@ useEffect(() => {
           Invoice Settings
         </Typography>
           </Box>
-
+ 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-
+ 
           <SettingSection title="Default Payment Mode">
             <RadioField
+              sx={ radioSx}
               name="payment_method"
               label=""
               options={[
                 { label: "Cash", value: "cash" },
-                { label: "Credit", value: "credit" },
+                { label: "Credit / Debit Card", value: "credit-card" },
                 { label: "UPI", value: "upi" },
               ]}
-              sx={radioSx}
+              
             />
-
-            <CheckboxGroup
-              name="allow_split_payment"
-              label=""
-              options={[
-                { label: "Allow split payment (Cash + UPI)", value: "split_payment" },
-              ]}
-              sx={checkboxSx}
-            />
-
+ 
           </SettingSection>
 
           <SettingSection title="Print Options">
             <CheckboxGroup
+              sx={checkboxSx}
               name="product_linking"
               label=""
               options={[
@@ -145,7 +154,6 @@ useEffect(() => {
                 { label: "Show HSN code", value: "show_hsn_code" },
                 { label: "Print duplicate copy", value: "print_duplicate_copy" },
               ]}
-              sx={checkboxSx}
             />
           </SettingSection>
 
@@ -167,7 +175,7 @@ useEffect(() => {
             >
               Reset
             </Button>
-
+ 
             <Button
               type="submit"
               variant="contained"
@@ -186,11 +194,12 @@ useEffect(() => {
               Save
             </Button>
           </Box>
-
+ 
         </form>
       </FormProvider>
     </Box>
   );
 };
-
+ 
 export default InvoiceSettings;
+ 

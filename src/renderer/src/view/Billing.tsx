@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/customer/ItemsSection";
+import ItemsSection from "@/containers/Customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -26,7 +26,6 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-
 type Doctor = {
   id: number;
   doctorName: string;
@@ -68,11 +67,12 @@ function RetailInvoice() {
 
   const isRetail = location.pathname.includes("retail-invoice");
 
+
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>(
-    {},
+    {}
   );
 
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
@@ -91,7 +91,6 @@ function RetailInvoice() {
       border: "2px solid #238878",
     },
   });
-
   // saved to local storage
   const onSubmit = (data: RetailInvoiceFormValues) => {
     setIsSubmitted(true);
@@ -102,13 +101,12 @@ function RetailInvoice() {
         row.qty === "" ||
         Number(row.qty) <= 0 ||
         row.price === "" ||
-        Number(row.price) <= 0,
+        Number(row.price) <= 0
     );
 
     if (hasInvalidItems) return;
 
     const now = new Date();
-
     const invoiceData = {
       invoice: `INV-${Date.now()}`,
       name: data.name,
@@ -117,14 +115,16 @@ function RetailInvoice() {
       email: data.email,
       doctor: data.doctor,
       address: data.addressLeft,
-
+      doctorAddress: data.addressRight,
       medicines: rows.map((r) => ({
         name: r.name,
         qty: r.qty,
         price: r.price,
         amount: Number(r.qty || 0) * Number(r.price || 0),
+         expiry: r.expiry || "",
       })),
-
+      subTotal: subTotal,
+      
       totalPrice: finalTotal,
       status: "Paid",
       date: now.toLocaleDateString(),
@@ -132,10 +132,10 @@ function RetailInvoice() {
       paymentMode,
     };
 
-    localStorage.setItem("currentRetailPayment", paymentMode); // state save
+    localStorage.setItem("currentRetailPayment", paymentMode);
     localStorage.setItem("currentRetailInvoice", JSON.stringify(invoiceData));
     navigate(URL_PATH.MediPoints, {
-      state: { totalFromInvoice: finalTotal },
+      state: { totalFromInvoice: finalTotal }
     });
   };
   type ItemRow = {
@@ -143,15 +143,14 @@ function RetailInvoice() {
     name: string;
     qty: number | "";
     price: number | "";
+      expiry?: string;
   };
-
   type InvoiceData = {
     form: RetailInvoiceFormValues;
     rows: ItemRow[];
-    gst: number;
+   
     paymentMode: string;
   };
-
   type Customer = {
     name: string;
     age: string;
@@ -162,10 +161,10 @@ function RetailInvoice() {
   };
 
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "" },
+    { id: Date.now(), name: "", qty: 1, price: "", expiry: ""  },
   ]);
 
-  const [gst, setGst] = useState(5);
+ 
 
   const [paymentMode, setPaymentMode] = useState("Cash");
 
@@ -181,7 +180,7 @@ function RetailInvoice() {
     if (savedData) {
       methods.reset(savedData.form);
       setRows(savedData.rows);
-      setGst(savedData.gst);
+     
       setPaymentMode(savedData.paymentMode);
     } else {
       methods.reset({
@@ -195,7 +194,7 @@ function RetailInvoice() {
         addressRight: "",
       });
       setRows([{ id: Date.now(), name: "", qty: 1, price: "" }]);
-      setGst(5);
+     
       setPaymentMode("Cash");
     }
   }, [activeInvoice, invoiceForms, methods]);
@@ -205,7 +204,7 @@ function RetailInvoice() {
     const storedDoctors = localStorage.getItem("doctors");
 
     if (storedDoctors) {
-      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors); //string->obj
+      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors);
       setDoctorList(parsedDoctors);
       const options = parsedDoctors.map((doc) => ({
         label: `Dr. ${doc.doctorName}`,
@@ -227,7 +226,6 @@ function RetailInvoice() {
   ];
 
   const selectedCustomerName = methods.watch("name");
-
   // when name change
   useEffect(() => {
     if (selectedCustomerName === "add_customer") {
@@ -236,17 +234,17 @@ function RetailInvoice() {
     }
     if (!selectedCustomerName) return;
     const selectedCustomer = customerOptions.find(
-      (c) => c.name === selectedCustomerName,
+      (c) => c.name === selectedCustomerName
     );
     if (selectedCustomer) {
-      // Existing customer - Autofill
+
       methods.setValue("age", selectedCustomer.age || "");
       methods.setValue("mobile", selectedCustomer.mobile || "");
       methods.setValue("email", selectedCustomer.email || "");
       methods.setValue("addressLeft", selectedCustomer.address || "");
       methods.setValue("doctor", selectedCustomer.doctor || "");
     } else {
-      // New name - Clear other fields
+
       methods.setValue("age", "");
       methods.setValue("mobile", "");
       methods.setValue("email", "");
@@ -254,31 +252,28 @@ function RetailInvoice() {
       methods.setValue("doctor", "");
     }
   }, [selectedCustomerName, customerOptions, methods, navigate]);
-
   // data load
   useEffect(() => {
-    const saved = localStorage.getItem("medical_customers");
+    const saved = localStorage.getItem("customers");
     if (saved) {
       setCustomerOptions(JSON.parse(saved));
     }
   }, []);
 
-  // Doctor Address Autofill
+
   useEffect(() => {
     if (selectedDoctorName) {
       const selectedDoctor = doctorList.find(
-        (doc) => doc.doctorName === selectedDoctorName,
+        (doc) => doc.doctorName === selectedDoctorName
       );
-
       if (selectedDoctor) {
         methods.setValue("addressRight", selectedDoctor.address);
       }
     }
   }, [selectedDoctorName, doctorList, methods]);
-
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
-    0,
+    0
   );
 
   const finalTotal = subTotal;
@@ -286,7 +281,6 @@ function RetailInvoice() {
   return (
     <FormProvider {...methods}>
       {/* invoice tab button */}
-
       <InvoiceTabButtons />
       {!isRetail ? (
         <NewInvoice />
@@ -312,7 +306,6 @@ function RetailInvoice() {
             {Array.from({ length: 10 }, (_, i) => {
               const invoiceNumber = i + 1;
               const isActive = String(invoiceNumber) === activeInvoice;
-
               return (
                 <Button
                   key={invoiceNumber}
@@ -328,20 +321,21 @@ function RetailInvoice() {
                       [activeInvoice]: {
                         form: methods.getValues(),
                         rows,
-                        gst,
+                        
                         paymentMode,
                       },
                     }));
 
-                    navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
-                  }}
-                >
+                    navigate(URL_PATH.PaymentMethod, {
+                      state: { flow: "retail", totalFromInvoice: finalTotal }
+                    });
+                  }}>
+
                   Invoice {invoiceNumber}
                 </Button>
               );
             })}
           </Box>
-
           <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
             <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3}>
               {/* inner box */}
@@ -364,8 +358,10 @@ function RetailInvoice() {
                         options={nameOptions}
                         required
                         onlyAlphabet
-                        freeSolo
+                        // freeSolo
                         editable={true}
+                        
+
                       />
                     </Box>
 
@@ -387,17 +383,17 @@ function RetailInvoice() {
                         required
                       />
                     </Box>
-
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <EmailField name="email" label="Email" />
                     </Box>
                   </Box>
-
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
                     <TextInputField
                       name="addressLeft"
                       label="Address"
                       inputType="textarea"
+                       minLength={10}
+                      maxLength={50}
                       rows={3}
                     />
                   </Box>
@@ -407,39 +403,41 @@ function RetailInvoice() {
                   flex={1}
                   display="flex"
                   flexDirection="column"
-                  gap={{ xs: 2, md: 1.5 }}
-                >
+                  gap={{ xs: 2, md: 1.5 }}>
+
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <DropdownField
                       name="doctor"
                       label="Doctor"
                       options={doctorOptions}
-                      freeSolo
+                     freeSolo={false}
                       editable={true}
                       placeholder="Select Dr"
                     />
                   </Box>
-
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <TextInputField
                       name="addressRight"
                       label="Address"
                       inputType="textarea"
-                      rows={3}
-                    />
+                      minLength={10}
+                      maxLength={50}
+                      rows={3} />
+
                   </Box>
                 </Box>
               </Box>
             </Paper>
 
             <Box mt={3}>
+
               <ItemsSection
                 rows={rows}
                 setRows={setRows}
-                gst={gst}
-                setGst={setGst}
+                finalTotal={finalTotal}
                 isSubmitted={isSubmitted}
               />
+
             </Box>
 
             {/* Bottom pay print button */}
@@ -472,8 +470,3 @@ function RetailInvoice() {
 }
 
 export default RetailInvoice;
-
-
-
-
-
