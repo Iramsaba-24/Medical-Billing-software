@@ -169,16 +169,18 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="name"
                   label="Customer Name"
                   inputType="alphabet"
+                  minLength={3}
                   required
                   maxLength={20}
                 />
  
-                <DateTimeField name="date" label="Date" required />
+                <DateTimeField name="date" label="Date" disabled required />
  
                 <TextInputField
                   name="age"
                   label="Age"
                   required
+                  minLength={1}
                   maxLength={3}
                   rules={{
                     pattern: {
@@ -204,6 +206,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="address"
                   label="Address"
                   inputType="textarea"
+                  minLength={10}
+                  maxLength={50}
                   rows={1}
                   required
                 />
@@ -218,7 +222,9 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                 <DropdownField
                   name="doctor"
                   label="Doctor Name"
-                  options={doctorOptions}
+                  options={doctorOptions} 
+                  freeSolo = {false}
+                  editable = {true}
                   placeholder="Select Doctors"
                   required
                 />

@@ -1,6 +1,6 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Paper, Typography, Button } from "@mui/material";
-
+import { useEffect, useState } from "react";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 import DropdownField from "@/components/controlled/DropdownField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
@@ -15,6 +15,35 @@ type DashboardSettingsForm = {
   chartPreferences: string[];
   autoRefresh: boolean;
   autoRefreshInterval: string;
+};
+
+type InventoryItem = {
+  itemName: string;
+};
+
+type MedicineOption = {
+  label: string;
+  value: string;
+};
+
+// medicines from localStorage
+const getMedicineOptions = (): MedicineOption[] => {
+  const stored = localStorage.getItem("inventory");
+
+  if (!stored) return [];
+
+  const parsed: InventoryItem[] = JSON.parse(stored);
+
+  const result: MedicineOption[] = [];
+
+  for (const item of parsed) {
+    result.push({
+      label: item.itemName,
+      value: item.itemName,
+    });
+  }
+
+  return result;
 };
 
 const kpiOptions = [
@@ -40,21 +69,6 @@ const chartPreferences = [
   { label: "Donut Chart", value: "donut" },
 ];
 
-const medicineOptions = [
-  "Acetaminophen",
-  "Antihistamines",
-  "Lisinopril",
-  "Statins",
-  "Metformin",
-  "Amoxicillin",
-  "Paracetamol 500mg",
-];
-
-const medicineDropdownOptions = medicineOptions.map((med) => ({
-  label: med,
-  value: med,
-}));
-
 const cardStyle = {
   p: { xs: 2, md: 4 },
   borderRadius: "5px",
@@ -62,7 +76,6 @@ const cardStyle = {
   mb: 1,
 };
 
-// ✅ UPDATED DEFAULT VALUES
 const defaultValues: DashboardSettingsForm = {
   visibleKpis: [
     "totalRevenue",
@@ -74,13 +87,17 @@ const defaultValues: DashboardSettingsForm = {
   quantityThreshold: null,
   expiryAlerts: ["30"],
   showExpiryOnDashboard: false,
-  topSellingMedicine: "Paracetamol 500mg", // ✅ default medicine
-  chartPreferences: ["bar"], // ✅ default chart
+  topSellingMedicine: "Paracetamol 500mg",
+  chartPreferences: ["bar"],
   autoRefresh: false,
   autoRefreshInterval: "",
 };
 
 const DashboardSettings = () => {
+  const [medicineDropdownOptions, setMedicineDropdownOptions] = useState<
+    MedicineOption[]
+  >([]);
+
   const savedSettings = localStorage.getItem("dashboardSettings");
 
   const methods = useForm<DashboardSettingsForm>({
@@ -91,10 +108,30 @@ const DashboardSettings = () => {
 
   const { handleSubmit, reset } = methods;
 
+  // auto update medicines
+  useEffect(() => {
+    const loadMedicines = () => {
+      const data = getMedicineOptions();
+      setMedicineDropdownOptions(data);
+    };
+
+    loadMedicines();
+
+    window.addEventListener("inventoryUpdated", loadMedicines);
+
+    return () => {
+      window.removeEventListener("inventoryUpdated", loadMedicines);
+    };
+  }, []);
+
   const onSubmit = (data: DashboardSettingsForm) => {
     console.log("Submitted", data);
 
+    // ✅ existing save
     localStorage.setItem("dashboardSettings", JSON.stringify(data));
+
+    // ✅ IMPORTANT: Top Selling Medicine separate save
+    localStorage.setItem("topSellingMedicine", data.topSellingMedicine);
 
     showToast("success", "Saved");
   };
@@ -189,6 +226,8 @@ const DashboardSettings = () => {
               onClick={() => {
                 reset(defaultValues);
                 localStorage.removeItem("dashboardSettings");
+                
+                localStorage.removeItem("topSellingMedicine");
               }}
               sx={{
                 color: "#238878",

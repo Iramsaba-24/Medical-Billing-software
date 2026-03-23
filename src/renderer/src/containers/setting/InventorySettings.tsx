@@ -1,7 +1,9 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Paper, Typography, Stack } from "@mui/material";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
-//  Define Form Types for Type Safety
+import { showToast } from "@/components/uncontrolled/ToastMessage";
+
+// Define Form Types for Type Safety
 export interface InventoryFormValues {
   groupExpiry: string[];
   pricing: string[];
@@ -12,9 +14,20 @@ export interface InventoryFormValues {
   returnsUpdate: string[];
   alertsVisibility: string[];
 }
+
 const InventorySettings = () => {
+
+  const savedData = (() => {
+    try {
+      const data = localStorage.getItem("inventorySettings");
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  })();
+
   const methods = useForm<InventoryFormValues>({
-    defaultValues: {
+    defaultValues: savedData ?? {
       groupExpiry: [],
       pricing: [],
       lowStockThreshold: "",
@@ -32,39 +45,44 @@ const InventorySettings = () => {
     color: "#212529",
     mb: 1,
   };
-  //  Save Function
+
+  // Save Function
   const { handleSubmit, reset } = methods;
+
   const onSubmit = (data: InventoryFormValues) => {
-  console.log("Inventory Settings Saved ");
-  console.log(data);
+    showToast("success", "Saved Successfully");
+    console.log("Inventory Settings Saved ");
+    console.log(data);
 
-  // localStorage.setItem("inventorySettings", JSON.stringify(data));
+    localStorage.setItem("inventorySettings", JSON.stringify(data));
 
-  // increment counter if checkbox selected
-  if (data.returnsUpdate.includes("autoUpdate")) {
-    const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
-    localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
-  }
-  localStorage.setItem("inventorySettings", JSON.stringify(data));
+    // increment counter if checkbox selected
+    if (data.returnsUpdate.includes("autoUpdate")) {
+      const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
+      localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
+    }
+    localStorage.setItem("inventorySettings", JSON.stringify(data));
 
-  // Returns counter
-  if (data.returnsUpdate.includes("autoUpdate")) {
-    const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
-    localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
-  }
+    // Returns counter
+    if (data.returnsUpdate.includes("autoUpdate")) {
+      const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
+      localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
+    }
 
-  // Low Stock Alert counter
-  if (data.alertsVisibility.includes("alert1")) {
-    const prevLowStock = Number(localStorage.getItem("lowStockAlertCount")) || 0;
-    localStorage.setItem("lowStockAlertCount", String(prevLowStock + 1));
-  }
+    // Low Stock Alert counter
+    if (data.alertsVisibility.includes("alert1")) {
+      const prevLowStock =
+        Number(localStorage.getItem("lowStockAlertCount")) || 0;
+      localStorage.setItem("lowStockAlertCount", String(prevLowStock + 1));
+    }
 
-  // Reorder Alert counter
-  if (data.alertsVisibility.includes("alert2")) {
-    const prevReorder = Number(localStorage.getItem("reorderAlertCount")) || 0;
-    localStorage.setItem("reorderAlertCount", String(prevReorder + 1));
-  }
-};
+    // Reorder Alert counter
+    if (data.alertsVisibility.includes("alert2")) {
+      const prevReorder =
+        Number(localStorage.getItem("reorderAlertCount")) || 0;
+      localStorage.setItem("reorderAlertCount", String(prevReorder + 1));
+    }
+  };
 
   return (
     <Box sx={{ backgroundColor: "#f9f9f9" }}>
@@ -84,28 +102,13 @@ const InventorySettings = () => {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2.5}>
-            {/*  Returns & Auto Update */}
-            <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
-              <Typography variant="subtitle1" sx={headingStyle}>
-                Returns & Auto Update
-              </Typography>
-              <CheckboxGroup
-                name="returnsUpdate"
-                label=""
-                options={[
-                  {
-                    label: "Auto-update stock on returns (Sales & Purchase)",
-                    value: "autoUpdate",
-                  },
-                ]}
-              />
-            </Paper>
 
-            {/*  Alerts & Visibility */}
+            {/* Alerts & Visibility */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
               <Typography variant="subtitle1" sx={headingStyle}>
                 Alerts & Visibility
               </Typography>
+
               <CheckboxGroup
                 name="alertsVisibility"
                 label=""
@@ -121,14 +124,26 @@ const InventorySettings = () => {
                 ]}
               />
             </Paper>
-            {/*  Buttons- save reset*/}
+
+            {/* Buttons */}
             <Box
               sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}
             >
               <Button
                 type="button"
                 variant="outlined"
-                onClick={() => reset()}
+                onClick={() =>
+                  reset({
+                    groupExpiry: [],
+                    pricing: [],
+                    lowStockThreshold: "",
+                    autoReorderQty: "",
+                    outOfStock: "",
+                    barcodeStorage: [],
+                    returnsUpdate: [],
+                    alertsVisibility: ["alert1", "alert2"],
+                  })
+                }
                 sx={{
                   color: "#238878",
                   border: "2px solid #238878",
@@ -142,6 +157,7 @@ const InventorySettings = () => {
               >
                 Reset
               </Button>
+
               <Button
                 type="submit"
                 variant="contained"
@@ -160,6 +176,7 @@ const InventorySettings = () => {
                 Save
               </Button>
             </Box>
+
           </Stack>
         </form>
       </FormProvider>

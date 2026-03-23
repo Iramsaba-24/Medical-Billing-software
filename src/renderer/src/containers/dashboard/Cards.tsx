@@ -515,7 +515,7 @@ const Cards: React.FC = () => {
  
   // filter for the dropdown
   const getFilteredSalesData = (filter: FilterType): SalesData[] => {
-  const stored = localStorage.getItem("invoices");
+  const stored = localStorage.getItem("currentInvoice");
   if (!stored) return [];
  
   const sales: SalesData[] = JSON.parse(stored);
@@ -571,31 +571,36 @@ const getDailyReportData = (filter: FilterType) => {
   };
 };
 const getTopSellingMedicine = (): string => {
-  const stored = localStorage.getItem("invoices");
+  const saved = localStorage.getItem("topSellingMedicine");
+
+  if (saved) {
+    return saved; // 👉 Settings madhun selected medicine
+  }
+
+  // fallback (optional): auto calculate
+  const stored = localStorage.getItem("currentInvoice");
   if (!stored) return "No Data";
- 
+
   const invoices: Invoice[] = JSON.parse(stored);
- 
+
   const counts: Record<string, number> = {};
- 
+
   invoices.forEach((sale) => {
     sale.medicines?.forEach((med) => {
-      const name = med.name;
- 
-      counts[name] = (counts[name] || 0) + (med.qty || 1);
+      counts[med.name] = (counts[med.name] || 0) + (med.qty || 1);
     });
   });
- 
+
   let topMedicine = "";
   let highest = 0;
- 
+
   Object.entries(counts).forEach(([name, qty]) => {
     if (qty > highest) {
       highest = qty;
       topMedicine = name;
     }
   });
- 
+
   return topMedicine || "No Data";
 };
  
