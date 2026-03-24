@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 export type InventoryFormData = {
   itemName: string;
   itemId: string;
-  // category: string;
   unit: string;
   stockQty: number;
   medicineGroup: string;
@@ -24,7 +23,6 @@ export type InventoryItem = {
   itemName: string;
   itemId: string;
   medicineGroup: string;
-  // category: string;
   stockQty: number;
   pricePerUnit: number;
   expiryDate: string;
@@ -36,21 +34,50 @@ export default function AddInventoryItem() {
   const methods = useForm<InventoryFormData>({});
   const navigate = useNavigate();
 
-  const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
+  const [groupOptions, setGroupOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
+  const [supplierOptions, setSupplierOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+
+  // Load Medicine Groups
   useEffect(() => {
-    const storedGroups = JSON.parse(localStorage.getItem("medicineGroups") || "[]");
-    const options = storedGroups.map((group: { id: number; groupName: string }) => ({
-      label: group.groupName,
-      value: group.groupName,
-    }));
+    const storedGroups = JSON.parse(
+      localStorage.getItem("medicineGroups") || "[]"
+    );
+
+    const options = storedGroups.map(
+      (group: { id: number; groupName: string }) => ({
+        label: group.groupName,
+        value: group.groupName,
+      })
+    );
+
     setGroupOptions(options);
   }, []);
 
-  //  submit
+  // Load Active Distributors as Suppliers
+  useEffect(() => {
+    const storedDistributors = JSON.parse(
+      localStorage.getItem("distributors") || "[]"
+    );
+
+    const options = storedDistributors
+      .filter((d: { status: string }) => d.status === "Active")
+      .map((distributor: { id: string; companyName: string }) => ({
+        label: distributor.companyName,
+        value: distributor.companyName,
+      }));
+
+    setSupplierOptions(options);
+  }, []);
+
   const onSubmit = (data: InventoryFormData) => {
-    const existing: InventoryItem[] =
-      JSON.parse(localStorage.getItem("inventory") || "[]");
+    const existing: InventoryItem[] = JSON.parse(
+      localStorage.getItem("inventory") || "[]"
+    );
 
     const status: InventoryItem["status"] =
       data.stockQty === 0
@@ -62,7 +89,6 @@ export default function AddInventoryItem() {
     const newItem: InventoryItem = {
       itemName: data.itemName,
       itemId: data.itemId,
-      // category: data.category,
       medicineGroup: data.medicineGroup,
       stockQty: data.stockQty,
       pricePerUnit: data.pricePerUnit,
@@ -71,7 +97,8 @@ export default function AddInventoryItem() {
       status,
     };
 
-    localStorage.setItem("inventory",
+    localStorage.setItem(
+      "inventory",
       JSON.stringify([...existing, newItem])
     );
 
@@ -79,139 +106,121 @@ export default function AddInventoryItem() {
   };
 
   return (
-  <FormProvider {...methods}>
-  <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
-    <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
-      <Typography fontSize={20} fontWeight={600} mb={4}>
-        Add New Item
-      </Typography>
+    <FormProvider {...methods}>
+      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
+        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
+          <Typography fontSize={20} fontWeight={600} mb={4}>
+            Add New Item
+          </Typography>
 
-      <Box
-        component="form"
-        onSubmit={methods.handleSubmit(onSubmit)}
-        noValidate
-        display="grid"
-        gridTemplateColumns={{
-          xs: "1fr",
-          md: "repeat(3, 1fr)",
-        }}
-        gap={2.5}
-        sx={{ px: { xs: 0, md: 4 } }}
-      >
-        <TextInputField name="itemName" label="Item Name" required inputType="all" rows={1}/>
-        <TextInputField name="itemId" label="Item ID" required />
-
-        {/* <DropdownField
-          name="category"
-          label="Category"
-          placeholder="Category"
-          required
-          options={[
-            { label: "Medicines", value: "medicines" },
-            { label: "Equipment", value: "equipment" },
-            { label: "Supplies", value: "supplies" },
-            { label: "Other", value: "other" },
-          ]}
-        /> */}
-
-        <DropdownField
-          name="unit"
-          label="Unit"
-          placeholder="Unit"
-          required
-          options={[
-            { label: "Tablets", value: "tablets" },
-            { label: "Bottle", value: "bottle" },
-            { label: "Strip", value: "strip" },
-            { label: "Capsules", value: "capsules" },
-            { label: "Rolls", value: "rolls" },
-            { label: "Boxes", value: "boxes" },
-            { label: "Pairs", value: "pairs" },
-          ]}
-        />
-
-        <NumericField name="stockQty" label="Stock Quantity" required />
-
-        <DropdownField
-          name="medicineGroup"
-          label="Medicine Group"
-          placeholder="Medicine Group"
-          required
-          options={groupOptions}
-        />
-
-        <NumericField
-          name="pricePerUnit"
-          label="Price per Unit (₹)"
-          decimal
-          decimalDigits={2}
-          required
-        />
-
-        <DateTimeField
-          name="expiryDate"
-          label="Expiry Date"
-          viewMode="date"
-          required
-        />
-
-        <DropdownField
-          name="supplier"
-          label="Supplier"
-          placeholder="Suppliers"
-          required
-          options={[
-            { label: "PharmaCare Ltd.", value: "pharmaCare" },
-            { label: "MedEquip Inc.", value: "medEquip" },
-            { label: "Other", value: "other" },
-          ]}
-        />
-
-        <Box
-          gridColumn="1 / -1"
-          display="flex"
-          justifyContent="flex-end"
-          gap={2}
-        >
-          <Button
-            variant="outlined"
-            onClick={() => navigate(-1)}
-            sx={{
-              px: 4,
-              // width: { xs: "100%", md: "14%" },
-              textTransform: "none",
-              border: "2px solid #1b7f6b",
-              color: "#1b7f6b",
-              "&:hover": {
-                backgroundColor: "#1b7f6b",
-                color: "#fff",
-              },
+          <Box
+            component="form"
+            onSubmit={methods.handleSubmit(onSubmit)}
+            display="grid"
+            gridTemplateColumns={{
+              xs: "1fr",
+              md: "repeat(3, 1fr)",
             }}
+            gap={2.5}
+            sx={{ px: { xs: 0, md: 4 } }}
           >
-            Cancel
-          </Button>
+            <TextInputField
+              name="itemName"
+              label="Item Name"
+              required
+            />
 
-          <Button
-            type="submit"
-            variant="contained"
-            sx={{
-              px: 4,
-              // width: { xs: "100%", md: "14%" },
-              textTransform: "none",
-              backgroundColor: "#1b7f6b",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#1b7f6b",
-                border: "2px solid #1b7f6b",
-              },
-            }}
-          >
-            Save
-          </Button>
-        </Box>
+            <TextInputField
+              name="itemId"
+              label="Item ID"
+              required
+            />
+
+            <DropdownField
+              name="unit"
+              label="Unit"
+              placeholder=" Unit"
+              required
+              options={[
+                { label: "Tablets", value: "tablets" },
+                { label: "Bottle", value: "bottle" },
+                { label: "Strip", value: "strip" },
+                { label: "Capsules", value: "capsules" },
+                { label: "Rolls", value: "rolls" },
+                { label: "Boxes", value: "boxes" },
+                { label: "Pairs", value: "pairs" },
+              ]}
+            />
+
+            <NumericField
+              name="stockQty"
+              label="Stock Quantity"
+              required
+            />
+
+            <DropdownField
+              name="medicineGroup"
+              label="Medicine Group"
+              placeholder="Medicine Group"
+              required
+              options={groupOptions}
+            />
+
+            <TextInputField
+              name="pricePerUnit"
+              label="Price per Unit (₹)"
+              required
+            />
+
+            <DateTimeField
+              name="expiryDate"
+              label="Expiry Date"
+              viewMode="date"
+              required
+            />
+
+            <DropdownField
+              name="supplier"
+              label="Supplier"
+              placeholder=" Supplier"
+              required
+              options={supplierOptions}
+            />
+
+            <Box
+              gridColumn="1 / -1"
+              display="flex"
+              justifyContent="flex-end"
+              gap={2}
+            >
+              <Button
+                variant="outlined"
+                onClick={() => navigate(-1)}
+                sx={{
+                  px: 4,
+                  textTransform: "none",
+                  border: "2px solid #1b7f6b",
+                  color: "#1b7f6b",
+                }}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  px: 4,
+                  textTransform: "none",
+                  backgroundColor: "#1b7f6b",
+                }}
+              >
+                Save
+              </Button>
+            </Box>
+          </Box>
+        </Paper>
       </Box>
-    </Paper>
-  </Box>
-</FormProvider>
-);
+    </FormProvider>
+  );
 }

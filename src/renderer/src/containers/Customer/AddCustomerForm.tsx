@@ -7,7 +7,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
 import DateTimeField from "@/components/controlled/DateTimeField";
-import ItemsSection from "@/containers/customer/ItemsSection";
+// import ItemsSection from "@/containers/customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
 
 // Structure for each medicine/item row in the bill
@@ -20,16 +20,16 @@ export interface ItemRow {
 
 interface Props {
   onBack: () => void;
-  onSave: (data: CustomerData, total: number, meds: string, qty: number, actualRows: ItemRow[]) => void;
+  onSave: (data: CustomerData) => void;
   initialData: CustomerData | null;
 }
 
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   
   const [rows, setRows] = useState<ItemRow[]>([{ id: Date.now(), name: "", qty: "", price: "" }]);
-  const [gst, setGst] = useState(5);
-  const [paymentMode, setPaymentMode] = useState("Cash");
-  const [isSubmitted, setIsSubmitted] = useState(false); 
+  // const [gst, setGst] = useState(5);
+  // const [paymentMode, setPaymentMode] = useState("Cash");
+  // const [isSubmitted, setIsSubmitted] = useState(false); 
   const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
 
   // Initialize the form with react-hook-form and default empty values
@@ -97,18 +97,18 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     }
   };
 
-  //  Calculate Subtotal Qty * Price and then add GST %
-  const subTotal = rows.reduce((acc, r) => acc + (Number(r.qty) * Number(r.price)), 0);
-  const finalTotal = subTotal + (subTotal * gst / 100);
+  // //  Calculate Subtotal Qty * Price and then add GST %
+  // const subTotal = rows.reduce((acc, r) => acc + (Number(r.qty) * Number(r.price)), 0);
+  // const finalTotal = subTotal + (subTotal * gst / 100);
 
   // Function to validate and save the entire form
   const handleActualSave = (data: CustomerData) => {
-    setIsSubmitted(true);
+    // setIsSubmitted(true);
     // Ensure all medicine rows have valid Name, Qty and Price
     const areItemsValid = rows.every(r => r.name.trim() !== "" && Number(r.qty) > 0 && Number(r.price) > 0);
     
     if (areItemsValid) {
-      onSave(data, finalTotal, rows.map(r => r.name).join(", "), rows.length, rows);
+      onSave(data);
     }
   };
 
@@ -136,10 +136,10 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         </Box>
 
         {/*  Customer & Doctor Personal Information Card */}
-        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }} elevation={0}>
+        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }} elevation={3}>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.5fr 1fr" }, gap: 4 }}>
             {/*  Customer details like Mobile, Age, Address */}
-            <Box>
+            <Box >
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>Customer Details</Typography>
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                 <TextInputField name="name" label="Customer Name" inputType="alphabet" required />
@@ -158,6 +158,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="doctor"
                   label="Doctor Name"
                   options={doctorOptions}
+                  placeholder="Select Doctors"
                 />
                 <TextInputField name="doctorAddress" label="Doctor Address/Clinic" inputType="textarea" rows={1} />
               </Box>
@@ -166,12 +167,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         </Paper>
 
         {/*  Medicines/Items Table Adding rows and calculating row totals */}
-        <ItemsSection 
+        {/* <ItemsSection 
           rows={rows} setRows={setRows} 
           gst={gst} setGst={setGst} 
           paymentMode={paymentMode} setPaymentMode={setPaymentMode} 
           finalTotal={finalTotal} isSubmitted={isSubmitted} 
-        />
+        /> */}
 
         {/*  Footer Action Buttons Print, Pay, Save */}
         <Box sx={{ 

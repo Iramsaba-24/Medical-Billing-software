@@ -10,7 +10,7 @@ export interface PurchaseHistory {
   date: string;
   medicines: string;
   totalQty: number;
-  totalPrice: number;
+  totalPrice: number; 
   doctor: string;
   itemsList: ItemRow[];
   [key: string]: string | number | ItemRow[] | undefined;
@@ -54,7 +54,7 @@ const CustomerMaster = () => {
   }, [customerList]);
 
   // Function to save or update customer and invoice data
-  const handleSave = (formData: CustomerData, total: number, meds: string, qty: number, actualItems: ItemRow[]) => {
+  const handleSave = (formData: CustomerData) => {
     setCustomerList((prev) => {
       // Check if the customer already exists by comparing names
       const existingIndex = prev.findIndex(
@@ -62,29 +62,29 @@ const CustomerMaster = () => {
       );
       
       // Create a new invoice object for this transaction
-      const newInvoice: PurchaseHistory = {
-        id: `INV-${Date.now()}`,
-        date: formData.date,
-        medicines: meds,
-        totalQty: qty,
-        totalPrice: total,
-        doctor: formData.doctor,
-        itemsList: actualItems,
-      };
+      // const newInvoice: PurchaseHistory = {
+      //   id: `INV-${Date.now()}`,
+      //   date: formData.date,
+      //   medicines: meds,
+      //   totalQty: qty,
+      //   totalPrice: total,
+      //   doctor: formData.doctor,
+      //   itemsList: actualItems,
+      // };
 
       if (existingIndex > -1) {
         // If customer exists, update their details and add new invoice to their history
         const updatedList = [...prev];
-        const existingCust = updatedList[existingIndex];
-        updatedList[existingIndex] = {
-          ...existingCust,
-          ...formData,
-          medicines: meds,
-          totalQty: qty,
-          totalPrice: total,
-          itemsList: actualItems,
-          history: [newInvoice, ...(existingCust.history || [])] 
-        };
+        // const existingCust = updatedList[existingIndex];
+        // updatedList[existingIndex] = {
+        //   ...existingCust,
+        //   ...formData,
+        //   medicines: meds,
+        //   totalQty: qty,
+        //   totalPrice: total,
+        //   itemsList: actualItems,
+        //   history: [newInvoice, ...(existingCust.history || [])] 
+        // };
         showToast("success", "Invoice updated successfully!");
         return updatedList;
       } else {
@@ -92,11 +92,6 @@ const CustomerMaster = () => {
         const newCustomer: CustomerData = { 
           ...formData, 
           id: `CUST-${Date.now()}`, 
-          medicines: meds,
-          totalQty: qty,
-          totalPrice: total,
-          itemsList: actualItems,
-          history: [newInvoice] 
         };
         showToast("success", "New Customer and Invoice saved!");
         return [...prev, newCustomer];

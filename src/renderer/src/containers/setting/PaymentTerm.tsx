@@ -1,5 +1,6 @@
 import { Paper, Typography, Box } from '@mui/material';
 import RadioField from '@/components/controlled/RadioField';
+import DropdownField from '@/components/controlled/DropdownField';
 
 const PaymentTerms = () => {
   const radioOptions = [
@@ -7,42 +8,53 @@ const PaymentTerms = () => {
     { label: 'Credit', value: 'credit' },
     { label: 'UPI', value: 'upi' },
   ];
+  const headingStyle = {
+    fontWeight: 700,
+    fontSize: "18px",
+    color: "#212529",
+    mb: 1,
+  };
+  
+  const creditDays = [
+    { label: "30 Months", value: "30" },
+    { label: "60 Months", value: "60" },
+    { label: "90 Months", value: "90" }
+  ]
 
-  return (  
+  return (
     // Payment Terms card style
-<Paper sx={{ p: 2, borderRadius: "10px", boxShadow: 4, mb: 1 }}>   
-      <Typography  fontWeight={600} mb={1}>
+    <Paper sx={{ p: 2, borderRadius: "10px", boxShadow: 4, mb: 1 }}>
+      <Typography sx={headingStyle}>
         Payment Terms
       </Typography>
-        
+
       <RadioField
         name="payment_method"
         label=""
         options={radioOptions}
         sx={{
-         width: '100%',
-       '& .MuiFormControlLabel-root': {   //radio fields label styling
-        width: '100%',
-         m: 0,
-        display: 'flex',
-        justifyContent: 'space-between',  //text-left side , radio-right side
-        flexDirection: 'row-reverse',  //radio on right side
-        mb: 0.5
-      }
+          width: '100%',
+          '& .MuiFormControlLabel-root': {   //radio fields label styling
+            width: '100%',
+            m: 0,
+            display: 'flex',
+            justifyContent: 'space-between',  //text-left side , radio-right side
+            flexDirection: 'row-reverse',  //radio on right side
+            mb: 0.5
+          }
 
         }}
       />
       {/* dropdown - credit days */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
         <Typography sx={{ fontSize: '16px' }}>Credit Days</Typography>
-        <select 
-          style={{  minWidth: '100px', padding: '4px 5px',borderRadius: '4px',
-            border: '1px solid #767676',fontSize: '13px',color: '#767676'}}>       
-          <option value="">Select</option>
-          <option value="30">30 Days</option>
-            <option value="60">60 Days</option>
-            <option value="90">90 Days</option>
-        </select>
+
+        <DropdownField
+          name="creditDays"
+          options={creditDays}
+          sx={{ width: 150, minWidth: 150 }}
+          //isStatic={true}
+        />
       </Box>
     </Paper>
   );

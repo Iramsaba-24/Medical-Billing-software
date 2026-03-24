@@ -1,3 +1,5 @@
+
+
 import React, { useMemo, useState } from 'react';
 import {
   Box,
@@ -15,7 +17,7 @@ import DropdownField from '@/components/controlled/DropdownField';
 import { UniversalTable, type Column, ACTION_KEY } from '@/components/uncontrolled/UniversalTable';
 import EditSalesForm from './EditSalesForm';
 
-interface SalesData { 
+export interface SalesData {
   id: number;
   name: string;
   medicine: string;
@@ -43,7 +45,7 @@ const filterOptions = [
 ];
 
 const parseDate = (dateStr: string): Date => {
-  const months: any = {
+  const months: Record<string, number> = {
     Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
     Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
   };
@@ -57,8 +59,10 @@ const getFilteredDataByDate = (data: SalesData[], filter: string) => {
 
   switch (filter) {
     case 'Today':
-      return data.filter(d =>
-        parseDate(d.date).toDateString() === new Date(2026, 0, 5).toDateString()
+      return data.filter(
+        d =>
+          parseDate(d.date).toDateString() ===
+          new Date(2026, 0, 5).toDateString()
       );
     case '6 Days':
       return data.filter(d => {
@@ -68,7 +72,6 @@ const getFilteredDataByDate = (data: SalesData[], filter: string) => {
     case 'This Month':
       return data.filter(d => parseDate(d.date).getMonth() === 0);
     case 'All':
-      return data;
     default:
       return data;
   }
@@ -78,7 +81,8 @@ const SalesTable: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('This Month');
   const [salesData, setSalesData] = useState<SalesData[]>(initialSalesData);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
+
+  //  Only one state needed for dialog
   const [editingRow, setEditingRow] = useState<SalesData | null>(null);
 
   const methods = useForm({
@@ -100,45 +104,25 @@ const SalesTable: React.FC = () => {
   }, [searchQuery, selectedMonth, salesData]);
 
   const columns: Column<SalesData>[] = [
-    {
-      key: 'name',
-      label: 'Name',
-    },
-    {
-      key: 'medicine',
-      label: 'Medicine',
-    },
-    {
-      key: 'quantity',
-      label: 'Qty',
-    },
+    { key: 'name', label: 'Name' },
+    { key: 'medicine', label: 'Medicine' },
+    { key: 'quantity', label: 'Qty' },
     {
       key: 'totalPrice',
       label: 'Price',
-      render: (row) => row.totalPrice.toFixed(2),
+      render: row => row.totalPrice.toFixed(2),
     },
-    {
-      key: 'date',
-      label: 'Date',
-    },
-    {
-      key: 'time',
-      label: 'Time',
-    },
-    {
-      key: ACTION_KEY,
-      label: 'Actions',
-    },
+    { key: 'date', label: 'Date' },
+    { key: 'time', label: 'Time' },
+    { key: ACTION_KEY, label: 'Actions' },
   ];
 
   const handleEdit = (row: SalesData) => {
-    setEditingRow(row);
-    setOpenEditDialog(true);
+    setEditingRow(row); // opens dialog
   };
 
   const handleCloseEditDialog = () => {
-    setOpenEditDialog(false);
-    setEditingRow(null);
+    setEditingRow(null); // closes dialog
   };
 
   const handleSaveEdit = (data: SalesData) => {
@@ -146,27 +130,40 @@ const SalesTable: React.FC = () => {
       const newData = prevData.map(item =>
         item.id === data.id ? { ...item, ...data } : item
       );
-      const updatedFiltered = getFilteredDataByDate(newData, selectedMonth);
+
+      const updatedFiltered = getFilteredDataByDate(
+        newData,
+        selectedMonth
+      );
+
       if (!updatedFiltered.some(item => item.id === data.id)) {
         setSelectedMonth('All');
       }
+
       return newData;
     });
+
     handleCloseEditDialog();
   };
 
   const handleDelete = (row: SalesData) => {
     if (window.confirm(`Are you sure you want to delete ${row.name}'s record?`)) {
-      setSalesData(prevData => prevData.filter(item => item.id !== row.id));
-      console.log('Deleted:', row);
+      setSalesData(prevData =>
+        prevData.filter(item => item.id !== row.id)
+      );
     }
   };
 
   const handleDeleteSelected = (rows: SalesData[]) => {
-    if (window.confirm(`Are you sure you want to delete ${rows.length} selected record(s)?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${rows.length} selected record(s)?`
+      )
+    ) {
       const selectedIds = rows.map(row => row.id);
-      setSalesData(prevData => prevData.filter(item => !selectedIds.includes(item.id)));
-      console.log('Deleted selected:', rows);
+      setSalesData(prevData =>
+        prevData.filter(item => !selectedIds.includes(item.id))
+      );
     }
   };
 
@@ -176,17 +173,33 @@ const SalesTable: React.FC = () => {
         <Card sx={{ borderRadius: 3, boxShadow: '0 6px 24px rgba(0,0,0,0.08)' }}>
           <CardContent>
             <FormProvider {...methods}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h6" fontWeight={600}>
+              <Box
+                display="flex"
+                flexDirection={{ xs: 'column', md: 'row' }}
+                justifyContent="space-between"
+                alignItems={{ xs: 'stretch', md: 'center' }}
+                gap={2}
+                mb={3}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  textAlign={{ xs: 'left', md: 'left' }}
+                >
                   Recent Sales List
                 </Typography>
 
-                <Box display="flex" alignItems="center" gap={2}>
+                <Box
+                  display="flex"
+                  flexDirection={{ xs: 'column', sm: 'row' }}
+                  gap={2}
+                  width={{ xs: '100%', md: 'auto' }}
+                >
                   <TextField
                     size="small"
                     placeholder="Search"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -195,24 +208,19 @@ const SalesTable: React.FC = () => {
                       ),
                     }}
                     sx={{
-                      width: 180,
+                      width: { xs: '100%', sm: 250, md: 300 },
                       '& .MuiOutlinedInput-root': {
-                        height: 40,
-                        borderRadius: 2,
+                        height: 50,
                       },
                     }}
                   />
 
-                  <Box sx={{ width: 180 }}>
+                  <Box sx={{ width: { xs: '100%', sm: 180 } }}>
                     <DropdownField
                       name="filter"
                       options={filterOptions}
-                      onChangeCallback={(value) => setSelectedMonth(value)}
+                      onChangeCallback={value => setSelectedMonth(value)}
                       sx={{
-                        '& .MuiOutlinedInput-root': {
-                          height: 40,
-                          borderRadius: 2,
-                        },
                         '& .MuiFormHelperText-root': {
                           display: 'none',
                         },
@@ -233,8 +241,8 @@ const SalesTable: React.FC = () => {
               data={filteredSalesData}
               columns={columns}
               rowsPerPage={5}
-              enableCheckbox={true}
-              getRowId={(row) => row.id}
+              enableCheckbox
+              getRowId={row => row.id}
               onDeleteSelected={handleDeleteSelected}
               actions={{
                 edit: handleEdit,
@@ -251,13 +259,15 @@ const SalesTable: React.FC = () => {
                 '&:hover': {
                   bgcolor: 'rgba(0, 0, 0, 0.04)',
                 },
-              }} caption={undefined}            />
+              }}
+              caption={undefined}
+            />
           </CardContent>
         </Card>
       </Slide>
 
+    
       <EditSalesForm
-        open={openEditDialog}
         editingRow={editingRow}
         onClose={handleCloseEditDialog}
         onSave={handleSaveEdit}
@@ -265,5 +275,5 @@ const SalesTable: React.FC = () => {
     </>
   );
 };
- 
+
 export default SalesTable;

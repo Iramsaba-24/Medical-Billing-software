@@ -23,7 +23,7 @@ const BankDetailsForm = () => {
         maxLength={11}
       />    
         <TextInputField name="accountHolderName"  label="A/C Holder's Name" inputType='alphabet'  required  />
-        <TextInputField name="branch" label="Branch" inputType='alphabet'  required />
+        <TextInputField name="branch" label="Branch" inputType='alphabet' maxLength={20}  required  />
         
         <TextInputField
           name="ifsc" 
