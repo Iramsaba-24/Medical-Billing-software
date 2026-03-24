@@ -44,7 +44,7 @@ const NetBanking = () => {
   const onSubmit = (data: FormValues) => {
     localStorage.setItem("paymentDetails", JSON.stringify(data));
     showToast("success", "Saved Successfully");
-    navigate(URL_PATH.ReceiverDetails);
+    navigate(URL_PATH.NetPurchaseDetails);
   };
 
   return (
@@ -60,11 +60,9 @@ const NetBanking = () => {
         backgroundPosition: "center",
       }}
     >
-      <FormProvider {...methods}>
+      <FormProvider {...methods} >
+        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate style={{ width: "100%", maxWidth: 800 }}>
         <Box
-          component="form"
-          noValidate
-          onSubmit={methods.handleSubmit(onSubmit)}
           sx={{ width: "100%", maxWidth: 800, textAlign: "center" }}
         >
           {/* Logo */}
@@ -112,31 +110,28 @@ const NetBanking = () => {
                   label="Bank Name"
                   required
                   inputType="alphabet"
-                  maxLength={50}
+                  maxLength={30}
+                  minLength={3}
                 />
               </Box>
 
               {/* Account Number */}
               <Box mb={1}>
+
                 <TextInputField
-                  name="accountNumber"
-                  label="Bank Account Number"
-                  required
-                  inputType="numbers"
-                  maxLength={13}
-                  minLength={9}
-                  rules={{
-                    pattern: {
-                      value: /^[0-9]+$/,
-                      message: "Only numbers allowed",
-                    },
-                  }}
-                  inputProps={{
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
-                    maxLength: 13,
-                  }}
-                />
+                    label="Bank Account Number"
+                    name="accountNumber"
+                    inputType="numbers"
+                    minLength={9}
+                    maxLength={18}
+                    rules={{
+                      pattern: {
+                        value: /^[0-9]{9,18}$/,
+                        message: "Invalid Account Number",
+                      },
+                      required: "Account Number is required",
+                    }}
+                  />
               </Box>
 
               {/* Account Holder Name */}
@@ -146,7 +141,8 @@ const NetBanking = () => {
                   label="Account Holder Name"
                   required
                   inputType="alphabet"
-                  maxLength={60}
+                  maxLength={30}
+                  minLength={3}
                 />
               </Box>
 
@@ -165,7 +161,8 @@ const NetBanking = () => {
                     label="Branch"
                     required
                     inputType="alphabet"
-                    maxLength={40}
+                    maxLength={30}
+                    minLength={3}
                   />
                 </Box>
 
@@ -212,6 +209,7 @@ const NetBanking = () => {
             </CardContent>
           </Card>
         </Box>
+        </form>
       </FormProvider>
     </Box>
   );

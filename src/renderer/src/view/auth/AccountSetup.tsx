@@ -1,21 +1,26 @@
-import { Box, Button, Typography, InputAdornment, IconButton, Checkbox, FormControlLabel, FormHelperText,
+import { Box, Button, Typography, Checkbox, FormControlLabel, FormHelperText,
 } from "@mui/material";
 import { FormProvider, useForm, Controller } from "react-hook-form";
-import { useState } from "react";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
-import TextInputField from "@/components/controlled/TextInputField";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
+import PasswordField from "@/components/controlled/PasswordField";
 
 type AccountForm = {
   password: string;
   confirmPassword: string;
   terms: boolean;
   emailUpdates: boolean;
+};
+  const checkboxStyle = {
+  "& .MuiCheckbox-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
 };
 
 const AccountSetup = () => {
@@ -33,12 +38,10 @@ const AccountSetup = () => {
   const {
     control,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = methods;
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -93,69 +96,25 @@ const AccountSetup = () => {
 
           {/* Password */}
           <Box sx={{ width: "100%", maxWidth: 420 }}>
-            <TextInputField
+            <PasswordField
               name="password"
               label="Create Password"
-              type={showPassword ? "text" : "password"}
-              rules={{
-                required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters",
-                },
-                validate: (value: string) => {
-                  if (!/[A-Z]/.test(value))
-                    return "Add at least one capital letter";
-                  if (!/[a-z]/.test(value))
-                    return "Add at least one small letter";
-                  if (!/[0-9]/.test(value))
-                    return "Add at least one number";
-                  if (!/[@$_#.*]/.test(value))
-                    return "Add special character";
-                  return true;
-                },
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowPassword(!showPassword)
-                      }
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
+              required
+              minLength={8}
+              maxLength={32}
+              showStrengthIndicator={false}
+              
             />
           </Box>
 
           {/* Confirm Password */}
           <Box sx={{ width: "100%", maxWidth: 420 }}>
-            <TextInputField
+            <PasswordField
               name="confirmPassword"
               label="Confirm Password"
-              type={showConfirm ? "text" : "password"}
-              rules={{
-                required: "Confirm Password is required",
-                validate: (value) =>
-                  value === getValues("password") ||
-                  "Passwords do not match",
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowConfirm(!showConfirm)
-                      }
-                    >
-                      {showConfirm ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
+              required
+              confirmFieldName="password"
+              showStrengthIndicator={false} 
             />
           </Box>
 
@@ -168,8 +127,9 @@ const AccountSetup = () => {
               render={({ field }) => (
                 <>
                   <FormControlLabel
-                    control={<Checkbox {...field} checked={field.value} />}
+                    control={<Checkbox {...field} checked={field.value}  />}
                     label="I agree to Terms & Privacy Policy"
+                    sx={checkboxStyle}
                   />
                   {errors.terms && (
                     <FormHelperText error>
@@ -188,8 +148,9 @@ const AccountSetup = () => {
               control={control}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value} />}
+                  control={<Checkbox {...field} checked={field.value}  />}
                   label="I want product updates via email (optional)"
+                  sx={checkboxStyle}
                 />
               )}
             />
