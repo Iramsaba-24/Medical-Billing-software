@@ -1,23 +1,23 @@
-import { useForm, FormProvider, Controller } from "react-hook-form";
-import {
-  Box,
-  Button,
-  Typography,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-} from "@mui/material";
+import { useForm, FormProvider } from "react-hook-form";
+import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LogoImage from "@/assets/logoimg.svg";
 import BgImage from "@/assets/bgloginpage.svg";
 import TextInputField from "@/components/controlled/TextInputField";
+import RadioField from "@/components/controlled/RadioField";
 import { URL_PATH } from "@/constants/UrlPath";
 
 type PaymentFormInputs = {
   paymentMethod: string;
   amount: string;
+};
+const radioStyle = {
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
 };
 
 const ProceedToPaymentPage = () => {
@@ -30,7 +30,7 @@ const ProceedToPaymentPage = () => {
   });
 
   const navigate = useNavigate();
-  const { handleSubmit, control } = methods;
+  const { handleSubmit } = methods;
 
   const handleAmountInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
@@ -84,7 +84,6 @@ const ProceedToPaymentPage = () => {
             alignItems: "center",
           }}
         >
-          {/* Logo */}
           <Box mb={{ xs: 1, sm: 1.5 }}>
             <img
               src={LogoImage}
@@ -97,7 +96,6 @@ const ProceedToPaymentPage = () => {
             />
           </Box>
 
-          {/* Heading */}
           <Typography
             mb={{ xs: 2.5, sm: 3 }}
             sx={{
@@ -111,37 +109,31 @@ const ProceedToPaymentPage = () => {
             Payment Details
           </Typography>
 
-          {/* Payment Method */}
           <Box sx={{ width: "100%", mb: 3 }}>
-            <FormControl component="fieldset" fullWidth>
-              <FormLabel sx={{ mb: 1, fontWeight: 600, color: "black" }}>
-                Payment Method
-              </FormLabel>
-
-              <Controller
-                name="paymentMethod"
-                control={control}
-                rules={{ required: "Please select payment method" }}
-                render={({ field }) => (
-                  <RadioGroup {...field}>
-                    <FormControlLabel value="upi" control={<Radio />} label="UPI" />
-                    <FormControlLabel
-                      value="card"
-                      control={<Radio />}
-                      label="Credit / Debit Card"
-                    />
-                    <FormControlLabel
-                      value="netbanking"
-                      control={<Radio />}
-                      label="Net Banking"
-                    />
-                  </RadioGroup>
-                )}
-              />
-            </FormControl>
+            <RadioField
+              name="paymentMethod"
+              label="Payment Method"
+              options={[
+                { value: "upi", label: "UPI" },
+                { value: "card", label: "Credit / Debit Card" },
+                { value: "netbanking", label: "Net Banking" },
+              ]}
+              sx={{
+                ...radioStyle,
+                mb: 2,
+                "& .MuiFormLabel-root": {
+                  color: "#000 !important",
+                },
+                "& .MuiFormLabel-root.Mui-focused": {
+                  color: "#000 !important",
+                },
+                "& .MuiFormLabel-asterisk": {
+                  display: "none",
+                },
+              }}
+            />
           </Box>
 
-          {/* Total Amount */}
           <Box sx={{ width: "100%", mb: 3 }}>
             <Typography
               sx={{
@@ -189,7 +181,6 @@ const ProceedToPaymentPage = () => {
             />
           </Box>
 
-          {/* Submit Button */}
           <Button
             type="submit"
             fullWidth

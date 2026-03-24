@@ -592,7 +592,7 @@ import {
   showConfirmation,
   showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
-
+ 
 export type InventoryItem = {
   itemName: string;
   itemId: string;
@@ -603,35 +603,34 @@ export type InventoryItem = {
   expiryDate: string;
   supplier: string;
 };
-
+ 
 const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]);
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
-
+ 
   useEffect(() => {
     const stored = localStorage.getItem("inventory");
     if (!stored) return setTableData([]);
-
+ 
     const parsed: InventoryItem[] = JSON.parse(stored).map(
       (item: InventoryItem) => ({
         ...item,
         stockQty: Number(item.stockQty),
       })
     );
-
     setTableData(parsed);
   }, []);
-
+ 
   // DELETE
   const handleDelete = (item: InventoryItem) => {
     showConfirmation("Delete item?", "Confirm").then((ok) => {
       if (!ok) return;
-
+ 
       const updated = tableData.filter(
         (i) => i.itemId !== item.itemId
       );
-
+ 
       setTableData(updated);
       localStorage.setItem("inventory", JSON.stringify(updated));
 
@@ -641,15 +640,15 @@ const InventoryList = () => {
       showSnackbar("success", "Item deleted successfully");
     });
   };
-
+ 
   // SAVE EDIT
   const handleSaveEdit = () => {
     if (!editItem) return;
-
+ 
     const updated = tableData.map((item) =>
       item.itemId === editItem.itemId ? editItem : item
     );
-
+ 
     setTableData(updated);
     localStorage.setItem("inventory", JSON.stringify(updated));
 
@@ -665,13 +664,13 @@ const InventoryList = () => {
     if (qty <= 10) return "Low Stock";
     return "In Stock";
   };
-
+ 
   const getStatusColor = (qty: number) => {
     if (qty === 0) return "error.main";
     if (qty <= 10) return "warning.main";
     return "success.main";
   };
-
+ 
   const columns: Column<InventoryItem>[] = [
     { key: "itemName", label: "Item" },
     { key: "medicineGroup", label: "Group" },
@@ -694,14 +693,13 @@ const InventoryList = () => {
     },
     { key: ACTION_KEY, label: "Action" },
   ];
-
+ 
   return (
     <>
       <Box sx={{ boxShadow: 3, p: 3, borderRadius: 2 }}>
         <Typography fontSize={20} fontWeight={600} mb={2}>
           Inventory List
         </Typography>
-
         <UniversalTable
           data={tableData}
           columns={columns}
@@ -713,7 +711,6 @@ const InventoryList = () => {
           }}
         />
       </Box>
-
       {/* VIEW */}
       <Dialog open={!!viewItem} onClose={() => setViewItem(null)}>
         <DialogTitle>View Item</DialogTitle>
@@ -726,11 +723,10 @@ const InventoryList = () => {
           )}
         </DialogContent>
       </Dialog>
-
       {/* EDIT */}
       <Dialog open={!!editItem} onClose={() => setEditItem(null)}>
         <DialogTitle>Edit Item</DialogTitle>
-
+ 
         <DialogContent>
           {editItem && (
             <Box display="flex" flexDirection="column" gap={2}>
@@ -759,7 +755,7 @@ const InventoryList = () => {
             </Box>
           )}
         </DialogContent>
-
+ 
         <DialogActions>
           <Button onClick={() => setEditItem(null)}>Cancel</Button>
           <Button onClick={handleSaveEdit}>Save</Button>
@@ -768,7 +764,6 @@ const InventoryList = () => {
     </>
   );
 };
-
+ 
 export default InventoryList;
  
-

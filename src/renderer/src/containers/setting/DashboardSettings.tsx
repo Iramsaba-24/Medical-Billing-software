@@ -1,5 +1,3 @@
-
-
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -28,14 +26,14 @@ type MedicineOption = {
   value: string;
 };
  
-
+ 
 const getMedicineOptions = (): MedicineOption[] => {
   try {
     const stored = localStorage.getItem("inventory");
     if (!stored) return [];
-
+ 
     const parsed: InventoryItem[] = JSON.parse(stored);
-
+ 
     return parsed.map((item) => ({
       label: item.itemName,
       value: item.itemName,
@@ -46,7 +44,7 @@ const getMedicineOptions = (): MedicineOption[] => {
   }
 };
  
-
+ 
 const kpiOptions = [
   { label: "Total Revenue", value: "totalRevenue" },
   { label: "Inventory Status", value: "inventoryStatus" },
@@ -76,7 +74,7 @@ const cardStyle = {
   boxShadow: 3,
   mb: 1,
 };
-
+ 
   const checkboxStyle = {
   "& .MuiCheckbox-root": {
     color: "default.main",
@@ -85,7 +83,7 @@ const cardStyle = {
     },
   },
 };
-
+ 
  
  
 const defaultValues: DashboardSettingsForm = {
@@ -112,7 +110,7 @@ const DashboardSettings = () => {
  
   const savedSettings = localStorage.getItem("dashboardSettings");
  
-
+ 
   const methods = useForm<DashboardSettingsForm>({
   defaultValues: (() => {
     try {
@@ -145,29 +143,29 @@ const DashboardSettings = () => {
  
   const onSubmit = (data: DashboardSettingsForm) => {
     console.log("Submitted", data);
-
-    
+ 
+   
  
     //  existing save
    
 localStorage.setItem("dashboardSettings", JSON.stringify(data));
-
+ 
  console.log(
     "Saved Data:",
     JSON.parse(localStorage.getItem("dashboardSettings") || "{}")
   );
-
-
+ 
+ 
     //  correct (same as first code)
 //localStorage.setItem("dashboardSettings", JSON.stringify(data.visibleKpis));
  
     // IMPORTANT: Top Selling Medicine separate save
     localStorage.setItem("topSellingMedicine", data.topSellingMedicine);
  
-
-      // ADD THIS LINE 
+ 
+      // ADD THIS LINE
 localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
-
+ 
     showToast("success", "Settings updated successfully");
   };
  
@@ -204,8 +202,8 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
               label=""
               options={kpiOptions}
               sx={checkboxStyle}
-
-                
+ 
+               
             />
           </Paper>
  
@@ -310,8 +308,9 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
 };
  
 export default DashboardSettings;
-
-
-
-
+ 
+ 
+ 
+ 
+ 
  

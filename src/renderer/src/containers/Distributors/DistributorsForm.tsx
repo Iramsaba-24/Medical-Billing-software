@@ -146,8 +146,8 @@ const DistributorsForm = () => {
               name="date" 
               label="Date"
               viewMode="date"
-              disabled
               useCurrentDate={true}
+              disabled
               dateRestriction="current-future-only"
               required
              //dateRestriction="past-current-future"
