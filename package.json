@@ -54,6 +54,7 @@
     "@mui/x-date-pickers": "^8.26.0",
     "@tabler/icons-react": "^3.36.0",
     "@tailwindcss/vite": "^4.1.18",
+    "axios": "^1.13.6",
     "dayjs": "^1.11.19",
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",

@@ -152,7 +152,7 @@ const Cards: React.FC = () => {
  
             <Box display="flex" justifyContent="space-between">
               <Box>
-                <Typography fontSize={24} fontWeight={800}>
+                <Typography  fontWeight={700} fontSize={{ xs: 18, sm: 22, md:24}} mb={2}>
                   {card.title === "Inventory"
                     ? totalMedicines()
                     : getSelectedTopMedicine()}
@@ -164,7 +164,7 @@ const Cards: React.FC = () => {
  
               {card.title === "Inventory" && (
                 <Box>
-                  <Typography fontSize={24} fontWeight={700}>
+                  <Typography  fontWeight={700} fontSize={{ xs: 18, sm: 22, md:24}} mb={2}>
                     {totalMedicineGroups()}
                   </Typography>
                   <Typography fontSize={12} color="text.secondary">

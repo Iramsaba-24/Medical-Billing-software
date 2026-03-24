@@ -1,116 +1,148 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
- 
-type FilterType = "Today" | "6 Days" | "This Month";
+import { Box, Typography, Card, Divider } from "@mui/material";
  
 interface SalesData {
   totalPrice: number;
   date: string;
 }
  
-interface PurchaseData {
-  totalPrice: number;
-  date: string;
-}
+const LineGraph: React.FC = () => {
  
-const LineGraph: React.FC<{ filter: FilterType }> = ({ filter }) => {
+  const parseDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) return d;
  
-  const getFilteredSalesData = (): SalesData[] => {
-    const stored = localStorage.getItem("currentInvoice");
-    if (!stored) return [];
+    // handle dd/mm/yyyy (your case)
+    const [day, month, year] = dateStr.split("/");
+    return new Date(`${year}-${month}-${day}`);
+  };
  
-    const sales: SalesData[] = JSON.parse(stored);
+  const isToday = (dateStr: string) => {
     const today = new Date();
+    const d = parseDate(dateStr);
  
-    return sales.filter((sale) => {
-      const date = new Date(sale.date);
- 
-      switch (filter) {
-        case "Today":
-          return date.toDateString() === today.toDateString();
- 
-        case "6 Days": {
-          const sixDaysAgo = new Date();
-          sixDaysAgo.setDate(today.getDate() - 6);
-          return date >= sixDaysAgo && date <= today;
-        }
- 
-        case "This Month":
-          return (
-            date.getMonth() === today.getMonth() &&
-            date.getFullYear() === today.getFullYear()
-          );
- 
-        default:
-          return true;
-      }
-    });
+    return d.toDateString() === today.toDateString();
   };
  
   const getData = () => {
-    const sales = getFilteredSalesData();
+    const storedRetail = localStorage.getItem("currentInvoice");
+    const storedDistributor = localStorage.getItem("currentNewInvoiceList");
  
-    const totalSales = sales.reduce((sum, s) => sum + s.totalPrice, 0);
+    let retailSales: SalesData[] = [];
+    let distributorSales: SalesData[] = [];
  
-    const storedPurchase = localStorage.getItem("purchaseData");
-    let totalPurchase = 0;
- 
-    if (storedPurchase) {
-      const purchases: PurchaseData[] = JSON.parse(storedPurchase);
-      totalPurchase = purchases.reduce((sum, p) => sum + p.totalPrice, 0);
+    if (storedRetail) {
+      retailSales = JSON.parse(storedRetail);
     }
  
-    return { totalSales, totalPurchase };
+    if (storedDistributor) {
+      distributorSales = JSON.parse(storedDistributor);
+    }
+ 
+    // Combine + filter only TODAY
+    const allSales = [...retailSales, ...distributorSales].filter((sale) =>
+      isToday(sale.date)
+    );
+ 
+    const totalSales = allSales.reduce(
+      (sum, s) => sum + (s.totalPrice || 0),
+      0
+    );
+ 
+    return {
+      totalSales,
+      totalPurchase: 0,
+    };
   };
  
   const { totalSales, totalPurchase } = getData();
  
-  // dynamic percentage
   const max = Math.max(totalSales, totalPurchase, 1);
  
   const salesPercent = (totalSales / max) * 100;
   const purchasePercent = (totalPurchase / max) * 100;
  
   return (
-    <Box display="flex" flexDirection="column" gap={4}>
+    <Card
+      sx={{
+        p: 3,
+        borderRadius: 3,
+        border: "1px solid #E5E7EB",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        backgroundColor: "#fff",
+      }}
+    >
+      <Typography  fontWeight={600} fontSize={{ xs: 14, sm: 18 }} mb={2}>
+        Daily Report
+      </Typography>
+
+      <Divider sx={{ mb: 4, borderColor: "#9CA3AF" }} />
  
-      {/* Sales */}
-      <Box>
-        <Typography fontWeight={700}>₹ {totalSales.toFixed(2)}</Typography>
-        <Typography fontSize={12}>Sales</Typography>
+      <Box display="flex" flexDirection="column" gap={6}>
  
-        <Box sx={{ mt: 1, height: 10, borderRadius: 5, background: "#E5E7EB" }}>
+        {/* Sales */}
+        <Box>
+          <Typography fontWeight={700} fontSize={18}>
+            ₹ {totalSales.toFixed(2)}
+          </Typography>
+ 
+          <Typography fontSize={15} mt={1}>
+            Today&apos;s Sale
+          </Typography>
+ 
           <Box
             sx={{
-              width: `${salesPercent}%`,
-              height: "100%",
-              borderRadius: 5,
-              background: "#238878",
+              mt: 3,
+              height: 18,
+              borderRadius: 999,
+              background: "#D1D5DB",
+              overflow: "hidden",
             }}
-          />
+          >
+            <Box
+              sx={{
+                width: `${salesPercent}%`,
+                height: "100%",
+                borderRadius: 999,
+                background: "#238878",
+              }}
+            />
+          </Box>
         </Box>
-      </Box>
  
-      {/* Purchase */}
-      <Box>
-        <Typography fontWeight={700}>₹ {totalPurchase.toFixed(2)}</Typography>
-        <Typography fontSize={12}>Purchase</Typography>
+        {/* Purchase UI */}
+        <Box>
+          <Typography fontWeight={700} fontSize={18}>
+            ₹ {totalPurchase.toFixed(2)}
+          </Typography>
  
-        <Box sx={{ mt: 1, height: 10, borderRadius: 5, background: "#E5E7EB" }}>
+          <Typography fontSize={15} mt={1}>
+            Today&apos;s Purchase
+          </Typography>
+ 
           <Box
             sx={{
-              width: `${purchasePercent}%`,
-              height: "100%",
-              borderRadius: 5,
-              background: "#238878",
+              mt: 3,
+              height: 18,
+              borderRadius: 999,
+              background: "#D1D5DB",
+              overflow: "hidden",
             }}
-          />
+          >
+            <Box
+              sx={{
+                width: `${purchasePercent}%`,
+                height: "100%",
+                borderRadius: 999,
+                background: "#238878",
+              }}
+            />
+          </Box>
         </Box>
-      </Box>
  
-    </Box>
+      </Box>
+    </Card>
   );
 };
  
 export default LineGraph;
- 

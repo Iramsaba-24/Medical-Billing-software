@@ -387,7 +387,7 @@
  import { useForm, FormProvider } from "react-hook-form";
 import { Typography, Box, Button, Paper } from "@mui/material";
 import PaymentTerms from "./PaymentTerm";
-import PurchaseGSTConfiguration from "./PurchaseGstConfiguration";
+// import PurchaseGSTConfiguration from "./PurchaseGstConfiguration";
 import { useEffect } from "react";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
@@ -463,7 +463,7 @@ defaultValues: DEFAULT_VALUES,
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <PaymentTerms />
-          <PurchaseGSTConfiguration />
+          {/* <PurchaseGSTConfiguration /> */}
           {/*  Bank Details Storage */}
           <Paper sx={{ p: 2, borderRadius: "10px", boxShadow: 4, mb: 1 }}>
             <Typography

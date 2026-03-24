@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
         }}
       >
         <Cards />
-        {showLine && <LineGraph filter="This Month" />}
+        {showLine && <LineGraph />}
       </Box>
  
       {/* Table */}
