@@ -23,7 +23,7 @@ export interface Invoice {
     expiry: string;
   }[];
   subTotal?: number;
-  
+ 
   totalPrice?: number;
   total?: number;
 }
@@ -76,16 +76,16 @@ const InvoiceView = () => {
  
   const subTotal = invoice?.medicines?.reduce(
     (sum, med) => sum + Number(med.amount), 0) || 0;
-
+ 
   // const gstAmount = invoice?.gst ? (subTotal * invoice.gst) / 100 : 0;
-
+ 
   const netTotal = subTotal ;
-
+ 
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
-  
+ 
   //fetch name and address from pharmacy profile setting page
   const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
-
+ 
 useEffect(() => {
   const stored = localStorage.getItem("pharmacyProfile");
   if (stored) {
@@ -94,7 +94,7 @@ useEffect(() => {
 }, []);
 const pharmacyName = pharmacyData?.pharmacyName || "Your Pharmacy";
 const pharmacyAddress = pharmacyData?.address || "-";
-  // Mobile view card style 
+  // Mobile view card style
   if (isMobile) {
     return (
       <>
@@ -226,8 +226,8 @@ const pharmacyAddress = pharmacyData?.address || "-";
       </>
     );
   }
-
-  // Desktop view 
+ 
+  // Desktop view
   return (
     <>
       <GlobalStyles
@@ -305,8 +305,8 @@ const pharmacyAddress = pharmacyData?.address || "-";
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Sub Total</strong></TableCell>
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
-
-
+ 
+ 
               <TableRow sx={{ borderTop: "2px solid #000" }}>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   Get Well Soon..
@@ -374,3 +374,4 @@ const pharmacyAddress = pharmacyData?.address || "-";
 }
  
 export default InvoiceView
+ 

@@ -28,6 +28,7 @@ type Props = {
   setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
 };
 
+
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
 const BillingTable = ({ invoices, setInvoices }: Props) => {
@@ -165,7 +166,7 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
         </Box>
 
         <UniversalTable<Invoice>
-          data={filteredInvoices}
+         data={filteredInvoices}
           columns={columns}
           showSearch
           showExport

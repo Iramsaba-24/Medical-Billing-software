@@ -4,9 +4,8 @@ import TextInputField from "@/components/controlled/TextInputField";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useState } from "react";
 import NumericField from "@/components/controlled/NumericField";
-
+import { useState } from "react";
 const PaperStyle = {
   borderRadius: 2,
   p: { xs: 1, sm: 2 },
@@ -167,3 +166,5 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
 };
 
 export default CardPayment;
+
+

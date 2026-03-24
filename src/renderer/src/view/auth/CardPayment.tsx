@@ -243,7 +243,7 @@ const CardPayment: React.FC = () => {
                 mt={1}
               >
                 <Box width={{ xs: "100%", sm: "auto" }}>
-                  <NumericField
+                 <NumericField
                     label="CVV"
                     name="Cvv"
                     required={true}
