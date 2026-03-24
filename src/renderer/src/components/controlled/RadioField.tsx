@@ -51,7 +51,7 @@ const RadioField: FC<RadioFieldProps> = ({ label, name, options, required = fals
           required: required ? translations.radioField.requiredError(label) : undefined
         }}
         render={({ field }) => (
-          <RadioGroup {...field} {...rest} row>
+          <RadioGroup {...field} {...rest} row = {false}>
             {options.map((option) => (
               <FormControlLabel disabled={disabled} key={option.value} value={option.value} control={<Radio />} label={option.label} />
             ))}
