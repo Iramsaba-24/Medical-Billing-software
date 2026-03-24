@@ -16,7 +16,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import { PharmacyFormValues } from "@/containers/setting/PharmacyProfile";
 export interface Invoice {
   name: string;
   company: string;
@@ -87,6 +87,19 @@ const NewInvoiceBill = () => {
   const displayName = invoice?.company || invoice?.name || "-";
   const displayAddress = invoice?.address || "-";
 
+  // fettch pharmacy name and address through the pharmacy setting
+const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
+
+useEffect(() => {
+  const stored = localStorage.getItem("pharmacyProfile");
+  if (stored) {
+    setPharmacyData(JSON.parse(stored) as PharmacyFormValues);
+  }
+}, []);
+
+const pharmacyName = pharmacyData?.pharmacyName || "Your Pharmacy";
+const pharmacyAddress = pharmacyData?.address || "-";
+
   // MOBILE VIEW 
   // CGST & SGST columns hidden on mobile 
   if (isMobile) {
@@ -114,8 +127,8 @@ const NewInvoiceBill = () => {
 
           {/* Shop Info */}
           <Box sx={{ border: "1.5px solid #000", p: "8px 10px" }}>
-            <Typography fontSize={12} fontWeight={600}>MEDIPLUS MEDICAL & GENERAL</Typography>
-            <Typography fontSize={10}>Shinoli, Tal: Ambegaon, Dist: Pune</Typography>
+            <Typography fontSize={12} fontWeight={600}>{pharmacyName}</Typography>
+            <Typography fontSize={10}>{pharmacyAddress}</Typography>
           </Box>
 
           {/* Customer Info */}
@@ -211,7 +224,7 @@ const NewInvoiceBill = () => {
               sales has been paid or shall be paid.
             </Typography>
             <Box display="flex" flexDirection="column" alignItems="center" mt={1.5}>
-              <Typography fontSize={11} fontWeight={600}>For MEDIPLUS MEDICAL & GENERAL STORE</Typography>
+              <Typography fontSize={11} fontWeight={600}>For {pharmacyData?.pharmacyName || "Your Pharmacy"}</Typography>
               <Box component="img" src={Sign} alt="Store Sign" sx={{ width: 80, py: 1 }} />
               <Typography fontSize={11}>Pharmacist</Typography>
             </Box>
@@ -282,8 +295,8 @@ const NewInvoiceBill = () => {
               {/* Header */}
               <TableRow>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
-                  <Typography fontSize={20} fontWeight={600}>MEDIPLUS MEDICAL & GENERAL</Typography>
-                  <Typography>Shinoli, Tal: Ambegaon, Dist: Pune</Typography>
+                  <Typography fontSize={20} fontWeight={600}>{pharmacyData?.pharmacyName || "Your Pharmacy"}</Typography>
+                  <Typography>{pharmacyData?.address || "Your Address"}</Typography>
                 </TableCell>
 
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
@@ -387,7 +400,7 @@ const NewInvoiceBill = () => {
                 </TableCell>
                 <TableCell colSpan={3} align="center" sx={{ border: "2px solid #000" }}>
                   <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                    <strong>For MEDIPLUS MEDICAL & GENERAL STORE</strong>
+                    <strong>For {pharmacyData?.pharmacyName || "Your Pharmacy"}</strong>
                     <Box
                       component="img"
                       src={Sign}

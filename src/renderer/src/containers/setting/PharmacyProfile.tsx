@@ -16,7 +16,7 @@ import EmailField from "@/components/controlled/EmailField";
 import LogoImage from "@/assets/icons.svg"; //  default logo image
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 
-type PharmacyFormValues = {
+export type PharmacyFormValues = {
   pharmacyName: string;
   address: string;
   drugLicense: string;
