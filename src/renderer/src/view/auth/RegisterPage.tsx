@@ -176,7 +176,7 @@ const RegisterPage = () => {
               label="Full Name"
               placeholder="Full Name"
               minLength={3}
-              maxLength={20}
+              maxLength={30}
               inputType="all"
               rows={1}
               sx={inputStyle("fullName")}
