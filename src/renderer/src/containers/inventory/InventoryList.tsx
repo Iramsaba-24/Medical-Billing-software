@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 // import {Box,Button,Typography,Dialog,DialogTitle,DialogContent,DialogActions,TextField,
 // } from "@mui/material";
 // import { ACTION_KEY, Column, UniversalTable,} from "@/components/uncontrolled/UniversalTable";
@@ -574,7 +572,6 @@
 // export default InventoryList;
  
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
  import {
   Box,
   Button,
@@ -622,11 +619,6 @@ const InventoryList = () => {
         stockQty: Number(item.stockQty),
       })
     );
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
     setTableData(parsed);
   }, []);
  
@@ -641,17 +633,10 @@ const InventoryList = () => {
  
       setTableData(updated);
       localStorage.setItem("inventory", JSON.stringify(updated));
-<<<<<<< HEAD
- 
-      //  notify Alerts
-      window.dispatchEvent(new Event("inventoryUpdated"));
- 
-=======
 
       //  IMPORTANT: notify Alerts
       window.dispatchEvent(new Event("inventoryUpdated"));
 
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
       showSnackbar("success", "Item deleted successfully");
     });
   };
@@ -666,16 +651,6 @@ const InventoryList = () => {
  
     setTableData(updated);
     localStorage.setItem("inventory", JSON.stringify(updated));
-<<<<<<< HEAD
- 
-    // notify Alerts
-    window.dispatchEvent(new Event("inventoryUpdated"));
- 
-    showSnackbar("success", "Item updated successfully");
-    setEditItem(null);
-  };
- 
-=======
 
     //  IMPORTANT: notify Alerts
     window.dispatchEvent(new Event("inventoryUpdated"));
@@ -684,7 +659,6 @@ const InventoryList = () => {
     setEditItem(null);
   };
 
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
   const getStatus = (qty: number) => {
     if (qty === 0) return "Out of Stock";
     if (qty <= 10) return "Low Stock";
@@ -726,11 +700,6 @@ const InventoryList = () => {
         <Typography fontSize={20} fontWeight={600} mb={2}>
           Inventory List
         </Typography>
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
         <UniversalTable
           data={tableData}
           columns={columns}
@@ -742,11 +711,6 @@ const InventoryList = () => {
           }}
         />
       </Box>
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
       {/* VIEW */}
       <Dialog open={!!viewItem} onClose={() => setViewItem(null)}>
         <DialogTitle>View Item</DialogTitle>
@@ -759,11 +723,6 @@ const InventoryList = () => {
           )}
         </DialogContent>
       </Dialog>
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
       {/* EDIT */}
       <Dialog open={!!editItem} onClose={() => setEditItem(null)}>
         <DialogTitle>Edit Item</DialogTitle>
@@ -771,20 +730,6 @@ const InventoryList = () => {
         <DialogContent>
           {editItem && (
             <Box display="flex" flexDirection="column" gap={2}>
-<<<<<<< HEAD
-              <TextField
-                label="Item Name"
-                value={editItem.itemName}
-                onChange={(e) =>
-                  setEditItem({
-                    ...editItem,
-                    itemName: e.target.value,
-                  })
-                }
-              />
- 
-              <TextField
-=======
               <TextField
                 label="Item Name"
                 value={editItem.itemName}
@@ -797,7 +742,6 @@ const InventoryList = () => {
               />
 
               <TextField
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
                 label="Stock"
                 type="number"
                 value={editItem.stockQty}
@@ -823,10 +767,3 @@ const InventoryList = () => {
  
 export default InventoryList;
  
-<<<<<<< HEAD
- 
- 
- 
-=======
-
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7

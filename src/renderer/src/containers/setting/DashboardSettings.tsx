@@ -1,5 +1,3 @@
-
-
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -28,14 +26,14 @@ type MedicineOption = {
   value: string;
 };
  
-
+ 
 const getMedicineOptions = (): MedicineOption[] => {
   try {
     const stored = localStorage.getItem("inventory");
     if (!stored) return [];
-
+ 
     const parsed: InventoryItem[] = JSON.parse(stored);
-
+ 
     return parsed.map((item) => ({
       label: item.itemName,
       value: item.itemName,
@@ -46,36 +44,7 @@ const getMedicineOptions = (): MedicineOption[] => {
   }
 };
  
-
-type InventoryItem = {
-  itemName: string;
-};
-
-type MedicineOption = {
-  label: string;
-  value: string;
-};
-
-// medicines from localStorage
-const getMedicineOptions = (): MedicineOption[] => {
-  const stored = localStorage.getItem("inventory");
-
-  if (!stored) return [];
-
-  const parsed: InventoryItem[] = JSON.parse(stored);
-
-  const result: MedicineOption[] = [];
-
-  for (const item of parsed) {
-    result.push({
-      label: item.itemName,
-      value: item.itemName,
-    });
-  }
-
-  return result;
-};
-
+ 
 const kpiOptions = [
   { label: "Total Revenue", value: "totalRevenue" },
   { label: "Inventory Status", value: "inventoryStatus" },
@@ -98,20 +67,14 @@ const chartPreferences = [
   { label: "Line Chart", value: "line" },
   { label: "Donut Chart", value: "donut" },
 ];
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
 const cardStyle = {
   p: { xs: 2, md: 4 },
   borderRadius: "5px",
   boxShadow: 3,
   mb: 1,
 };
-
-<<<<<<< HEAD
-=======
+ 
   const checkboxStyle = {
   "& .MuiCheckbox-root": {
     color: "default.main",
@@ -120,10 +83,9 @@ const cardStyle = {
     },
   },
 };
-
  
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
+ 
 const defaultValues: DashboardSettingsForm = {
   visibleKpis: [
     "totalRevenue",
@@ -135,11 +97,7 @@ const defaultValues: DashboardSettingsForm = {
   quantityThreshold: null,
   expiryAlerts: ["30"],
   showExpiryOnDashboard: false,
-<<<<<<< HEAD
-  topSellingMedicine: "Paracetamol 500mg",
-=======
   topSellingMedicine: "",
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
   chartPreferences: ["bar"],
   autoRefresh: false,
   autoRefreshInterval: "",
@@ -149,14 +107,10 @@ const DashboardSettings = () => {
   const [medicineDropdownOptions, setMedicineDropdownOptions] = useState<
     MedicineOption[]
   >([]);
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
   const savedSettings = localStorage.getItem("dashboardSettings");
  
-
+ 
   const methods = useForm<DashboardSettingsForm>({
   defaultValues: (() => {
     try {
@@ -170,75 +124,49 @@ const DashboardSettings = () => {
 });
  
   const { handleSubmit, reset } = methods;
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
   // auto update medicines
   useEffect(() => {
     const loadMedicines = () => {
       const data = getMedicineOptions();
       setMedicineDropdownOptions(data);
     };
-<<<<<<< HEAD
-
-    loadMedicines();
-
-    window.addEventListener("inventoryUpdated", loadMedicines);
-
-=======
  
     loadMedicines();
  
     window.addEventListener("inventoryUpdated", loadMedicines);
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
     return () => {
       window.removeEventListener("inventoryUpdated", loadMedicines);
     };
   }, []);
-<<<<<<< HEAD
-
-  const onSubmit = (data: DashboardSettingsForm) => {
-    console.log("Submitted", data);
-
-    // ✅ existing save
-    localStorage.setItem("dashboardSettings", JSON.stringify(data));
-
-    // ✅ IMPORTANT: Top Selling Medicine separate save
-    localStorage.setItem("topSellingMedicine", data.topSellingMedicine);
-
-    showToast("success", "Saved");
-=======
  
   const onSubmit = (data: DashboardSettingsForm) => {
     console.log("Submitted", data);
-
-    
+ 
+   
  
     //  existing save
    
 localStorage.setItem("dashboardSettings", JSON.stringify(data));
-
+ 
  console.log(
     "Saved Data:",
     JSON.parse(localStorage.getItem("dashboardSettings") || "{}")
   );
-
-
+ 
+ 
     //  correct (same as first code)
 //localStorage.setItem("dashboardSettings", JSON.stringify(data.visibleKpis));
  
     // IMPORTANT: Top Selling Medicine separate save
     localStorage.setItem("topSellingMedicine", data.topSellingMedicine);
  
-
-      // ADD THIS LINE 
+ 
+      // ADD THIS LINE
 localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
-
+ 
     showToast("success", "Settings updated successfully");
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
   };
  
   return (
@@ -274,8 +202,8 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
               label=""
               options={kpiOptions}
               sx={checkboxStyle}
-
-                
+ 
+               
             />
           </Paper>
  
@@ -337,12 +265,8 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
               onClick={() => {
                 reset(defaultValues);
                 localStorage.removeItem("dashboardSettings");
-<<<<<<< HEAD
-                
-=======
  
                 //  optional cleanup
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
                 localStorage.removeItem("topSellingMedicine");
               }}
               sx={{
@@ -384,8 +308,9 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
 };
  
 export default DashboardSettings;
-
-
-
-
+ 
+ 
+ 
+ 
+ 
  

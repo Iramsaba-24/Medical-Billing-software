@@ -1,14 +1,8 @@
-
-
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Paper, Typography, Stack } from "@mui/material";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
 // Define Form Types for Type Safety
 export interface InventoryFormValues {
   groupExpiry: string[];
@@ -20,12 +14,8 @@ export interface InventoryFormValues {
   returnsUpdate: string[];
   alertsVisibility: string[];
 }
-
 const InventorySettings = () => {
-<<<<<<< HEAD
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
   const savedData = (() => {
     try {
       const data = localStorage.getItem("inventorySettings");
@@ -34,21 +24,6 @@ const InventorySettings = () => {
       return null;
     }
   })();
-<<<<<<< HEAD
-
-  const methods = useForm<InventoryFormValues>({
-    defaultValues:
-      savedData ?? {
-        groupExpiry: [],
-        pricing: [],
-        lowStockThreshold: "",
-        autoReorderQty: "",
-        outOfStock: "",
-        barcodeStorage: [],
-        returnsUpdate: [],
-        alertsVisibility: [],
-      },
-=======
  
   const methods = useForm<InventoryFormValues>({
     defaultValues: savedData ?? {
@@ -61,7 +36,6 @@ const InventorySettings = () => {
       returnsUpdate: [],
       alertsVisibility: [],
     },
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
   });
  
   const headingStyle = {
@@ -70,28 +44,6 @@ const InventorySettings = () => {
     color: "#212529",
     mb: 1,
   };
-<<<<<<< HEAD
-
-  const checkboxStyle = {
-    "& .MuiCheckbox-root": {
-      color: "default.main",
-      "&.Mui-checked": {
-        color: "#238878",
-      },
-    },
-  };
-
-  // Save Function
-  const { handleSubmit, reset } = methods;
-
-  const onSubmit = (data: InventoryFormValues) => {
-    showToast("success", "Saved Successfully");
-    console.log("Inventory Settings Saved ");
-    console.log(data);
-
-    localStorage.setItem("inventorySettings", JSON.stringify(data));
-
-=======
  
   // Save Function
   const { handleSubmit, reset } = methods;
@@ -103,39 +55,26 @@ const InventorySettings = () => {
  
     localStorage.setItem("inventorySettings", JSON.stringify(data));
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
     // increment counter if checkbox selected
     if (data.returnsUpdate.includes("autoUpdate")) {
       const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
       localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
     }
     localStorage.setItem("inventorySettings", JSON.stringify(data));
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
     // Returns counter
     if (data.returnsUpdate.includes("autoUpdate")) {
       const prevCount = Number(localStorage.getItem("returnsUpdateCount")) || 0;
       localStorage.setItem("returnsUpdateCount", String(prevCount + 1));
     }
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
     // Low Stock Alert counter
     if (data.alertsVisibility.includes("alert1")) {
       const prevLowStock =
         Number(localStorage.getItem("lowStockAlertCount")) || 0;
       localStorage.setItem("lowStockAlertCount", String(prevLowStock + 1));
     }
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
     // Reorder Alert counter
     if (data.alertsVisibility.includes("alert2")) {
       const prevReorder =
@@ -162,24 +101,16 @@ const InventorySettings = () => {
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2.5}>
-<<<<<<< HEAD
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
             {/* Alerts & Visibility */}
             <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
               <Typography variant="subtitle1" sx={headingStyle}>
                 Alerts & Visibility
               </Typography>
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
               <CheckboxGroup
                 name="alertsVisibility"
                 label=""
-                sx={{ ...checkboxStyle }}
                 options={[
                   {
                     label: "Show low-stock alerts on dashboard",
@@ -192,11 +123,7 @@ const InventorySettings = () => {
                 ]}
               />
             </Paper>
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
             {/* Buttons */}
             <Box
               sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}
@@ -229,11 +156,7 @@ const InventorySettings = () => {
               >
                 Reset
               </Button>
-<<<<<<< HEAD
-
-=======
  
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7
               <Button
                 type="submit"
                 variant="contained"
@@ -259,18 +182,5 @@ const InventorySettings = () => {
     </Box>
   );
 };
-<<<<<<< HEAD
-
-export default InventorySettings;
-=======
  
 export default InventorySettings;
- 
-
-
-
- 
- 
-
-
->>>>>>> f2290076155e32a9119946d21bb63fb0434f41a7

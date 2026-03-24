@@ -1,3 +1,6 @@
+
+
+ 
 import React from 'react';
 import {
   Box,
@@ -89,19 +92,23 @@ const getVisibleKpis = (): string[] => {
     "medicinesShortage",
   ];
  
-  if (!data) {
+  const data = localStorage.getItem("dashboardSettings");
+ 
+  if (!data) return defaultKpis;
+ 
+  try {
+    const parsed = JSON.parse(data);
+ 
+    //  handle BOTH formats
+    if (Array.isArray(parsed)) return parsed;
+ 
+    return parsed.visibleKpis || defaultKpis;
+ 
+  } catch {
     return defaultKpis;
   }
- 
-  const parsed = JSON.parse(data);
- 
-  if (!parsed || parsed.length === 0) {
-    return defaultKpis;
-  }
- 
-  return parsed;
 };
-
+ 
 const visibleKpis = getVisibleKpis();
  
   return (

@@ -45,7 +45,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    const value = input.value.replace(/[^0-9]/g, "");
+    let value = input.value.replace(/[^0-9]/g, "");
+
+    if (value !== "" && Number(value) > 100) {
+      value = value.slice(0, -1);
+    }
+
     input.value = value;
   };
 
@@ -169,8 +174,23 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   label="Customer Name"
                   inputType="alphabet"
                   minLength={3}
-                  required
                   maxLength={20}
+                  required
+                  rules={{
+                    pattern: {
+                      value: /^[A-Za-z ]+$/,
+                      message: "Only alphabets are allowed",
+                    },
+                  }}
+                  inputProps={{
+                    maxLength: 20,
+                    onInput: (e: React.FormEvent<HTMLInputElement>) => {
+                      e.currentTarget.value = e.currentTarget.value.replace(
+                        /[^A-Za-z ]/g,
+                        ""
+                      );
+                    },
+                  }}
                 />
 
                 <DateTimeField name="date" label="Date" disabled required />
@@ -187,7 +207,8 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                       message: "Only numbers allowed",
                     },
                     validate: (value) =>
-                      Number(value) >= 15 || "Age should be 15 or above",
+                      (Number(value) >= 15 && Number(value) <= 100) ||
+                      "Age should be between 15 and 100",
                   }}
                   inputProps={{
                     inputMode: "numeric",
@@ -199,24 +220,43 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="mobile"
                   label="Mobile"
                   countryCode
-                  preventDuplicate
+                  preventDuplicate={!initialData}
                   required
                 />
                 <EmailField
                   name="email"
                   label="Email"
                   required
-                  preventDuplicate
+                  preventDuplicate={!initialData}
                 />
 
                 <TextInputField
                   name="address"
                   label="Address"
                   inputType="textarea"
-                  minLength={10}
+                  minLength={5}
                   maxLength={50}
                   rows={1}
                   required
+                  rules={{
+                    pattern: {
+                      value: /^[A-Za-z0-9\s,./-]+$/,
+                      message:
+                        "Only alphabets, numbers and , . / - are allowed",
+                    },
+                  }}
+                  inputProps={{
+                    maxLength: 50,
+                    onInput: (
+                      e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
+                    ) => {
+                      e.currentTarget.value = e.currentTarget.value.replace(
+                        /[^A-Za-z0-9\s,./-]/g,
+                        ""
+                      );
+                      methods.trigger("address");
+                    },
+                  }}
                 />
               </Box>
             </Box>
@@ -240,8 +280,29 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="doctorAddress"
                   label="Doctor Address/Clinic"
                   inputType="textarea"
+                  minLength={5}
+                  maxLength={50}
                   rows={1}
                   required
+                  rules={{
+                    pattern: {
+                      value: /^[A-Za-z0-9\s,./-]+$/,
+                      message:
+                        "Only alphabets, numbers and , . / - are allowed",
+                    },
+                  }}
+                  inputProps={{
+                    maxLength: 50,
+                    onInput: (
+                      e: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
+                    ) => {
+                      e.currentTarget.value = e.currentTarget.value.replace(
+                        /[^A-Za-z0-9\s,./-]/g,
+                        ""
+                      );
+                      methods.trigger("doctorAddress");
+                    },
+                  }}
                 />
               </Box>
             </Box>
