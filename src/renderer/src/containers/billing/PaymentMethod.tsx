@@ -94,73 +94,124 @@ const PaymentMethod = () => {
   }, [location.state, setValue]); 
 
 
-  const saveInvoice = () => {
-    const storedRetail = localStorage.getItem("currentRetailInvoice");
-    const storedNew = localStorage.getItem("currentNewInvoice");
+ const saveInvoice = () => {
+  const storedRetail = localStorage.getItem("currentRetailInvoice");
+  const storedNew = localStorage.getItem("currentNewInvoice");
 
-    // Retail Flow
-    if (storedRetail) {
-      const existingInvoices = JSON.parse(
-        localStorage.getItem("currentInvoice") || "[]"
-      );
-      const retail = JSON.parse(storedRetail);
-
-      const newInvoice = {
-        invoice: retail.invoice,
-        name: retail.name,
-        doctor: retail.doctor,
-        address: retail.address,
-        doctorAddress: retail.doctorAddress,
-        date: new Date().toLocaleDateString("en-GB"),
-        price: retail.totalPrice,
-        status: "Paid",
-        medicines: retail.medicines,
-        gst: retail.gst,
-        type: "retail",
-        gstAmount: retail.gstAmount,
-        subTotal: retail.subTotal,
-        totalPrice: retail.totalPrice,
-      };
-
-      const updated = [newInvoice, ...existingInvoices];
-      localStorage.setItem("currentInvoice", JSON.stringify(updated));
-      localStorage.removeItem("currentRetailInvoice");
-      navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
-        state: { invoice: newInvoice },
-      });
-      return;
+  function getTimeFormat(): string {
+  try {
+    const saved = localStorage.getItem("generalSettings");
+    if (saved) {
+      const settings = JSON.parse(saved);
+      const timeZone = settings.timeZone || "India (IST)";
+      const twelveHourZones = ["US (EST)", "US (PST)", "Australia (AEST)"];
+      if (twelveHourZones.includes(timeZone)) {
+        return "12";  // 12-hour
+      }
+      return "24";  // 24-hour
     }
+  } catch {
+    // ignore
+  }
+  return "24";
+}
 
-    // New Invoice Flow
-    if (storedNew) {
-      const existingInvoices = JSON.parse(
-        localStorage.getItem("currentNewInvoiceList") || "[]"
-      );
-      const invoices = JSON.parse(storedNew);
-      const lastInvoice = invoices[invoices.length - 1];
+function getFormattedTime(): string {
+  const now = new Date();
+  const format = getTimeFormat();
+  
+  if (format === "12") {
+    // 12-hour format — hh:mm:ss AM/PM
+    return now.toLocaleTimeString("en-US", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit",
+      hour12: true 
+    });
+  } else {
+    // 24-hour format — HH:mm:ss
+    return now.toLocaleTimeString("en-GB", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit",
+      hour12: false 
+    });
+  }
+}
 
-      const summaryInvoice = {
-        invoice: lastInvoice.id?.toString() || Date.now().toString(),
-        name: lastInvoice.company,
-        date: new Date().toLocaleDateString(),
-        price: lastInvoice.totalPrice,
-        status: "Paid",
-        type: "distributor",
-        medicines: lastInvoice.medicines || [],
-        totalPrice: lastInvoice.totalPrice,
-      };
+  // Retail Flow
+  if (storedRetail) {
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentInvoice") || "[]"
+    );
+    const retail = JSON.parse(storedRetail);
 
-      const updated = [summaryInvoice, ...existingInvoices];
-      localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
-      localStorage.setItem("currentInvoiceBill", JSON.stringify(lastInvoice));
-      localStorage.removeItem("currentNewInvoice");
+    const newInvoice = {
+      invoice: retail.invoice,
+      name: retail.name,
+      doctor: retail.doctor,
+      address: retail.address,
+      doctorAddress: retail.doctorAddress,
+      date: new Date().toLocaleDateString("en-GB"),
+        time: getFormattedTime(),
+      price: retail.totalPrice,
+      status: "Paid",
+      medicines: retail.medicines,
+      gst: retail.gst,
+      type: "retail",
+      gstAmount: retail.gstAmount,
+      subTotal: retail.subTotal,
+      totalPrice: retail.totalPrice,
+    };
 
-      navigate(URL_PATH.NewInvoiceBill, {
-        state: { invoice: lastInvoice },
-      });
-    }
-    console.log("Saved Invoices → ", localStorage.getItem("currentInvoice"));
-  };
+    const updated = [newInvoice, ...existingInvoices];
+    localStorage.setItem("currentInvoice", JSON.stringify(updated));
+    localStorage.removeItem("currentRetailInvoice");
+    navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
+      state: { invoice: newInvoice },
+    });
+    return;
+  }
+
+  // New Invoice Flow
+  if (storedNew) {
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentNewInvoiceList") || "[]"
+    );
+    const invoices = JSON.parse(storedNew);
+    const lastInvoice = invoices[invoices.length - 1];
+
+    const invoiceNumber = `INV-${lastInvoice.id || Date.now()}`;
+
+    const summaryInvoice = {
+      invoice: invoiceNumber,
+      name: lastInvoice.company,
+      date: new Date().toLocaleDateString(),
+        time: getFormattedTime(),
+      price: lastInvoice.totalPrice,
+      status: "Paid",
+      type: "distributor",
+      medicines: lastInvoice.medicines || [],
+      totalPrice: lastInvoice.totalPrice,
+    };
+
+    const billInvoice = {
+      ...lastInvoice,
+      invoice: invoiceNumber,
+      date: new Date().toLocaleDateString(),
+    };
+
+    const updated = [summaryInvoice, ...existingInvoices];
+    localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
+    localStorage.removeItem("currentNewInvoice");
+
+    navigate(URL_PATH.NewInvoiceBill, {
+      state: { invoice: billInvoice },
+    });
+  }
+};
+   
+  
 
   return (
     <FormProvider {...methods}>

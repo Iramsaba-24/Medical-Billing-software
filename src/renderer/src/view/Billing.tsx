@@ -121,6 +121,7 @@ function RetailInvoice() {
         qty: r.qty,
         price: r.price,
         amount: Number(r.qty || 0) * Number(r.price || 0),
+         expiry: r.expiry || "",
       })),
       subTotal: subTotal,
       
@@ -142,6 +143,7 @@ function RetailInvoice() {
     name: string;
     qty: number | "";
     price: number | "";
+      expiry?: string;
   };
   type InvoiceData = {
     form: RetailInvoiceFormValues;
@@ -159,7 +161,7 @@ function RetailInvoice() {
   };
 
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "" },
+    { id: Date.now(), name: "", qty: 1, price: "", expiry: ""  },
   ]);
 
  
@@ -364,7 +366,7 @@ function RetailInvoice() {
                     </Box>
 
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <NumericField name="age" label="Age" maxlength={3} />
+                      <NumericField name="age" label="Age" min={15} max={100} />
                     </Box>
                   </Box>
 

@@ -11,6 +11,7 @@ type GeneralSettingsFormValues = {
   language: string;
   dateFormat: string;
   timeZone: string;
+  
   financialYear: string;
   currency: string;
   autoSave: boolean;
@@ -24,6 +25,7 @@ function GenralSettings() {
     defaultValues: {
       language: "English",
       dateFormat: "DD/MM/YYYY",
+       
       timeZone: "India (IST)",
       financialYear: "2023-24",
       currency: "INR",
@@ -33,6 +35,19 @@ function GenralSettings() {
     },
     mode: "onSubmit",
   });
+
+  
+
+const timeZoneOptions = [
+  { value: "India (IST)", label: "India (IST) — UTC+5:30" },
+  { value: "UTC", label: "UTC — Universal Time" },
+  { value: "US (EST)", label: "US Eastern (EST) — UTC-5" },
+  { value: "US (PST)", label: "US Pacific (PST) — UTC-8" },
+  { value: "Europe (CET)", label: "Europe Central (CET) — UTC+1" },
+  { value: "Japan (JST)", label: "Japan (JST) — UTC+9" },
+  { value: "Australia (AEST)", label: "Australia (AEST) — UTC+10" },
+  { value: "UK (GMT)", label: "UK (GMT) — UTC+0" },
+];
 
   useEffect(() => {
     const savedSettings = localStorage.getItem("generalSettings");
@@ -62,7 +77,7 @@ function GenralSettings() {
     }
   }, [methods]);
 
-  //  For Drop down Options
+
   const languageOptions = [
     { value: "English", label: "English" },
     { value: "Hindi", label: "Hindi" },
@@ -127,31 +142,23 @@ function GenralSettings() {
               <Typography variant="subtitle2" mb={1}>
                 Time Zone
               </Typography>
-              {/* <DropdownField
-                name="timeZone"
-                options={timeZoneOptions}
-                required
-              /> */}
+              
               <DropdownField
                 name="timeZone"
-                options={[
-                  { value: "India (IST)", label: "India (IST)" },
-                  { value: "UTC", label: "UTC" },
-                  { value: "US (EST)", label: "US (EST)" },
-                ]}
+                options={timeZoneOptions}
                 required
               />
             </Box>
           </Box>
 
-          {/*  Date Format & Currency */}
+          {/*  Date Format */}
           <Box
             display="flex"
             flexDirection={{ xs: "column", md: "row" }}
             gap={3}
             mb={{ xs: 2.5, md: 0 }}
           >
-            <Box width={{ xs: "100%", md: "640px" }}>
+            <Box width={{ xs: "100%", md: "49%" }}>
               <Typography variant="subtitle2" mb={1}>
                 Date Format
               </Typography>

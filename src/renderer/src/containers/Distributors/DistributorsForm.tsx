@@ -137,7 +137,7 @@ const DistributorsForm = () => {
                label="Email" 
                required 
                maxLength={50}
-           //  preventDuplicate 
+            preventDuplicate 
               />
 
               <DateTimeField 
@@ -175,7 +175,7 @@ const DistributorsForm = () => {
                 name="gstIn"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"
-                
+                preventDuplicate
                 rows={1}
                 required
                 rules={{
