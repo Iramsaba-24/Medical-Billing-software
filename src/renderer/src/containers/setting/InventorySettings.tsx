@@ -14,6 +14,7 @@ export interface InventoryFormValues {
   returnsUpdate: string[];
   alertsVisibility: string[];
 }
+
 const InventorySettings = () => {
  
   const savedData = (() => {
@@ -43,6 +44,15 @@ const InventorySettings = () => {
     fontSize: "18px",
     color: "#212529",
     mb: 1,
+  };
+
+  const checkboxStyle = {
+    "& .MuiCheckbox-root": {
+      color: "default.main",
+      "&.Mui-checked": {
+        color: "#238878",
+      },
+    },
   };
  
   // Save Function
@@ -103,7 +113,15 @@ const InventorySettings = () => {
           <Stack spacing={2.5}>
  
             {/* Alerts & Visibility */}
-            <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 4, mb: 1 }}>
+            <Paper
+              sx={{
+                p: 2,
+                borderRadius: "5px",
+                boxShadow: 4,
+                mb: 1,
+                ...checkboxStyle,
+              }}
+            >
               <Typography variant="subtitle1" sx={headingStyle}>
                 Alerts & Visibility
               </Typography>
