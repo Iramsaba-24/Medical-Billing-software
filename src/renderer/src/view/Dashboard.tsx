@@ -7,7 +7,7 @@ import BarChart from "@/containers/dashboard/Barchart";
 import SalesTable from "@/containers/dashboard/SalesTable";
 import Cards from "@/containers/dashboard/Cards";
 import Alerts from "@/containers/dashboard/Alerts";
-import LineChart from "@/containers/dashboard/LineChart";
+import LineGraph from "@/containers/dashboard/LineGraph";
 
 const Dashboard: React.FC = () => {
 
@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
         }}
       >
         <Cards />
-        {showLine && <LineChart filter="This Month" />}
+        {showLine && <LineGraph />}
       </Box>
 
       {/* Table */}
