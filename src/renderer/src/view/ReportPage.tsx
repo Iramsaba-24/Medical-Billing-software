@@ -15,9 +15,7 @@ const DEFAULT_SETTINGS = {
 };
 
 const stored = localStorage.getItem("report_settings");
-
 const settings = stored ? JSON.parse(stored) : DEFAULT_SETTINGS;
-
 const visibleTables: string[] = settings.other_visibility_control;
   return (
    

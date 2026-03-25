@@ -1,7 +1,14 @@
-import React from 'react';
-import { Card, Box, Typography, Select, MenuItem, type SelectChangeEvent } from '@mui/material';
-import { PieChart } from '@mui/x-charts/PieChart';
-import { useDrawingArea } from '@mui/x-charts/hooks';
+import React from "react";
+import {
+  Card,
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  type SelectChangeEvent,
+} from "@mui/material";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { useDrawingArea } from "@mui/x-charts/hooks";
 
 function PieCenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
@@ -13,7 +20,7 @@ function PieCenterLabel({ children }: { children: React.ReactNode }) {
       fill="#000"
       textAnchor="middle"
       dominantBaseline="central"
-      style={{ fontSize: 24, fontWeight: 'bold' }}
+      style={{ fontSize: 24, fontWeight: "bold" }}
     >
       {children}
     </text>
@@ -37,21 +44,26 @@ const PieChartCard: React.FC<{
   selectedFilter,
   onFilterChange,
   dataMap,
-  colors = ['#2196f3', '#f44336'],
+  colors = ["#2196f3", "#f44336"],
   chartSize = { width: 260, height: 260 },
   cardWidth = 320,
-  centerLabel
+  centerLabel,
 }) => {
   const percentage = dataMap[selectedFilter] ?? 0;
 
   const chartData = [
-    { value: percentage, label: 'Collected', color: colors[0] },
-    { value: 100 - percentage, label: 'Remaining', color: colors[1] }
+    { value: percentage, label: "Collected", color: colors[0] },
+    { value: 100 - percentage, label: "Remaining", color: colors[1] },
   ];
 
   return (
-    <Card variant="outlined" sx={{ p: 2, width: cardWidth || '100%' }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+    <Card variant="outlined" sx={{ p: 2, width: cardWidth || "100%" }}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={1}
+      >
         <Typography variant="h6" fontWeight={600}>
           {title}
         </Typography>
@@ -71,8 +83,16 @@ const PieChartCard: React.FC<{
         </Select>
       </Box>
 
-      <PieChart series={[{ data: chartData, innerRadius: 70 }]} width={chartSize.width} height={chartSize.height}>
-        <PieCenterLabel>{typeof centerLabel === 'function' ? centerLabel(percentage) : centerLabel || `${percentage}%`}</PieCenterLabel>
+      <PieChart
+        series={[{ data: chartData, innerRadius: 70 }]}
+        width={chartSize.width}
+        height={chartSize.height}
+      >
+        <PieCenterLabel>
+          {typeof centerLabel === "function"
+            ? centerLabel(percentage)
+            : centerLabel || `${percentage}%`}
+        </PieCenterLabel>
       </PieChart>
     </Card>
   );

@@ -10,7 +10,7 @@ export interface RegisterRequest {
   email: string;
   mobileNumber: string;
   companyName: string;
-  clinicName: string;
+  // clinicName: string;
   city: string;
   state: string;
   businessDetail?: CreateBusinessDetailRequest;

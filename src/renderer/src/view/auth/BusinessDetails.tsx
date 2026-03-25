@@ -7,33 +7,55 @@ import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
+import { useState } from "react";
 
 type FormInputs = {
-  BuisinessTypes: string;
+  businessType: string;
   gstin: string;
-  LicenseNumber: string;
+  licenseNumber: string;
 };
 
 const BusinessDetails = () => {
   const methods = useForm<FormInputs>({
     defaultValues: {
-      BuisinessTypes: "",
+      businessType: "",
       gstin: "",
-      LicenseNumber: "",
+      licenseNumber: "",
     },
     mode: "onChange",
   });
 
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const onSubmit = (data: FormInputs) => {
-    console.log(data);
-
-    const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
-    const completeData = { ...existingData, businessDetails: data };
-    localStorage.setItem('registrationData', JSON.stringify(completeData));
-    showToast("success", "Business details saved successfully!");
-    navigate(URL_PATH.ChoosePlan);
+  const onSubmit = async (data: FormInputs) => {
+    setIsLoading(true);
+    
+    try {
+      // Get registration data from localStorage
+      const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
+      
+      // Combine with business details
+      const completeData = { 
+        ...existingData, 
+        businessDetail: {
+          businessType: data.businessType,
+          gstin: data.gstin,
+          licenseNumber: data.licenseNumber
+        }
+      };
+      
+      // Store complete data
+      localStorage.setItem('registrationData', JSON.stringify(completeData));
+      
+      showToast("success", "Business details saved!");
+      navigate(URL_PATH.ChoosePlan);
+    } catch (error) {
+      console.error("Error saving business details:", error);
+      showToast("error", "Failed to save business details");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -98,7 +120,7 @@ const BusinessDetails = () => {
             }}
           >
             <TextInputField
-              name="BuisinessTypes"
+              name="businessType"
               label="Business Types"
               inputType="alphabet"
               maxLength={40}
@@ -112,10 +134,8 @@ const BusinessDetails = () => {
 
             <TextInputField
               name="gstin"
-              label="GSTIN (Optional)"
+              label="GSTIN "
               maxLength={15}
-              //inputProps={{ style: { textTransform: "uppercase" } }}
-
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",
@@ -132,7 +152,7 @@ const BusinessDetails = () => {
             />
 
             <TextInputField
-              name="LicenseNumber"
+              name="licenseNumber"
               label="License Number (Optional)"
               placeholder="DL-KA-2023-001245"
               sx={{
@@ -150,6 +170,7 @@ const BusinessDetails = () => {
           {/* Button */}
           <Button
             type="submit"
+            disabled={isLoading}
             fullWidth
             variant="contained"
             sx={{
@@ -167,8 +188,28 @@ const BusinessDetails = () => {
               },
             }}
           >
-            Next Step
+           {isLoading ? "Saving..." : "Next Step"}
           </Button>
+           {/* <Button
+            type="submit"
+            disabled={isLoading}
+            sx={{
+              mt: { xs: 3, sm: 5 },
+              fontWeight: 600,
+              fontSize: { xs: "1rem", sm: "1.05rem" },
+              backgroundColor: "#1b7f6b",
+              textTransform: "none",
+              border: "2px solid #1b7f6b",
+              boxShadow: "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
+              transition: "all 0.25s ease",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#1b7f6b",
+              },
+            }}
+          >
+            {isLoading ? "Saving..." : "Next Step"}
+          </Button> */}
         </Box>
       </FormProvider>
     </Box>

@@ -58,6 +58,7 @@ const PasswordField: FC<PasswordFieldProps> = ({
     if (!PasswordRegex.withNumber.regex.test(value)) return PasswordRegex.withNumber.message;
     if (!PasswordRegex.withSpecialChar.regex.test(value)) return PasswordRegex.withSpecialChar.message;
     if (confirmFieldName && value !== confirmValue) return translations.passwordField.mismatch;
+    if (!/^[A-Z]/.test(value)) return "Password must start with a capital letter";
 
     return true;
   };

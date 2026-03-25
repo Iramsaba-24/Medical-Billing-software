@@ -9,8 +9,18 @@ type ReportFormValues = {
 };
 
 const DEFAULT_VALUES: ReportFormValues = {
-  card_visibility_control: ["Total Sales Report"],
-  other_visibility_control: ["Sales Report", "Invoice Report Table"],
+  card_visibility_control: [
+    "Total Sales Report",
+    "Total Purchase",
+    "Profit"
+  ],
+  other_visibility_control: [
+    "Sales Report",
+    "Invoice Report Table",
+    "Inventory Stock Report",
+    "Distributor List",
+    "Customer List"
+  ],
 };
 
 

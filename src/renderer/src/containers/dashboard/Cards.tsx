@@ -1,12 +1,12 @@
-
+ 
 import React, { useState } from "react";
 import { Box, Card, Typography, Divider } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
 import { InventoryItem } from "@/containers/inventory/AddInventoryItem";
-
+ 
 type FilterType = "Today" | "6 Days" | "This Month";
-
+ 
 interface CardInfo {
   title: string;
   data: Partial<
@@ -19,7 +19,7 @@ interface CardInfo {
     >
   >;
 }
-
+ 
 const cardsConfig: CardInfo[] = [
   {
     title: "Inventory",
@@ -38,13 +38,13 @@ const cardsConfig: CardInfo[] = [
     },
   },
 ];
-
+ 
 const filterOptions = [
   { label: "Today", value: "Today" },
   { label: "6 Days", value: "6 Days" },
   { label: "This Month", value: "This Month" },
 ];
-
+ 
 const getGridArea = (title: string) => {
   switch (title) {
     case "Inventory":
@@ -55,44 +55,44 @@ const getGridArea = (title: string) => {
       return "auto";
   }
 };
-
+ 
 const Cards: React.FC = () => {
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
     1: "This Month",
   });
-
+ 
   const methodsArray = [
     useForm({ defaultValues: { filter: "This Month" } }),
     useForm({ defaultValues: { filter: "This Month" } }),
   ];
-
+ 
   const handleFilterChange = (index: number) => (value: string) => {
     setFilters((prev) => ({
       ...prev,
       [index]: value as FilterType,
     }));
   };
-
+ 
   const totalMedicines = (): string => {
     const data = localStorage.getItem("inventory");
     if (!data) return "0";
     const parsedData: InventoryItem[] = JSON.parse(data);
     return parsedData.length.toString();
   };
-
+ 
   const totalMedicineGroups = (): string => {
     const data = localStorage.getItem("medicineGroups");
     if (!data) return "0";
     const parsedData = JSON.parse(data);
     return parsedData.length.toString();
   };
-
+ 
   const getSelectedTopMedicine = (): string => {
     const stored = localStorage.getItem("topSellingMedicine");
     return stored || "No Medicine Selected";
   };
-
+ 
   return (
     <Box
       sx={{
@@ -118,7 +118,7 @@ const Cards: React.FC = () => {
         const filter = filters[index];
         const info = card.data[filter];
         const methods = methodsArray[index];
-
+ 
         return (
           <Card
             key={index}
@@ -136,7 +136,7 @@ const Cards: React.FC = () => {
           >
             <Box display="flex" justifyContent="space-between" mb={2}>
               <Typography fontWeight={600}>{card.title}</Typography>
-
+ 
               <FormProvider {...methods}>
                 <Box width={150}>
                   <DropdownField
@@ -147,12 +147,12 @@ const Cards: React.FC = () => {
                 </Box>
               </FormProvider>
             </Box>
-
+ 
             <Divider sx={{ mb: 2 }} />
-
+ 
             <Box display="flex" justifyContent="space-between">
               <Box>
-                <Typography fontSize={24} fontWeight={800}>
+                <Typography  fontWeight={700} fontSize={{ xs: 18, sm: 22, md:24}} mb={2}>
                   {card.title === "Inventory"
                     ? totalMedicines()
                     : getSelectedTopMedicine()}
@@ -161,10 +161,10 @@ const Cards: React.FC = () => {
                   {info?.leftLabel}
                 </Typography>
               </Box>
-
+ 
               {card.title === "Inventory" && (
                 <Box>
-                  <Typography fontSize={24} fontWeight={700}>
+                  <Typography  fontWeight={700} fontSize={{ xs: 18, sm: 22, md:24}} mb={2}>
                     {totalMedicineGroups()}
                   </Typography>
                   <Typography fontSize={12} color="text.secondary">
@@ -179,5 +179,7 @@ const Cards: React.FC = () => {
     </Box>
   );
 };
-
+ 
 export default Cards;
+ 
+ 
