@@ -235,7 +235,8 @@ useEffect(() => {
   name="date"
   label="Invoice Date"
   viewMode="date"
-  useCurrentDate={false}
+  useCurrentDate={true}
+  disabled
 />
 
           <DropdownField

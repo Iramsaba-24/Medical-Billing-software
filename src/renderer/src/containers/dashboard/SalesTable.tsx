@@ -33,6 +33,7 @@ type StoredSale = {
   totalPrice: number;
   invoice: string;
   date: string;
+   time?: string; 
   medicines: { name: string; qty: number }[];
 };
 
@@ -114,7 +115,8 @@ const SalesTable: React.FC = () => {
       quantity: totalQty,
       totalPrice: item.totalPrice || 0,
       date: item.date || new Date().toISOString().split('T')[0],
-      time: new Date().toLocaleTimeString(),
+  
+     time:item.time || '-',
     };
   });
 
@@ -137,6 +139,7 @@ const SalesTable: React.FC = () => {
     }));
 
     localStorage.setItem('currentInvoice', JSON.stringify(formatted));
+    localStorage.setItem('currentNewInvoiceList', JSON.stringify([]));
   };
 
   const filteredSalesData = useMemo(() => {
