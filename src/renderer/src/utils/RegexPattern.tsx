@@ -38,6 +38,7 @@ export const TextRegexPattern = {
     allowed: /[\s\S]/g,
     message: 'All characters are allowed.'
   }
+
 } as const;
 
 export type InputType = keyof typeof TextRegexPattern;

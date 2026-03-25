@@ -1,8 +1,7 @@
-import SearchField from "@/components/controlled/SearchField";
 import {ACTION_KEY,Column,UniversalTable,
 } from "@/components/uncontrolled/UniversalTable";
 import { URL_PATH } from "@/constants/UrlPath";
-import {Box,Typography,Paper, MenuItem, Button,Select,} from "@mui/material";
+import {Typography,Paper, MenuItem, Button,Select, Box,} from "@mui/material";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -107,33 +106,29 @@ const Distributors = () => {
   return (
     <>
       <FormProvider {...methods}>
-        <Paper
-          sx={{
-            px: { xs: 2, md: 4 },
-            pt: 2,
-            pb: { xs: 2, md: 2 },
-          }}
+       
+    
+      <Paper sx={{ mt: 3, p: { xs: 1, md: 3 } }}>
+        <Box
+  display="flex"
+  justifyContent="space-between"
+  alignItems="center"
+  flexWrap="wrap"
+>
+        <Typography
+          fontSize={{ xs: 18, md: 22 }}
+          mb={2}
+          fontWeight={600}
         >
-          <Box
-            display="flex"
-            flexDirection={{ xs: "column", md: "row" }}
-            justifyContent="space-between"
-            alignItems={{ md: "center" }}
-            sx={{ gap: { xs: 2, md: 2 } }}
-          >
-            <SearchField
-              name="search"
-              label="Search"
-              placeholder="Search by Company Name or Reg No."
-              size="small"
-              sx={{ width: { xs: "100%", md: 550 } }}
-            />
+          Distributors List
+        </Typography>
+         <Button 
 
-            <Button
               variant="contained"
               sx={{
                 textTransform: "none",
                 height: 36,
+                 mb:2,
                 width: { xs: "100%", md: "auto" },
                 bgcolor: "#238878",
                 "&:hover": {
@@ -147,24 +142,14 @@ const Distributors = () => {
               }
             >
                Add Distributor
-            </Button>
-          </Box>
-        </Paper>
-      </FormProvider>
-
-      <Paper sx={{ mt: 3, p: { xs: 1, md: 3 } }}>
-        <Typography
-          fontSize={{ xs: 18, md: 22 }}
-          mb={2}
-          fontWeight={600}
-        >
-          Distributors List
-        </Typography>
+            </Button></Box>
 
         <UniversalTable
           data={filteredDistributors}
           columns={columns}
-          tableSize="small"
+          showExport={true}
+          //tableSize="small"
+          showSearch={true}
           getRowId={(row) => row.id}
           actions={{
             view: (distributor) =>
@@ -212,7 +197,10 @@ const Distributors = () => {
         onClose={() => setEditingRow(null)}
         onSave={handleSave}
       />
+        </FormProvider>
+
     </>
+    
   );
 };
 

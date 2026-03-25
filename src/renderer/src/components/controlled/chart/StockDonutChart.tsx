@@ -91,6 +91,9 @@ const StockDonutChart = ({ title }: { title: string }) => {
       sx={{
         p: { xs: 1, sm: 2 },
         overflow: 'hidden',
+        // elevation:1000,
+        boxShadow: '0px 0px 10px 0px rgba(0, 0, 0, 0.1)',
+        borderRadius:3
       }}
     >
       {/* Header with Title + Dropdown */}
@@ -98,14 +101,14 @@ const StockDonutChart = ({ title }: { title: string }) => {
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        mb={1}
+        mb={0.5}
       >
-        <Typography variant="h6" fontWeight={600}>
+        <Typography fontSize={{xs:16 , md:18}} fontWeight={600} mb={5}>
           {title}
         </Typography>
 
         <FormProvider {...methods}>
-          <Box sx={{ width: 150 }}>
+          <Box sx={{ width: 200, mr:1 }}>
             <DropdownField
               name="filterSelect"
               options={filterOptions}

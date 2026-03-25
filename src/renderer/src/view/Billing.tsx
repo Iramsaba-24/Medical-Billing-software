@@ -1,4 +1,4 @@
-import { Box, Button, Paper, } from "@mui/material";
+import { Box, Button, Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -7,10 +7,10 @@ import DropdownField from "@/components/controlled/DropdownField";
 import ItemsSection from "@/containers/customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Print } from "@mui/icons-material";
 import { URL_PATH } from "@/constants/UrlPath";
-import RetailInvoice from "@/containers/billing/RetailInvoice";
-
+import InvoiceTabButtons from "@/containers/billing/InvoiceTabButtons";
+import NewInvoice from "@/containers/billing/NewInvoice";
+import EmailField from "@/components/controlled/EmailField";
 
 // Payprint button reuse sx
 const PayNPrint = {
@@ -26,7 +26,6 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-
 type Doctor = {
   id: number;
   doctorName: string;
@@ -38,8 +37,7 @@ type Doctor = {
   status: "Active";
 };
 
-
-type NewInvoiceFormValues = {
+type RetailInvoiceFormValues = {
   name: string;
   age: string;
   mobile: string;
@@ -50,10 +48,10 @@ type NewInvoiceFormValues = {
   addressRight: string;
 };
 
-function POSMaster() {
+function RetailInvoice() {
   const navigate = useNavigate();
   const location = useLocation();
-  const methods = useForm<NewInvoiceFormValues>({
+  const methods = useForm<RetailInvoiceFormValues>({
     defaultValues: {
       name: "",
       age: "",
@@ -64,15 +62,18 @@ function POSMaster() {
       addressLeft: "",
       addressRight: "",
     },
+    mode: "onChange",
   });
 
-  const activeTab: "new" | "retail" = location.pathname.includes('retail-invoice') ? "retail" : "new";
-  const isRetail = activeTab === "retail";
+  const isRetail = location.pathname.includes("retail-invoice");
+
 
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>({});
+  const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>(
+    {}
+  );
 
   const [doctorList, setDoctorList] = useState<Doctor[]>([]);
 
@@ -90,57 +91,66 @@ function POSMaster() {
       border: "2px solid #238878",
     },
   });
-
-
   // saved to local storage
-  const onSubmit = (data: NewInvoiceFormValues) => {
-  setIsSubmitted(true);
-  const hasInvalidItems = rows.some(
-    (row) =>
-      row.name.trim() === "" ||
-      row.qty === "" ||
-      Number(row.qty) <= 0 ||
-      row.price === "" ||
-      Number(row.price) <= 0
-  );
-  if (hasInvalidItems) {
-    return;
-  }
-  const invoiceData = {
-    form: data,
-    rows,
-    gst,
-    paymentMode,
-    createdAt: new Date().toISOString(),
+  const onSubmit = (data: RetailInvoiceFormValues) => {
+    setIsSubmitted(true);
+
+    const hasInvalidItems = rows.some(
+      (row) =>
+        row.name.trim() === "" ||
+        row.qty === "" ||
+        Number(row.qty) <= 0 ||
+        row.price === "" ||
+        Number(row.price) <= 0
+    );
+
+    if (hasInvalidItems) return;
+
+    const now = new Date();
+    const invoiceData = {
+      invoice: `INV-${Date.now()}`,
+      name: data.name,
+      age: data.age,
+      mobile: data.mobile,
+      email: data.email,
+      doctor: data.doctor,
+      address: data.addressLeft,
+      doctorAddress: data.addressRight,
+      medicines: rows.map((r) => ({
+        name: r.name,
+        qty: r.qty,
+        price: r.price,
+        amount: Number(r.qty || 0) * Number(r.price || 0),
+         expiry: r.expiry || "",
+      })),
+      subTotal: subTotal,
+      
+      totalPrice: finalTotal,
+      status: "Paid",
+      date: now.toLocaleDateString(),
+      time: now.toLocaleTimeString(),
+      paymentMode,
+    };
+
+    localStorage.setItem("currentRetailPayment", paymentMode);
+    localStorage.setItem("currentRetailInvoice", JSON.stringify(invoiceData));
+    navigate(URL_PATH.MediPoints, {
+      state: { totalFromInvoice: finalTotal }
+    });
   };
-  const existingInvoices = JSON.parse(
-    localStorage.getItem("billing_invoices") || "[]"
-  );
-  existingInvoices.push(invoiceData);
-  localStorage.setItem(
-    "billing_invoices",
-    JSON.stringify(existingInvoices)
-  );
-  console.log("Saved Invoice:", invoiceData);
-  navigate(URL_PATH.MediPoints, { state: { totalFromInvoice: finalTotal } });
-};
-
-
-
   type ItemRow = {
     id: number;
     name: string;
     qty: number | "";
     price: number | "";
+      expiry?: string;
   };
-
   type InvoiceData = {
-    form: NewInvoiceFormValues;
+    form: RetailInvoiceFormValues;
     rows: ItemRow[];
-    gst: number;
+   
     paymentMode: string;
   };
-
   type Customer = {
     name: string;
     age: string;
@@ -151,17 +161,18 @@ function POSMaster() {
   };
 
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "" },
+    { id: Date.now(), name: "", qty: 1, price: "", expiry: ""  },
   ]);
 
-  const [gst, setGst] = useState(5);
+ 
 
   const [paymentMode, setPaymentMode] = useState("Cash");
 
-  const [doctorOptions, setDoctorOptions] = useState<{ label: string; value: string }[]>([]);
+  const [doctorOptions, setDoctorOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
   const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
-
 
   // when invoice button change
   useEffect(() => {
@@ -169,7 +180,7 @@ function POSMaster() {
     if (savedData) {
       methods.reset(savedData.form);
       setRows(savedData.rows);
-      setGst(savedData.gst);
+     
       setPaymentMode(savedData.paymentMode);
     } else {
       methods.reset({
@@ -183,18 +194,17 @@ function POSMaster() {
         addressRight: "",
       });
       setRows([{ id: Date.now(), name: "", qty: 1, price: "" }]);
-      setGst(5);
+     
       setPaymentMode("Cash");
     }
-  }, [activeInvoice, invoiceForms]);
-
+  }, [activeInvoice, invoiceForms, methods]);
 
   // load doctor list
   useEffect(() => {
     const storedDoctors = localStorage.getItem("doctors");
 
     if (storedDoctors) {
-      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors);       //string->obj
+      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors);
       setDoctorList(parsedDoctors);
       const options = parsedDoctors.map((doc) => ({
         label: `Dr. ${doc.doctorName}`,
@@ -205,121 +215,75 @@ function POSMaster() {
     }
   }, []);
 
-
   const selectedDoctorName = methods.watch("doctor");
 
-  const nameOptions = customerOptions.map((customer) => ({
-    label: customer.name,
-    value: customer.name,
-  }));
+  const nameOptions = [
+    { label: "+ Add Customer", value: "add_customer" },
+    ...customerOptions.map((customer) => ({
+      label: customer.name,
+      value: customer.name,
+    })),
+  ];
 
   const selectedCustomerName = methods.watch("name");
-
-
   // when name change
   useEffect(() => {
+    if (selectedCustomerName === "add_customer") {
+      navigate(URL_PATH.AddCustomerForm);
+      return;
+    }
     if (!selectedCustomerName) return;
     const selectedCustomer = customerOptions.find(
       (c) => c.name === selectedCustomerName
     );
     if (selectedCustomer) {
-      // Existing customer - Autofill
+
       methods.setValue("age", selectedCustomer.age || "");
       methods.setValue("mobile", selectedCustomer.mobile || "");
       methods.setValue("email", selectedCustomer.email || "");
       methods.setValue("addressLeft", selectedCustomer.address || "");
       methods.setValue("doctor", selectedCustomer.doctor || "");
     } else {
-      // New name - Clear other fields
+
       methods.setValue("age", "");
       methods.setValue("mobile", "");
       methods.setValue("email", "");
       methods.setValue("addressLeft", "");
       methods.setValue("doctor", "");
     }
-  }, [selectedCustomerName, customerOptions, methods]);
-
+  }, [selectedCustomerName, customerOptions, methods, navigate]);
   // data load
   useEffect(() => {
-    const saved = localStorage.getItem("medical_customers");
+    const saved = localStorage.getItem("customers");
     if (saved) {
       setCustomerOptions(JSON.parse(saved));
     }
   }, []);
 
 
-  // Doctor Address Autofill 
   useEffect(() => {
     if (selectedDoctorName) {
       const selectedDoctor = doctorList.find(
         (doc) => doc.doctorName === selectedDoctorName
       );
-
       if (selectedDoctor) {
         methods.setValue("addressRight", selectedDoctor.address);
       }
     }
   }, [selectedDoctorName, doctorList, methods]);
-
   const subTotal = rows.reduce(
     (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
     0
   );
 
-  const finalTotal = subTotal + (subTotal * gst) / 100;
+  const finalTotal = subTotal;
 
   return (
     <FormProvider {...methods}>
-      {/* New Invoice */}
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.Billing) {
-            navigate(URL_PATH.Billing);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "new" ? "#238878" : "#fff",
-          color: activeTab === "new" ? "#fff" : "#000",
-          border: activeTab === "new" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        New Invoice
-      </Button>
-
-      {/* Retail Invoice */}
-      <Button
-        onClick={() => {
-          if (location.pathname !== URL_PATH.RetailInvoice) {
-            navigate(URL_PATH.RetailInvoice);
-          }
-        }}
-        sx={{
-          textTransform: "none",
-          width: { xs: "50%", md: "10%" },
-          height: "38px",
-          fontWeight: 500,
-          borderRadius: "0px 18px 0px 0px",
-          backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-          color: activeTab === "retail" ? "#fff" : "#000",
-          border: activeTab === "retail" ? "none" : "1px solid #ccc",
-          "&:hover": {
-            backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-          },
-        }}
-      >
-        Retail Invoice
-      </Button>
-
-      {isRetail ? (
-        <RetailInvoice />
+      {/* invoice tab button */}
+      <InvoiceTabButtons />
+      {!isRetail ? (
+        <NewInvoice />
       ) : (
         <Box
           sx={{
@@ -328,8 +292,8 @@ function POSMaster() {
             borderColor: "grey.400",
             p: 2,
             backgroundColor: "#fff",
-          }}>
-
+          }}
+        >
           <Box
             display="flex"
             gap={1.5}
@@ -342,40 +306,36 @@ function POSMaster() {
             {Array.from({ length: 10 }, (_, i) => {
               const invoiceNumber = i + 1;
               const isActive = String(invoiceNumber) === activeInvoice;
-
               return (
                 <Button
                   key={invoiceNumber}
                   sx={{
                     ...invoiceButtonSx(isActive),
-                    width: { xs: "calc(50% - 6px)", md: "auto" },
-                    minWidth: { xs: "unset", md: "250px" },
+                    width: { xs: "calc(50% - 6px)", md: "19%" },
+                    minWidth: { xs: "unset", md: "19%" },
                     fontSize: { xs: "12px", md: "14px" },
                   }}
                   onClick={() => {
-
                     setInvoiceForms((prev) => ({
                       ...prev,
                       [activeInvoice]: {
                         form: methods.getValues(),
                         rows,
-                        gst,
+                        
                         paymentMode,
                       },
                     }));
 
-                    // Navigate to new invoice
-                    navigate(`${URL_PATH.Billing}/invoice${invoiceNumber}`);
-                  }}
-                >
-
+                    navigate(URL_PATH.PaymentMethod, {
+                      state: { flow: "retail", totalFromInvoice: finalTotal }
+                    });
+                  }}>
 
                   Invoice {invoiceNumber}
                 </Button>
               );
             })}
           </Box>
-
           <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
             <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3}>
               {/* inner box */}
@@ -392,17 +352,17 @@ function POSMaster() {
                     flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Box width={{ xs: "100%", sm: "260px" }}>
-
                       <DropdownField
                         name="name"
                         label="Name"
                         options={nameOptions}
                         required
-                        freeSolo   // typing allowed
+                        onlyAlphabet
+                        // freeSolo
                         editable={true}
-                        placeholder="Select or Type Name"
-                      />
+                        
 
+                      />
                     </Box>
 
                     <Box width={{ xs: "100%", sm: "260px" }}>
@@ -416,31 +376,24 @@ function POSMaster() {
                     flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <MobileField name="mobile" label="Mobile Number" required />
-                    </Box>
-
-                    <Box width={{ xs: "100%", sm: "260px" }}>
-                      <TextInputField
-                        name="email"
-                        label="Email"
-                        rules={{
-                          required: "Email is required",
-                          validate: (value: string) => {
-                            if (!/[@]/.test(value)) return "Add special character (@)";
-                            if (!/[.]/.test(value)) return "Add special character (.)";
-                            return true;
-                          },
-                        }}
+                      <MobileField
+                        name="mobile"
+                        label="Mobile Number"
+                        countryCode
+                        required
                       />
                     </Box>
-
+                    <Box width={{ xs: "100%", sm: "260px" }}>
+                      <EmailField name="email" label="Email" />
+                    </Box>
                   </Box>
-
                   <Box sx={{ width: { xs: "100%", md: "535px" } }}>
                     <TextInputField
                       name="addressLeft"
                       label="Address"
                       inputType="textarea"
+                       minLength={10}
+                      maxLength={50}
                       rows={3}
                     />
                   </Box>
@@ -450,56 +403,41 @@ function POSMaster() {
                   flex={1}
                   display="flex"
                   flexDirection="column"
-                  gap={{ xs: 2, md: 1.5 }}
-                >
+                  gap={{ xs: 2, md: 1.5 }}>
+
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <DropdownField
                       name="doctor"
                       label="Doctor"
                       options={doctorOptions}
-                      freeSolo
+                     freeSolo={false}
                       editable={true}
                       placeholder="Select Dr"
                     />
                   </Box>
-
-                  <Box width={{ xs: "100%", sm: "260px" }}>
-                    <TextInputField
-                      name="reference"
-                      label="New Reference"
-                      inputType="alphanumeric"
-                      minLength={3}
-                      maxLength={50}
-                      rules={{
-                        pattern: {
-                          value: /^[A-Za-z0-9\s-]+$/,
-                          message: "Only letters, numbers, spaces, and hyphens allowed",
-                        },
-                      }}
-                    />
-                  </Box>
-
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <TextInputField
                       name="addressRight"
                       label="Address"
                       inputType="textarea"
-                      rows={3}
-                    />
+                      minLength={10}
+                      maxLength={50}
+                      rows={3} />
+
                   </Box>
                 </Box>
               </Box>
             </Paper>
 
-            <Box mt={3} >
+            <Box mt={3}>
+
               <ItemsSection
                 rows={rows}
                 setRows={setRows}
-                gst={gst}
-                setGst={setGst}
-                paymentMode={paymentMode}
-                setPaymentMode={setPaymentMode}
-                finalTotal={finalTotal} isSubmitted={isSubmitted} />
+                finalTotal={finalTotal}
+                isSubmitted={isSubmitted}
+              />
+
             </Box>
 
             {/* Bottom pay print button */}
@@ -523,17 +461,6 @@ function POSMaster() {
               >
                 Save & Continue
               </Button>
-              <Button
-                variant="outlined"
-                startIcon={<Print />}
-                sx={{
-                  ...PayNPrint,
-                  minWidth: "140px",
-                }}
-                onClick={() => window.print()}
-              >
-                Print
-              </Button>
             </Box>
           </form>
         </Box>
@@ -542,4 +469,4 @@ function POSMaster() {
   );
 }
 
-export default POSMaster;
+export default RetailInvoice;

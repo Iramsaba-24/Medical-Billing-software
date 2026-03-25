@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
 
+
 export type InventoryFormData = {
   itemName: string;
   itemId: string;
@@ -31,7 +32,10 @@ export type InventoryItem = {
 };
 
 export default function AddInventoryItem() {
-  const methods = useForm<InventoryFormData>({});
+  const methods = useForm<InventoryFormData>({
+    mode: "onChange",
+  });
+
   const navigate = useNavigate();
 
   const [groupOptions, setGroupOptions] = useState<
@@ -102,12 +106,12 @@ export default function AddInventoryItem() {
       JSON.stringify([...existing, newItem])
     );
 
-    navigate(URL_PATH.InventoryList);
+    navigate(URL_PATH.Inventory);
   };
 
   return (
     <FormProvider {...methods}>
-      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
+      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8} >
         <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
           <Typography fontSize={20} fontWeight={600} mb={4}>
             Add New Item
@@ -115,7 +119,8 @@ export default function AddInventoryItem() {
 
           <Box
             component="form"
-            onSubmit={methods.handleSubmit(onSubmit)}
+             noValidate
+            onSubmit={methods.handleSubmit(onSubmit) }
             display="grid"
             gridTemplateColumns={{
               xs: "1fr",
@@ -125,12 +130,15 @@ export default function AddInventoryItem() {
             sx={{ px: { xs: 0, md: 4 } }}
           >
             <TextInputField
+              inputType="all"
+              rows={1}
               name="itemName"
               label="Item Name"
+              maxLength={30}
               required
             />
 
-            <TextInputField
+            <NumericField
               name="itemId"
               label="Item ID"
               required
@@ -139,7 +147,7 @@ export default function AddInventoryItem() {
             <DropdownField
               name="unit"
               label="Unit"
-              placeholder=" Unit"
+              placeholder="Unit"
               required
               options={[
                 { label: "Tablets", value: "tablets" },
@@ -150,6 +158,8 @@ export default function AddInventoryItem() {
                 { label: "Boxes", value: "boxes" },
                 { label: "Pairs", value: "pairs" },
               ]}
+              freeSolo={false}
+              editable={true}
             />
 
             <NumericField
@@ -164,27 +174,35 @@ export default function AddInventoryItem() {
               placeholder="Medicine Group"
               required
               options={groupOptions}
+              freeSolo={false}
+              editable={true}
             />
 
-            <TextInputField
+            <NumericField
               name="pricePerUnit"
               label="Price per Unit (₹)"
               required
             />
 
+            {/* Expiry Date (past date disabled) */}
             <DateTimeField
               name="expiryDate"
               label="Expiry Date"
               viewMode="date"
               required
+
+              useCurrentDate={false}
+              dateRestriction="current-future-only"
             />
 
             <DropdownField
               name="supplier"
               label="Supplier"
-              placeholder=" Supplier"
+              placeholder="Supplier"
               required
               options={supplierOptions}
+              freeSolo={false}
+              editable={true}
             />
 
             <Box

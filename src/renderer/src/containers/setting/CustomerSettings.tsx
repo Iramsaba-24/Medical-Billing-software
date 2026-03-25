@@ -102,7 +102,7 @@ const CustomerSettings = () => {
 
     const onSubmit =(data:CustomerFormFields)=>{  
       console.log("submmitted data: ", data);
-      showToast("success", "Saved");
+      showToast("success", "Settings updated successfully");
       
     }
     const {reset}=methods;

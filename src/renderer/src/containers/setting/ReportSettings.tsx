@@ -1,18 +1,22 @@
 import { useForm, FormProvider } from 'react-hook-form';
 import { Paper, Typography, Box, Button } from '@mui/material';
 import CheckboxGroup from '@/components/controlled/CheckboxGroup';
-
+import { showToast } from '@/components/uncontrolled/ToastMessage';
+import { useEffect } from "react";
 type ReportFormValues = {
-  export_format: string[];
-  price_visibility: string[];
-}
+  card_visibility_control: string[];
+  other_visibility_control: string[];
+};
+
+const DEFAULT_VALUES: ReportFormValues = {
+  card_visibility_control: ["Total Sales Report"],
+  other_visibility_control: ["Sales Report", "Invoice Report Table"],
+};
+
 
 const ReportSettings = () => {
   const methods = useForm<ReportFormValues>({
-    defaultValues: {
-      export_format: [],
-      price_visibility: [],
-    }
+  defaultValues: DEFAULT_VALUES
   });
   
   const headingStyle = {
@@ -21,12 +25,28 @@ const ReportSettings = () => {
   color: "#212529",
   mb: 1,
 };
-
+  const checkboxStyle = {
+  "& .MuiCheckbox-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
+};
 
   const { handleSubmit, reset } = methods;
   const onSubmit = (data: ReportFormValues) => {
-    console.log(" Data:", data);
+    localStorage.setItem("report_settings", JSON.stringify(data));
+    showToast("success", "Settings updated successfully");
   }
+  useEffect(() => {
+  const savedSettings = localStorage.getItem("report_settings");
+
+  if (savedSettings) {
+    const parsed = JSON.parse(savedSettings);
+    reset(parsed);
+  }
+}, [reset]);
 
   return (
     
@@ -45,45 +65,58 @@ const ReportSettings = () => {
           </Box>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-        {/*  Exports format */}
+          {/* card visibility control */}
         <Paper sx={{p: { xs: 2, md: 4 }, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
-          <Typography sx={headingStyle}>Exports Format</Typography>
+          <Typography sx={headingStyle}>Card Visibility Control</Typography>
           <CheckboxGroup
-            name="export_format"
+            sx={checkboxStyle}
+            name="card_visibility_control"
             label=""
             options={[
-              { label: 'PDF', value: 'pdf' },
-              { label: 'Excel', value: 'excel' },
-              { label: 'Include Company logo in PDF', value: 'include_company_logo_in_pdf' },
+              { label: 'Total Sales Report', value: 'Total Sales Report' },
+              { label: 'Total Purchase', value: 'Total Purchase' },
+              { label: 'Profit', value: 'Profit' },
             ]}
           />
         </Paper>
-        {/* price Visibility Control */}
-        <Paper sx={{ p: 2, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
-          <Typography sx={headingStyle}>Price Visibility Control</Typography>
+        {/* Other Visibility Control */}
+        <Paper sx={{p: { xs: 2, md: 4 }, borderRadius: "5px", boxShadow: 3, mb: 1 }}>
+          <Typography sx={headingStyle}>Other Visibility Control</Typography>
           <CheckboxGroup
-            name="price_visibility"
+            sx={checkboxStyle}
+            name="other_visibility_control"
             label=""
             options={[
-              { label: 'Hide Cost Price from staff', value: 'hide_cost_price' },
-              { label: 'Sale Reports', value: 'sale_reports' },
-              { label: 'Stock Reports', value: 'stock_reports' },
+              { label: 'Sales Report', value: 'Sales Report' },
+              { label: 'Invoice Report Table', value: 'Invoice Report Table' },
+              { label: 'Inventory Stock Report', value: 'Inventory Stock Report' },
+              {label:"Distributor List", value:"Distributor List"},
+              {label:"Customer List", value:"Customer List"},
             ]}
           />
         </Paper>
         {/*  Buttons- save reset*/}
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, gap: 4 }}>
-          <Button 
-            variant="outlined" 
-            onClick={() => reset()}                       
-           sx={{
-           color: "#238878",
-           border: "2px solid #238878",
-           textTransform: "none",
-          "&:hover": { backgroundColor: "#238878", color: "#fff", border: "2px solid #238878" },
-          }}>           
-        Reset
-          </Button>
+<Button
+  variant="outlined"
+  onClick={() => {
+    reset(DEFAULT_VALUES);
+    localStorage.setItem("report_settings", JSON.stringify(DEFAULT_VALUES));
+    showToast("success", "Settings reset to default");
+  }}
+  sx={{
+    color: "#238878",
+    border: "2px solid #238878",
+    textTransform: "none",
+    "&:hover": {
+      backgroundColor: "#238878",
+      color: "#fff",
+      border: "2px solid #238878",
+    },
+  }}
+>
+  Reset
+</Button>
           <Button 
               type="submit" 
               variant="contained" 

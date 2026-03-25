@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
 
 export type MedicineItem = {
@@ -9,10 +11,14 @@ export type MedicineItem = {
 };
 
 export type Invoice = {
+  customerName: ReactNode;
   invoice: string;
   patient: string;
   date: string;
   price: number;
   status: InvoiceStatus;
   medicines: MedicineItem[];
+  type?: "retail" | "distributor";
+  gstIn?: string;        
+  distributorId?: string;
 };

@@ -1,8 +1,6 @@
-import SearchField from "@/components/controlled/SearchField";
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { Box, Typography, Paper, MenuItem, Button, Select, Divider, Dialog, DialogActions } from "@mui/material";
 import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 import DoctorEdit from "@/containers/doctors/DoctorEdit";
@@ -20,14 +18,14 @@ type Doctor = {
 };
 
 const Doctors = () => {
-  const methods = useForm({ defaultValues: { search: "" } });
+
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [viewItem, setViewItem] = useState<Doctor | null>(null);
   const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
 
 
   const navigate = useNavigate();
-  const searchValue = methods.watch("search");
+  
 
   useEffect(() => {
     setDoctors(JSON.parse(localStorage.getItem("doctors") || "[]"));
@@ -78,66 +76,62 @@ const Doctors = () => {
     { key: ACTION_KEY, label: "Actions" },
   ];
 
-  // filter doctors
-  const filteredDoctors = doctors.filter((d) =>
-    d.doctorName.toLowerCase().includes(searchValue.toLowerCase())
-  );
-
   return (
     <>
-    {/* search & add doctor */}
-      <FormProvider {...methods}>
-        <Box>
-          <Typography
-            sx={{
-              fontSize: { xs: 20, sm: 24, md: 28 },  
-              fontWeight: 700,
-              color: '#111827',
-              mt: {xs:1 , md:0.5},
-              mb: 0.5,
-            }}
-          >
-            Doctors
-          </Typography>
-        </Box>
-        <Paper sx={{ px: { xs:2, md:4 },
-         pt:2,
-          
-          pb:{ xs:2, md:0} }}>
-
-            
-          <Box display="flex"
-           flexDirection={{ xs:"column", md:"row" }} justifyContent="space-between" alignItems={{ md:"center" }} 
-           sx={{
-            gap: {xs:0, md:2 }
-            }} >
-             <SearchField
-              name="search"
-               label="Search" placeholder="Search by Name" size="small"
-                sx={{ 
-                  width: { xs:"100%", md:550 },
-                   }} />
-              <Button
-                     variant="contained"
-                      sx={{ textTransform:"none", alignItems:"center", height:36, width: { xs:"100%", md:"auto" }, bgcolor:"#238878", 
-                      "&:hover": { backgroundColor:"#fff", color:"#1b7f6b", border:"2px solid #1b7f6b", },
-                       }}
-                       onClick={() => navigate(URL_PATH.AddDoctor)} > +Add Doctor 
-                </Button>
-           </Box>
-     </Paper>
-      </FormProvider>
-
+    <Box sx={{mb:{xs:1, md:4}}}>
+<Box >
+  <Typography
+    sx={{
+      fontSize: { xs: 20, sm:24, md: 28 },
+      fontWeight: 700,
+      color: "#111827",
+      mt: { xs: 1, md: 0.5 },
+      mb: 0.5,
+    }}
+  >
+    Doctors
+  </Typography>
+</Box>
       <Paper sx={{ 
         //mx:{xs:1, md:2},
-         mt:2, p: { xs:1, md:2 } }}>
-        <Typography fontSize={{ xs: 18, md: 20 }} mb={2} fontWeight={600}>
-          Doctors List
-        </Typography>
-        <Divider sx={{ mb: 3 }} />
+         mt:1, p: { xs:1, md:2 } }}>
+          
+<Box
+  display="flex"
+  flexDirection={{ xs: "column", sm: "row" }}
+  justifyContent="space-between"
+  alignItems={{ xs: "stretch", sm: "center" }}
+  gap={2}
+  mb={2}
+>
+  <Typography
+    fontSize={{ xs: 18, md: 20 }}
+    fontWeight={600}
+  >
+    Doctors List
+  </Typography>
+
+  <Button
+    variant="contained"
+    sx={{
+      textTransform: "none",
+      bgcolor: "#238878",
+      width: { xs: "100%", sm: "auto" },
+      "&:hover": {
+        backgroundColor: "#fff",
+        color: "#238878",
+        border: "2px solid #238878",
+      },
+    }}
+    onClick={() => navigate(URL_PATH.AddDoctor)}
+  >
+    + Add Doctor
+  </Button>
+</Box>
+<Divider sx={{ mb: 3 }} />
      
           <UniversalTable
-            data={filteredDoctors}
+            data={doctors}
             columns={columns}
             showSearch={true}         
             showExport={true}
@@ -266,7 +260,8 @@ const Doctors = () => {
         showSnackbar("info", "Doctor updated successfully");
         setEditDoctor(null);
       }}
-    />  
+    /> 
+    </Box> 
     </>
   );
 };

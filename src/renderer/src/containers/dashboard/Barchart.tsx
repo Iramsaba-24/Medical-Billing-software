@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography } from '@mui/material';
-
+ 
 const baseData = [
   { day: 'Mon', value: 6000 },
   { day: 'Tue', value: 10000 },
@@ -9,12 +9,12 @@ const baseData = [
   { day: 'Fri', value: 15000 },
   { day: 'Sat', value: 16000 },
 ];
-
+ 
 const MAX_VALUE = 45000;
-
+ 
 const BarChart: React.FC = () => {
   const [data, setData] = useState(baseData);
-
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       setData(prev =>
@@ -24,10 +24,10 @@ const BarChart: React.FC = () => {
         }))
       );
     }, 3000);
-
+ 
     return () => clearInterval(interval);
   }, []);
-
+ 
   return (
     <Card
       sx={{
@@ -40,7 +40,7 @@ const BarChart: React.FC = () => {
         <Typography fontWeight={600} fontSize={{ xs: 14, sm: 18 }} mb={2}>
           Total Sales Overview
         </Typography>
-
+ 
         <Box display="flex" width="100%">
          
           <Box
@@ -64,7 +64,7 @@ const BarChart: React.FC = () => {
               </Typography>
             ))}
           </Box>
-
+ 
           <Box
             flex={1}
             display="flex"
@@ -74,7 +74,7 @@ const BarChart: React.FC = () => {
           >
             {data.map(item => {
               const heightPercent = (item.value / MAX_VALUE) * 100;
-
+ 
               return (
                 <Box
                   key={item.day}
@@ -105,7 +105,7 @@ const BarChart: React.FC = () => {
                       }}
                     />
                   </Box>
-
+ 
                   <Typography
                     mt={1}
                     fontSize={{ xs: 9, sm: 12 }}
@@ -123,5 +123,7 @@ const BarChart: React.FC = () => {
     </Card>
   );
 };
-
+ 
 export default BarChart;
+ 
+ 
