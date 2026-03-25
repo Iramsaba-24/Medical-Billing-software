@@ -109,10 +109,8 @@ const BusinessDetails = () => {
 
             <TextInputField
               name="gstin"
-              label="GSTIN (Optional)"
+              label="GSTIN "
               maxLength={15}
-              //inputProps={{ style: { textTransform: "uppercase" } }}
-
               sx={{
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#ffffff",

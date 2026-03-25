@@ -6,7 +6,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import NumericField from "@/components/controlled/NumericField";
 import { useState } from "react";
-
 const PaperStyle = {
   borderRadius: 2,
   p: { xs: 1, sm: 2 },
@@ -94,10 +93,17 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
             <TextInputField
               label="Card Number"
               name="CardNumber"
- 
+              required
               inputType="numbers"
               minLength={13}
               maxLength={19}
+              rules={{
+                pattern: {
+                  value: /^[0-9]{13,19}$/,
+                  message: "Invalid Card Number",
+                },
+                required: "Card Number is required",
+              }}
             />
           </Box>
 
@@ -128,14 +134,14 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
 
           <Box width={{ xs: "100%", sm: "auto" }}>
             <NumericField
-                    label="CVV"
-                    name="Cvv"
-                    required={true}
-                    decimal={false}
-                    maxlength={3}
-                    max={999}
-                    min={100}
-                  />
+              label="CVV"
+              name="Cvv"
+              required={true}
+              decimal={false}
+              maxlength={3}
+              max={999}
+              min={100}
+            />
           </Box>
 
           <Button

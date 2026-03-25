@@ -1,7 +1,7 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Typography, Box, Button, Paper } from "@mui/material";
 import PaymentTerms from "./PaymentTerm";
-import PurchaseGSTConfiguration from "./PurchaseGstConfiguration";
+// import PurchaseGSTConfiguration from "./PurchaseGstConfiguration";
 import { useEffect } from "react";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
@@ -16,7 +16,7 @@ type DistributorFormValues = {
   gst_settings?: string[];
   creditDays: string;
 };
-
+ 
 const DEFAULT_VALUES: DistributorFormValues = {
   supplier_details: [],
   product_linking: [],
@@ -32,9 +32,9 @@ const DistributorSettings = () => {
   const methods = useForm<DistributorFormValues>({
 defaultValues: DEFAULT_VALUES,
   });
-
+ 
   const { handleSubmit, reset } = methods;
-
+ 
   const onSubmit = (data: DistributorFormValues) => {
     console.log(" Data:", data);
     localStorage.setItem("distributorSettings", JSON.stringify(data));
@@ -46,12 +46,12 @@ defaultValues: DEFAULT_VALUES,
   };
   useEffect(() => {
     const storedSettings = localStorage.getItem("distributorSettings");
-
+ 
     if (storedSettings) {
       reset(JSON.parse(storedSettings));
     }
   }, [reset]);
-
+ 
   const checkboxStyle = {
   "& .MuiCheckbox-root": {
     color: "default.main",
@@ -73,17 +73,17 @@ defaultValues: DEFAULT_VALUES,
       >
         Distributors Settings
       </Typography>
-
+ 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <PaymentTerms />
-          <PurchaseGSTConfiguration />
+          {/* <PurchaseGSTConfiguration /> */}
           {/*  Bank Details Storage */}
           <Paper sx={{ p: 2, borderRadius: "10px", boxShadow: 4, mb: 1 }}>
             <Typography
               sx={{
                 fontWeight: 700,
-
+ 
                 fontSize: { xs: "16px", sm: "18px" },
                 color: "#212529",
                 mb: 1,
@@ -100,7 +100,7 @@ defaultValues: DEFAULT_VALUES,
               ]}
             />
           </Paper>
-
+ 
           {/*  Buttons- save reset*/}
           <Box
             sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}
@@ -150,5 +150,7 @@ defaultValues: DEFAULT_VALUES,
     </Box>
   );
 };
-
+ 
 export default DistributorSettings;
+ 
+ 

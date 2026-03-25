@@ -194,9 +194,14 @@ const CardPayment: React.FC = () => {
                     minLength={13}
                     maxLength={19}
                     rules={{
+                      pattern: {
+                        value: /^[0-9]{13,19}$/,
+                        message: "Invalid Card Number",
+                      },
                       required: "Card Number is required",
                     }}
                   />
+
                 </Box>
                 <Box
                   sx={{
