@@ -4,6 +4,7 @@ import Sign from "@/assets/Sign.svg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoImage from "@/assets/logoimg.svg";
+import { PharmacyFormValues } from "../setting/PharmacyProfile";
  
  
  
@@ -22,7 +23,7 @@ export interface Invoice {
     expiry: string;
   }[];
   subTotal?: number;
-  
+ 
   totalPrice?: number;
   total?: number;
 }
@@ -75,14 +76,25 @@ const InvoiceView = () => {
  
   const subTotal = invoice?.medicines?.reduce(
     (sum, med) => sum + Number(med.amount), 0) || 0;
-
+ 
   // const gstAmount = invoice?.gst ? (subTotal * invoice.gst) / 100 : 0;
-
+ 
   const netTotal = subTotal ;
-
+ 
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
-
-  // Mobile view card style 
+ 
+  //fetch name and address from pharmacy profile setting page
+  const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
+ 
+useEffect(() => {
+  const stored = localStorage.getItem("pharmacyProfile");
+  if (stored) {
+    setPharmacyData(JSON.parse(stored) as PharmacyFormValues);
+  }
+}, []);
+const pharmacyName = pharmacyData?.pharmacyName || "Your Pharmacy";
+const pharmacyAddress = pharmacyData?.address || "-";
+  // Mobile view card style
   if (isMobile) {
     return (
       <>
@@ -114,8 +126,8 @@ const InvoiceView = () => {
                 />
               )}
               <Box>
-                <Typography fontSize={13} fontWeight={600}>MEDIPLUS MEDICAL & GENERAL</Typography>
-                <Typography fontSize={11}>Shinoli, Tal: Ambegaon, Dist: Pune</Typography>
+                <Typography fontSize={13} fontWeight={600}> {pharmacyName}</Typography>
+                <Typography fontSize={11}>{pharmacyAddress}</Typography>
               </Box>
             </Box>
           </Box>
@@ -180,7 +192,7 @@ const InvoiceView = () => {
               I/We hereby certify that my/our registration certificate under the Maharashtra Value Added Tax Act 2002 is in force on the date on the which sales of the goods specified in this tax invoice is made by me/us and that the transaction of the sale covered by this tax invoice has been effected by me/us and it shall be accounted for in the turnover of sales while filling of return and the due tax, if any, payble on the sales has been paid or shall be paid.
             </Typography>
             <Box display="flex" flexDirection="column" alignItems="center" mt={1.5}>
-              <Typography fontSize={11} fontWeight={600}>For MEDIPLUS MEDICAL & GENERAL STORE</Typography>
+              <Typography fontSize={11} fontWeight={600}>For {pharmacyName}</Typography>
               <Box component="img" src={Sign} alt="Store Sign" sx={{ width: 80, py: 1 }} />
               <Typography fontSize={11}>Pharmacist</Typography>
             </Box>
@@ -214,8 +226,8 @@ const InvoiceView = () => {
       </>
     );
   }
-
-  // Desktop view 
+ 
+  // Desktop view
   return (
     <>
       <GlobalStyles
@@ -250,8 +262,8 @@ const InvoiceView = () => {
                       />
                     )}
                     <Box>
-                      <Typography fontSize={20}>MEDIPLUS MEDICAL & GENERAL</Typography>
-                      <Typography>Shinoli, Tal: Ambegaon, Dist: Pune</Typography>
+                      <Typography fontSize={20}>{pharmacyName}</Typography>
+                      <Typography>{pharmacyAddress}</Typography>
                     </Box>
                   </Box>
                 </TableCell>
@@ -293,8 +305,8 @@ const InvoiceView = () => {
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Sub Total</strong></TableCell>
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
-
-
+ 
+ 
               <TableRow sx={{ borderTop: "2px solid #000" }}>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   Get Well Soon..
@@ -319,7 +331,7 @@ const InvoiceView = () => {
                 </TableCell>
                 <TableCell colSpan={2} align="center" sx={{ border: "2px solid #000" }}>
                   <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center">
-                    <strong>For MEDIPLUS MEDICAL & GENERAL STORE</strong>
+                    <strong>For {pharmacyName}</strong>
                     <Box component="img" src={Sign} alt="Store Sign" sx={{ width: { xs: 80, md: 120 }, alignItems: "center", py: 2 }} />
                     <Typography>Pharmacist</Typography>
                   </Box>
@@ -362,3 +374,4 @@ const InvoiceView = () => {
 }
  
 export default InvoiceView
+ 

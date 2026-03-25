@@ -164,3 +164,4 @@ const CashPayment = ({ payment, finalAmount, onSuccess }: Props) => {
 };
 
 export default CashPayment;
+

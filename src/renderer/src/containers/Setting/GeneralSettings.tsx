@@ -96,7 +96,7 @@ const timeZoneOptions = [
 
     localStorage.setItem("generalSettings", JSON.stringify(data));
 
-    showToast("success", "Settings saved successfully!");
+    showToast("success", "Settings updated successfully!");
   };
 
   return (

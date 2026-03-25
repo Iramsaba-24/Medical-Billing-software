@@ -1,17 +1,19 @@
 import {Paper,Button,Stack,Typography,Box,IconButton,} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate, useParams } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
 import TextInputField from "@/components/controlled/TextInputField";
+
 import dayjs, { Dayjs } from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat"; // ✅ ADD
+
 import { useEffect, useState } from "react";
-import { useWatch } from "react-hook-form";
 
-
+dayjs.extend(customParseFormat); // ✅ ADD
 
 type InvoiceItem = {
   item: string;
@@ -80,15 +82,14 @@ const EditInvoice = () => {
     control,
     name: "items",
   });
+
   const watchedItems = useWatch({
     control,
     name: "items",
   });
 
   const [customerOptions, setCustomerOptions] = useState<DropdownOption[]>([]);
-  const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>(
-    []
-  );
+  const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>([]);
 
   const statusOptions: DropdownOption[] = [
     { label: "Paid", value: "Paid" },
@@ -96,7 +97,7 @@ const EditInvoice = () => {
     { label: "Overdue", value: "Overdue" },
   ];
 
-  // Load customers
+  // Load Customers
   useEffect(() => {
     const stored = localStorage.getItem("medical_customers");
     if (!stored) return;
@@ -111,7 +112,7 @@ const EditInvoice = () => {
     );
   }, []);
 
-
+  // Load Inventory
   useEffect(() => {
     watchedItems?.forEach((item, index) => {
       const selectedItem = inventoryOptions.find(
@@ -191,10 +192,7 @@ useEffect(() => {
     const stored = localStorage.getItem("currentInvoice");
     const invoices: StoredInvoice[] = stored ? JSON.parse(stored) : [];
 
-    const totalPrice = data.items.reduce(
-      (sum, i) => sum + Number(i.price),
-      0
-    );
+    const totalPrice = data.items.reduce((sum, i) => sum + Number(i.price), 0);
 
     const updated = invoices.map((inv) =>
       inv.invoice === invoiceNo
@@ -268,7 +266,9 @@ useEffect(() => {
 
                   if (!selectedItem) return;
 
-                  const qty = Number(methods.getValues(`items.${index}.qty`)) || 1;
+                  const qty =
+                    Number(methods.getValues(`items.${index}.qty`)) || 1;
+
                   const total = qty * selectedItem.price;
 
                   setValue(`items.${index}.price`, total);
@@ -286,7 +286,6 @@ useEffect(() => {
                 name={`items.${index}.price`}
                 label="Price"
                 type="number"
-
                 inputProps={{ readOnly: true }}
                 sx={{ width: 140 }}
               />
@@ -328,7 +327,8 @@ useEffect(() => {
             Cancel
           </Button>
 
-          <Button variant="contained"
+          <Button
+            variant="contained"
             sx={{
               backgroundColor: "#238878",
               color: "#fff",
@@ -340,7 +340,8 @@ useEffect(() => {
                 border: "2px solid #238878",
               },
             }}
-            onClick={handleSubmit(onSubmit)}>
+            onClick={handleSubmit(onSubmit)}
+          >
             Update Invoice
           </Button>
         </Stack>

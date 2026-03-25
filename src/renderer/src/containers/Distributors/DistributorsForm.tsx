@@ -110,6 +110,7 @@ const DistributorsForm = () => {
               <TextInputField
                 name="companyName"
                 label="Company Name"
+                minLength={3}
                 maxLength={30}
                 inputType="textarea"
                 rows={1}
@@ -120,6 +121,7 @@ const DistributorsForm = () => {
                 name="ownerName"
                 label="Owner Name"
                 inputType="alphabet"
+                minLength={3}
                 maxLength={30}
                 required
               />
@@ -144,7 +146,8 @@ const DistributorsForm = () => {
               name="date" 
               label="Date"
               viewMode="date"
-              useCurrentDate={false}
+              disabled
+              useCurrentDate={true}
               dateRestriction="current-future-only"
               required
              //dateRestriction="past-current-future"
@@ -196,7 +199,7 @@ const DistributorsForm = () => {
                 rows={2}
                 required
                 maxLength={50}
-                minLength={5}
+                minLength={10}
               />
             </Box>
           </Paper>
