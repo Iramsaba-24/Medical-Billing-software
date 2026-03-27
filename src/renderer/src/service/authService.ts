@@ -2,7 +2,6 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:5158/api";
 
-// Define proper types
 export interface RegisterRequest {
   username: string;
   password: string;
@@ -10,7 +9,6 @@ export interface RegisterRequest {
   email: string;
   mobileNumber: string;
   companyName: string;
-  // clinicName: string;
   city: string;
   state: string;
   businessDetail?: CreateBusinessDetailRequest;

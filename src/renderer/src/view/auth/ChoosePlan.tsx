@@ -1,4 +1,3 @@
-// ChoosePlan.tsx
 import { Box, Button, Typography } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import BgImage from "@/assets/bgloginpage.svg";
@@ -24,10 +23,8 @@ const ChoosePlan = () => {
   const onSubmit = (data: PlanForm) => {
     console.log("Plan selected:", data);
     
-    // Store selected plan
     localStorage.setItem('selectedPlan', data.plan);
     
-    // Update registration data with plan
     const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
     const completeData = { ...existingData, plan: data.plan };
     localStorage.setItem('registrationData', JSON.stringify(completeData));
