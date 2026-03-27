@@ -1,6 +1,3 @@
-// NetBanking_PurchaseDetails
-
-
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography } from "@mui/material";
 import BgImage from "@/assets/bgloginpage.svg";

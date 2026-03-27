@@ -6,6 +6,7 @@ import BgImage from "@/assets/bgloginpage.svg";
 import TextInputField from "@/components/controlled/TextInputField";
 import RadioField from "@/components/controlled/RadioField";
 import { URL_PATH } from "@/constants/UrlPath";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 type PaymentFormInputs = {
   paymentMethod: string;
@@ -47,6 +48,40 @@ const ProceedToPaymentPage = () => {
   const onSubmit = (data: PaymentFormInputs) => {
     console.log("Payment Data:", data);
 
+    // Store payment data in localStorage
+    const userId = localStorage.getItem('userId');
+    const selectedPlan = localStorage.getItem('selectedPlan');
+
+    // Validate required data
+    if (!userId) {
+      showToast("error", "User not found. Please register again.");
+      navigate(URL_PATH.REGISTER);
+      return;
+    }
+
+    if (!selectedPlan) {
+      showToast("error", "Plan not selected. Please start over.");
+      navigate(URL_PATH.ChoosePlan);
+      return;
+    }
+
+    // Map plan to planId (you can also fetch from API)
+    const planMapping: Record<string, number> = {
+      'basic': 1,
+      'standard': 2,
+      'premium': 3
+    };
+
+    const paymentData = {
+      userId: userId ? parseInt(userId) : 0,
+      amount: parseFloat(data.amount),
+      paymentMethod: data.paymentMethod,
+      planId: planMapping[selectedPlan] || 1,
+      couponCode: ''
+    };
+
+    localStorage.setItem('paymentData', JSON.stringify(paymentData));
+
     if (data.paymentMethod === "upi") {
       navigate(URL_PATH.UpiPayment);
     } else if (data.paymentMethod === "card") {
@@ -54,7 +89,7 @@ const ProceedToPaymentPage = () => {
     } else if (data.paymentMethod === "netbanking") {
       navigate(URL_PATH.NetBanking);
     } else {
-      alert("Please select payment method");
+      showToast("error", "Please select payment method");
     }
   };
 
