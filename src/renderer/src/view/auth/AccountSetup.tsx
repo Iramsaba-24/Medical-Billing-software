@@ -17,7 +17,6 @@ type AccountForm = {
   emailUpdates: boolean;
 };
 
-// Define proper types for API responses
 interface SubscriptionActivationResponse {
   success: boolean;
   message?: string;
@@ -77,7 +76,6 @@ const AccountSetup = () => {
 
   const navigate = useNavigate();
 
-  // Map plan name to plan ID based on your backend
   const getPlanId = (planName: string): number => {
     const planMapping: Record<string, number> = {
       'basic': 1,
@@ -87,7 +85,6 @@ const AccountSetup = () => {
     return planMapping[planName] || 1;
   };
 
-  // Get plan details for display (optional)
   const getPlanDetails = (planId: number): PlanDetails => {
     const planDetails: Record<number, PlanDetails> = {
       1: { name: 'Basic', price: 999, duration: 30 },
@@ -97,7 +94,6 @@ const AccountSetup = () => {
     return planDetails[planId] || { name: 'Basic', price: 999, duration: 30 };
   };
 
-  // Function to activate subscription using your existing endpoint
   const activateSubscription = async (userId: number, planId: number): Promise<SubscriptionActivationResponse> => {
     try {
       const apiBaseUrl = 'http://localhost:5158/api'; 
@@ -121,7 +117,6 @@ const AccountSetup = () => {
         console.error('Response status:', axiosError.response?.status);
         console.error('Response data:', axiosError.response?.data);
         
-        // Handle specific error cases
         if (axiosError.response?.data === "User already has active subscription") {
           return { success: true, message: "Already subscribed" };
         }
@@ -181,7 +176,6 @@ const AccountSetup = () => {
         const planId = getPlanId(selectedPlan);
         const planDetails = getPlanDetails(planId);
         
-        // Store user and plan info
         localStorage.setItem('userId', userId.toString());
         localStorage.setItem('planId', planId.toString());
         localStorage.setItem('selectedPlan', selectedPlan);
@@ -189,12 +183,10 @@ const AccountSetup = () => {
         console.log(`Attempting to activate subscription for user ${userId} with plan ${planId} (${planDetails.name} - ${planDetails.duration} days)`);
         
         try {
-          // Activate subscription - this will automatically set start and end dates based on plan
           const activationResponse = await activateSubscription(userId, planId);
           console.log("Subscription activation result:", activationResponse);
           
           if (activationResponse.success || activationResponse.data) {
-            // Store subscription details if available
             if (activationResponse.data) {
               localStorage.setItem('subscriptionDetails', JSON.stringify({
                 subscriptionId: activationResponse.data.subscriptionId,
@@ -204,7 +196,6 @@ const AccountSetup = () => {
               }));
             }
             
-            // Prepare payment data for the next step
             const paymentData = {
               userId: userId,
               amount: planDetails.price,
@@ -216,7 +207,6 @@ const AccountSetup = () => {
             
             showToast("success", `Account created! Your ${planDetails.name} plan subscription is active for ${planDetails.duration} days.`);
             
-            // Navigate to payment page
             navigate(URL_PATH.ProceedToPaymentPage);
           } else {
             showToast("warning", "Account created but subscription activation issue. Please contact support.");
@@ -225,8 +215,6 @@ const AccountSetup = () => {
         } catch (subscriptionError: unknown) {
           console.error("Failed to activate subscription:", subscriptionError);
           
-          // Even if subscription activation fails, we still have the user account
-          // We can still proceed to payment but show a warning
           showToast("warning", "Account created. Please complete payment to activate your subscription.");
           navigate(URL_PATH.ProceedToPaymentPage);
         }

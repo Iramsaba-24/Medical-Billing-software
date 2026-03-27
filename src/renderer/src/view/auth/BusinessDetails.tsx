@@ -44,7 +44,6 @@ const BusinessDetails = () => {
         }
       };
       
-      // Store complete data
       localStorage.setItem('registrationData', JSON.stringify(completeData));
       
       showToast("success", "Business details saved!");
@@ -84,7 +83,6 @@ const BusinessDetails = () => {
             p: { xs: 3, sm: 4 },
           }}
         >
-          {/* Logo */}
           <Box mb={2} alignSelf="center">
             <img
               src={LogoImage}
@@ -93,7 +91,6 @@ const BusinessDetails = () => {
             />
           </Box>
 
-          {/* Heading */}
           <Typography
             variant="h4"
             mb={{ xs: 3, sm: 4 }}
@@ -109,7 +106,6 @@ const BusinessDetails = () => {
             Business Details
           </Typography>
 
-          {/* Input Fields */}
           <Box
             sx={{
               width: "100%",
@@ -166,7 +162,6 @@ const BusinessDetails = () => {
             />
           </Box>
 
-          {/* Button */}
           <Button
             type="submit"
             disabled={isLoading}
@@ -189,26 +184,6 @@ const BusinessDetails = () => {
           >
            {isLoading ? "Saving..." : "Next Step"}
           </Button>
-           {/* <Button
-            type="submit"
-            disabled={isLoading}
-            sx={{
-              mt: { xs: 3, sm: 5 },
-              fontWeight: 600,
-              fontSize: { xs: "1rem", sm: "1.05rem" },
-              backgroundColor: "#1b7f6b",
-              textTransform: "none",
-              border: "2px solid #1b7f6b",
-              boxShadow: "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
-              transition: "all 0.25s ease",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#1b7f6b",
-              },
-            }}
-          >
-            {isLoading ? "Saving..." : "Next Step"}
-          </Button> */}
         </Box>
       </FormProvider>
     </Box>

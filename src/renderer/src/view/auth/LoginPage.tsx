@@ -57,13 +57,11 @@ const LoginPage = () => {
     setIsLoading(true);
     
     try {
-      // Prepare login data - remove empty licenseKey if not provided
       const loginData: LoginRequest = {
         usernameOrEmail: data.usernameOrEmail,
         password: data.password,
       };
       
-      // Only include licenseKey if it's not empty
       if (data.licenseKey && data.licenseKey.trim() !== "") {
         loginData.licenseKey = data.licenseKey.trim();
       }
@@ -75,7 +73,6 @@ const LoginPage = () => {
       console.log("Login response:", response);
       
       if (response.token) {
-        // Store token and user info
         localStorage.setItem('token', response.token);
         if (response.userId) {
           localStorage.setItem('userId', response.userId.toString());
@@ -89,7 +86,6 @@ const LoginPage = () => {
         
         showToast("success", "Login successful!");
         
-        // Navigate to dashboard or landing page
         navigate(URL_PATH.Landing);
       } else {
         showToast("error", response.message || "Login failed");
@@ -98,21 +94,16 @@ const LoginPage = () => {
       console.error("Login error:", error);
       
       if (axios.isAxiosError(error)) {
-        // Handle specific error messages from backend
         const statusCode = error.response?.status;
         const errorData = error.response?.data as ErrorResponse;
         
         console.log("Error status:", statusCode);
         console.log("Error data:", errorData);
         
-        // Check for subscription inactive error
         if (errorData?.message?.toLowerCase().includes("subscription not active")) {
-          // Store user info temporarily for subscription activation
-          // You might need to extract userId from the response if available
-          // For now, we'll prompt user to activate subscription
+          
           setShowSubscriptionDialog(true);
           
-          // If you have user email or ID from the error, store it
           if (data.usernameOrEmail) {
             setTempUserData({ email: data.usernameOrEmail });
           }
@@ -122,15 +113,12 @@ const LoginPage = () => {
         }
         
         if (statusCode === 400) {
-          // Check if it's a validation error
           if (errorData?.errors) {
-            // Handle validation errors
             const errorMessages = Object.values(errorData.errors).flat();
             showToast("error", errorMessages[0] || "Invalid input data");
           } else if (typeof errorData === 'string') {
             showToast("error", errorData);
           } else if (errorData?.message) {
-            // Handle specific messages
             if (errorData.message.includes("license")) {
               showToast("error", "Invalid or expired license key");
             } else if (errorData.message.includes("password")) {
@@ -162,7 +150,6 @@ const LoginPage = () => {
   
   const handleActivateSubscription = () => {
     setShowSubscriptionDialog(false);
-    // Navigate to plan selection page with user info
     if (tempUserData.email) {
       localStorage.setItem('pendingActivationEmail', tempUserData.email);
     }
@@ -171,7 +158,6 @@ const LoginPage = () => {
   
   const handleContactSupport = () => {
     setShowSubscriptionDialog(false);
-    // You can open a support modal or navigate to support page
     showToast("info", "Please contact support at support@yourdomain.com");
   };
   
@@ -179,7 +165,6 @@ const LoginPage = () => {
     formState: { errors },
   } = methods;
   
-  // textinput field styling(text box)
   const inputStyle = (fieldName: keyof LoginFormInputs) => ({
     "& .MuiOutlinedInput-root": {
       height: { xs: 44, sm: 48 },
@@ -238,7 +223,6 @@ const LoginPage = () => {
               borderRadius: 2,
             }}
           >
-            {/* logo img */}
             <Box mb={1}>
               <img
                 src={LogoImage}
@@ -247,7 +231,6 @@ const LoginPage = () => {
               />
             </Box>
 
-            {/* heading */}
             <Typography
               variant="h4"
               mb={{ xs: 3, sm: 4 }}
@@ -261,7 +244,6 @@ const LoginPage = () => {
               Login
             </Typography>
 
-            {/* Textinput fields */}
             <Box
               sx={{
                 width: "100%",
@@ -277,7 +259,7 @@ const LoginPage = () => {
                 rules={{
                   required: "Username or Email is required",
                   validate: (value: string) => {
-                    if (!value) return true; // Let required handle empty
+                    if (!value) return true; 
                     
                     const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}$/i;
                     const usernameRegex = /^[a-zA-Z0-9_.@]{3,20}$/;
@@ -347,7 +329,6 @@ const LoginPage = () => {
               />
             </Box>
             
-            {/* login button */}
             <Button
               type="submit"
               fullWidth
@@ -378,7 +359,6 @@ const LoginPage = () => {
         </FormProvider>
       </Box>
 
-      {/* Subscription Activation Dialog */}
       <Dialog
         open={showSubscriptionDialog}
         onClose={() => setShowSubscriptionDialog(false)}

@@ -84,21 +84,18 @@ const UpiPayment: React.FC = () => {
   const { handleSubmit, control } = methods;
 
 
-  // watch UPI ID for live icon detection
   const upiId = useWatch({ control, name: "UpiId" });
   const detectedIcon = getUpiApp(upiId) || "upi";
 
-  // payment status 
   const [upiPaymentStatus, setUpiPaymentStatus] = useState<"default" | "loading" | "success">("default");
 
   const onUpiPay = async () => {
     setUpiPaymentStatus("loading");
 
     try {
-      // Get stored payment data
       const paymentDataStr = localStorage.getItem('paymentData');
       const userId = localStorage.getItem('userId');
-      // const selectedPlanId = localStorage.getItem('selectedPlanId');
+      
 
       if (!paymentDataStr || !userId) {
         throw new Error("Missing payment information");
@@ -106,7 +103,6 @@ const UpiPayment: React.FC = () => {
 
       const paymentData = JSON.parse(paymentDataStr);
 
-      // First, create subscription
       const subscriptionResponse = await authService.createSubscription({
         userId: parseInt(userId),
         planId: paymentData.planId
@@ -130,14 +126,12 @@ const UpiPayment: React.FC = () => {
       if (paymentResponse.paymentStatus === "pending" || paymentResponse.paymentStatus === "success") {
         setUpiPaymentStatus("success");
 
-        // Clear temporary data
         localStorage.removeItem('registrationData');
         localStorage.removeItem('paymentData');
         localStorage.removeItem('selectedPlanId');
 
         showToast("success", "Payment Successful!");
 
-        // Navigate to success page
         setTimeout(() => {
           navigate(URL_PATH.PaymentSuccess);
         }, 900);

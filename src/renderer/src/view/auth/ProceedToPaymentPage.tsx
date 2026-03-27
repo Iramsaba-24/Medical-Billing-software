@@ -77,7 +77,7 @@ const ProceedToPaymentPage = () => {
       amount: parseFloat(data.amount),
       paymentMethod: data.paymentMethod,
       planId: planMapping[selectedPlan] || 1,
-      couponCode: '' // Add if you have coupon functionality
+      couponCode: ''
     };
 
     localStorage.setItem('paymentData', JSON.stringify(paymentData));

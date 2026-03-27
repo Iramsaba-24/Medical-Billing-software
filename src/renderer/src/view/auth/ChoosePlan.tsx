@@ -31,7 +31,6 @@ const ChoosePlan = () => {
     
     showToast("success", "Plan selected successfully!");
     
-    // Navigate to AccountSetup to set password
     navigate(URL_PATH.AccountSetup);
   };
 
@@ -62,7 +61,6 @@ const ChoosePlan = () => {
             px: 2,
           }}
         >
-          {/* Logo */}
           <img
             src={LogoImage}
             style={{
@@ -72,7 +70,6 @@ const ChoosePlan = () => {
             alt="Logo"
           />
 
-          {/* Title */}
           <Typography
             sx={{
               mt: 0.5,
@@ -85,7 +82,6 @@ const ChoosePlan = () => {
             Choose Your Plan
           </Typography>
 
-          {/* Radio Options */}
           <Box
             sx={{
               width: "100%",
@@ -113,7 +109,6 @@ const ChoosePlan = () => {
             </Box>
           </Box>
 
-          {/* Button */}
           <Button
             type="submit"
             fullWidth
