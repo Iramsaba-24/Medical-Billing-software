@@ -11,13 +11,13 @@ import { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 
 type Doctor = {
-  id: string;
+  doctorId: number;
   doctorName: string;
   degree: string;
   phone: string;
   email: string;
-  registrationNo: string;
-  address: string;
+  registrationNumber: string;
+  hospitalAddress: string;
   status: "Active" | "Inactive";
 };
 
@@ -70,8 +70,8 @@ const DoctorEdit = ({ doctor, onClose, onSave }: Props) => {
             <MobileField name="phone" label="Phone" countryCode required />
 
             <TextInputField
-              name="address"
-              label="Address"
+              name="hospitalAddress"
+              label="Clinic / Hospital Address"
               inputType="all"
               required
               rules={{ required: "Address is required" }}

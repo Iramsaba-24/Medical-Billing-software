@@ -11,8 +11,8 @@ export interface AddDoctorFormValues {
   degree: string;
   phone: string;
   email: string;
-  registrationNo: string;
-  address: string;
+  registrationNumber: string;
+  hospitalAddress: string;
   status: "Active";
 }
 
@@ -23,8 +23,8 @@ const AddDoctor = () => {
       degree: "",
       phone: "",
       email: "",
-      registrationNo: "",
-      address: "",
+      registrationNumber: "",
+      hospitalAddress: "",
       status: "Active",
     },
     mode: "onChange",
@@ -39,7 +39,7 @@ const AddDoctor = () => {
     );
 
     const newDoctor = {
-      id: Date.now(),
+      doctorId: Date.now(),
       ...data,
     };
     
@@ -119,7 +119,7 @@ const AddDoctor = () => {
         <Box mt={3} width="100%">
           <TextInputField
             inputType="numbers"
-            name="registrationNo"
+            name="registrationNumber"
             label="Registration No."
             required
             minLength={3}
@@ -131,7 +131,7 @@ const AddDoctor = () => {
       {/* address */}
         <Box mt={3}>
           <TextInputField
-            name="address"
+            name="hospitalAddress"
             label="Clinic / Hospital Address"
             inputType="all"
             required
