@@ -108,11 +108,20 @@ const RegisterPage = () => {
       city: data.city.trim(),
       state: data.state.trim(),
     };
+
+     localStorage.setItem('registrationData', JSON.stringify({
+    fullName: cleanedData.fullName,
+    email: cleanedData.email,
+    mobileNumber: cleanedData.mobileNumber,
+    companyName: cleanedData.companyName,
+    city: cleanedData.city,
+    state: cleanedData.state,
+  }));
  
     console.log(cleanedData);
- 
+
     navigate(URL_PATH.BusinessDetails);
-    showToast("success", "Registration successful!");
+    showToast("success", "Personal details saved!");
   };
  
   return (
