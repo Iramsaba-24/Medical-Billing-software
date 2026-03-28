@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import ItemsSection from "@/containers/customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -99,10 +99,10 @@ function RetailInvoice() {
     const hasInvalidItems = rows.some(
       (row) =>
         row.name.trim() === "" ||
-        row.qty === "" ||
-        Number(row.qty) <= 0 ||
-        row.price === "" ||
-        Number(row.price) <= 0
+        row.quantity === "" ||
+        Number(row.quantity) <= 0 ||
+        row.mrp === "" ||
+        Number(row.mrp) <= 0
     );
 
     if (hasInvalidItems) return;
@@ -119,16 +119,17 @@ function RetailInvoice() {
       doctorAddress: data.addressRight,
       medicines: rows.map((r) => ({
         name: r.name,
-        qty: r.qty,
-        price: r.price,
-        amount: Number(r.qty || 0) * Number(r.price || 0),
+        qty: r.quantity,
+        price: r.mrp,
+        amount: Number(r.quantity || 0) * Number(r.mrp || 0),
          expiry: r.expiry || "",
       })),
       subTotal: subTotal,
       
-      totalPrice: finalTotal,
-      status: "Paid",
-      date: now.toLocaleDateString(),
+      totalAmount: finalTotal,
+      paymentStatus: "Paid",
+      // invoiceate: now.toLocaleDateString(),
+      invoiceDate: now.toLocaleDateString(), 
       time: now.toLocaleTimeString(),
       paymentMode,
     };
@@ -142,8 +143,8 @@ function RetailInvoice() {
   type ItemRow = {
     id: number;
     name: string;
-    qty: number | "";
-    price: number | "";
+    quantity: number | "";
+    mrp: number | "";
       expiry?: string;
   };
   type InvoiceData = {
@@ -162,7 +163,7 @@ function RetailInvoice() {
   };
 
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "", expiry: ""  },
+    { id: Date.now(), name: "", quantity: 1, mrp: "", expiry: ""  },
   ]);
 
  
@@ -194,7 +195,7 @@ function RetailInvoice() {
         addressLeft: "",
         addressRight: "",
       });
-      setRows([{ id: Date.now(), name: "", qty: 1, price: "" }]);
+      setRows([{ id: Date.now(), name: "", quantity: 1, mrp: "" }]);
      
       setPaymentMode("Cash");
     }
@@ -273,7 +274,7 @@ function RetailInvoice() {
     }
   }, [selectedDoctorName, doctorList, methods]);
   const subTotal = rows.reduce(
-    (sum, r) => sum + (Number(r.qty) * Number(r.price) || 0),
+    (sum, r) => sum + (Number(r.quantity) * Number(r.mrp) || 0),
     0
   );
 

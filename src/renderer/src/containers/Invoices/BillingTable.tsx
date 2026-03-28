@@ -51,7 +51,10 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
   const filteredInvoices = invoices.filter((invoice) => {
     if (!filterType || filterType === "all") return true;
 
-    const parts = invoice.date.split("/");
+      const dateStr = invoice.invoiceDate ?? ""; 
+  if (!dateStr) return false; 
+
+    const parts = dateStr.split("/");
     const invoiceDate = new Date(
       Number(parts[2]),
       Number(parts[1]) - 1,
@@ -86,13 +89,13 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
   const columns: Column<Invoice>[] = [
     { key: "invoice", label: "Invoice" },
     { key: "name", label: "Name" },
-    { key: "date", label: "Date" },
+    { key: "invoiceDate", label: "Date" },
     {
       key: "price",
       label: "Price",
       render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
     },
-    { key: "status", label: "Status" },
+    { key: "paymentStatus", label: "Status" },
     { key: "actionbutton", label: "Action" },
   ];
 
@@ -173,7 +176,7 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
           enableCheckbox
           getRowId={(row) => row.invoice}
           dropdown={{
-            key: "status",
+            key: "paymentStatus",
 
             options: statusOptions,
 
@@ -181,7 +184,7 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
               setInvoices((prev) => {
                 const updated = prev.map((inv) =>
                   inv.invoice === row.invoice
-                    ? { ...inv, status: value as InvoiceStatus }
+                    ? { ...inv, paymentStatus: value as InvoiceStatus }
                     : inv
                 );
 

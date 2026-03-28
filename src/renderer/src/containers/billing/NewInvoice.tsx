@@ -63,8 +63,8 @@ type FormData = {
 type ItemRow = {
   id: number;
   name: string;
-  qty: number | "";
-  price: number | "";
+  quantity: number | "";
+  mrp: number | "";
   expiry?: string;
 };
  
@@ -72,7 +72,7 @@ const NewInvoice = () => {
   const navigate = useNavigate();
   const [distributors, setDistributors] = useState<Distributor[]>([]);
   const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", qty: 1, price: "", expiry: "" },
+    { id: Date.now(), name: "", quantity: 1, mrp: "", expiry: "" },
   ]);
  
   const [gst, setGst] = useState<number>(5);
@@ -81,7 +81,7 @@ const NewInvoice = () => {
   /*  GRAND TOTAL */
  
   const finalTotal = rows.reduce((sum, r) => {
-    return sum + Number(r.qty || 0) * Number(r.price || 0);
+    return sum + Number(r.quantity || 0) * Number(r.mrp || 0);
   }, 0);
  
   const methods = useForm<FormData>({
@@ -116,7 +116,7 @@ const NewInvoice = () => {
  
   const onSubmit = (data: FormData) => {
     setIsSubmitted(true);
-    if (rows.some((r) => !r.name || !r.qty || !r.price)) {
+    if (rows.some((r) => !r.name || !r.quantity || !r.mrp)) {
       showToast("error", "Please fill all item details");
       return;
     }
@@ -139,12 +139,13 @@ const NewInvoice = () => {
   distributorId: selectedDistributor?.id || "",      
       medicines: rows.map((r) => ({
       name: r.name,
-        qty: r.qty,
-        amount: Number(r.qty || 0) * Number(r.price || 0),
+        quantity: r.quantity,
+          mrp: r.mrp, 
+        amount: Number(r.quantity || 0) * Number(r.mrp || 0),
         batch: "",
         expiry: r.expiry || "",
       })),
-      totalPrice: grandTotal,
+      totalAmount: grandTotal,
     };
  
     const updatedInvoices = [...existingInvoices, newInvoice];
