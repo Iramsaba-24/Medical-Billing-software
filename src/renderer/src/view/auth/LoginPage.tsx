@@ -33,14 +33,11 @@ const LoginPage = () => {
     navigate(URL_PATH.Landing, {
       state: {
         username: data.username,
-        password: data.password,
         licenseKey: data.licenseKey,
       },
     });
   };
-  const {
-    formState: { errors },
-  } = methods;
+  const {formState: { errors },} = methods;
   // textinput field styling(text box)
   const inputStyle = (fieldName: keyof LoginFormInputs) => ({
     // input box -container height, border radius, background color
@@ -61,8 +58,8 @@ const LoginPage = () => {
           : "#1b7f6b !important",
       },
       "&.Mui-focused fieldset": {
-        borderColor: errors[fieldName]
-          ? "#d32f2f !important"
+        borderColor: errors[fieldName]  // If there's an error for this field, use red; otherwise, use green
+          ? "#d32f2f !important"      //type of error color
           : "#1b7f6b !important",
       },
     },

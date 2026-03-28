@@ -98,28 +98,31 @@ const Dashboard: React.FC = () => {
           alignItems: { xs: 'flex-start', md: 'center' },
           flexDirection: { xs: 'column', md: 'row' },
           gap: 2,
-          mb: 4,
         }}
       >
-        <Box>
-          <Typography
-            sx={{
-              fontSize: '28px',
-              fontWeight: 700,
-              color: '#111827',
-            }}
-          >
-            Dashboard
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: '15px',
-              mt: 0.5,
-            }}
-          >
-            A quick data overview of the inventory.
-          </Typography>
-        </Box>
+      <Box>
+        <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 24, md: 28 },  
+            fontWeight: 700,
+            color: '#111827',
+            mt: {xs:1 , md:0.5},
+            mb: 0.5,
+          }}
+        >
+          Dashboard
+        </Typography>
+
+        <Typography
+          sx={{
+            fontSize: { xs: 13, sm: 14, md: 15 }, 
+            mb: 1.5,
+            color: "text.secondary",
+          }}
+        >
+          A quick data overview of the inventory.
+        </Typography>
+      </Box>
 
         {/* <Button
           variant="contained"

@@ -136,10 +136,10 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         </Box>
 
         {/*  Customer & Doctor Personal Information Card */}
-        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }} elevation={0}>
+        <Paper sx={{ p: { xs: 2, md: 3 }, mb: 3, border: "1px solid #e0e0e0" }} elevation={3}>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.5fr 1fr" }, gap: 4 }}>
             {/*  Customer details like Mobile, Age, Address */}
-            <Box>
+            <Box >
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>Customer Details</Typography>
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
                 <TextInputField name="name" label="Customer Name" inputType="alphabet" required />
@@ -158,6 +158,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   name="doctor"
                   label="Doctor Name"
                   options={doctorOptions}
+                  placeholder="Select Doctors"
                 />
                 <TextInputField name="doctorAddress" label="Doctor Address/Clinic" inputType="textarea" rows={1} />
               </Box>

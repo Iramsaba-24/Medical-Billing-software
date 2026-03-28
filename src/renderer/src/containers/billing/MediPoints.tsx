@@ -11,6 +11,8 @@ import NumericField from "@/components/controlled/NumericField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import TextInputField from "@/components/controlled/TextInputField";
+import { useLocation } from "react-router-dom";
+
 
 // types
 type MediPointsForm = {
@@ -25,7 +27,12 @@ type InfoRowProps = {
   color?: string;
 };
 
+
 const MediPoints: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const totalFromInvoice = location.state?.totalFromInvoice || 0;       //total amount from Billing page
   
   const [earned] = useState(5);
 
@@ -37,7 +44,7 @@ const MediPoints: React.FC = () => {
 
   const methods = useForm<MediPointsForm>({
     defaultValues: {
-      totalAmount: "",
+      totalAmount: totalFromInvoice.toString(),           //autofill total
       mediPoints: "",
       discountedAmount: "",
     },
@@ -94,7 +101,7 @@ const MediPoints: React.FC = () => {
       </Typography>
     </Box>
   );
-  const navigate = useNavigate();
+  
    const onSubmit = (data:  MediPointsForm) => {
     console.log(data);
     navigate(URL_PATH.PaymentMethod);
@@ -229,11 +236,14 @@ const MediPoints: React.FC = () => {
                   Total (GST included)
                 </Typography>
                 <TextInputField
-                  name="totalAmount"
-                  label=""
-                  inputType="numbers"
-                 
-                />
+  name="totalAmount"
+  label=""
+  inputType="numbers"
+  InputProps={{
+    readOnly: true,
+  }}
+/>
+
               </Box>
 
               <Box mb={2}>

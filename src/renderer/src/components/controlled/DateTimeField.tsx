@@ -41,7 +41,7 @@ const DateTimeField: FC<DateFieldProps> = ({
   required = false,
   sx,
   viewMode = "date",
-  useCurrentDate = false,
+  useCurrentDate = true,
   ...pickerProps
 }) => {
   const { t } = useTranslation();

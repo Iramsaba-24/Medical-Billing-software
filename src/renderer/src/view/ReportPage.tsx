@@ -4,16 +4,29 @@ import InvoiceTable from '@/containers/Report/InvoiceTable';
 import InventoryTable from '@/containers/Report/InventoryTable';
 import CustomerList from '@/containers/Report/CustomersList';
 import DistributorReportTable from '@/containers/Report/DistributorReportTable';
+import { Box, Typography } from "@mui/material";
 
 const ReportPage = () => {
   return (
    
-    <div className="container"  >
+    <Box className="container"  >
       
-      <h2 style={{ marginTop: '-20px' }}>Reports</h2>
+      <Box>
+          <Typography
+            sx={{
+              fontSize: { xs: 20, sm: 24, md: 28 },
+              fontWeight: 700,
+              color: '#111827',
+              mt: {xs:1 , md:0.5},
+              mb:0.5
+            }}
+          >
+            Reports
+          </Typography>
+        </Box>
       <ReportCards />
       <SalesGraph />
-      <div style={{ 
+      <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column', 
         gap: '30px',      
@@ -25,8 +38,8 @@ const ReportPage = () => {
         <DistributorReportTable />
         <CustomerList />
         
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
