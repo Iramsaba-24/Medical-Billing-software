@@ -48,7 +48,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.3.7",
+    "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.7",
     "@mui/x-charts": "^8.27.5",
     "@mui/x-date-pickers": "^8.26.0",
@@ -59,6 +59,7 @@
     "docx": "^9.5.1",
     "file-saver": "^2.0.5",
     "i18next": "^25.7.3",
+    "icons-material": "^0.0.1-security",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
     "motion": "^12.23.26",

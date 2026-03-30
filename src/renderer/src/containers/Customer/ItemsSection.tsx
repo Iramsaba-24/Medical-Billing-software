@@ -23,7 +23,7 @@ export type InventoryItem = {
   itemName: string;
   itemId: string;
   medicineGroup: string;
-  stockQty: number;
+  quantity: number;
   pricePerUnit: number;
   expiryDate: string;
   supplier: string;
@@ -55,7 +55,7 @@ const ItemsSection = ({
     const parsed: InventoryItem[] = JSON.parse(stored).map(
       (item: InventoryItem) => ({
         ...item,
-        stockQty: Number(item.stockQty),
+        stockQty: Number(item.quantity),
       })
     );
 

@@ -82,7 +82,6 @@ const CardPayment: React.FC = () => {
     }
   }, [cardPaymentStatus, navigate]);
 
-  //Status UI 
   const showPaymentStatus = (
     status: "default" | "loading" | "success"
   ) => {
@@ -141,7 +140,6 @@ const CardPayment: React.FC = () => {
             }}
         >
           <Box sx={{ textAlign: "center", width: "100%" }}>
-            {/* Logo */}
             <Box
               component="img"
               src={LogoImage}
@@ -176,7 +174,6 @@ const CardPayment: React.FC = () => {
                 mx: "auto",
               }}
             >
-              {/* Card Radio label */}
               <RadioField
                 name="paymentMethod"
                 options={[{ label: "Debit / Credit Card", value: "credit-card" }]}
@@ -184,7 +181,6 @@ const CardPayment: React.FC = () => {
                 sx={radioStyle}
               />
 
-              {/* Card Number n Icon */}
               <Box display="flex" alignItems="center" gap={2} mt={1}>
                 <Box flex={1}>
                   <TextInputField
@@ -216,7 +212,6 @@ const CardPayment: React.FC = () => {
                 </Box>
               </Box>
 
-              {/* Card Holder Name */}
               <Box display="flex" alignItems="center" gap={2}>
                 <Box flex={1}>
                   <TextInputField
@@ -233,7 +228,6 @@ const CardPayment: React.FC = () => {
                 <Box sx={{ width: 24, flexShrink: 0 }} />
               </Box>
 
-              {/* CVV n Pay button */}
               <Box
                 display="flex"
                 flexDirection={{ xs: "column", sm: "row" }}
@@ -251,6 +245,7 @@ const CardPayment: React.FC = () => {
                     maxlength={3}
                     max={999}
                     min={100}
+ 
                   />
                 </Box>
 
@@ -264,7 +259,6 @@ const CardPayment: React.FC = () => {
                     width: { xs: "100%", sm: "auto" },
                     mb: 1,
                   }}
-                //   onClick={handleSubmit}
                 >
                   Pay
                 </Button>

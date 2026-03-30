@@ -34,7 +34,7 @@ type Doctor = {
   phone: string;
   email: string;
   registrationNo: string;
-  address: string;
+  hospitalAddress: string;
   status: "Active";
 };
 
@@ -268,7 +268,7 @@ function RetailInvoice() {
         (doc) => doc.doctorName === selectedDoctorName
       );
       if (selectedDoctor) {
-        methods.setValue("addressRight", selectedDoctor.address);
+        methods.setValue("addressRight", selectedDoctor.hospitalAddress || "");
       }
     }
   }, [selectedDoctorName, doctorList, methods]);

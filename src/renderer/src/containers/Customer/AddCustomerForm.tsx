@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 interface StoredDoctor {
   doctorName: string;
-  doctorAddress?: string;
+  hospitalAddress?: string;
   address?: string;
   clinicAddress?: string;
 }
@@ -77,7 +77,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     const options = storedDoctors.map((doc) => ({
       label: doc.doctorName,
       value: doc.doctorName,
-      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
+      address: doc.hospitalAddress ?? doc.address ?? doc.clinicAddress ?? "",
     }));
     const updatedOptions = [
       { label: "+ Add Doctor", value: "add_doctor", address: "" },
