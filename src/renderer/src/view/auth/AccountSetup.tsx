@@ -1,5 +1,4 @@
-import { Box, Button, Typography, Checkbox, FormControlLabel, FormHelperText,
-} from "@mui/material";
+import { Box, Button, Typography, Checkbox, FormControlLabel, FormHelperText } from "@mui/material";
 import { FormProvider, useForm, Controller } from "react-hook-form";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
@@ -7,6 +6,9 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import PasswordField from "@/components/controlled/PasswordField";
+import { authService } from "@/service/authService";
+import axios, { AxiosError } from "axios";
+import { useState } from "react";
 
 type AccountForm = {
   password: string;
@@ -14,7 +16,37 @@ type AccountForm = {
   terms: boolean;
   emailUpdates: boolean;
 };
-  const checkboxStyle = {
+
+interface SubscriptionActivationResponse {
+  success: boolean;
+  message?: string;
+  data?: {
+    subscriptionId: number;
+    startDate: string;
+    endDate: string;
+    planId: number;
+  };
+}
+
+interface RegistrationResponse {
+  userId?: number;
+  message?: string;
+  success?: boolean;
+}
+
+interface ErrorResponse {
+  message?: string;
+  errors?: Record<string, string[]>;
+  status?: number;
+}
+
+interface PlanDetails {
+  name: string;
+  price: number;
+  duration: number;
+}
+
+const checkboxStyle = {
   "& .MuiCheckbox-root": {
     color: "default.main",
     "&.Mui-checked": {
@@ -24,7 +56,8 @@ type AccountForm = {
 };
 
 const AccountSetup = () => {
-
+  const [isLoading, setIsLoading] = useState(false);
+  
   const methods = useForm<AccountForm>({
     mode: "onChange",
     defaultValues: {
@@ -41,15 +74,229 @@ const AccountSetup = () => {
     formState: { errors },
   } = methods;
 
-
-
   const navigate = useNavigate();
 
-  const onSubmit = (data: AccountForm) => {
-    console.log(data);
-    navigate(URL_PATH.ProceedToPaymentPage);
-    showToast("success", "Account setup successful!");
+  const getPlanId = (planName: string): number => {
+    const planMapping: Record<string, number> = {
+      'basic': 1,
+      'standard': 2,
+      'premium': 3
+    };
+    return planMapping[planName] || 1;
   };
+
+  const getPlanDetails = (planId: number): PlanDetails => {
+    const planDetails: Record<number, PlanDetails> = {
+      1: { name: 'Basic', price: 999, duration: 30 },
+      2: { name: 'Standard', price: 1999, duration: 30 },
+      3: { name: 'Premium', price: 2999, duration: 30 }
+    };
+    return planDetails[planId] || { name: 'Basic', price: 999, duration: 30 };
+  };
+
+  const activateSubscription = async (userId: number, planId: number): Promise<SubscriptionActivationResponse> => {
+    try {
+      const apiBaseUrl = 'http://localhost:5158/api'; 
+      
+      console.log(`Calling: ${apiBaseUrl}/UserSubscription/activate?userId=${userId}&planId=${planId}`);
+      
+      const response = await axios.post<SubscriptionActivationResponse>(`${apiBaseUrl}/UserSubscription/activate`, null, {
+        params: {
+          userId: userId,
+          planId: planId
+        }
+      });
+      
+      console.log('Subscription activation response:', response.data);
+      return response.data;
+    } catch (error: unknown) {
+      console.error('Error activating subscription:', error);
+      
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        console.error('Response status:', axiosError.response?.status);
+        console.error('Response data:', axiosError.response?.data);
+        
+        if (axiosError.response?.data === "User already has active subscription") {
+          return { success: true, message: "Already subscribed" };
+        }
+      }
+      
+      throw error;
+    }
+  };
+
+const onSubmit = async (data: AccountForm): Promise<void> => {
+  setIsLoading(true);
+  
+  try {
+    console.log("Account setup data:", data);
+    
+    const registrationData = JSON.parse(localStorage.getItem('registrationData') || '{}');
+    const selectedPlan = localStorage.getItem('selectedPlan');
+    
+    console.log("Registration data:", registrationData);
+    console.log("Selected plan:", selectedPlan);
+
+    if (!registrationData.email || !registrationData.fullName) {
+      showToast("error", "Registration data missing. Please start over.");
+      navigate(URL_PATH.REGISTER);
+      return;
+    }
+
+    if (!selectedPlan) {
+      showToast("error", "Plan not selected. Please start over.");
+      navigate(URL_PATH.ChoosePlan);
+      return;
+    }
+
+    const completeUserData: {
+      username: string;
+      password: string;
+      fullName: string;
+      email: string;
+      mobileNumber: string;
+      companyName: string;
+      city: string;
+      state: string;
+      businessDetail?: {
+        businessType: string;
+        gstin: string;
+        licenseNumber: string;
+      };
+    } = {
+      username: registrationData.email.split('@')[0],
+      password: data.password,
+      fullName: registrationData.fullName,
+      email: registrationData.email,
+      mobileNumber: registrationData.mobileNumber,
+      companyName: registrationData.companyName || "",
+      city: registrationData.city || "",
+      state: registrationData.state || "",
+    };
+
+    // Add BusinessDetail if it exists and has values
+    if (registrationData.businessDetail && 
+        (registrationData.businessDetail.businessType || 
+         registrationData.businessDetail.gstin || 
+         registrationData.businessDetail.licenseNumber)) {
+      completeUserData.businessDetail = {
+        businessType: registrationData.businessDetail.businessType || "",
+        gstin: registrationData.businessDetail.gstin || "",
+        licenseNumber: registrationData.businessDetail.licenseNumber || ""
+      };
+    }
+
+    console.log("Sending to registration API:", JSON.stringify(completeUserData, null, 2));
+
+    const response = await authService.register(completeUserData) as RegistrationResponse;
+    console.log("Registration response:", response);
+
+    if (response.userId) {
+      const userId = response.userId;
+      const planId = getPlanId(selectedPlan);
+      const planDetails = getPlanDetails(planId);
+      
+      localStorage.setItem('userId', userId.toString());
+      localStorage.setItem('planId', planId.toString());
+      localStorage.setItem('selectedPlan', selectedPlan);
+      
+      console.log(`Attempting to activate subscription for user ${userId} with plan ${planId}`);
+      
+      try {
+        const activationResponse = await activateSubscription(userId, planId);
+        console.log("Subscription activation result:", activationResponse);
+        
+        if (activationResponse.success || activationResponse.data) {
+          if (activationResponse.data) {
+            localStorage.setItem('subscriptionDetails', JSON.stringify({
+              subscriptionId: activationResponse.data.subscriptionId,
+              startDate: activationResponse.data.startDate,
+              endDate: activationResponse.data.endDate,
+              planId: planId
+            }));
+          }
+          
+          const paymentData = {
+            userId: userId,
+            amount: planDetails.price,
+            paymentMethod: '',
+            planId: planId,
+            couponCode: ''
+          };
+          localStorage.setItem('paymentData', JSON.stringify(paymentData));
+          
+          showToast("success", `Account created! Your ${planDetails.name} plan subscription is active for ${planDetails.duration} days.`);
+          
+          navigate(URL_PATH.ProceedToPaymentPage);
+        } else {
+          showToast("warning", "Account created but subscription activation issue. Please contact support.");
+          navigate(URL_PATH.ProceedToPaymentPage);
+        }
+      } catch (subscriptionError: unknown) {
+        console.error("Failed to activate subscription:", subscriptionError);
+        
+        showToast("warning", "Account created. Please complete payment to activate your subscription.");
+        navigate(URL_PATH.ProceedToPaymentPage);
+      }
+    } else {
+      showToast("error", response.message || "Registration failed");
+    }
+  } catch (error: unknown) {
+    console.error('Registration error:', error);
+    
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      
+      if (axiosError.response) {
+        const statusCode = axiosError.response.status;
+        const errorData = axiosError.response.data;
+        
+        console.error('Error response details:', {
+          status: statusCode,
+          data: errorData,
+          headers: axiosError.response.headers
+        });
+        
+        if (statusCode === 409) {
+          showToast("error", "User already exists. Please login.");
+          navigate(URL_PATH.LOGIN);
+        } else if (statusCode === 400) {
+          // Handle validation errors
+          let errorMessage = "Validation failed: ";
+          
+          if (typeof errorData === 'string') {
+            errorMessage = errorData;
+          } else if (errorData?.errors) {
+            // Format validation errors nicely
+            const errorList: string[] = [];
+            Object.keys(errorData.errors).forEach(field => {
+              const fieldErrors = errorData.errors?.[field];
+              if (fieldErrors && Array.isArray(fieldErrors)) {
+                errorList.push(`${field}: ${fieldErrors.join(', ')}`);
+              }
+            });
+            errorMessage = errorList.join('; ');
+          } else if (errorData?.message) {
+            errorMessage = errorData.message;
+          }
+          
+          showToast("error", errorMessage);
+        } else {
+          showToast("error", errorData?.message || `Registration failed with status ${statusCode}`);
+        }
+      } else if (axiosError.request) {
+        showToast("error", "No response from server. Please check if the backend is running.");
+      } else {
+        showToast("error", "Network error. Please check your connection.");
+      }
+    } else {
+      showToast("error", "An unexpected error occurred. Please try again.");
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <Box
@@ -77,14 +324,12 @@ const AccountSetup = () => {
             px: 2,
           }}
         >
-
-          {/* Logo */}
           <img
             src={LogoImage}
             style={{ width: "100%", maxWidth: "160px" }}
+            alt="Logo"
           />
 
-          {/* Title */}
           <Typography
             sx={{
               fontSize: { xs: "1.5rem", sm: "1.7rem" },
@@ -94,7 +339,6 @@ const AccountSetup = () => {
             Account Setup
           </Typography>
 
-          {/* Password */}
           <Box sx={{ width: "100%", maxWidth: 420 }}>
             <PasswordField
               name="password"
@@ -103,11 +347,9 @@ const AccountSetup = () => {
               minLength={8}
               maxLength={32}
               showStrengthIndicator={false}
-              
             />
           </Box>
 
-          {/* Confirm Password */}
           <Box sx={{ width: "100%", maxWidth: 420 }}>
             <PasswordField
               name="confirmPassword"
@@ -118,7 +360,6 @@ const AccountSetup = () => {
             />
           </Box>
 
-          {/* Terms Checkbox */}
           <Box sx={{ width: "100%", maxWidth: 420 }}>
             <Controller
               name="terms"
@@ -127,7 +368,7 @@ const AccountSetup = () => {
               render={({ field }) => (
                 <>
                   <FormControlLabel
-                    control={<Checkbox {...field} checked={field.value}  />}
+                    control={<Checkbox {...field} checked={field.value} />}
                     label="I agree to Terms & Privacy Policy"
                     sx={checkboxStyle}
                   />
@@ -141,14 +382,13 @@ const AccountSetup = () => {
             />
           </Box>
 
-          {/* Checkbox */}
           <Box sx={{ width: "100%", maxWidth: 420 }}>
             <Controller
               name="emailUpdates"
               control={control}
               render={({ field }) => (
                 <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value}  />}
+                  control={<Checkbox {...field} checked={field.value} />}
                   label="I want product updates via email (optional)"
                   sx={checkboxStyle}
                 />
@@ -156,11 +396,11 @@ const AccountSetup = () => {
             />
           </Box>
 
-          {/* Button */}
           <Button
             type="submit"
             fullWidth
             variant="contained"
+            disabled={isLoading}
             sx={{
               maxWidth: 420,
               mt: 2,
@@ -169,19 +409,21 @@ const AccountSetup = () => {
               backgroundColor: "#1b7f6b",
               textTransform: "none",
               border: "2px solid #1b7f6b",
-              boxShadow:
-                "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
+              boxShadow: "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
               transition: "all 0.25s ease",
               "&:hover": {
                 backgroundColor: "#fff",
                 color: "#1b7f6b",
                 border: "2px solid #1b7f6b",
               },
+              "&.Mui-disabled": {
+                backgroundColor: "#cccccc",
+                color: "#666666",
+              }
             }}
           >
-            Next Step
+            {isLoading ? "Creating Account..." : "Next Step"}
           </Button>
-
         </Box>
       </FormProvider>
     </Box>
@@ -189,3 +431,4 @@ const AccountSetup = () => {
 };
 
 export default AccountSetup;
+

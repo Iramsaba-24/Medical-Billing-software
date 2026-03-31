@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import ItemsSection from "@/containers/customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -367,7 +367,7 @@ function RetailInvoice() {
                     </Box>
 
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <NumericField name="age" label="Age" maxlength={3} />
+                      <NumericField name="age" label="Age" min={15} max={100} />
                     </Box>
                   </Box>
 

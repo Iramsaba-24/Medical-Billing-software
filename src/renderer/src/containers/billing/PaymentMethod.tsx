@@ -1,4 +1,3 @@
-
 import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import CardPayment from "@/containers/billing/CardPayment";
@@ -99,6 +98,47 @@ const PaymentMethod = () => {
   const storedRetail = localStorage.getItem("currentRetailInvoice");
   const storedNew = localStorage.getItem("currentNewInvoice");
 
+  function getTimeFormat(): string {
+  try {
+    const saved = localStorage.getItem("generalSettings");
+    if (saved) {
+      const settings = JSON.parse(saved);
+      const timeZone = settings.timeZone || "India (IST)";
+      const twelveHourZones = ["US (EST)", "US (PST)", "Australia (AEST)"];
+      if (twelveHourZones.includes(timeZone)) {
+        return "12";  // 12-hour
+      }
+      return "24";  // 24-hour
+    }
+  } catch {
+    // ignore
+  }
+  return "24";
+}
+
+function getFormattedTime(): string {
+  const now = new Date();
+  const format = getTimeFormat();
+  
+  if (format === "12") {
+    // 12-hour format — hh:mm:ss AM/PM
+    return now.toLocaleTimeString("en-US", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit",
+      hour12: true 
+    });
+  } else {
+    // 24-hour format — HH:mm:ss
+    return now.toLocaleTimeString("en-GB", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit",
+      hour12: false 
+    });
+  }
+}
+
   // Retail Flow
   if (storedRetail) {
     const existingInvoices = JSON.parse(
@@ -113,6 +153,7 @@ const PaymentMethod = () => {
       address: retail.address,
       doctorAddress: retail.doctorAddress,
       date: new Date().toLocaleDateString("en-GB"),
+        time: getFormattedTime(),
       price: retail.totalPrice,
       status: "Paid",
       medicines: retail.medicines,
@@ -146,6 +187,7 @@ const PaymentMethod = () => {
       invoice: invoiceNumber,
       name: lastInvoice.company,
       date: new Date().toLocaleDateString(),
+        time: getFormattedTime(),
       price: lastInvoice.totalPrice,
       status: "Paid",
       type: "distributor",

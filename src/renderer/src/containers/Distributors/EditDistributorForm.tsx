@@ -14,9 +14,9 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 export type Distributor = {
   id: string;
   companyName: string;
-  mobile: string;
+  phone: string;
   email: string;
-  date: string;
+  createdAt: string;
   registrationNumber: string;
   address: string;
   status: "Active" | "Inactive";
@@ -33,9 +33,9 @@ const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
     defaultValues: {
       id: "",
       companyName: "",
-      mobile: "",
+      phone: "",
       email: "",
-      date: "",
+      createdAt: "",
       registrationNumber: "",
       address: "",
       status: "Active",
@@ -91,7 +91,7 @@ const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
           <DateTimeField
             useCurrentDate={true}
             disabled
-            name="date"
+            name="createdAt"
             label="Date"
           />
 

@@ -56,9 +56,9 @@ const Distributors = () => {
   const columns: Column<Distributor>[] = [
     { key: "companyName", label: "Company Name" },
     { key: "registrationNumber", label: "Reg. No." },
-    { key: "mobile", label: "Mobile" },
+    { key: "phone", label: "Mobile" },
     { key: "email", label: "Email" },
-    { key: "date", label: "Date" },
+    { key: "createdAt", label: "Date" },
     { key: "address", label: "Address" },
     {
       key: "status",

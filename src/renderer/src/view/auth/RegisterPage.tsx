@@ -9,7 +9,7 @@ import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-
+ 
 type RegisterFormInputs = {
   fullName: string;
   email: string;
@@ -18,7 +18,7 @@ type RegisterFormInputs = {
   city: string;
   state: string;
 };
-
+ 
 const RegisterPage = () => {
   const methods = useForm<RegisterFormInputs>({
     defaultValues: {
@@ -31,9 +31,9 @@ const RegisterPage = () => {
     },
     mode: "onChange",
   });
-
+ 
   const navigate = useNavigate();
-
+ 
   const {
     formState: { errors },
     setValue,
@@ -41,7 +41,7 @@ const RegisterPage = () => {
     setError,
     clearErrors,
   } = methods;
-
+ 
   const inputStyle = (fieldName: keyof RegisterFormInputs) => ({
     "& .MuiOutlinedInput-root": {
       height: { xs: 42, sm: 46, md: 48 },
@@ -69,7 +69,7 @@ const RegisterPage = () => {
       padding: { xs: "10px 12px", sm: "12px 14px" },
     },
   });
-
+ 
   const handleLettersOnlyChange =
     (field: "fullName" | "city" | "state") =>
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -78,24 +78,28 @@ const RegisterPage = () => {
       setValue(field, value, { shouldValidate: true });
       if (value) clearErrors(field);
     };
-
-
+ 
+  const handleLettersOnlyInput = (e: FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    input.value = input.value.replace(/[^A-Za-z ]/g, "").slice(0, 20);
+  };
+ 
   const validateRequiredFields = (data: RegisterFormInputs) => {
     let isValid = true;
-
+ 
     (Object.keys(data) as (keyof RegisterFormInputs)[]).forEach((field) => {
       if (!data[field]?.trim()) {
         setError(field, { type: "manual", message: "This field is required" });
         isValid = false;
       }
     });
-
+ 
     return isValid;
   };
-
+ 
   const onSubmit = (data: RegisterFormInputs) => {
     if (!validateRequiredFields(data)) return;
-
+ 
     const cleanedData = {
       ...data,
       fullName: data.fullName.trim(),
@@ -105,12 +109,21 @@ const RegisterPage = () => {
       state: data.state.trim(),
     };
 
+     localStorage.setItem('registrationData', JSON.stringify({
+    fullName: cleanedData.fullName,
+    email: cleanedData.email,
+    mobileNumber: cleanedData.mobileNumber,
+    companyName: cleanedData.companyName,
+    city: cleanedData.city,
+    state: cleanedData.state,
+  }));
+ 
     console.log(cleanedData);
 
     navigate(URL_PATH.BusinessDetails);
-    showToast("success", "Registration successful!");
+    showToast("success", "Personal details saved!");
   };
-
+ 
   return (
     <Box
       sx={{
@@ -145,7 +158,7 @@ const RegisterPage = () => {
               style={{ width: "100%", maxWidth: "150px" }}
             />
           </Box>
-
+ 
           <Typography
             mb={{ xs: 2.5, sm: 3 }}
             sx={{
@@ -158,7 +171,7 @@ const RegisterPage = () => {
           >
             Create Your Account
           </Typography>
-
+ 
           <Box
             sx={{
               width: "100%",
@@ -172,31 +185,28 @@ const RegisterPage = () => {
               label="Full Name"
               placeholder="Full Name"
               minLength={3}
-              maxLength={40}
+              maxLength={30}
               inputType="alphabet"
               rows={1}
               sx={inputStyle("fullName")}
               required
+            
               onChange={handleLettersOnlyChange("fullName")}
               rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
                 pattern: {
                   value: /^[A-Za-z ]+$/,
                   message: "Only alphabets allowed",
                 },
               }}
             />
-
+ 
             <EmailField
               name="email"
               label="Email Address"
               required
               sx={inputStyle("email")}
             />
-
+ 
             <MobileField
               name="mobileNumber"
               label="Mobile Number"
@@ -204,7 +214,7 @@ const RegisterPage = () => {
               required
               sx={inputStyle("mobileNumber")}
             />
-
+ 
             <TextInputField
               name="companyName"
               label="Company / Clinic Name"
@@ -214,7 +224,7 @@ const RegisterPage = () => {
               minLength={3}
               maxLength={30}
             />
-
+ 
             <TextInputField
               name="city"
               label="City"
@@ -230,7 +240,7 @@ const RegisterPage = () => {
                 },
               }}
             />
-
+ 
             <TextInputField
               name="state"
               label="State"
@@ -247,7 +257,7 @@ const RegisterPage = () => {
               }}
             />
           </Box>
-
+ 
           <Button
             type="submit"
             fullWidth
@@ -269,7 +279,7 @@ const RegisterPage = () => {
           >
             Next step
           </Button>
-
+ 
           <Typography
             mt={2}
             sx={{ fontSize: "14px", color: "#555", textAlign: "center" }}
@@ -299,5 +309,7 @@ const RegisterPage = () => {
     </Box>
   );
 };
-
+ 
 export default RegisterPage;
+ 
+ 
