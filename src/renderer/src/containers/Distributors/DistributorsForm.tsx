@@ -1,3 +1,4 @@
+
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -14,12 +15,12 @@ import BankDetailsForm from "@/containers/distributors/BankDetailForm";
 type DistributorFormInput = {
   companyName: string;
   ownerName?: string;
-  mobile: string;
+  phone: string;
   email: string;
-  date: string;
+  createdAt: string
   registrationNumber: string;
   website: string;
-  gstIn: string;
+  gstin: string;
   address: string;
   bankName: string;
   accountNumber: string;
@@ -35,13 +36,13 @@ const DistributorsForm = () => {
     defaultValues: {
       companyName: "",
       ownerName: "",
-      mobile: "",
+      phone: "",
       email: "",
    
 
       registrationNumber: "",
       website: "",
-      gstIn: "",
+      gstin: "",
       address: "",
       bankName: "",
       accountNumber: "",
@@ -127,7 +128,7 @@ const DistributorsForm = () => {
               />
 
               <MobileField 
-              name="mobile" 
+              name="phone" 
               label="Phone" 
               placeholder="Mobile Number"
               countryCode
@@ -143,7 +144,7 @@ const DistributorsForm = () => {
               />
 
               <DateTimeField 
-              name="date" 
+              name="createdAt" 
               label="Date"
               viewMode="date"
               useCurrentDate={true}
@@ -175,7 +176,7 @@ const DistributorsForm = () => {
                 }}
               />
               <TextInputField
-                name="gstIn"
+                name="gstin"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"
                 preventDuplicate
@@ -270,3 +271,4 @@ const DistributorsForm = () => {
 };
 
 export default DistributorsForm;
+

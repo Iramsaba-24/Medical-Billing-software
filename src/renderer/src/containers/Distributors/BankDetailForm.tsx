@@ -1,3 +1,4 @@
+
 import { Box, Typography, Divider } from "@mui/material";
 import TextInputField from "@/components/controlled/TextInputField";
 
@@ -52,7 +53,7 @@ const BankDetailsForm = () => {
         />
 
         <TextInputField
-          name="ifsc"
+          name="ifscCode"
           label="IFSC Code"
           required
           maxLength={11}
