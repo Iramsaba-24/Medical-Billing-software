@@ -7,13 +7,13 @@ import DoctorEdit from "@/containers/doctors/DoctorEdit";
 import { URL_PATH } from "@/constants/UrlPath";
 
 type Doctor = {
-  id: string;
+  doctorId: number;
   doctorName: string;
   degree: string;
   phone: string;
   email: string;
-  registrationNo: string;
-  address: string;
+  registrationNumber: string;
+  hospitalAddress: string;
   status: "Active" | "Inactive";
 };
 
@@ -37,9 +37,9 @@ const Doctors = () => {
   };
 
   // change status
-  const handleStatusChange = (id: string, status: "Active" | "Inactive") => {
+  const handleStatusChange = (id: number, status: "Active" | "Inactive") => {
     saveDoctors(
-      doctors.map((doctor) => (doctor.id === id ? { ...doctor, status } : doctor))
+      doctors.map((doctor) => (doctor.doctorId === id ? { ...doctor, status } : doctor))
     );
   };
 
@@ -47,14 +47,14 @@ const Doctors = () => {
     { key: "doctorName", label: "Name" },
     { key: "degree", label: "Degree" },
     { key: "phone", label: "Phone" },
-    { key: "address", label: "Address" },
+    { key: "hospitalAddress", label: "Address" },
     { key: "status", label: "Status",
       render: (row) => (
         <Select
           size="small"
           value={row.status}
           onChange={(e) =>
-            handleStatusChange(row.id, e.target.value as "Active" | "Inactive")
+            handleStatusChange(row.doctorId, e.target.value as "Active" | "Inactive")
           }
           sx={{
             minWidth: 100,
@@ -142,7 +142,7 @@ const Doctors = () => {
               delete: async (doctor) => {
                 const ok = await showConfirmation("Delete doctor?", "Confirm");
                 if (ok) {
-                  saveDoctors(doctors.filter((d) => d.id !== doctor.id));
+                  saveDoctors(doctors.filter((d) => d.doctorId !== doctor.doctorId));
                   showSnackbar("success", "Doctor deleted successfully");
                 }
               },
@@ -194,7 +194,7 @@ const Doctors = () => {
         <Typography>
           <strong>Registration No.:</strong>
           <br />
-          {viewItem?.registrationNo}
+          {viewItem?.registrationNumber}
         </Typography>
       </Box>
 
@@ -221,7 +221,7 @@ const Doctors = () => {
         <Typography>
           <strong>Address:</strong>
           <br />
-          {viewItem?.address}
+          {viewItem?.hospitalAddress}
         </Typography>
       </Box>
     </Paper>
@@ -254,7 +254,7 @@ const Doctors = () => {
       onSave={(updatedDoctor: Doctor) => {
         saveDoctors(
           doctors.map((d) =>
-            d.id === updatedDoctor.id ? updatedDoctor : d
+            d.doctorId === updatedDoctor.doctorId ? updatedDoctor : d
           )
         );
         showSnackbar("info", "Doctor updated successfully");

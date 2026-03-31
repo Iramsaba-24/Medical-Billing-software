@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/customer/ItemsSection";
+import ItemsSection from "@/containers/Customer/ItemsSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -34,7 +34,7 @@ type Doctor = {
   phone: string;
   email: string;
   registrationNo: string;
-  address: string;
+  hospitalAddress: string;
   status: "Active";
 };
 
@@ -268,7 +268,7 @@ function RetailInvoice() {
         (doc) => doc.doctorName === selectedDoctorName
       );
       if (selectedDoctor) {
-        methods.setValue("addressRight", selectedDoctor.address);
+        methods.setValue("addressRight", selectedDoctor.hospitalAddress || "");
       }
     }
   }, [selectedDoctorName, doctorList, methods]);

@@ -7,9 +7,9 @@ import {showConfirmation,showSnackbar,} from "@/components/uncontrolled/ToastMes
 
 // DATA TYPE
 type ReorderHistoryItem = {
-  itemId: string;
+  medicineId: number;
   itemName: string;
-  qty: number;
+  quantity: number;
   pricePerUnit: number;
   totalAmount: number;
   expiryDate: string;
@@ -53,7 +53,7 @@ const ReorderList = () => {
         data.filter(
           (item)=>
           !(
-            item.itemId===row.itemId &&
+            item.medicineId===row.medicineId &&
             item.purchasedAt===row.purchasedAt
           )
         );
@@ -69,7 +69,7 @@ const ReorderList = () => {
 
   const handleEditOpen=(row:ReorderHistoryItem)=>{
     setEditItem(row);
-    setEditQty(row.qty);
+    setEditQty(row.quantity);
   };
 
 
@@ -80,7 +80,7 @@ const ReorderList = () => {
       data.map((item)=>{
 
         if(
-          item.itemId===editItem.itemId &&
+          item.medicineId===editItem.medicineId &&
           item.purchasedAt===editItem.purchasedAt
         ){
 
@@ -112,7 +112,7 @@ const ReorderList = () => {
         ` ${row.pricePerUnit}`,},
       { key:"gst",label:"GST",
         render:(row)=>
-          ` ${(row.qty* row.pricePerUnit* 0.12).toFixed(2)}`,
+          ` ${(row.quantity* row.pricePerUnit* 0.12).toFixed(2)}`,
       },
       {key:"totalAmount", label:"Total",
         render:(row)=>
@@ -202,7 +202,7 @@ Item Name
 Item ID
 </Typography>
 <Typography>
-{viewItem?.itemId}
+{viewItem?.medicineId}
 </Typography>
 </Box>
 
@@ -222,7 +222,7 @@ Expiry Date
 Quantity
 </Typography>
 <Typography>
-{viewItem?.qty}
+{viewItem?.quantity}
 </Typography>
 </Box>
 

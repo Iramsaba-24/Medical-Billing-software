@@ -11,9 +11,9 @@ import { useEffect, useState } from "react";
 
 export type InventoryFormData = {
   itemName: string;
-  itemId: string;
+  medicineId: number;
   unit: string;
-  stockQty: number;
+  quantity: number;
   medicineGroup: string;
   pricePerUnit: number;
   expiryDate: string;
@@ -22,9 +22,9 @@ export type InventoryFormData = {
 
 export type InventoryItem = {
   itemName: string;
-  itemId: string;
+  medicineId: number;
+  quantity: number;
   medicineGroup: string;
-  stockQty: number;
   pricePerUnit: number;
   expiryDate: string;
   supplier: string;
@@ -53,7 +53,7 @@ export default function AddInventoryItem() {
     );
 
     const options = storedGroups.map(
-      (group: { id: number; groupName: string }) => ({
+      (group: { groupId: number; groupName: string }) => ({
         label: group.groupName,
         value: group.groupName,
       })
@@ -70,7 +70,7 @@ export default function AddInventoryItem() {
 
     const options = storedDistributors
       .filter((d: { status: string }) => d.status === "Active")
-      .map((distributor: { id: string; companyName: string }) => ({
+      .map((distributor: { distributorId: number; companyName: string }) => ({
         label: distributor.companyName,
         value: distributor.companyName,
       }));
@@ -84,17 +84,17 @@ export default function AddInventoryItem() {
     );
 
     const status: InventoryItem["status"] =
-      data.stockQty === 0
+      data.quantity === 0
         ? "Out of Stock"
-        : data.stockQty < 20
+        : data.quantity < 20
         ? "Low Stock"
         : "In Stock";
 
     const newItem: InventoryItem = {
       itemName: data.itemName,
-      itemId: data.itemId,
+      medicineId: data.medicineId,
       medicineGroup: data.medicineGroup,
-      stockQty: data.stockQty,
+      quantity: data.quantity,
       pricePerUnit: data.pricePerUnit,
       expiryDate: data.expiryDate,
       supplier: data.supplier,
@@ -139,7 +139,7 @@ export default function AddInventoryItem() {
             />
 
             <NumericField
-              name="itemId"
+              name="medicineId"
               label="Item ID"
               required
             />
@@ -163,7 +163,7 @@ export default function AddInventoryItem() {
             />
 
             <NumericField
-              name="stockQty"
+              name="quantity"
               label="Stock Quantity"
               required
             />
@@ -184,7 +184,7 @@ export default function AddInventoryItem() {
               required
             />
 
-            {/* Expiry Date (past date disabled) */}
+            {/* Expiry Date  */}
             <DateTimeField
               name="expiryDate"
               label="Expiry Date"
