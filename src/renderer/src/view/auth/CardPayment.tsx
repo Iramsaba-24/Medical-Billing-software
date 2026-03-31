@@ -245,6 +245,7 @@ const CardPayment: React.FC = () => {
                     maxlength={3}
                     max={999}
                     min={100}
+ 
                   />
                 </Box>
 

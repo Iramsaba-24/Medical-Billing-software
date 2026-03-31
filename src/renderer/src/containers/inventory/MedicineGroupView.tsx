@@ -5,9 +5,9 @@ import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable
 
 type InventoryItem = {
   itemName: string;
-  itemId: string;
+  medicineId: string;
   medicineGroup: string;
-  stockQty: number;
+  quantity: number;
   pricePerUnit: number;
   expiryDate: string;
   supplier: string;
@@ -45,13 +45,13 @@ export default function MedicineGroupDetails() {
 
   const columns: Column<InventoryItem>[] = [
     { key: "itemName", label: "Item Name" },
-    { key: "itemId", label: "Item ID" },
-    { key: "stockQty", label: "Stock Qty" },
+    { key: "medicineId", label: "Item ID" },
+    { key: "quantity", label: "Stock Qty" },
     { key: "pricePerUnit", label: "Price" },
     { key: "status", label: "Status",
        render: (row) => (
-        <Typography fontWeight={500} color={getStatusColor(row.stockQty)}>
-          {getStatus(row.stockQty)}
+        <Typography fontWeight={500} color={getStatusColor(row.quantity)}>
+          {getStatus(row.quantity)}
         </Typography>
       ),
     },

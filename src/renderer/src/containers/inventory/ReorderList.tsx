@@ -1,5 +1,8 @@
 import { Box, Typography, Button } from "@mui/material";
-import { Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
+import {
+  Column,
+  UniversalTable,
+} from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReorderDialog from "@/containers/inventory/ReorderDialog";
@@ -7,82 +10,68 @@ import PurchaseRecord from "@/containers/inventory/PurchaseRecord";
 import { URL_PATH } from "@/constants/UrlPath";
 type InventoryItem = {
   itemName: string;
-  itemId: string;
-  stockQty: number;
+  medicineId: string;
+  quantity: number;
   pricePerUnit: number;
   gst: "12%";
 };
 const Reorder = 10;
 const ReorderList = () => {
   const [items, setItems] = useState<InventoryItem[]>([]);
-  const [openItem, setOpenItem] =
-    useState<InventoryItem | null>(null);
- 
+  const [openItem, setOpenItem] = useState<InventoryItem | null>(null);
+
   //  NEW LINE ADDED
   const [refreshKey, setRefreshKey] = useState(0);
   const navigate = useNavigate();
   useEffect(() => {
-    const inventory =
-      JSON.parse(localStorage.getItem("inventory") || "[]");
+    const inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
     setItems(
       inventory
         .map((item: InventoryItem) => ({
           ...item,
-          stockQty: Number(item.stockQty),
+          quantity: Number(item.quantity),
         }))
-        .filter((item: InventoryItem) => item.stockQty < Reorder)
+        .filter((item: InventoryItem) => item.quantity < Reorder),
     );
   }, []);
   const handleReorderSubmit = (reorderQty: number) => {
     if (!openItem) return;
-    const inventory =
-      JSON.parse(localStorage.getItem("inventory") || "[]");
+    const inventory = JSON.parse(localStorage.getItem("inventory") || "[]");
 
-    const updatedInventory =
-      inventory.map((item: InventoryItem) =>
-        item.itemId === openItem.itemId
-          ? {
-              ...item,
-              stockQty:
-                Number(item.stockQty) + Number(reorderQty),
-            }
-          : item
-      );
-
-    localStorage.setItem(
-      "inventory",
-      JSON.stringify(updatedInventory)
+    const updatedInventory = inventory.map((item: InventoryItem) =>
+      item.medicineId === openItem.medicineId
+        ? {
+            ...item,
+            quantity: Number(item.quantity) + Number(reorderQty),
+          }
+        : item,
     );
+
+    localStorage.setItem("inventory", JSON.stringify(updatedInventory));
     // IMPORTANT FIX
-    const history =
-      JSON.parse(localStorage.getItem("reorderHistory") || "[]");
+    const history = JSON.parse(localStorage.getItem("reorderHistory") || "[]");
 
     history.unshift({
-      itemId: openItem.itemId,
+      medicineId: openItem.medicineId,
       itemName: openItem.itemName,
-      qty: reorderQty,
+      quantity: reorderQty,
       pricePerUnit: openItem.pricePerUnit,
       totalAmount: reorderQty * openItem.pricePerUnit * 1.12,
       gst: "12%",
       expiryDate: "",
-      purchasedAt:new Date().toISOString(),
+      purchasedAt: new Date().toISOString(),
     });
 
-    localStorage.setItem(
-      "reorderHistory",
-      JSON.stringify(history)
-    );
+    localStorage.setItem("reorderHistory", JSON.stringify(history));
 
     setItems(
-      updatedInventory.filter(
-        (item: InventoryItem) => item.stockQty < Reorder
-      )
+      updatedInventory.filter((item: InventoryItem) => item.quantity < Reorder),
     );
 
     setOpenItem(null);
- 
+
     // NEW LINE ADDED
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const columns: Column<InventoryItem>[] = [
@@ -92,20 +81,18 @@ const ReorderList = () => {
     {
       key: "gst",
       label: "GST",
-      render: (row) =>
-        `₹ ${(row.pricePerUnit * 0.12).toFixed(2)}`,
+      render: (row) => `₹ ${(row.pricePerUnit * 0.12).toFixed(2)}`,
     },
     {
       key: "total",
       label: "Total",
-      render: (row) =>
-        `₹ ${(row.pricePerUnit * 1.12).toFixed(2)}`,
+      render: (row) => `₹ ${(row.pricePerUnit * 1.12).toFixed(2)}`,
     },
     {
       key: "reorder",
       label: "Reorder",
       render: (row) => (
-<Button
+        <Button
           size="small"
           sx={{
             backgroundColor: "#238878",
@@ -118,25 +105,19 @@ const ReorderList = () => {
             },
           }}
           onClick={() => setOpenItem(row)}
->
+        >
           Reorder
-</Button>
+        </Button>
       ),
     },
   ];
 
   return (
-<>
-<Box
-        display="flex"
-        justifyContent="flex-end"
-        mb={2}
->
-<Button
+    <>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Button
           variant="contained"
-          onClick={() =>
-            navigate(URL_PATH.Inventory)
-          }
+          onClick={() => navigate(URL_PATH.Inventory)}
           sx={{
             backgroundColor: "#238878",
             color: "#fff",
@@ -147,39 +128,36 @@ const ReorderList = () => {
               color: "#238878",
             },
           }}
->
+        >
           Back to Home
-</Button>
-</Box>
-<Box
+        </Button>
+      </Box>
+      <Box
         sx={{
           boxShadow: 4,
           p: 4,
         }}
->
-<Typography
-          fontSize={20}
-          mb={2}
->
+      >
+        <Typography fontSize={20} mb={2}>
           Reorder List
-</Typography>
-<UniversalTable
+        </Typography>
+        <UniversalTable
           data={items}
           columns={columns}
           rowsPerPage={5}
           textAlign="center"
         />
-<ReorderDialog
+        <ReorderDialog
           open={!!openItem}
           itemName={openItem?.itemName || ""}
           onClose={() => setOpenItem(null)}
           onSubmit={handleReorderSubmit}
         />
-</Box>
- 
+      </Box>
+
       {/*  key PROP ADDED */}
-<PurchaseRecord key={refreshKey} />
-</>
+      <PurchaseRecord key={refreshKey} />
+    </>
   );
 };
 export default ReorderList;

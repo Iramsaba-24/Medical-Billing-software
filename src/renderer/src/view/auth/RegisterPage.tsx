@@ -108,7 +108,7 @@ const RegisterPage = () => {
       city: data.city.trim(),
       state: data.state.trim(),
     };
-
+ 
      localStorage.setItem('registrationData', JSON.stringify({
     fullName: cleanedData.fullName,
     email: cleanedData.email,
@@ -119,7 +119,7 @@ const RegisterPage = () => {
   }));
  
     console.log(cleanedData);
-
+ 
     navigate(URL_PATH.BusinessDetails);
     showToast("success", "Personal details saved!");
   };
@@ -190,7 +190,7 @@ const RegisterPage = () => {
               rows={1}
               sx={inputStyle("fullName")}
               required
-            
+           
               onChange={handleLettersOnlyChange("fullName")}
               rules={{
                 pattern: {
@@ -311,5 +311,3 @@ const RegisterPage = () => {
 };
  
 export default RegisterPage;
- 
- 
