@@ -5,6 +5,7 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { addDoctor } from "@/service/doctorService";
 
 export interface AddDoctorFormValues {
   doctorName: string;
@@ -33,23 +34,31 @@ const AddDoctor = () => {
   const navigate = useNavigate();
 
   // submit
-  const onSubmit = (data: AddDoctorFormValues) => {
-    const existingDoctors = JSON.parse(
-      localStorage.getItem("doctors") || "[]"
-    );
+  // const onSubmit = (data: AddDoctorFormValues) => {
+  //   const existingDoctors = JSON.parse(
+  //     localStorage.getItem("doctors") || "[]"
+  //   );
 
-    const newDoctor = {
-      doctorId: Date.now(),
-      ...data,
-    };
+  //   const newDoctor = {
+  //     doctorId: Date.now(),
+  //     ...data,
+  //   };
     
-   localStorage.setItem(
-      "doctors",
-      JSON.stringify([...existingDoctors, newDoctor])
-    );
+  //  localStorage.setItem(
+  //     "doctors",
+  //     JSON.stringify([...existingDoctors, newDoctor])
+  //   );
 
+  //   navigate(URL_PATH.Doctors);
+  // };
+  const onSubmit = async (data: AddDoctorFormValues) => {
+  try {
+    await addDoctor(data); // API call
     navigate(URL_PATH.Doctors);
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
    <Paper sx={{ p: { xs:2, md:4 }, mx: { xs:1, md:4 }, my: { xs:1, md:4 } }}>
