@@ -270,7 +270,7 @@ const UpiPayment: React.FC = () => {
                       pattern: {
                         value:
                           /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ib|phonepe)$/,
-                        message: "Enter valid UPI ID",
+                        message: "Enter valid UPI ID example: user@bankname",
                       },
                     }}
                   />

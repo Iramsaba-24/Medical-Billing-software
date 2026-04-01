@@ -33,7 +33,7 @@ const PaymentSuccess: React.FC = () => {
   };
   
   const handleClick = () => { 
-    navigate(URL_PATH.Dashboard);
+    navigate(URL_PATH.LOGIN);
   };
   
   return (

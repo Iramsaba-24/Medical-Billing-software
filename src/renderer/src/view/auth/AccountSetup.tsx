@@ -126,136 +126,177 @@ const AccountSetup = () => {
     }
   };
 
-  const onSubmit = async (data: AccountForm): Promise<void> => {
-    setIsLoading(true);
+const onSubmit = async (data: AccountForm): Promise<void> => {
+  setIsLoading(true);
+  
+  try {
+    console.log("Account setup data:", data);
     
-    try {
-      console.log("Account setup data:", data);
-      
-      const registrationData = JSON.parse(localStorage.getItem('registrationData') || '{}');
-      const selectedPlan = localStorage.getItem('selectedPlan');
-      
-      console.log("Registration data:", registrationData);
-      console.log("Selected plan:", selectedPlan);
+    const registrationData = JSON.parse(localStorage.getItem('registrationData') || '{}');
+    const selectedPlan = localStorage.getItem('selectedPlan');
+    
+    console.log("Registration data:", registrationData);
+    console.log("Selected plan:", selectedPlan);
 
-      if (!registrationData.email || !registrationData.fullName) {
-        showToast("error", "Registration data missing. Please start over.");
-        navigate(URL_PATH.REGISTER);
-        return;
-      }
+    if (!registrationData.email || !registrationData.fullName) {
+      showToast("error", "Registration data missing. Please start over.");
+      navigate(URL_PATH.REGISTER);
+      return;
+    }
 
-      if (!selectedPlan) {
-        showToast("error", "Plan not selected. Please start over.");
-        navigate(URL_PATH.ChoosePlan);
-        return;
-      }
+    if (!selectedPlan) {
+      showToast("error", "Plan not selected. Please start over.");
+      navigate(URL_PATH.ChoosePlan);
+      return;
+    }
 
-      const completeUserData = {
-        username: registrationData.email.split('@')[0],
-        password: data.password,
-        fullName: registrationData.fullName,
-        email: registrationData.email,
-        mobileNumber: registrationData.mobileNumber,
-        companyName: registrationData.companyName,
-        city: registrationData.city,
-        state: registrationData.state,
-        businessDetail: registrationData.businessDetail ? {
-          businessType: registrationData.businessDetail.businessType,
-          gstin: registrationData.businessDetail.gstin,
-          licenseNumber: registrationData.businessDetail.licenseNumber
-        } : undefined
+    const completeUserData: {
+      username: string;
+      password: string;
+      fullName: string;
+      email: string;
+      mobileNumber: string;
+      companyName: string;
+      city: string;
+      state: string;
+      businessDetail?: {
+        businessType: string;
+        gstin: string;
+        licenseNumber: string;
       };
+    } = {
+      username: registrationData.email.split('@')[0],
+      password: data.password,
+      fullName: registrationData.fullName,
+      email: registrationData.email,
+      mobileNumber: registrationData.mobileNumber,
+      companyName: registrationData.companyName || "",
+      city: registrationData.city || "",
+      state: registrationData.state || "",
+    };
 
-      console.log("Sending to registration API:", completeUserData);
+    // Add BusinessDetail if it exists and has values
+    if (registrationData.businessDetail && 
+        (registrationData.businessDetail.businessType || 
+         registrationData.businessDetail.gstin || 
+         registrationData.businessDetail.licenseNumber)) {
+      completeUserData.businessDetail = {
+        businessType: registrationData.businessDetail.businessType || "",
+        gstin: registrationData.businessDetail.gstin || "",
+        licenseNumber: registrationData.businessDetail.licenseNumber || ""
+      };
+    }
 
-      const response = await authService.register(completeUserData) as RegistrationResponse;
-      console.log("Registration response:", response);
+    console.log("Sending to registration API:", JSON.stringify(completeUserData, null, 2));
 
-      if (response.userId) {
-        const userId = response.userId;
-        const planId = getPlanId(selectedPlan);
-        const planDetails = getPlanDetails(planId);
+    const response = await authService.register(completeUserData) as RegistrationResponse;
+    console.log("Registration response:", response);
+
+    if (response.userId) {
+      const userId = response.userId;
+      const planId = getPlanId(selectedPlan);
+      const planDetails = getPlanDetails(planId);
+      
+      localStorage.setItem('userId', userId.toString());
+      localStorage.setItem('planId', planId.toString());
+      localStorage.setItem('selectedPlan', selectedPlan);
+      
+      console.log(`Attempting to activate subscription for user ${userId} with plan ${planId}`);
+      
+      try {
+        const activationResponse = await activateSubscription(userId, planId);
+        console.log("Subscription activation result:", activationResponse);
         
-        localStorage.setItem('userId', userId.toString());
-        localStorage.setItem('planId', planId.toString());
-        localStorage.setItem('selectedPlan', selectedPlan);
-        
-        console.log(`Attempting to activate subscription for user ${userId} with plan ${planId} (${planDetails.name} - ${planDetails.duration} days)`);
-        
-        try {
-          const activationResponse = await activateSubscription(userId, planId);
-          console.log("Subscription activation result:", activationResponse);
-          
-          if (activationResponse.success || activationResponse.data) {
-            if (activationResponse.data) {
-              localStorage.setItem('subscriptionDetails', JSON.stringify({
-                subscriptionId: activationResponse.data.subscriptionId,
-                startDate: activationResponse.data.startDate,
-                endDate: activationResponse.data.endDate,
-                planId: planId
-              }));
-            }
-            
-            const paymentData = {
-              userId: userId,
-              amount: planDetails.price,
-              paymentMethod: '',
-              planId: planId,
-              couponCode: ''
-            };
-            localStorage.setItem('paymentData', JSON.stringify(paymentData));
-            
-            showToast("success", `Account created! Your ${planDetails.name} plan subscription is active for ${planDetails.duration} days.`);
-            
-            navigate(URL_PATH.ProceedToPaymentPage);
-          } else {
-            showToast("warning", "Account created but subscription activation issue. Please contact support.");
-            navigate(URL_PATH.ProceedToPaymentPage);
+        if (activationResponse.success || activationResponse.data) {
+          if (activationResponse.data) {
+            localStorage.setItem('subscriptionDetails', JSON.stringify({
+              subscriptionId: activationResponse.data.subscriptionId,
+              startDate: activationResponse.data.startDate,
+              endDate: activationResponse.data.endDate,
+              planId: planId
+            }));
           }
-        } catch (subscriptionError: unknown) {
-          console.error("Failed to activate subscription:", subscriptionError);
           
-          showToast("warning", "Account created. Please complete payment to activate your subscription.");
+          const paymentData = {
+            userId: userId,
+            amount: planDetails.price,
+            paymentMethod: '',
+            planId: planId,
+            couponCode: ''
+          };
+          localStorage.setItem('paymentData', JSON.stringify(paymentData));
+          
+          showToast("success", `Account created! Your ${planDetails.name} plan subscription is active for ${planDetails.duration} days.`);
+          
+          navigate(URL_PATH.ProceedToPaymentPage);
+        } else {
+          showToast("warning", "Account created but subscription activation issue. Please contact support.");
           navigate(URL_PATH.ProceedToPaymentPage);
         }
-      } else {
-        showToast("error", response.message || "Registration failed");
-      }
-    } catch (error: unknown) {
-      console.error('Registration error:', error);
-      
-      if (axios.isAxiosError(error)) {
-        const axiosError = error as AxiosError<ErrorResponse>;
+      } catch (subscriptionError: unknown) {
+        console.error("Failed to activate subscription:", subscriptionError);
         
-        if (axiosError.response) {
-          const statusCode = axiosError.response.status;
-          const errorData = axiosError.response.data;
-          
-          if (statusCode === 409) {
-            showToast("error", "User already exists. Please login.");
-            navigate(URL_PATH.LOGIN);
-          } else if (errorData?.errors) {
-            let errorMessage = '';
-            Object.keys(errorData.errors).forEach(field => {
-        const fieldErrors = errorData.errors?.[field];
-        if (fieldErrors && Array.isArray(fieldErrors)) {
-          errorMessage += `${field}: ${fieldErrors.join(', ')}\n`;
-        }
-            });
-            showToast("error", errorMessage || "Validation failed");
-          } else {
-            showToast("error", errorData?.message || "Registration failed");
-          }
-        } else {
-          showToast("error", "Network error. Please check your connection.");
-        }
-      } else {
-        showToast("error", "An unexpected error occurred. Please try again.");
+        showToast("warning", "Account created. Please complete payment to activate your subscription.");
+        navigate(URL_PATH.ProceedToPaymentPage);
       }
-    } finally {
-      setIsLoading(false);
+    } else {
+      showToast("error", response.message || "Registration failed");
     }
-  };
+  } catch (error: unknown) {
+    console.error('Registration error:', error);
+    
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<ErrorResponse>;
+      
+      if (axiosError.response) {
+        const statusCode = axiosError.response.status;
+        const errorData = axiosError.response.data;
+        
+        console.error('Error response details:', {
+          status: statusCode,
+          data: errorData,
+          headers: axiosError.response.headers
+        });
+        
+        if (statusCode === 409) {
+          showToast("error", "User already exists. Please login.");
+          navigate(URL_PATH.LOGIN);
+        } else if (statusCode === 400) {
+          // Handle validation errors
+          let errorMessage = "Validation failed: ";
+          
+          if (typeof errorData === 'string') {
+            errorMessage = errorData;
+          } else if (errorData?.errors) {
+            // Format validation errors nicely
+            const errorList: string[] = [];
+            Object.keys(errorData.errors).forEach(field => {
+              const fieldErrors = errorData.errors?.[field];
+              if (fieldErrors && Array.isArray(fieldErrors)) {
+                errorList.push(`${field}: ${fieldErrors.join(', ')}`);
+              }
+            });
+            errorMessage = errorList.join('; ');
+          } else if (errorData?.message) {
+            errorMessage = errorData.message;
+          }
+          
+          showToast("error", errorMessage);
+        } else {
+          showToast("error", errorData?.message || `Registration failed with status ${statusCode}`);
+        }
+      } else if (axiosError.request) {
+        showToast("error", "No response from server. Please check if the backend is running.");
+      } else {
+        showToast("error", "Network error. Please check your connection.");
+      }
+    } else {
+      showToast("error", "An unexpected error occurred. Please try again.");
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <Box

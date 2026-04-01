@@ -9,7 +9,7 @@ import { showConfirmation, showSnackbar,
 import { URL_PATH } from "@/constants/UrlPath";
 
 type MedicineGroupRow = {
-  id: number;
+  groupId: number;
   groupName: string;
   category: string;
   count: string;
@@ -31,7 +31,7 @@ const MedicineGroup = () => {
     );
 
     const updatedGroups = groups.map(
-      (group: { id: number; groupName: string; category: string }) => {
+      (group: { groupId: number; groupName: string; category: string }) => {
         const count = inventory.filter(
           (item: { medicineGroup: string }) =>
             item.medicineGroup === group.groupName
@@ -56,7 +56,7 @@ const MedicineGroup = () => {
     if (!editGroup) return;
 
     const updated = medicineGroups.map((g) =>
-      g.id === editGroup.id ? editGroup : g
+      g.groupId === editGroup.groupId ? editGroup : g
     );
 
     saveGroups(updated);
@@ -75,13 +75,13 @@ const MedicineGroup = () => {
 
   return (
     <>
-      {/* 🔹 Back to Home Button - Right side, Paper chya baher */}
+      {/*  Back to Home Button  */}
       <Box display="flex" justifyContent="flex-end" mb={2}>
   <Button
     variant="contained"
     onClick={() => navigate(URL_PATH.Inventory)}
     sx={{
-      mr: 5,   //  he important
+      mr: 5,   
       backgroundColor: "#238878",
       color: "#fff",
       textTransform: "none",
@@ -142,7 +142,7 @@ const MedicineGroup = () => {
               );
               if (ok) {
                 saveGroups(
-                  medicineGroups.filter((g) => g.id !== row.id)
+                  medicineGroups.filter((g) => g.groupId !== row.groupId)
                 );
                 showSnackbar(
                   "success",

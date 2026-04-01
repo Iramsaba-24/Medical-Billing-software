@@ -11,7 +11,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 export interface AddMedicineGroupFormValues {
-  id: number;
+  groupId: number;
   groupName: string;
   category: string;
 }
@@ -33,7 +33,7 @@ const AddMedicineGroup = () => {
     );
 
     const newGroup = {
-      id: Date.now(),
+      groupId: Date.now(),
       groupName: data.groupName,
       category: data.category,
     };
