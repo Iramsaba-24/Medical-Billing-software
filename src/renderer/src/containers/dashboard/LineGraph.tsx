@@ -8,22 +8,43 @@ interface SalesData {
  
 const LineGraph: React.FC = () => {
  
+  // const parseDate = (dateStr: string) => {
+  //   const d = new Date(dateStr);
+  //   if (!isNaN(d.getTime())) return d;
+ 
+  //   // handle dd/mm/yyyy (your case)
+  //   const [day, month, year] = dateStr.split("/");
+  //   return new Date(`${year}-${month}-${day}`);
+  // };
+ 
+  // const isToday = (dateStr: string) => {
+  //   const today = new Date();
+  //   const d = parseDate(dateStr);
+ 
+  //   return d.toDateString() === today.toDateString();
+  // };
+ 
   const parseDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    if (!isNaN(d.getTime())) return d;
- 
-    // handle dd/mm/yyyy (your case)
-    const [day, month, year] = dateStr.split("/");
-    return new Date(`${year}-${month}-${day}`);
-  };
- 
-  const isToday = (dateStr: string) => {
-    const today = new Date();
-    const d = parseDate(dateStr);
- 
-    return d.toDateString() === today.toDateString();
-  };
- 
+  if (!dateStr) return null; 
+
+  const d = new Date(dateStr);
+  if (!isNaN(d.getTime())) return d;
+
+  const [day, month, year] = dateStr.split("/");
+  if (!day || !month || !year) return null; 
+  return new Date(`${year}-${month}-${day}`);
+};
+
+const isToday = (dateStr: string) => {
+  if (!dateStr) return false; 
+
+  const today = new Date();
+  const d = parseDate(dateStr);
+
+  if (!d) return false; 
+  return d.toDateString() === today.toDateString();
+};
+
   const getData = () => {
     const storedRetail = localStorage.getItem("currentInvoice");
     const storedDistributor = localStorage.getItem("currentNewInvoiceList");
@@ -40,9 +61,12 @@ const LineGraph: React.FC = () => {
     }
  
     // Combine + filter only TODAY
+    // const allSales = [...retailSales, ...distributorSales].filter((sale) =>
+    //   isToday(sale.date)
+    // );
     const allSales = [...retailSales, ...distributorSales].filter((sale) =>
-      isToday(sale.date)
-    );
+  sale?.date && isToday(sale.date)
+);
  
     const totalSales = allSales.reduce(
       (sum, s) => sum + (s.totalPrice || 0),
@@ -75,7 +99,7 @@ const LineGraph: React.FC = () => {
       <Typography  fontWeight={600} fontSize={{ xs: 14, sm: 18 }} mb={2}>
         Daily Report
       </Typography>
-
+ 
       <Divider sx={{ mb: 4, borderColor: "#9CA3AF" }} />
  
       <Box display="flex" flexDirection="column" gap={6}>
@@ -146,3 +170,4 @@ const LineGraph: React.FC = () => {
 };
  
 export default LineGraph;
+ 

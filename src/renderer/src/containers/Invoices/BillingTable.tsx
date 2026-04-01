@@ -82,7 +82,7 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
       return invoiceDate.getFullYear() === today.getFullYear();
     }
 
-    return true;
+    return true; 
   });
   console.log("Filtered Invoices →", filteredInvoices);
 

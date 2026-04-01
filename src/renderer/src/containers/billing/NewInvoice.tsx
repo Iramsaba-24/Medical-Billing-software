@@ -244,7 +244,7 @@ const NewInvoice = () => {
  
           {/* ITEMS */}
  
-          <ItemsSection
+          <ItemsSection 
             rows={rows}
             setRows={setRows}
             finalTotal={finalTotal}

@@ -20,7 +20,7 @@ import { PharmacyFormValues } from "@/containers/setting/PharmacyProfile";
 export interface Invoice {
   name: string;
   company: string;
-  doctor: string;
+  doctor: string; 
   address: string;
   invoice: string;
   date: string;

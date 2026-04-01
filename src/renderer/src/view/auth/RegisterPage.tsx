@@ -104,7 +104,7 @@ const RegisterPage = () => {
       ...data,
       fullName: data.fullName.trim(),
       email: data.email.trim(),
-      company: data.companyName.trim(),
+      companyName: data.companyName.trim(),
       city: data.city.trim(),
       state: data.state.trim(),
     };
