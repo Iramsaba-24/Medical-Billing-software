@@ -79,11 +79,6 @@ const RegisterPage = () => {
       if (value) clearErrors(field);
     };
  
-  const handleLettersOnlyInput = (e: FormEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    input.value = input.value.replace(/[^A-Za-z ]/g, "").slice(0, 20);
-  };
- 
   const validateRequiredFields = (data: RegisterFormInputs) => {
     let isValid = true;
  
