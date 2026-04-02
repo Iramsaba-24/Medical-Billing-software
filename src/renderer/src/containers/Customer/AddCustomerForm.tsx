@@ -217,7 +217,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   }}
                 />
                 <MobileField
-                  name="mobile"
+                  name="phone"
                   label="Mobile"
                   countryCode
                   preventDuplicate={!initialData}

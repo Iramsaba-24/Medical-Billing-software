@@ -68,7 +68,8 @@ const StockDonutChart = ({
     },
   });
 
-  const total = chartDataMap[filter].reduce((sum, d) => sum + d.value, 0);
+  const total =
+    chartDataMap[filter]?.reduce((sum, d) => sum + d.value, 0) || 0;
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -111,6 +112,7 @@ const StockDonutChart = ({
     : 110;
 
   const handleFilterChange = (value: string) => {
+    if (!value || !(value in chartDataMap)) return;
     setFilter(value as FilterType);
   };
 

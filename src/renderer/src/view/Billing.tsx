@@ -367,7 +367,7 @@ function RetailInvoice() {
                     </Box>
 
                     <Box width={{ xs: "100%", sm: "260px" }}>
-                      <NumericField name="age" label="Age" maxlength={3} />
+                      <NumericField name="age" label="Age" min={15} max={100} />
                     </Box>
                   </Box>
 
