@@ -1,5 +1,6 @@
 import { useForm, FormProvider } from "react-hook-form";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, CircularProgress } from "@mui/material";
+import { useEffect, useState } from "react";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -9,8 +10,19 @@ import { showToast } from "@/components/uncontrolled/ToastMessage";
 import MobileField from "@/components/controlled/MobileField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { authService } from "@/service/authService";
+import  { AxiosError } from "axios";
 
-
+// Define error type
+// interface ApiError {
+//   response?: {
+//     data?: {
+//       message?: string;
+//       errors?: Record<string, string[]>;
+//     };
+//   };
+//   message?: string;
+// }
 
 const radioStyle = {
   "& .MuiRadio-root": {
@@ -18,7 +30,6 @@ const radioStyle = {
     "&.Mui-checked": { color: "#238878" },
   },
 };
-
 
 type FormInputs = {
   amount: string;
@@ -35,40 +46,225 @@ const NetBanking_PurchaseDetails = () => {
       email: "",
       whatsapp: "",
     },
-    
-     mode: "onChange",
+    mode: "onChange",
   });
 
   const selectedBillType = methods.watch("billType");
-
   const navigate = useNavigate();
-  const onSubmit = (data: FormInputs) => {
-    console.log("Form Data:", data);
-    showToast("success", "Payment initiated successfully!");
-    navigate(URL_PATH.PaymentSuccess);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Auto-fill form data from localStorage
+  useEffect(() => {
+    const paymentDataStr = localStorage.getItem('paymentData');
+    const userDataStr = localStorage.getItem('userData');
+    const registrationDataStr = localStorage.getItem('registrationData');
+    
+    if (paymentDataStr) {
+      try {
+        const paymentData = JSON.parse(paymentDataStr);
+        
+        // Auto-fill amount
+        if (paymentData.amount) {
+          methods.setValue('amount', paymentData.amount.toString());
+        }
+        
+        // Auto-fill email
+        if (paymentData.email) {
+          methods.setValue('email', paymentData.email);
+        } else if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          if (userData.email) {
+            methods.setValue('email', userData.email);
+          }
+        } else if (registrationDataStr) {
+          const registrationData = JSON.parse(registrationDataStr);
+          if (registrationData.email) {
+            methods.setValue('email', registrationData.email);
+          }
+        }
+        
+        // Auto-fill whatsapp
+        if (paymentData.whatsapp) {
+          methods.setValue('whatsapp', paymentData.whatsapp);
+        } else if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          if (userData.phone) {
+            methods.setValue('whatsapp', userData.phone);
+          }
+        } else if (registrationDataStr) {
+          const registrationData = JSON.parse(registrationDataStr);
+          if (registrationData.mobile) {
+            methods.setValue('whatsapp', registrationData.mobile);
+          }
+        }
+        
+      } catch (error) {
+        console.error("Error parsing payment data:", error);
+      }
+    }
+  }, [methods]);
+
+  const getOrCreateSubscription = async (userId: number, planId: number): Promise<number> => {
+    // First, check if we already have a subscription ID in localStorage
+    const subscriptionId = localStorage.getItem("subscriptionId");
+    
+    if (subscriptionId) {
+      const parsedId = parseInt(subscriptionId);
+      if (!isNaN(parsedId)) {
+        console.log("Using existing subscription ID from localStorage:", parsedId);
+        return parsedId;
+      }
+    }
+    
+    try {
+      console.log("Creating new subscription for user:", userId, "plan:", planId);
+      const subscriptionResponse = await authService.createSubscription({
+        userId: userId,
+        planId: planId
+      });
+      
+      const newSubscriptionId = subscriptionResponse.subscriptionId;
+      
+      if (newSubscriptionId) {
+        localStorage.setItem("subscriptionId", newSubscriptionId.toString());
+        console.log("Created/retrieved subscription with ID:", newSubscriptionId);
+        return newSubscriptionId;
+      } else {
+        throw new Error("Failed to create subscription: No subscription ID returned");
+      }
+    } catch (error: unknown) {
+      console.error("Error in subscription:", error);
+      
+      // Type guard for AxiosError
+      let errorMsg = "Unable to get subscription";
+      if (error instanceof AxiosError) {
+        errorMsg = error.response?.data?.message || error.message;
+      } else if (error instanceof Error) {
+        errorMsg = error.message;
+      }
+      
+      throw new Error(`Unable to get subscription: ${errorMsg}`);
+    }
   };
 
+const onSubmit = async (data: FormInputs) => {
+  setIsProcessing(true);
+  
+  try {
+    // Get userId
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      throw new Error("User ID not found. Please login again.");
+    }
+    
+    const parsedUserId = parseInt(userId);
+    if (isNaN(parsedUserId)) {
+      throw new Error("Invalid User ID");
+    }
+    
+    // Get payment data
+    const paymentDataStr = localStorage.getItem('paymentData');
+    if (!paymentDataStr) {
+      throw new Error("Payment data not found. Please select a plan first.");
+    }
+    
+    const paymentData = JSON.parse(paymentDataStr);
+    
+    // Validate required fields
+    if (!paymentData.planId) {
+      throw new Error("Plan ID not found. Please select a plan again.");
+    }
+    
+    // Get or create subscription
+    const subscriptionId = await getOrCreateSubscription(parsedUserId, paymentData.planId);
+    
+    console.log("Using subscription ID:", subscriptionId);
+    
+    // Prepare payment request
+    const paymentRequest = {
+      userId: parsedUserId,
+      subscriptionId: subscriptionId,
+      amount: Number(data.amount),
+      paymentMethod: "NetBanking",
+      couponCode: paymentData.couponCode || "",
+    };
+    
+    console.log("Processing payment with data:", paymentRequest);
+    console.log("Bill type:", data.billType);
+    
+    // Process payment with receipt delivery
+    let paymentResponse;
+    
+    if (data.billType === "email") {
+      const emailParam: string = data.email || "";
+      paymentResponse = await authService.processPayment(
+        paymentRequest,
+        data.billType,
+        emailParam,
+        ""
+      );
+    } else {
+      const whatsappParam: string = data.whatsapp || "";
+      paymentResponse = await authService.processPayment(
+        paymentRequest,
+        data.billType,
+        "",
+        whatsappParam
+      );
+    }
+    
+    console.log("Payment response:", paymentResponse);
+    
+    // Check if payment was successful - the response will have userPaymentId if successful
+    if (paymentResponse && (paymentResponse.userPaymentId || paymentResponse.userPaymentId === 0)) {
+      // Clear temporary data but keep subscription info
+      localStorage.removeItem('paymentData');
+      localStorage.removeItem('selectedPlanId');
+      
+      showToast("success", "Payment successful & receipt sent!");
+      navigate(URL_PATH.PaymentSuccess);
+    } else {
+      throw new Error(paymentResponse?.paymentStatus || "Payment failed");
+    }
+    
+  } catch (error: unknown) {
+    console.error("Payment error details:", error);
+    
+    let errorMessage = "Payment failed. Please try again.";
+    
+    if (error instanceof AxiosError) {
+      errorMessage = error.response?.data?.message || error.message;
+    } else if (error instanceof Error) {
+      // Don't show "Success" as an error
+      if (error.message !== "Success") {
+        errorMessage = error.message;
+      } else {
+        // If it says "Success" but we're in error block, payment was actually successful
+        showToast("success", "Payment successful!");
+        navigate(URL_PATH.PaymentSuccess);
+        return;
+      }
+    }
+    
+    showToast("error", errorMessage);
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   return (
-    
-     <Box 
-
-    
+    <Box
       sx={{
-         //minHeight: "100vh",
-          minHeight: "110vh",
-          display: "flex",
+        minHeight: "110vh",
+        display: "flex",
         backgroundImage: `url(${BgImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         flexDirection: "column",
         alignItems: "center",
-
-         
-       
+        py: 4,
       }}
-    > 
-
+    >
       {/* Logo */}
       <Box textAlign="center">
         <img src={LogoImage} alt="logo" style={{ width: 170 }} />
@@ -90,17 +286,15 @@ const NetBanking_PurchaseDetails = () => {
       <FormProvider {...methods}>
         <Box
           component="form"
-          onSubmit={methods.handleSubmit(onSubmit)}noValidate
+          onSubmit={methods.handleSubmit(onSubmit)}
+          noValidate
           sx={{
-            //width: "100%",
             maxWidth: 850,
-            backgroundColor: "#ffffff", 
+            backgroundColor: "#ffffff",
             borderRadius: 2,
-            boxShadow: "4",
+            boxShadow: 4,
             p: 4,
-
           }}
-          
         >
           {/* Purchase Details */}
           <Typography sx={{ fontWeight: 600, mb: 3 }}>
@@ -115,7 +309,8 @@ const NetBanking_PurchaseDetails = () => {
             type="number"
             maxLength={30}
             fullWidth
-           required
+            required
+            disabled={isProcessing}
             sx={{
               mb: 3,
               "& .MuiOutlinedInput-root": {
@@ -128,13 +323,11 @@ const NetBanking_PurchaseDetails = () => {
           <RadioField
             name="billType"
             label=""
-            
-            //sx={radioStyle}
             options={[
               { value: "email", label: "Send E-Bill on your Email ID" },
               { value: "whatsapp", label: "Send E-Bill on your WhatsApp" },
             ]}
-            sx={{ mb: 2 , ...radioStyle}}
+            sx={{ mb: 2, ...radioStyle }}
           />
 
           {/* Conditional Email Field */}
@@ -142,19 +335,15 @@ const NetBanking_PurchaseDetails = () => {
             <EmailField
               name="email"
               label="Enter Email"
-
               maxLength={50}
-              //inputProps={{ maxLength: 254 }}
-        
               required
+              disabled={isProcessing}
               sx={{
-            radioStyle,
-                 mt: 1,
+                mt: 1,
                 mb: 3,
                 "& .MuiOutlinedInput-root": {
                   backgroundColor: "#f9f9f9",
                 },
-              
               }}
             />
           )}
@@ -168,6 +357,7 @@ const NetBanking_PurchaseDetails = () => {
               countryCode
               required
               fullWidth
+              disabled={isProcessing}
               sx={{
                 mt: 1,
                 mb: 3,
@@ -206,7 +396,7 @@ const NetBanking_PurchaseDetails = () => {
             <Button
               type="submit"
               variant="contained"
-              //onClick={onSubmit}
+              disabled={isProcessing}
               sx={{
                 backgroundColor: "#2c8a74",
                 px: 5,
@@ -217,7 +407,7 @@ const NetBanking_PurchaseDetails = () => {
                 },
               }}
             >
-              Pay
+              {isProcessing ? <CircularProgress size={24} color="inherit" /> : "Pay"}
             </Button>
           </Box>
         </Box>
