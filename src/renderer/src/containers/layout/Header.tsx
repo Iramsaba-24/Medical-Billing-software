@@ -219,7 +219,7 @@ const Header: React.FC = () => {
           </IconButton>
         </Toolbar>
  
-        {/* MOBILE SEARCH OPEN */}
+        {/*  MOBILE SEARCH OPEN */}
         {isMobile && showSearch && (
           <Box sx={{ width: "100%", backgroundColor: "#238878", px: 2, py: 1 }}>
             <SearchBox sx={{ width: "100%" }}>

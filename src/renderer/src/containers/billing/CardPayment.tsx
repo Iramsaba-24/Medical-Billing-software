@@ -11,7 +11,7 @@ const PaperStyle = {
   p: { xs: 1, sm: 2 },
   mb: 1,
 };
-
+ 
 const btnStyle = {
   backgroundColor: "#238878",  
   height: 40,
@@ -92,7 +92,7 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
           <Box flex={1}>
             <TextInputField
               label="Card Number"
-              name="CardNumber"
+              name="cardLastFour"
               required
               inputType="numbers"
               minLength={13}
@@ -118,7 +118,7 @@ const CardPayment = ({ finalAmount, onSuccess }: Props) => {
           <Box flex={1}>
             <TextInputField
               label="Card Holder Name"
-              name="CardHolderName"
+              name="cardholderName"
 
               inputType="alphabet"
               minLength={3}

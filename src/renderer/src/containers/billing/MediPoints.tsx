@@ -108,7 +108,7 @@ const MediPoints: React.FC = () => {
     if (storedInvoice) {
       const invoice = JSON.parse(storedInvoice);
 
-      invoice.totalPrice = Number(data.discountedAmount);
+      invoice.totalAmount = Number(data.discountedAmount);
 
       localStorage.setItem("currentRetailInvoice", JSON.stringify(invoice));
     }

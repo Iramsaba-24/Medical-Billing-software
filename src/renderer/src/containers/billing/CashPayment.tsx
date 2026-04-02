@@ -50,7 +50,7 @@ const CashPayment = ({ payment, finalAmount, onSuccess }: Props) => {
   const isAmountMatched = subTotal >= finalAmount;
   const onCashPay = () => {
     onSuccess();
-  };
+  }; 
 
   return (
     <Paper sx={PaperStyle}>

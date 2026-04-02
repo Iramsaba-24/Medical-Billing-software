@@ -94,7 +94,7 @@ const timeZoneOptions = [
   const onSubmit: SubmitHandler<GeneralSettingsFormValues> = async (data) => {
     console.log("General Settings Data:", data);
 
-    localStorage.setItem("generalSettings", JSON.stringify(data));
+    localStorage.setItem("generalSettings", JSON.stringify(data));       //flow goes to header.tsx file
 
     showToast("success", "Settings updated successfully!");
   };
