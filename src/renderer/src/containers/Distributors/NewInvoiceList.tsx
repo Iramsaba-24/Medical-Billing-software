@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 type InvoiceItem = {
   invoice: string;
   name: string;
-  createdAt: string;
+  createdDate: string;
   price: number;
   status: string;
 };
@@ -17,7 +17,7 @@ type InvoiceItem = {
 const columns: Column<InvoiceItem>[] = [
   { key: "invoice", label: "Invoice No" },
   { key: "name", label: "Customer / Company" },
-  { key: "createdAt", label: "Date" },
+  { key: "createdDate", label: "Date" },
   {
     key: "price",
     label: "Amount",

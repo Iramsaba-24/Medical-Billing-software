@@ -103,6 +103,15 @@ const Distributors = () => {
         .includes(searchValue.toLowerCase())
   );
 
+// const filteredDistributors = distributors.filter((d) => {
+//   const company = (d.distributorName || "").toLowerCase();
+//   const regNo = (d.registrationNo || "").toLowerCase();
+//   const search = (searchValue || "").toLowerCase();
+
+//   return company.includes(search) || regNo.includes(search);
+// });
+
+
   return (
     <>
       <FormProvider {...methods}>

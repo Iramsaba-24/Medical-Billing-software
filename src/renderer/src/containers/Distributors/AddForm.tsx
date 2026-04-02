@@ -8,11 +8,12 @@ import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
 import AppToast from "@/containers/distributors/AppToast";
 
+
 const AddForm = () => {
   const methods = useForm({
     defaultValues: {
-      companyName: '',
-      phone: '',
+    companyName: '',
+      Phone: '',
       email: '',
       createdAt: '',
       address: '',

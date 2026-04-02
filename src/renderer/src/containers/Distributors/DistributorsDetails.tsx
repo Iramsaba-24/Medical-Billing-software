@@ -35,8 +35,8 @@ const [showBankDetails, setShowBankDetails] = useState(false);
     { label: "Bank Name", value: data.bankName },
     { label: "A/C Number", value: data.accountNumber },
     { label: "A/C Holder's Name", value: data.accountHolderName },
-    { label: "Branch", value: data.branch },
-    { label: "IFSC", value: data.ifscCode },
+    { label: "Branch", value: data.branchName },
+    { label: "IFSC", value: data.ifsc },
     { label: "UPI ID", value: data.upiId },
   ];
 
