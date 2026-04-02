@@ -10,14 +10,15 @@ export interface DoctorFormData {
   email: string;
   registrationNumber: string;
   hospitalAddress: string;
-
+    isActive?: boolean;
+    IsActive?: boolean;
 }
 
 // backend request
 interface DoctorRequest extends DoctorFormData {
   userId: number;
   clinicName: string;
-
+  IsActive: boolean;
 }
 
 // backend response
@@ -29,6 +30,8 @@ export interface DoctorResponse {
   email: string;
   registrationNumber: string;
   hospitalAddress: string;
+   isActive: boolean;
+    IsActive?: boolean;
 }
 
 // helpers
@@ -71,6 +74,7 @@ export const addDoctor = async (
     ...data,
     userId: getUserId(),
     clinicName: "Default Clinic",
+    IsActive: data.isActive ?? data.IsActive ?? true,
   };
 
   const res = await axios.post(
@@ -78,7 +82,6 @@ export const addDoctor = async (
     doctorData,
     getAuthHeaders() // token
   );
-
   return res.data;
 };
 // UPDATE doctor
@@ -91,6 +94,7 @@ export const updateDoctor = async (
     ...data,
     userId: getUserId(),
     clinicName: "Default Clinic",
+    IsActive: data.isActive ?? data.IsActive ?? true,
   };
 
   const res = await axios.put(
@@ -109,3 +113,4 @@ export const deleteDoctor = async (id: number): Promise<void> => {
     getAuthHeaders() // token
   );
 };
+

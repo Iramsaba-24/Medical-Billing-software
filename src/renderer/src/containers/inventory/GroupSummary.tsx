@@ -1,5 +1,6 @@
 import { Box, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { getMedicineGroups } from "@/service/medicineGroupService";
 
 type GroupSummaryProps = {
   groupId: number;
@@ -10,9 +11,23 @@ type GroupSummaryProps = {
 const GroupSummary = () => {
     const [groups, setGroups] = useState<GroupSummaryProps[]>([]);
 
+    // useEffect(() => {
+    //     const storedGroups = JSON.parse(localStorage.getItem("medicineGroups") || "[]");
+    //     setGroups(storedGroups.slice(-3));
+    // }, []);
+
+    // fetch group summary
     useEffect(() => {
-        const storedGroups = JSON.parse(localStorage.getItem("medicineGroups") || "[]");
-        setGroups(storedGroups.slice(-3));
+    const fetchGroups = async () => {
+    try {
+      const res = await getMedicineGroups();
+      // last 3 groups
+          setGroups(res.slice(-3));
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      fetchGroups();
     }, []);
   return (
     <>

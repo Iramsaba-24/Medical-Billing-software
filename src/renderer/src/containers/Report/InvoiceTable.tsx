@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import {
   Paper,
@@ -42,7 +41,6 @@ const InvoiceTable = () => {
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  //  FIXED SYNC LOGIC
   useEffect(() => {
     const loadInvoices = () => {
       const stored = localStorage.getItem("currentInvoice");
@@ -76,12 +74,17 @@ const InvoiceTable = () => {
       const matchesStatus =
         statusFilter === "All" || inv.status === statusFilter;
 
-      const parts = inv.date.split("/");
-      const invDate = new Date(
-        Number(parts[2]),
-        Number(parts[1]) - 1,
-        Number(parts[0])
-      );
+     if (!inv.date) return false;
+
+const parts = inv.date.split("/");
+
+if (parts.length !== 3) return false;
+
+const invDate = new Date(
+  Number(parts[2]),
+  Number(parts[1]) - 1,
+  Number(parts[0])
+);
 
       const today = new Date();
 

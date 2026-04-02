@@ -59,7 +59,7 @@ const AddForm = () => {
           }}
         >
           <Typography variant="h6" mb={3}>
-            Add Distributor
+            Add Distributor 
           </Typography>
           <Box
             sx={{
