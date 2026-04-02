@@ -4,12 +4,10 @@ import {
   Card,
   CardContent,
   Typography,
-  TextField,
-  InputAdornment,
   Chip,
   Slide
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
+// import { Search as SearchIcon } from '@mui/icons-material';
 import { useForm, FormProvider } from 'react-hook-form';
 import DropdownField from '@/components/controlled/DropdownField';
 import { UniversalTable, type Column, ACTION_KEY } from '@/components/uncontrolled/UniversalTable';
@@ -76,7 +74,7 @@ const getFilteredDataByDate = (data: SalesData[], filter: string): SalesData[] =
 
 
 const SalesTable: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('This Month');
   const [salesList, setSalesList] = useState<SalesData[]>([]);
   const [editingRow, setEditingRow] = useState<SalesData | null>(null);
@@ -227,20 +225,7 @@ const SalesTable: React.FC = () => {
                   Recent Sales List
                 </Typography>
 
-                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
-                  <TextField
-                    size="small"
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
+               
 
                   <Box sx={{ width: { xs: '100%', sm: 180 } }}>
                     <DropdownField
@@ -250,12 +235,13 @@ const SalesTable: React.FC = () => {
                     />
                   </Box>
                 </Box>
-              </Box>
+              
             </FormProvider>
 
             <Chip label={`Filter: ${selectedMonth}`} sx={{ mb: 2 }} />
 
             <UniversalTable
+            showSearch={true}
               data={filteredSalesData}
               columns={columns}
               rowsPerPage={5}

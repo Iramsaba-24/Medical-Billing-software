@@ -20,16 +20,17 @@ import { PharmacyFormValues } from "@/containers/setting/PharmacyProfile";
 export interface Invoice {
   name: string;
   company: string;
-  doctor: string;
+  doctor: string; 
   address: string;
   invoice: string;
   date: string;
   gst?: number;
-  totalPrice?: number;
+  totalAmount?: number;
   gstIn?: string;
   medicines: {
     name: string;
-    qty: string;
+      quantity: string;  
+        mrp?: number; 
     amount: number;
     hsn: string;
     expiry: string;
@@ -49,10 +50,11 @@ const columns = [
 
 interface Medicine {
   name: string;
-  qty: number | string;
+ quantity: number | string;
   amount: number;
   hsn?: string;
   expiry?: string;
+   mrp?: number;
 }
 
 const NewInvoiceBill = () => {
@@ -81,7 +83,7 @@ const NewInvoiceBill = () => {
 
   const invoiceGst = invoice?.gst ?? 0;
   const gstAmount = (subTotal * invoiceGst) / 100;
-  const grandTotal = invoice?.totalPrice ?? (subTotal + gstAmount);
+  const grandTotal = invoice?.totalAmount ?? (subTotal + gstAmount);
 
   const displayDate = invoice?.date || new Date().toLocaleDateString();
   const displayName = invoice?.company || invoice?.name || "-";
@@ -163,7 +165,8 @@ const pharmacyAddress = pharmacyData?.address || "-";
 
          
           {invoice?.medicines?.map((med: Medicine, index: number) => {
-            const rate = Number(med.qty) > 0 ? med.amount / Number(med.qty) : 0;
+             const rate = Number(med.quantity) > 0 ? med.amount / Number(med.quantity) : 0;
+          
             return (
               <Box
                 key={index}
@@ -184,7 +187,7 @@ const pharmacyAddress = pharmacyData?.address || "-";
                 </Typography>
                 <Typography fontSize={9.5} textAlign="center">{med.hsn || "-"}</Typography>
                 <Typography fontSize={9.5} textAlign="center">{med.expiry || "-"}</Typography>
-                <Typography fontSize={9.5} textAlign="center">{med.qty}</Typography>
+                <Typography fontSize={9.5} textAlign="center">{med.quantity}</Typography>
                 <Typography fontSize={9.5} textAlign="center">{rate.toFixed(2)}</Typography>
               </Box>
             );
@@ -333,14 +336,14 @@ const pharmacyAddress = pharmacyData?.address || "-";
 
               {/* Medicines */}
               {invoice?.medicines?.map((med: Medicine, index: number) => {
-                const rate = Number(med.qty) > 0 ? med.amount / Number(med.qty) : 0;
+                const rate = Number(med.quantity) > 0 ? med.amount / Number(med.quantity) : 0;
                 return (
                   <TableRow key={index} sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
                     <TableCell align="center">{index + 1}</TableCell>
                     <TableCell align="center">{med.name}</TableCell>
                     <TableCell align="center">{med.hsn || "-"}</TableCell>
                     <TableCell align="center">{med.expiry || "-"}</TableCell>
-                    <TableCell align="center">{med.qty}</TableCell>
+                    <TableCell align="center">{med.quantity}</TableCell>
                     <TableCell align="center">{rate.toFixed(2)}</TableCell>
                     <TableCell align="center">{invoiceGst}%</TableCell>
                     <TableCell align="center">-</TableCell>

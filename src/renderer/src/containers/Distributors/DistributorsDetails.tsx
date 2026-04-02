@@ -25,7 +25,7 @@ const [showBankDetails, setShowBankDetails] = useState(false);
     { label: "Company Name", value: data.companyName },
     { label: "Owner Name", value: data.ownerName },
     { label: "Registration Number", value: data.registrationNumber },
-    { label: "Mobile Number", value: data.mobile },
+    { label: "Mobile Number", value: data.phone },
     { label: "Email", value: data.email },
     { label: "Website", value: data.website },
     { label: "Address", value: data.address },
@@ -35,7 +35,7 @@ const [showBankDetails, setShowBankDetails] = useState(false);
     { label: "Bank Name", value: data.bankName },
     { label: "A/C Number", value: data.accountNumber },
     { label: "A/C Holder's Name", value: data.accountHolderName },
-    { label: "Branch", value: data.branch },
+    { label: "Branch", value: data.branchName },
     { label: "IFSC", value: data.ifsc },
     { label: "UPI ID", value: data.upiId },
   ];

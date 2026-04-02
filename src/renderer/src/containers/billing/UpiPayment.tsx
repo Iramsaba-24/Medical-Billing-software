@@ -109,7 +109,7 @@ const UpiPayment = ({ finalAmount, onSuccess }: Props) => {
  
   const upiId = useWatch({
     control,
-    name: "UpiId",
+    name: "upiId",
   });
  
   const detectedIcon = getUpiApp(upiId) || "upi";

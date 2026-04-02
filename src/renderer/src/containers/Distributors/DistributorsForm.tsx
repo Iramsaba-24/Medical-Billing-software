@@ -9,23 +9,26 @@ import { useState } from "react";
 import AppToast from "@/containers/distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
 import BankDetailsForm from "@/containers/distributors/BankDetailForm";
+import { addDistributor } from "@/service/distributorService";
+
 
 // Define the structure of the data
 type DistributorFormInput = {
+  distributorId: number;
   companyName: string;
   ownerName?: string;
-  mobile: string;
+  phone: string;
   email: string;
-  date: string;
+  createdAt: string;
   registrationNumber: string;
   website: string;
-  gstIn: string;
+  gstin: string;
   address: string;
   bankName: string;
   accountNumber: string;
   accountHolderName: string;
   branch: string;
-  ifsc: string;
+  ifscCode: string;
   upiId: string;
 };
 
@@ -35,19 +38,19 @@ const DistributorsForm = () => {
     defaultValues: {
       companyName: "",
       ownerName: "",
-      mobile: "",
+      phone: "",
       email: "",
-   
+      createdAt: "",
 
       registrationNumber: "",
       website: "",
-      gstIn: "",
+      gstin: "",
       address: "",
       bankName: "",
       accountNumber: "",
       accountHolderName: "",
       branch: "",
-      ifsc: "",
+      ifscCode: "",
       upiId: "",
     },
     mode: "onChange",
@@ -57,28 +60,41 @@ const DistributorsForm = () => {
   const [toastOpen, setToastOpen] = useState(false);
 
   // Function  runs when the form  submitted successfully
-  const onSubmit = (data: DistributorFormInput) => {
-    const stored = localStorage.getItem("distributors");
-    const currentData = stored ? JSON.parse(stored) : [];
+  // const onSubmit = (data: DistributorFormInput) => {
+  //   const stored = localStorage.getItem("distributors");
+  //   const currentData = stored ? JSON.parse(stored) : [];
 
-    //  Prepare new entry with a unique ID and default status
-    const newEntry = {
-      ...data,
-      id: Date.now().toString(),
-      status: "Active",
+  //   //  Prepare new entry with a unique ID and default status
+  //   const newEntry = {
+  //     ...data,
+  //     id: Date.now().toString(),
+  //     status: "Active",
       
-    };
+  //   };
 
-    //  Add new entry to the list and save it back to storage
-    const updatedData = [...currentData, newEntry];
-    localStorage.setItem("distributors", JSON.stringify(updatedData));
+  //   //  Add new entry to the list and save it back to storage
+  //   const updatedData = [...currentData, newEntry];
+  //   localStorage.setItem("distributors", JSON.stringify(updatedData));
 
+  //   setToastOpen(true);
+  //   setTimeout(() => {
+  //     navigate(URL_PATH.DistributorsPage);
+  //   }, 1500);
+  // };
+const onSubmit = async (data: DistributorFormInput) => {
+  try {
+    console.log("Submitting data:", JSON.stringify(data, null, 2)); // ← हे add करा
+    await addDistributor(data);
     setToastOpen(true);
     setTimeout(() => {
       navigate(URL_PATH.DistributorsPage);
     }, 1500);
-  };
-
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error saving distributor:", error.message);
+    }
+  }
+};
   return (
     <Box p={2} sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
       <FormProvider {...methods}>
@@ -127,7 +143,7 @@ const DistributorsForm = () => {
               />
 
               <MobileField 
-              name="mobile" 
+              name="phone" 
               label="Phone" 
               placeholder="Mobile Number"
               countryCode
@@ -143,7 +159,7 @@ const DistributorsForm = () => {
               />
 
               <DateTimeField 
-              name="date" 
+              name="createdAt" 
               label="Date"
               viewMode="date"
               useCurrentDate={true}
@@ -175,7 +191,7 @@ const DistributorsForm = () => {
                 }}
               />
               <TextInputField
-                name="gstIn"
+                name="gstin"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"
                 preventDuplicate
