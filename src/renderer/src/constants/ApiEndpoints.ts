@@ -7,4 +7,6 @@ export const API_ENDPOINTS = {
 
 MEDICINE: `${API_BASE_URL}/Medicine`,
 MEDICINE_GROUP: `${API_BASE_URL}/MedicineGroup`,  
+  DOCTOR: `${API_BASE_URL}/Doctor`
+  
 };

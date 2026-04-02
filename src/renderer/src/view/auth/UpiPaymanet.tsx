@@ -269,8 +269,8 @@ const UpiPayment: React.FC = () => {
                       required: "UPI ID is required",
                       pattern: {
                         value:
-                          /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ib|phonepe)$/,
-                        message: "Enter valid UPI ID example: user@bankname",
+                          /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ibl|phonepe)$/,
+                        message: "Enter valid UPI ID example: user@oksbi",
                       },
                     }}
                   />
