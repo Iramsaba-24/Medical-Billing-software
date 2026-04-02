@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
   LOGIN: `${API_BASE_URL}/Auth/login`,
   ACTIVATE_SUBSCRIPTION: `${API_BASE_URL}/UserSubscription/activate`,
 
+   DISTRIBUTOR: `${API_BASE_URL}/Distributor`,
 MEDICINE: `${API_BASE_URL}/Medicine`,
 MEDICINE_GROUP: `${API_BASE_URL}/MedicineGroup`,  
   DOCTOR: `${API_BASE_URL}/Doctor`

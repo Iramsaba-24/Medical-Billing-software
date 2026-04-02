@@ -56,9 +56,9 @@ const Distributors = () => {
   const columns: Column<Distributor>[] = [
     { key: "companyName", label: "Company Name" },
     { key: "registrationNumber", label: "Reg. No." },
-    { key: "mobile", label: "Mobile" },
+    { key: "phone", label: "Mobile" },
     { key: "email", label: "Email" },
-    { key: "date", label: "Date" },
+    { key: "createdAt", label: "Date" },
     { key: "address", label: "Address" },
     {
       key: "status",
@@ -102,6 +102,15 @@ const Distributors = () => {
         .toLowerCase()
         .includes(searchValue.toLowerCase())
   );
+
+// const filteredDistributors = distributors.filter((d) => {
+//   const company = (d.distributorName || "").toLowerCase();
+//   const regNo = (d.registrationNo || "").toLowerCase();
+//   const search = (searchValue || "").toLowerCase();
+
+//   return company.includes(search) || regNo.includes(search);
+// });
+
 
   return (
     <>

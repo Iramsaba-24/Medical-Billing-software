@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent } from "react";
+import { ChangeEvent } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -221,32 +221,19 @@ const RegisterPage = () => {
               inputType="alphabet"
               required
               sx={inputStyle("companyName")}
-              slotProps={{
-                htmlInput: { maxLength: 30 },
-              }}
-              rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
-              }}
+              minLength={3}
+              maxLength={30}
             />
  
             <TextInputField
               name="city"
               label="City"
               required
+              minLength={3}
+              maxLength={30}
               sx={inputStyle("city")}
-              inputProps={{
-                maxLength: 20,
-                onInput: handleLettersOnlyInput,
-              }}
               onChange={handleLettersOnlyChange("city")}
               rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
                 pattern: {
                   value: /^[A-Za-z ]+$/,
                   message: "Only letters allowed",
@@ -259,16 +246,10 @@ const RegisterPage = () => {
               label="State"
               required
               sx={inputStyle("state")}
-              inputProps={{
-                maxLength: 20,
-                onInput: handleLettersOnlyInput,
-              }}
+              minLength={3}
+              maxLength={30}
               onChange={handleLettersOnlyChange("state")}
               rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
                 pattern: {
                   value: /^[A-Za-z ]+$/,
                   message: "Only letters allowed",

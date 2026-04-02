@@ -13,7 +13,6 @@ type FormInputs = {
   gstin: string;
   licenseNumber: string;
 };
-
 const BusinessDetails = () => {
   const methods = useForm<FormInputs>({
     defaultValues: {
@@ -191,3 +190,4 @@ const BusinessDetails = () => {
 };
 
 export default BusinessDetails;
+
