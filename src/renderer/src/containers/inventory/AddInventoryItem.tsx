@@ -7,7 +7,7 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
-
+import { addMedicine } from "@/service/medicineService";
 
 export type InventoryFormData = {
   itemName: string;
@@ -78,36 +78,71 @@ export default function AddInventoryItem() {
     setSupplierOptions(options);
   }, []);
 
-  const onSubmit = (data: InventoryFormData) => {
-    const existing: InventoryItem[] = JSON.parse(
-      localStorage.getItem("inventory") || "[]"
-    );
+  // const onSubmit = (data: InventoryFormData) => {
+  //   const existing: InventoryItem[] = JSON.parse(
+  //     localStorage.getItem("inventory") || "[]"
+  //   );
 
-    const status: InventoryItem["status"] =
-      data.quantity === 0
-        ? "Out of Stock"
-        : data.quantity < 20
-        ? "Low Stock"
-        : "In Stock";
+  //   const status: InventoryItem["status"] =
+  //     data.quantity === 0
+  //       ? "Out of Stock"
+  //       : data.quantity < 20
+  //       ? "Low Stock"
+  //       : "In Stock";
 
-    const newItem: InventoryItem = {
-      itemName: data.itemName,
-      medicineId: data.medicineId,
-      medicineGroup: data.medicineGroup,
-      quantity: data.quantity,
-      pricePerUnit: data.pricePerUnit,
-      expiryDate: data.expiryDate,
-      supplier: data.supplier,
-      status,
-    };
+  //   const newItem: InventoryItem = {
+  //     itemName: data.itemName,
+  //     medicineId: data.medicineId,
+  //     medicineGroup: data.medicineGroup,
+  //     quantity: data.quantity,
+  //     pricePerUnit: data.pricePerUnit,
+  //     expiryDate: data.expiryDate,
+  //     supplier: data.supplier,
+  //     status,
+  //   };
 
-    localStorage.setItem(
-      "inventory",
-      JSON.stringify([...existing, newItem])
-    );
+  //   // localStorage.setItem(
+  //   //   "inventory",
+  //   //   JSON.stringify([...existing, newItem])
+  //   // );
 
+  //   navigate(URL_PATH.Inventory);
+  // };
+
+// const onSubmit = async (data: InventoryFormData) => {
+//   try {
+//     await addMedicine(data);
+
+//     navigate(URL_PATH.Inventory);
+//   } catch (error) {
+//     console.error("Error adding medicine:", error);
+//   }
+// };
+
+
+const onSubmit = async (data: InventoryFormData) => {
+  try {
+    await addMedicine(data);
     navigate(URL_PATH.Inventory);
-  };
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("Error message:", error.message);
+    }
+
+    // axios specific error
+    if (typeof error === "object" && error !== null && "response" in error) {
+      const err = error as {
+        response?: {
+          data?: unknown;
+        };
+      };
+
+      console.log("BACKEND ERROR:", err.response?.data);
+    }
+  }
+};
+
+
 
   return (
     <FormProvider {...methods}>

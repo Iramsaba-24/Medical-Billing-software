@@ -15,6 +15,7 @@ export interface PurchaseHistory {
 // Main Customer data structure including their history
 export interface CustomerData {
   id?: string;
+    customerId?: number;
   name: string;
   age: string;
   mobile: string;

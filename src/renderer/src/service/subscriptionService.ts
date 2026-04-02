@@ -18,7 +18,7 @@ export const subscriptionService = {
       throw error;
     }
   },
-
+  
   // Activate subscription after payment
   activateSubscription: async (subscriptionId: number) => {
     try {

@@ -10,15 +10,15 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 
 type PaymentMethods = {
-  paymentMethod: "credit-card" | "upi" | "cash";
+  paymentMethod: "debitCard" | "upi" | "cash";
 
-  CardNumber?: string;
+  cardLastFour?: string;
 
-  CardHolderName?: string;
+  cardholderName?: string;
 
   Cvv?: string;
 
-  UpiId?: string;
+  upiId?: string;
 };
 
 const radioStyle = {
@@ -37,7 +37,7 @@ const PaymentMethod = () => {
   const methods = useForm<PaymentMethods>({
     
     defaultValues: {
-      paymentMethod: "credit-card",    
+      paymentMethod: "debitCard",    
     },
     mode: "onChange",
   });
@@ -62,11 +62,11 @@ const PaymentMethod = () => {
       const storedInvoice = localStorage.getItem("currentNewInvoice");
       if (storedRetail) {
         const retail = JSON.parse(storedRetail);
-        setFinalAmount(retail.totalPrice || 0);
+        setFinalAmount(retail.totalAmount || 0);
       } else if (storedInvoice) {
         const invoices = JSON.parse(storedInvoice);
         const lastInvoice = invoices[invoices.length - 1];
-        setFinalAmount(lastInvoice?.totalPrice || 0);
+        setFinalAmount(lastInvoice?.totalAmount || 0);
       }
     }
 
@@ -152,16 +152,16 @@ function getFormattedTime(): string {
       doctor: retail.doctor,
       address: retail.address,
       doctorAddress: retail.doctorAddress,
-      date: new Date().toLocaleDateString("en-GB"),
+      invoiceDate: new Date().toLocaleDateString("en-GB"),
         time: getFormattedTime(),
-      price: retail.totalPrice,
-      status: "Paid",
+      price: retail.totalAmount,
+      paymentStatus: "Paid",
       medicines: retail.medicines,
       gst: retail.gst,
       type: "retail",
       gstAmount: retail.gstAmount,
       subTotal: retail.subTotal,
-      totalPrice: retail.totalPrice,
+      totalAmount: retail.totalAmount,
     };
 
     const updated = [newInvoice, ...existingInvoices];
@@ -188,11 +188,11 @@ function getFormattedTime(): string {
       name: lastInvoice.company,
       date: new Date().toLocaleDateString(),
         time: getFormattedTime(),
-      price: lastInvoice.totalPrice,
-      status: "Paid",
+      price: lastInvoice.totalAmount,
+      paymentStatus: "Paid", 
       type: "distributor",
       medicines: lastInvoice.medicines || [],
-      totalPrice: lastInvoice.totalPrice,
+      totalAmount: lastInvoice.totalAmount,
     };
 
     const billInvoice = {
@@ -234,7 +234,7 @@ function getFormattedTime(): string {
           <RadioField
             name="paymentMethod"
             options={[
-              { label: "Credit / Debit Card", value: "credit-card" },
+              { label: "Credit / Debit Card", value: "debitCard" },
 
               { label: "UPI Payment", value: "upi" },
 
@@ -245,7 +245,7 @@ function getFormattedTime(): string {
           />
         </Box>
 
-        {payment === "credit-card" && (
+        {payment === "debitCard" && (
           <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
         )}
 

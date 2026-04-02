@@ -11,7 +11,7 @@ type InvoiceItem = {
   name: string;
   createdDate: string;
   price: number;
-  status: string;
+  paymentStatus: string;
 };
 
 const columns: Column<InvoiceItem>[] = [
@@ -23,7 +23,7 @@ const columns: Column<InvoiceItem>[] = [
     label: "Amount",
     render: (row) => `₹ ${row.price}`,
   },
-  { key: "status", label: "Status" },
+  { key: "paymentStatus", label: "Status" },
   {
     key: "invoice",
     label: "Actions",

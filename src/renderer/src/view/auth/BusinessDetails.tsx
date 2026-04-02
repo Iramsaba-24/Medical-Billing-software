@@ -36,7 +36,7 @@ const BusinessDetails = () => {
       // Combine with business details
       const completeData = { 
         ...existingData, 
-        businessDetail: {
+        businessDetails: {
           businessType: data.businessType,
           gstin: data.gstin,
           licenseNumber: data.licenseNumber
