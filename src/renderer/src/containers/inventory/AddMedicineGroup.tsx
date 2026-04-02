@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { addMedicineGroup } from "@/service/medicineGroupService";
 
 export interface AddMedicineGroupFormValues {
   groupId: number;
@@ -27,24 +28,37 @@ const AddMedicineGroup = () => {
 
   const navigate = useNavigate();
 
-  const onSubmit = (data: AddMedicineGroupFormValues) => {
-    const existingGroups = JSON.parse(
-      localStorage.getItem("medicineGroups") || "[]"
-    );
+  // const onSubmit = (data: AddMedicineGroupFormValues) => {
+  //   const existingGroups = JSON.parse(
+  //     localStorage.getItem("medicineGroups") || "[]"
+  //   );
 
-    const newGroup = {
-      groupId: Date.now(),
+  //   const newGroup = {
+  //     groupId: Date.now(),
+  //     groupName: data.groupName,
+  //     category: data.category,
+  //   };
+
+  //   localStorage.setItem(
+  //     "medicineGroups",
+  //     JSON.stringify([...existingGroups, newGroup])
+  //   );
+
+  //   navigate(URL_PATH.MedicineGroup);
+  // };
+
+  const onSubmit = async (data: AddMedicineGroupFormValues) => {
+  try {
+    await addMedicineGroup({
       groupName: data.groupName,
       category: data.category,
-    };
-
-    localStorage.setItem(
-      "medicineGroups",
-      JSON.stringify([...existingGroups, newGroup])
-    );
+    });
 
     navigate(URL_PATH.MedicineGroup);
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
     <FormProvider {...methods}>
