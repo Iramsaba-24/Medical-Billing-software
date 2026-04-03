@@ -13,7 +13,6 @@ const getAuthHeaders = () => {
   };
 };
 
-// userId 
 const getUserId = (): number => {
   const id = localStorage.getItem("userId");
   if (!id) {
@@ -22,8 +21,6 @@ const getUserId = (): number => {
   return Number(id);
 };
 
-
-//  GET all customers
 export const getAllCustomers = async (): Promise<CustomerData[]> => {
   const res = await axios.get(
     API_ENDPOINTS.CUSTOMER,
@@ -32,8 +29,6 @@ export const getAllCustomers = async (): Promise<CustomerData[]> => {
   return res.data;
 };
 
-
-//  GET customer by ID
 export const getCustomerById = async (
   id: number | string
 ): Promise<CustomerData> => {
@@ -44,7 +39,6 @@ export const getCustomerById = async (
   return res.data;
 };
 
-
 //  CREATE customer
 export const createCustomer = async (
   data: CustomerData
@@ -52,7 +46,7 @@ export const createCustomer = async (
 
   const customerData = {
     ...data,
-    userId: getUserId(), // agar backend me required ho
+    userId: getUserId(), 
   };
 
   const res = await axios.post(

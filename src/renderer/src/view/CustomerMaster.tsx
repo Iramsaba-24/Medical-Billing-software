@@ -6,8 +6,7 @@ import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMess
 import { getAllCustomers } from "@/service/customerService";
 import { deleteCustomer } from "@/service/customerService";
 
- 
-// Structure for a single purchase invoice record
+
 export interface PurchaseHistory {
   id: string;
   date: string;
@@ -15,7 +14,6 @@ export interface PurchaseHistory {
   [key: string]: string | number  | undefined;
 }
 
-// Main Customer data structure including their history
 export interface CustomerData {
   id?: string;
     customerId?: number;
@@ -35,12 +33,10 @@ export interface CustomerData {
 }
  
 const CustomerMaster = () => {
-  // State to manage which screen to  'list', 'add', or 'view'
   const [view, setView] = useState<"list" | "add" | "view">("list");
-  
- 
+
  const [customerList, setCustomerList] = useState<CustomerData[]>([]);
- 
+
  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
 const fetchCustomers = async () => {
   try {
@@ -56,7 +52,6 @@ useEffect(() => {
   fetchCustomers();
 }, []);
 
-  // Function to save or update customer and invoice data 
 const handleSave = async () => {
   await fetchCustomers();   
   setView("list");          
@@ -72,7 +67,6 @@ const handleSave = async () => {
     setView("add");
   };
  
-  // Function to delete a customer entirely
 const handleDeleteCustomer = async (cust: CustomerData) => {
   const confirmed = await showConfirmation(
     `Are you sure you want to delete ${cust.name}?`,
@@ -86,7 +80,6 @@ const handleDeleteCustomer = async (cust: CustomerData) => {
   }
 };
 
-  // Function to delete only one specific invoice from a customer's history
   const handleDeleteInvoice = async (invoice: PurchaseHistory) => {
     if (!selectedCustomer) return;
  
@@ -98,7 +91,6 @@ const handleDeleteCustomer = async (cust: CustomerData) => {
     if (confirmed) {
       setCustomerList((prev) => {
         const updatedList = prev.map((cust) => {
-          // Find the customer and filter out the specific invoice ID
           if (cust.name.toLowerCase().trim() === selectedCustomer.name.toLowerCase().trim()) {
             const updatedHistory = (cust.history || []).filter((inv) => inv.id !== invoice.id);
             const updatedCust = { ...cust, history: updatedHistory };
@@ -115,7 +107,6 @@ const handleDeleteCustomer = async (cust: CustomerData) => {
  
   return (
     <>
-      {/* Conditionally render screens based on the 'view' state */}
       {view === "list" && (
         <CustomerListPage 
           data={customerList} 

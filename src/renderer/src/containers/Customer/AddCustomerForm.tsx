@@ -11,7 +11,6 @@ import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { getDoctors, DoctorResponse } from "@/service/doctorService";
-
 import { createCustomer, updateCustomer } from "@/service/customerService";
 
 interface Props {
