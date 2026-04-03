@@ -15,12 +15,23 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 export type Distributor = {
   id: string;
   companyName: string;
-  mobile: string;
+  phone: string;
   email: string;
-  date: string;
   registrationNumber: string;
   address: string;
   status: "Active" | "Inactive";
+  createdDate: string;
+  ownerName: string;
+  website?: string;
+  gstin: string;
+  bankDetails?: { 
+    bankName: string;
+    accountNumber: string;
+    accountHolderName: string;
+    branch: string;
+    ifscCode: string;
+    upiId: string;
+  };
 };
 
 type Props = {
@@ -34,9 +45,9 @@ const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
     defaultValues: {
       id: "",
       companyName: "",
-      mobile: "",
+      phone: "",
       email: "",
-      date: "",
+      createdDate: "",
       registrationNumber: "",
       address: "",
       status: "Active",
