@@ -1,19 +1,18 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
-/*TYPES  */
+/* ================= TYPES ================= */
 
 // frontend form data
 export interface DistributorFormData {
   companyName: string;
-  ownerName?: string;
+  ownerName: string; // ✅ make required
   phone: string;
   email: string;
   registrationNumber: string;
   website?: string;
   gstin: string;
   address: string;
-  createdAt: string;
 
   // bank
   bankName: string;
@@ -24,19 +23,18 @@ export interface DistributorFormData {
   upiId: string;
 }
 
-// backend request
+// backend request (MATCH DTO EXACTLY)
 interface DistributorRequest {
-  userId: number;
   companyName: string;
+  ownerName: string; // ✅ REQUIRED
   phone: string;
   email: string;
   registrationNumber: string;
-  website?: string;
+  website?: string | null;
   gstin: string;
   address: string;
-  createdAt: string;
 
-  BankDetails: {
+  bankDetails: { 
     bankName: string;
     accountNumber: string;
     accountHolderName: string;
@@ -50,15 +48,15 @@ interface DistributorRequest {
 export interface DistributorResponse {
   distributorId: number;
   companyName: string;
+  ownerName: string;
   phone: string;
   email: string;
   registrationNumber: string;
   website?: string;
   gstin: string;
   address: string;
-  createdAt: string;
-
-  BankDetails?: {
+  createdDate: string;
+  bankDetails?: { 
     bankName: string;
     accountNumber: string;
     accountHolderName: string;
@@ -70,7 +68,6 @@ export interface DistributorResponse {
 
 /* ================= HELPERS ================= */
 
-// token header
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
 
@@ -79,17 +76,6 @@ const getAuthHeaders = () => {
       Authorization: token ? `Bearer ${token}` : "",
     },
   };
-};
-
-// userId
-const getUserId = (): number => {
-  const id = localStorage.getItem("userId");
-
-  if (!id) {
-    throw new Error("User not logged in");
-  }
-
-  return Number(id);
 };
 
 /* ================= API CALLS ================= */
@@ -116,31 +102,30 @@ export const getDistributorById = async (
   return res.data;
 };
 
-// ADD distributor
+// ✅ ADD distributor (FIXED)
 export const addDistributor = async (
   data: DistributorFormData
 ): Promise<DistributorResponse> => {
 
-const distributorData: DistributorRequest = {
-  userId: getUserId(),
-  companyName: data.companyName,
-  phone: data.phone,
-  email: data.email,
-  registrationNumber: String(data.registrationNumber), // ← string मध्ये convert करा
-  website: data.website || undefined,
-  gstin: data.gstin,
-  address: data.address,
-createdAt: data.createdAt 
-  ? new Date(data.createdAt).toISOString() 
-  : new Date().toISOString(),  BankDetails: {
-    bankName: data.bankName,
-    accountNumber: data.accountNumber,
-    accountHolderName: data.accountHolderName,
-    branch: data.branch,
-    ifscCode: data.ifscCode,
-    upiId: data.upiId,
-  },
-};
+  const distributorData: DistributorRequest = {
+    companyName: data.companyName,
+    ownerName: data.ownerName, // ✅ REQUIRED
+    phone: data.phone,
+    email: data.email,
+    registrationNumber: data.registrationNumber,
+    website: data.website ? data.website : null, // ✅ fix URL issue
+    gstin: data.gstin,
+    address: data.address,
+
+    bankDetails: { // ✅ MUST be nested
+      bankName: data.bankName,
+      accountNumber: data.accountNumber,
+      accountHolderName: data.accountHolderName,
+      branch: data.branch,
+      ifscCode: data.ifscCode,
+      upiId: data.upiId,
+    },
+  };
 
   const res = await axios.post(
     API_ENDPOINTS.DISTRIBUTOR,
@@ -151,24 +136,23 @@ createdAt: data.createdAt
   return res.data;
 };
 
-// UPDATE distributor
+// ✅ UPDATE distributor (FIXED)
 export const updateDistributor = async (
   id: number,
   data: DistributorFormData
 ): Promise<DistributorResponse> => {
 
   const distributorData: DistributorRequest = {
-    userId: getUserId(),
     companyName: data.companyName,
+    ownerName: data.ownerName,
     phone: data.phone,
     email: data.email,
     registrationNumber: data.registrationNumber,
-    website: data.website,
+    website: data.website ? data.website : null,
     gstin: data.gstin,
     address: data.address,
-    createdAt: data.createdAt,
 
-    BankDetails: {
+    bankDetails: {
       bankName: data.bankName,
       accountNumber: data.accountNumber,
       accountHolderName: data.accountHolderName,
