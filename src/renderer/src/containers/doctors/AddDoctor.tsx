@@ -51,9 +51,13 @@ const AddDoctor = () => {
 
   //   navigate(URL_PATH.Doctors);
   // };
-  const onSubmit = async (data: AddDoctorFormValues) => {
+const onSubmit = async (data: AddDoctorFormValues) => {
   try {
-    await addDoctor(data); // API call
+    await addDoctor({
+      ...data,
+      isActive: data.status === "Active", 
+    });
+
     navigate(URL_PATH.Doctors);
   } catch (error) {
     console.error(error);
