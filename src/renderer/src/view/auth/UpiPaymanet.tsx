@@ -1,4 +1,4 @@
-import {Box,Paper,Button,CircularProgress, Typography} from "@mui/material";
+import { Box, Paper, Button, CircularProgress, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BgImage from "@/assets/bgloginpage.svg";
@@ -13,6 +13,7 @@ import phonepeIcon from "@/assets/icons/phonepe.svg";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
+import { authService } from "@/service/authService";
 
 type UpiFormFields = {
   paymentMethod: "upi";
@@ -37,7 +38,7 @@ const btnStyle = {
     color: "#238878",
     borderColor: "#238878",
   },
-} 
+}
 
 // UPI app icon 
 const getUpiApp = (upiId?: string) => {
@@ -83,33 +84,80 @@ const UpiPayment: React.FC = () => {
   const { handleSubmit, control } = methods;
 
 
-  // watch UPI ID for live icon detection
   const upiId = useWatch({ control, name: "UpiId" });
   const detectedIcon = getUpiApp(upiId) || "upi";
 
-  // payment status 
-  const [upiPaymentStatus, setUpiPaymentStatus] = useState <"default" | "loading" | "success">("default");
+  const [upiPaymentStatus, setUpiPaymentStatus] = useState<"default" | "loading" | "success">("default");
 
-  const onUpiPay = () => {
+  const onUpiPay = async () => {
     setUpiPaymentStatus("loading");
-    setTimeout(() => {
-      setUpiPaymentStatus("success");
-    }, 2000);
+
+    try {
+      const paymentDataStr = localStorage.getItem('paymentData');
+      const userId = localStorage.getItem('userId');
+      
+
+      if (!paymentDataStr || !userId) {
+        throw new Error("Missing payment information");
+      }
+
+      const paymentData = JSON.parse(paymentDataStr);
+
+      const subscriptionResponse = await authService.createSubscription({
+        userId: parseInt(userId),
+        planId: paymentData.planId
+      });
+
+      if (!subscriptionResponse.subscriptionId) {
+        throw new Error("Failed to create subscription");
+      }
+
+      // Then process payment
+      const paymentRequest = {
+        userId: parseInt(userId),
+        subscriptionId: subscriptionResponse.subscriptionId,
+        amount: paymentData.amount,
+        paymentMethod: "UPI",
+        couponCode: paymentData.couponCode || ""
+      };
+
+      const paymentResponse = await authService.processPayment(paymentRequest);
+
+      if (paymentResponse.paymentStatus === "pending" || paymentResponse.paymentStatus === "success") {
+        setUpiPaymentStatus("success");
+
+        localStorage.removeItem('registrationData');
+        localStorage.removeItem('paymentData');
+        localStorage.removeItem('selectedPlanId');
+
+        showToast("success", "Payment Successful!");
+
+        setTimeout(() => {
+          navigate(URL_PATH.PaymentSuccess);
+        }, 900);
+      } else {
+        throw new Error("Payment failed");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      setUpiPaymentStatus("default");
+      showToast("error", "Payment failed. Please try again.");
+    }
   };
 
-    
+
   const navigate = useNavigate();
   useEffect(() => {
-  if (upiPaymentStatus === "success") {
-    const timer = setTimeout(() => {
-      navigate(URL_PATH.NetPurchaseDetails);
+    if (upiPaymentStatus === "success") {
+      const timer = setTimeout(() => {
+        navigate(URL_PATH.NetPurchaseDetails);
         showToast("success", "Payment Successful!");
-      
-    }, 900); 
 
-    return () => clearTimeout(timer);
-  }
-}, [upiPaymentStatus, navigate]);
+      }, 900);
+
+      return () => clearTimeout(timer);
+    }
+  }, [upiPaymentStatus, navigate]);
 
   const showPaymentStatus = (
     status: "default" | "loading" | "success"
@@ -155,16 +203,16 @@ const UpiPayment: React.FC = () => {
     <FormProvider {...methods}>
       <form noValidate>
         <Box
-            sx={{
-                minHeight: "98vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundImage: `url(${BgImage})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                px: { xs: 2, sm: 0 },
-            }}
+          sx={{
+            minHeight: "98vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundImage: `url(${BgImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            px: { xs: 2, sm: 0 },
+          }}
         >
           <Box sx={{ textAlign: "center", width: "100%" }}>
             {/* Logo */}
@@ -174,32 +222,32 @@ const UpiPayment: React.FC = () => {
               alt="Logo"
               sx={{ width: 160, mb: 2 }}
             />
-                    <Typography
-          variant="h4"
-          fontWeight={500}
-          sx={{
-             color: "#212529",
-            mb: 3,
-            fontSize: { xs: 20, sm: 22, md: 25 }
-          }}
-        >
-          UPI Payment
-        </Typography>
+            <Typography
+              variant="h4"
+              fontWeight={500}
+              sx={{
+                color: "#212529",
+                mb: 3,
+                fontSize: { xs: 20, sm: 22, md: 25 }
+              }}
+            >
+              UPI Payment
+            </Typography>
 
             <Paper
               elevation={4}
-                sx={{
-                    p: { xs: 3, sm: 4 },
-                    borderRadius: 3,
-                    textAlign: "left",
-                    backgroundColor: " #F8F9FA",
-                    maxWidth: {
-                    xs: "100%", 
-                    sm: "80%",       
-                    md: "70%",      
-                    },
-                    mx: "auto",     
-                }}
+              sx={{
+                p: { xs: 3, sm: 4 },
+                borderRadius: 3,
+                textAlign: "left",
+                backgroundColor: " #F8F9FA",
+                maxWidth: {
+                  xs: "100%",
+                  sm: "80%",
+                  md: "70%",
+                },
+                mx: "auto",
+              }}
             >
               {/* UPI Radio label */}
               <RadioField
@@ -221,8 +269,8 @@ const UpiPayment: React.FC = () => {
                       required: "UPI ID is required",
                       pattern: {
                         value:
-                          /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ib|phonepe)$/,
-                        message: "Enter valid UPI ID",
+                          /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ibl|phonepe)$/,
+                        message: "Enter valid UPI ID example: user@oksbi",
                       },
                     }}
                   />
@@ -262,7 +310,7 @@ const UpiPayment: React.FC = () => {
                   onClick={handleSubmit(onUpiPay)}
                   disabled={upiPaymentStatus === "loading"}
                   sx={{ ...btnStyle, width: { xs: "100%", sm: "auto" } }}
-                  
+
                 >
                   Pay
                 </Button>

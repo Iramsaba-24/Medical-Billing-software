@@ -7,9 +7,11 @@ import { useEffect, useState } from "react";
 import { showConfirmation, showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
+  import { getMedicineGroups } from "@/service/medicineGroupService";
+
 
 type MedicineGroupRow = {
-  id: number;
+  groupId: number;
   groupName: string;
   category: string;
   count: string;
@@ -21,31 +23,52 @@ const MedicineGroup = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const groups = JSON.parse(
-      localStorage.getItem("medicineGroups") || "[]"
-    );
+  // useEffect(() => {
+  //   const groups = JSON.parse(
+  //     localStorage.getItem("medicineGroups") || "[]"
+  //   );
 
-    const inventory = JSON.parse(
-      localStorage.getItem("inventory") || "[]"
-    );
+  //   const inventory = JSON.parse(
+  //     localStorage.getItem("inventory") || "[]"
+  //   );
 
-    const updatedGroups = groups.map(
-      (group: { id: number; groupName: string; category: string }) => {
-        const count = inventory.filter(
-          (item: { medicineGroup: string }) =>
-            item.medicineGroup === group.groupName
-        ).length;
+  //   const updatedGroups = groups.map(
+  //     (group: { groupId: number; groupName: string; category: string }) => {
+  //       const count = inventory.filter(
+  //         (item: { medicineGroup: string }) =>
+  //           item.medicineGroup === group.groupName
+  //       ).length;
 
-        return {
-          ...group,
-          count: count.toString(),
-        };
-      }
-    );
+  //       return {
+  //         ...group,
+  //         count: count.toString(),
+  //       };
+  //     }
+  //   );
 
-    setMedicineGroups(updatedGroups);
-  }, []);
+  //   setMedicineGroups(updatedGroups);
+  // }, []);
+
+useEffect(() => {
+  const fetchGroups = async () => {
+    try {
+      const res = await getMedicineGroups();
+
+      const formatted = res.map((g) => ({
+        groupId: g.groupId,
+        groupName: g.groupName,
+        category: g.category,
+        count: "0", 
+      }));
+
+      setMedicineGroups(formatted);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchGroups();
+}, []);
 
   const saveGroups = (updated: MedicineGroupRow[]) => {
     localStorage.setItem("medicineGroups", JSON.stringify(updated));
@@ -56,7 +79,7 @@ const MedicineGroup = () => {
     if (!editGroup) return;
 
     const updated = medicineGroups.map((g) =>
-      g.id === editGroup.id ? editGroup : g
+      g.groupId === editGroup.groupId ? editGroup : g
     );
 
     saveGroups(updated);
@@ -75,13 +98,13 @@ const MedicineGroup = () => {
 
   return (
     <>
-      {/* 🔹 Back to Home Button - Right side, Paper chya baher */}
+      {/*  Back to Home Button  */}
       <Box display="flex" justifyContent="flex-end" mb={2}>
   <Button
     variant="contained"
     onClick={() => navigate(URL_PATH.Inventory)}
     sx={{
-      mr: 5,   //  he important
+      mr: 5,   
       backgroundColor: "#238878",
       color: "#fff",
       textTransform: "none",
@@ -131,7 +154,7 @@ const MedicineGroup = () => {
           rowsPerPage={5}
           actions={{
             view: (row) =>
-              navigate(`/medicine-groups/${row.groupName}`),
+                navigate(`/medicine-groups/${row.groupId}`),  
 
             edit: (row) => setEditGroup(row),
 
@@ -142,7 +165,7 @@ const MedicineGroup = () => {
               );
               if (ok) {
                 saveGroups(
-                  medicineGroups.filter((g) => g.id !== row.id)
+                  medicineGroups.filter((g) => g.groupId !== row.groupId)
                 );
                 showSnackbar(
                   "success",
@@ -154,7 +177,7 @@ const MedicineGroup = () => {
         />
       </Paper>
 
-      {/* 🔹 EDIT DIALOG */}
+      {/* EDIT DIALOG */}
       <Dialog
         open={!!editGroup}
         onClose={() => setEditGroup(null)}

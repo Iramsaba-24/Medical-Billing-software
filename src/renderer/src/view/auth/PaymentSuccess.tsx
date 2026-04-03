@@ -3,12 +3,39 @@ import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { useEffect, useState } from "react";
+
+interface SubscriptionDetails {
+  subscriptionId: number;
+  startDate: string;
+  endDate: string;
+  planId: number;
+}
 
 const PaymentSuccess: React.FC = () => {
   const navigate = useNavigate();
-  const handleClick = () => { 
-    navigate(URL_PATH.Dashboard);
+  const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetails | null>(null);
+  
+  useEffect(() => {
+    const details = localStorage.getItem('subscriptionDetails');
+    if (details) {
+      setSubscriptionDetails(JSON.parse(details));
+    }
+  }, []);
+  
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
   };
+  
+  const handleClick = () => { 
+    navigate(URL_PATH.LOGIN);
+  };
+  
   return (
     <Box
       sx={{
@@ -73,6 +100,32 @@ const PaymentSuccess: React.FC = () => {
         >
           Your account is now active and ready to use.
         </Typography>
+        
+        {/* Subscription Details */}
+        {subscriptionDetails && (
+          <Box
+            sx={{
+              backgroundColor: "#f5f5f5",
+              p: 2,
+              borderRadius: 2,
+              mb: 3,
+              mt: 2,
+              textAlign: "left",
+              maxWidth: 400,
+              mx: "auto"
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>
+              Subscription Details:
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
+              📅 Start Date: {formatDate(subscriptionDetails.startDate)}
+            </Typography>
+            <Typography variant="body2">
+              📅 End Date: {formatDate(subscriptionDetails.endDate)}
+            </Typography>
+          </Box>
+        )}
 
         <Typography
           sx={{
@@ -86,36 +139,32 @@ const PaymentSuccess: React.FC = () => {
 
         {/* Button */}
         <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{
-              mt: { xs: 3, sm: 5 },
-              fontWeight: 600,
-              fontSize: { xs: "1rem", sm: "1.05rem" },
-              backgroundColor: "#1b7f6b",
-              textTransform: "none",
-              border: "2px solid #1b7f6b",
-              boxShadow: "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
-              transition: "all 0.25s ease",
-              "&:hover": {
-                backgroundColor: "#fff",
-                color: "#1b7f6b",
-              },
-            }}
-            onClick={handleClick}
-          >
-            Get Started
-          </Button>
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{
+            mt: { xs: 3, sm: 5 },
+            fontWeight: 600,
+            fontSize: { xs: "1rem", sm: "1.05rem" },
+            backgroundColor: "#1b7f6b",
+            textTransform: "none",
+            border: "2px solid #1b7f6b",
+            boxShadow: "0 0 0 1.5px #ffffff, 0 6px 14px rgba(0,0,0,0.25)",
+            transition: "all 0.25s ease",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#1b7f6b",
+            },
+          }}
+          onClick={handleClick}
+        >
+          Get Started
+        </Button>
       </Box>
     </Box>
   );
 }
 
 export default PaymentSuccess;
-
-
-
-
 
 

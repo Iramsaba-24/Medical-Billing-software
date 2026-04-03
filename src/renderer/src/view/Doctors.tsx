@@ -5,15 +5,19 @@ import { useNavigate } from "react-router-dom";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 import DoctorEdit from "@/containers/doctors/DoctorEdit";
 import { URL_PATH } from "@/constants/UrlPath";
+import { getDoctors } from "@/service/doctorService";
+import { deleteDoctor } from "@/service/doctorService";
+import { updateDoctor } from "@/service/doctorService";
+
 
 type Doctor = {
-  id: string;
+  doctorId: number;
   doctorName: string;
   degree: string;
   phone: string;
   email: string;
-  registrationNo: string;
-  address: string;
+  registrationNumber: string;
+  hospitalAddress: string;
   status: "Active" | "Inactive";
 };
 
@@ -27,9 +31,29 @@ const Doctors = () => {
   const navigate = useNavigate();
   
 
-  useEffect(() => {
-    setDoctors(JSON.parse(localStorage.getItem("doctors") || "[]"));
+  // useEffect(() => {
+  //   setDoctors(JSON.parse(localStorage.getItem("doctors") || "[]"));
+  // }, []);
+  //get dr list when add dr using add dr form
+    useEffect(() => {
+    fetchDoctors();
   }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      const data = await getDoctors();
+
+      const mappedDoctors: Doctor[] = data.map((doc) => ({
+        ...doc,
+        status: "Active", // default status
+      }));
+
+      setDoctors(mappedDoctors);
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const saveDoctors = (updated: Doctor[]) => {
     localStorage.setItem("doctors", JSON.stringify(updated));
@@ -37,9 +61,9 @@ const Doctors = () => {
   };
 
   // change status
-  const handleStatusChange = (id: string, status: "Active" | "Inactive") => {
+  const handleStatusChange = (id: number, status: "Active" | "Inactive") => {
     saveDoctors(
-      doctors.map((doctor) => (doctor.id === id ? { ...doctor, status } : doctor))
+      doctors.map((doctor) => (doctor.doctorId === id ? { ...doctor, status } : doctor))
     );
   };
 
@@ -47,14 +71,14 @@ const Doctors = () => {
     { key: "doctorName", label: "Name" },
     { key: "degree", label: "Degree" },
     { key: "phone", label: "Phone" },
-    { key: "address", label: "Address" },
+    { key: "hospitalAddress", label: "Address" },
     { key: "status", label: "Status",
       render: (row) => (
         <Select
           size="small"
           value={row.status}
           onChange={(e) =>
-            handleStatusChange(row.id, e.target.value as "Active" | "Inactive")
+            handleStatusChange(row.doctorId, e.target.value as "Active" | "Inactive")
           }
           sx={{
             minWidth: 100,
@@ -141,12 +165,19 @@ const Doctors = () => {
               edit: setEditDoctor,
               delete: async (doctor) => {
                 const ok = await showConfirmation("Delete doctor?", "Confirm");
+
                 if (ok) {
-                  saveDoctors(doctors.filter((d) => d.id !== doctor.id));
-                  showSnackbar("success", "Doctor deleted successfully");
+                  try {
+                    await deleteDoctor(doctor.doctorId);   // backend call
+                    showSnackbar("success", "Doctor deleted successfully");
+                    fetchDoctors();
+                  } catch (error) {
+                    console.error(error);
+                    showSnackbar("error", "Delete failed");
+                  }
                 }
-              },
-            }}
+              }
+              }}
           />
            </Paper>
 
@@ -194,7 +225,7 @@ const Doctors = () => {
         <Typography>
           <strong>Registration No.:</strong>
           <br />
-          {viewItem?.registrationNo}
+          {viewItem?.registrationNumber}
         </Typography>
       </Box>
 
@@ -221,7 +252,7 @@ const Doctors = () => {
         <Typography>
           <strong>Address:</strong>
           <br />
-          {viewItem?.address}
+          {viewItem?.hospitalAddress}
         </Typography>
       </Box>
     </Paper>
@@ -251,15 +282,17 @@ const Doctors = () => {
       <DoctorEdit
       doctor={editDoctor}
       onClose={() => setEditDoctor(null)}
-      onSave={(updatedDoctor: Doctor) => {
-        saveDoctors(
-          doctors.map((d) =>
-            d.id === updatedDoctor.id ? updatedDoctor : d
-          )
-        );
-        showSnackbar("info", "Doctor updated successfully");
-        setEditDoctor(null);
-      }}
+      onSave={async (updatedDoctor: Doctor) => {
+          try {
+            await updateDoctor(updatedDoctor.doctorId, updatedDoctor);
+            showSnackbar("success", "Doctor updated successfully");
+            setEditDoctor(null);
+            fetchDoctors(); 
+          } catch (error) {
+            console.error(error);
+            showSnackbar("error", "Update failed");
+          }
+        }}
     /> 
     </Box> 
     </>

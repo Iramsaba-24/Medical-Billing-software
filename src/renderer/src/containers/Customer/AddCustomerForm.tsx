@@ -10,6 +10,9 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+
+import { createCustomer, updateCustomer } from "@/service/customerService";
+
 interface StoredDoctor {
   doctorName: string;
   doctorAddress?: string;
@@ -110,29 +113,41 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       methods.reset(initialData);
     }
   }, [initialData, methods]);
-  const handleActualSave = (data: CustomerData) => {
-    const existingCustomers: CustomerData[] = JSON.parse(
-      localStorage.getItem("customers") || "[]"
-    );
+const handleActualSave = async (data: CustomerData) => {
+  try {
+    const formattedData = {
+  ...data,
+  age: String(data.age),   
+  phone: String(data.phone),
+  name: data.name,
+  email: data.email,
+  address: data.address,
+  date: data.date,
+  doctor: data.doctor,
+  doctorAddress: data.doctorAddress,
+};
 
-    let updatedCustomers: CustomerData[];
+    let savedData: CustomerData;
 
-    if (initialData) {
-      updatedCustomers = existingCustomers.map((customer) =>
-        customer.mobile === initialData.mobile ? data : customer
+    if (initialData && initialData.customerId) {
+
+      savedData = await updateCustomer(
+        initialData.customerId,
+        formattedData
       );
     } else {
-      updatedCustomers = [...existingCustomers, data];
+      savedData = await createCustomer(formattedData);
     }
 
-    localStorage.setItem("customers", JSON.stringify(updatedCustomers));
-
-    onSave?.(data);
+    onSave?.(savedData);
 
     if (!initialData) {
       navigate(URL_PATH.Billing);
     }
-  };
+  } catch (error) {
+    console.error("Save failed:", error);
+  }
+};
   return (
     <FormProvider {...methods}>
       <Box

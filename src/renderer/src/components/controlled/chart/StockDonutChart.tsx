@@ -4,14 +4,14 @@ import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
-
+ 
 function CenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
-
+ 
   return (
     <text
       x={left + width / 2}
-      y={top + height / 2}
+      y={top + height / 2} 
       textAnchor="middle"
       dominantBaseline="central"
       style={{
@@ -23,9 +23,9 @@ function CenterLabel({ children }: { children: React.ReactNode }) {
     </text>
   );
 }
-
+ 
 type FilterType = "Today" | "6 Days" | "This Month";
-
+ 
 const chartDataMap = {
   Today: [
     { label: "Purchases", value: 20, color: "#6EE700" },
@@ -46,13 +46,13 @@ const chartDataMap = {
     { label: "No Sales", value: 12, color: "#FFD200" },
   ],
 };
-
+ 
 const filterOptions = [
   { label: "Today", value: "Today" },
   { label: "6 Days", value: "6 Days" },
   { label: "This Month", value: "This Month" },
 ];
-
+ 
 const StockDonutChart = ({
   title,
   isOnlyDonutSelected = false,
@@ -61,20 +61,20 @@ const StockDonutChart = ({
   isOnlyDonutSelected?: boolean;
 }) => {
   const [filter, setFilter] = useState<FilterType>("This Month");
-
+ 
   const methods = useForm({
     defaultValues: {
       filterSelect: "This Month",
     },
   });
-
+ 
   const total =
     chartDataMap[filter]?.reduce((sum, d) => sum + d.value, 0) || 0;
-
+ 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isSmallMobile = useMediaQuery("(max-width:360px)");
-
+ 
   const chartSize = isOnlyDonutSelected
     ? isSmallMobile
       ? 240
@@ -86,7 +86,7 @@ const StockDonutChart = ({
     : isMobile
     ? 180
     : 260;
-
+ 
   const innerRadius = isOnlyDonutSelected
     ? isSmallMobile
       ? 58
@@ -98,7 +98,7 @@ const StockDonutChart = ({
     : isMobile
     ? 45
     : 70;
-
+ 
   const outerRadius = isOnlyDonutSelected
     ? isSmallMobile
       ? 95
@@ -110,12 +110,12 @@ const StockDonutChart = ({
     : isMobile
     ? 75
     : 110;
-
+ 
   const handleFilterChange = (value: string) => {
     if (!value || !(value in chartDataMap)) return;
     setFilter(value as FilterType);
   };
-
+ 
   return (
     <Card
       variant="outlined"
@@ -142,7 +142,7 @@ const StockDonutChart = ({
         >
           {title}
         </Typography>
-
+ 
         <FormProvider {...methods}>
           <Box sx={{ width: { xs: "100%", sm: 200 }, mr: { sm: 1 } }}>
             <DropdownField
@@ -153,7 +153,7 @@ const StockDonutChart = ({
           </Box>
         </FormProvider>
       </Box>
-
+ 
       {isOnlyDonutSelected ? (
         <Box
           sx={{
@@ -192,7 +192,7 @@ const StockDonutChart = ({
               <CenterLabel>{total}%</CenterLabel>
             </PieChart>
           </Box>
-
+ 
           <Box
             sx={{
               display: "grid",
@@ -258,5 +258,5 @@ const StockDonutChart = ({
     </Card>
   );
 };
-
+ 
 export default StockDonutChart;

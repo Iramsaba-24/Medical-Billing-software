@@ -24,7 +24,7 @@ export interface Invoice {
   }[];
   subTotal?: number;
  
-  totalPrice?: number;
+  totalAmount?: number;
   total?: number;
 }
 interface Medicine {

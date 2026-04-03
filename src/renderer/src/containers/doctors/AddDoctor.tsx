@@ -5,14 +5,15 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { addDoctor } from "@/service/doctorService";
 
 export interface AddDoctorFormValues {
   doctorName: string;
   degree: string;
   phone: string;
   email: string;
-  registrationNo: string;
-  address: string;
+  registrationNumber: string;
+  hospitalAddress: string;
   status: "Active";
 }
 
@@ -23,8 +24,8 @@ const AddDoctor = () => {
       degree: "",
       phone: "",
       email: "",
-      registrationNo: "",
-      address: "",
+      registrationNumber: "",
+      hospitalAddress: "",
       status: "Active",
     },
     mode: "onChange",
@@ -33,23 +34,31 @@ const AddDoctor = () => {
   const navigate = useNavigate();
 
   // submit
-  const onSubmit = (data: AddDoctorFormValues) => {
-    const existingDoctors = JSON.parse(
-      localStorage.getItem("doctors") || "[]"
-    );
+  // const onSubmit = (data: AddDoctorFormValues) => {
+  //   const existingDoctors = JSON.parse(
+  //     localStorage.getItem("doctors") || "[]"
+  //   );
 
-    const newDoctor = {
-      id: Date.now(),
-      ...data,
-    };
+  //   const newDoctor = {
+  //     doctorId: Date.now(),
+  //     ...data,
+  //   };
     
-   localStorage.setItem(
-      "doctors",
-      JSON.stringify([...existingDoctors, newDoctor])
-    );
+  //  localStorage.setItem(
+  //     "doctors",
+  //     JSON.stringify([...existingDoctors, newDoctor])
+  //   );
 
+  //   navigate(URL_PATH.Doctors);
+  // };
+  const onSubmit = async (data: AddDoctorFormValues) => {
+  try {
+    await addDoctor(data); // API call
     navigate(URL_PATH.Doctors);
-  };
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   return (
    <Paper sx={{ p: { xs:2, md:4 }, mx: { xs:1, md:4 }, my: { xs:1, md:4 } }}>
@@ -119,7 +128,7 @@ const AddDoctor = () => {
         <Box mt={3} width="100%">
           <TextInputField
             inputType="numbers"
-            name="registrationNo"
+            name="registrationNumber"
             label="Registration No."
             required
             minLength={3}
@@ -131,7 +140,7 @@ const AddDoctor = () => {
       {/* address */}
         <Box mt={3}>
           <TextInputField
-            name="address"
+            name="hospitalAddress"
             label="Clinic / Hospital Address"
             inputType="all"
             required

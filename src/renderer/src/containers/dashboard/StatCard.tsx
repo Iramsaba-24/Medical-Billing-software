@@ -32,7 +32,7 @@ const availableMedicines = () :string =>
     return "0"
   }
   const parseData : InventoryItem[] = JSON.parse(data)
-  const count = parseData.filter((item)=> Number(item.stockQty) >0 ).length
+  const count = parseData.filter((item)=> Number(item.quantity) >0 ).length
   return count.toString()
 }
  
@@ -44,7 +44,7 @@ const medicineShoratage = () : string =>
     return "0"
   }
   const parseData : InventoryItem[] = JSON.parse(data)
-  const count = parseData.filter((item)=> Number(item.stockQty) <5 ).length
+  const count = parseData.filter((item)=> Number(item.quantity) <5 ).length
   return count.toString()
 }
  
