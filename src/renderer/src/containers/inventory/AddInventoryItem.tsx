@@ -242,7 +242,6 @@
 //     </FormProvider>
 //   );
 // }
-
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -285,108 +284,95 @@ export default function AddInventoryItem() {
 
   const navigate = useNavigate();
 
-  const [groupOptions, setGroupOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
-
-  const [supplierOptions, setSupplierOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
+  const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
+  const [groupIdMap, setGroupIdMap] = useState<Record<string, number>>({});
+  const [supplierIdMap, setSupplierIdMap] = useState<Record<string, number>>({});
 
   // Load Medicine Groups
-useEffect(() => {
-  const fetchGroups = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await axios.get(API_ENDPOINTS.MEDICINE_GROUP, {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : "",
-        },
-      });
-
-      const options = res.data.data.map((g: {
-        groupId: number;
-        groupName: string;
-      }) => ({
-        label: g.groupName,
-        value: g.groupId.toString(),
-      }));
-
-      setGroupOptions(options);
-    } catch (error) {
-      console.error("Error fetching groups:", error);
-    }
-  };
-
-  fetchGroups();
-}, []);
-
-
   useEffect(() => {
-  const fetchDistributors = async () => {
-    try {
-      const token = localStorage.getItem("token");
+    const fetchGroups = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-      const res = await axios.get(
-        `${API_ENDPOINTS.DISTRIBUTOR}`,
-        {
+        const res = await axios.get(API_ENDPOINTS.MEDICINE_GROUP, {
           headers: {
             Authorization: token ? `Bearer ${token}` : "",
           },
-        }
-      );
-      console.log("API RESPONSE:", res.data);
+        });
 
-    
-      const options = res.data.map((d: {
-  distributorId: number;
-  companyName: string;
-}) => ({
-  label: d.companyName,
-  value: d.distributorId.toString(),
-}));
+        const idMap: Record<string, number> = {};
 
-      setSupplierOptions(options);
+        const options = res.data.data.map((g: { groupId: number; groupName: string }) => {
+          idMap[g.groupName] = g.groupId; // name → id map
+          return { label: g.groupName, value: g.groupName };
+        });
+
+        setGroupOptions(options);
+        setGroupIdMap(idMap); // ← save करा
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
+  // Load Distributors
+  useEffect(() => {
+    const fetchDistributors = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await axios.get(`${API_ENDPOINTS.DISTRIBUTOR}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        const sMap: Record<string, number> = {};
+
+        const options = res.data.map((d: { distributorId: number; companyName: string }) => {
+          sMap[d.companyName] = d.distributorId; // name → id map
+          return { label: d.companyName, value: d.companyName };
+        });
+
+        setSupplierOptions(options);
+        setSupplierIdMap(sMap); // ← save करा
+      } catch (error) {
+        console.error("Error fetching distributors:", error);
+      }
+    };
+
+    fetchDistributors();
+  }, []);
+
+  const onSubmit = async (data: InventoryFormData) => {
+    try {
+      // name → id convert करा
+      const finalData = {
+        ...data,
+        medicineGroup: groupIdMap[data.medicineGroup]?.toString() ?? "",
+        supplier: supplierIdMap[data.supplier]?.toString() ?? "",
+      };
+
+      await addMedicine(finalData);
+      navigate(URL_PATH.Inventory);
     } catch (error) {
-      console.error("Error fetching distributors:", error);
+      if (error instanceof Error) {
+        console.log("Error message:", error.message);
+      }
+
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const err = error as { response?: { data?: unknown } };
+        console.log("BACKEND ERROR:", err.response?.data);
+      }
     }
   };
 
-  fetchDistributors();
-}, []);
-
- 
-
-
-
-const onSubmit = async (data: InventoryFormData) => {
-  try {
-    await addMedicine(data);
-    navigate(URL_PATH.Inventory);
-  } catch (error) {
-    if (error instanceof Error) {
-      console.log("Error message:", error.message);
-    }
-
-    // axios specific error
-    if (typeof error === "object" && error !== null && "response" in error) {
-      const err = error as {
-        response?: {
-          data?: unknown;
-        };
-      };
-
-      console.log("BACKEND ERROR:", err.response?.data);
-    }
-  }
-};
-
-
-
   return (
     <FormProvider {...methods}>
-      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8} >
+      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
         <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
           <Typography fontSize={20} fontWeight={600} mb={4}>
             Add New Item
@@ -394,13 +380,10 @@ const onSubmit = async (data: InventoryFormData) => {
 
           <Box
             component="form"
-             noValidate
-            onSubmit={methods.handleSubmit(onSubmit) }
+            noValidate
+            onSubmit={methods.handleSubmit(onSubmit)}
             display="grid"
-            gridTemplateColumns={{
-              xs: "1fr",
-              md: "repeat(3, 1fr)",
-            }}
+            gridTemplateColumns={{ xs: "1fr", md: "repeat(3, 1fr)" }}
             gap={2.5}
             sx={{ px: { xs: 0, md: 4 } }}
           >
@@ -459,13 +442,11 @@ const onSubmit = async (data: InventoryFormData) => {
               required
             />
 
-            {/* Expiry Date  */}
             <DateTimeField
               name="expiryDate"
               label="Expiry Date"
               viewMode="date"
               required
-
               useCurrentDate={false}
               dateRestriction="current-future-only"
             />

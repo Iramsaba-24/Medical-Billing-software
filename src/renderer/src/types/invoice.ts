@@ -14,11 +14,13 @@ export type Invoice = {
   customerName: ReactNode;
   invoice: string;
   patient: string;
-  date: string;
+  invoiceDate?: string;
   price: number;
+  paymentStatus?: string;
   status: InvoiceStatus;
   medicines: MedicineItem[];
   type?: "retail" | "distributor";
   gstIn?: string;        
   distributorId?: string;
+    totalAmount?: number;
 };

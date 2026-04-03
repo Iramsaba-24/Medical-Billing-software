@@ -35,7 +35,9 @@ export interface MedicineResponse {
   quantity: number;
   pricePerUnit: number;
   expiryDate: string;
-
+  unit: string;        
+  groupId: number;     
+  distributorId: number;
 
   
 }
@@ -89,5 +91,30 @@ export const addMedicine = async (
     getAuthHeaders()
   );
 
+  return res.data.data;
+};
+
+export const updateMedicine = async (
+  id: number,
+  data: MedicineFormData
+): Promise<MedicineResponse> => {
+  const payload: MedicineRequest = {
+    itemName: data.itemName,
+    unit: data.unit,
+    quantity: data.quantity,
+    pricePerUnit: data.pricePerUnit,
+    expiryDate: new Date(data.expiryDate).toISOString(),
+    groupId: Number(data.medicineGroup),
+    distributorId: Number(data.supplier),
+    batchNumber: "NA",
+    company: "NA",
+    gstPercentage: 0,
+  };
+
+  const res = await axios.put(
+    `${API_ENDPOINTS.MEDICINE}/${id}`,
+    payload,
+    getAuthHeaders()
+  );
   return res.data.data;
 };

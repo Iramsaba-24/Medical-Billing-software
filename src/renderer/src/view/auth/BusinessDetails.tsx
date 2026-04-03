@@ -13,7 +13,6 @@ type FormInputs = {
   gstin: string;
   licenseNumber: string;
 };
-
 const BusinessDetails = () => {
   const methods = useForm<FormInputs>({
     defaultValues: {
@@ -37,7 +36,7 @@ const BusinessDetails = () => {
       // Combine with business details
       const completeData = { 
         ...existingData, 
-        businessDetail: {
+        businessDetails: {
           businessType: data.businessType,
           gstin: data.gstin,
           licenseNumber: data.licenseNumber
@@ -191,3 +190,4 @@ const BusinessDetails = () => {
 };
 
 export default BusinessDetails;
+

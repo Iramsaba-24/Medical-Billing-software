@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
-/* ================= TYPES ================= */
+/*TYPES  */
 
 // frontend form data
 export interface DistributorFormData {

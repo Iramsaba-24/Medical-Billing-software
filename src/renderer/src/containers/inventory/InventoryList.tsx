@@ -205,7 +205,7 @@ export type InventoryItem = {
   medicineId: number;
   medicineGroup: string;
   groupId: number;
-
+  unit: string;        // ← हे add करा
   quantity: number;
   pricePerUnit: number;
 
@@ -227,6 +227,7 @@ type MedicineApi = {
   groupId: number;
   distributorId: number;
   gstPercentage: number;
+  unit: string;        // ← हे add करा
 };
 
 type GroupApi = {
@@ -293,7 +294,7 @@ distributorsData.forEach((d: DistributorApi) => {
   medicineId: item.medicineId,
   medicineGroup: groupMap[item.groupId] || "N/A",
   groupId: item.groupId, // ✅ ADD THIS
-
+  unit: item.unit || "N/A",  // ← हे add करा
   quantity: item.quantity,
   pricePerUnit: item.pricePerUnit,
   expiryDate: item.expiryDate.split("T")[0],
