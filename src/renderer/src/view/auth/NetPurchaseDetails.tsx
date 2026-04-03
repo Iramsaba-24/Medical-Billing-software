@@ -104,54 +104,23 @@ const NetBanking_PurchaseDetails = () => {
     }
   }, [methods]);
 
-  const getOrCreateSubscription = async (userId: number, planId: number): Promise<number> => {
-    // First, check if we already have a subscription ID in localStorage
-    const subscriptionId = localStorage.getItem("subscriptionId");
-    
-    if (subscriptionId) {
-      const parsedId = parseInt(subscriptionId);
-      if (!isNaN(parsedId)) {
-        console.log("Using existing subscription ID from localStorage:", parsedId);
-        return parsedId;
-      }
-    }
-    
-    try {
-      console.log("Creating new subscription for user:", userId, "plan:", planId);
-      const subscriptionResponse = await authService.createSubscription({
-        userId: userId,
-        planId: planId
-      });
-      
-      const newSubscriptionId = subscriptionResponse.subscriptionId;
-      
-      if (newSubscriptionId) {
-        localStorage.setItem("subscriptionId", newSubscriptionId.toString());
-        console.log("Created/retrieved subscription with ID:", newSubscriptionId);
-        return newSubscriptionId;
-      } else {
-        throw new Error("Failed to create subscription: No subscription ID returned");
-      }
-    } catch (error: unknown) {
-      console.error("Error in subscription:", error);
-      
-      // Type guard for AxiosError
-      let errorMsg = "Unable to get subscription";
-      if (error instanceof AxiosError) {
-        errorMsg = error.response?.data?.message || error.message;
-      } else if (error instanceof Error) {
-        errorMsg = error.message;
-      }
-      
-      throw new Error(`Unable to get subscription: ${errorMsg}`);
-    }
-  };
+  const getOrCreateSubscription = async (userId: number, planId: number) => {
+  try {
+    const response = await authService.createSubscription({
+      userId,
+      planId
+    });
+
+    return response.subscriptionId;
+  } catch (error) {
+    throw new Error("Failed to get subscription");
+  }
+};
 
 const onSubmit = async (data: FormInputs) => {
   setIsProcessing(true);
   
   try {
-    // Get userId
     const userId = localStorage.getItem("userId");
     if (!userId) {
       throw new Error("User ID not found. Please login again.");
