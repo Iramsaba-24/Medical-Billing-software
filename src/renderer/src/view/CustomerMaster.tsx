@@ -3,6 +3,9 @@ import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
 import CustomerListPage from "@/containers/Customer/CustomerListPage";
 import CustomerViewDetails from "@/containers/Customer/CustomerViewDetails";
 import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage"
+import { getAllCustomers } from "@/service/customerService";
+import { deleteCustomer } from "@/service/customerService";
+
  
 // Structure for a single purchase invoice record
 export interface PurchaseHistory {
@@ -34,65 +37,30 @@ export interface CustomerData {
 const CustomerMaster = () => {
   // State to manage which screen to  'list', 'add', or 'view'
   const [view, setView] = useState<"list" | "add" | "view">("list");
+  
  
-  // Load customer list from LocalStorage when the app starts
-  const [customerList, setCustomerList] = useState<CustomerData[]>(() => {
-    const savedData = localStorage.getItem("medical_customers");
-    return savedData ? JSON.parse(savedData) : [];
-  });
+ const [customerList, setCustomerList] = useState<CustomerData[]>([]);
  
-  // State to hold the data of the customer currently being edited or viewed
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
- 
-  // Automatically save the customer list to LocalStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("medical_customers", JSON.stringify(customerList));
-  }, [customerList]);
- 
+ const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
+const fetchCustomers = async () => {
+  try {
+    const data = await getAllCustomers();
+    console.log("API DATA ", data);
+    setCustomerList(data);
+  } catch (error) {
+    console.error("Failed to fetch customers", error);
+  }
+};
+
+useEffect(() => {
+  fetchCustomers();
+}, []);
+
   // Function to save or update customer and invoice data 
-  const handleSave = (formData: CustomerData ) => {
-    setCustomerList((prev) => { 
-      // Check if the customer already exists by comparing names
-      const existingIndex = prev.findIndex(
-        (c) => c.name.toLowerCase().trim() === formData.name.toLowerCase().trim()
-      );
-     
-      // Create a new invoice object for this transaction
-      const newInvoice: PurchaseHistory = {
-        id: `INV-${Date.now()}`,
-        date: formData.date,
-        doctor: formData.doctor,
-      };
- 
-      if (existingIndex > -1) {
-        // If customer exists, update their details and add new invoice to their history
-        const updatedList = [...prev];
-        const existingCust = updatedList[existingIndex];
-        updatedList[existingIndex] = {
-          ...existingCust,
-          ...formData,
-          history: [newInvoice, ...(existingCust.history || [])]
-        };
-        showToast("success", "Invoice updated successfully!");
-        return updatedList;
-      } else {
-        //  create a new record and set their first invoice
-        const newCustomer: CustomerData = {
-          ...formData,
-          id: `CUST-${Date.now()}`,
-          history: [newInvoice]
-        };
-        showToast("success", "New Customer and Invoice saved!");
-        return [...prev, newCustomer];
-      }
-    });
-   
-    // Reset and go back to the list view after saving
-    setSelectedCustomer(null);
-    setView("list");
-  };
- 
-  // Function to load existing invoice data into the form for editing
+const handleSave = async () => {
+  await fetchCustomers();   
+  setView("list");          
+}; 
   const handleEditInvoice = (invoice: PurchaseHistory) => {
     if (!selectedCustomer) return;
     const editData: CustomerData = {
@@ -105,18 +73,19 @@ const CustomerMaster = () => {
   };
  
   // Function to delete a customer entirely
-  const handleDeleteCustomer = async (cust: CustomerData) => {
-    const confirmed = await showConfirmation(
-      `Are you sure you want to delete ${cust.name}?`,
-      "Confirm Delete"
-    );
- 
-    if (confirmed) {
-      setCustomerList((prev) => prev.filter((item) => item.name !== cust.name));
-      showToast("success", "Customer deleted successfully!");
-    }
-  };
- 
+const handleDeleteCustomer = async (cust: CustomerData) => {
+  const confirmed = await showConfirmation(
+    `Are you sure you want to delete ${cust.name}?`,
+    "Confirm Delete"
+  );
+
+  if (confirmed && cust.customerId) {
+    await deleteCustomer(cust.customerId);   
+    await fetchCustomers();                  
+    showToast("success", "Customer deleted successfully!");
+  }
+};
+
   // Function to delete only one specific invoice from a customer's history
   const handleDeleteInvoice = async (invoice: PurchaseHistory) => {
     if (!selectedCustomer) return;

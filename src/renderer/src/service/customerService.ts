@@ -78,7 +78,7 @@ export const updateCustomer = async (
   const res = await axios.put(
     `${API_ENDPOINTS.CUSTOMER}/${id}`,
     customerData,
-    getAuthHeaders()
+    getAuthHeaders() 
   );
 
   return res.data;

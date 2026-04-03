@@ -10,15 +10,9 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { getDoctors, DoctorResponse } from "@/service/doctorService";
 
 import { createCustomer, updateCustomer } from "@/service/customerService";
-
-interface StoredDoctor {
-  doctorName: string;
-  doctorAddress?: string;
-  address?: string;
-  clinicAddress?: string;
-}
 
 interface Props {
   onBack?: () => void;
@@ -36,7 +30,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     defaultValues: {
       name: "",
       age: "",
-      mobile: "",
+      phone: "",
       email: "",
       address: "",
       doctor: "",
@@ -73,20 +67,26 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   };
 
   useEffect(() => {
-    const storedDoctors: StoredDoctor[] = JSON.parse(
-      localStorage.getItem("doctors") || "[]"
-    );
+    const fetchDoctors = async () => {
+      try {
+        const doctors: DoctorResponse[] = await getDoctors();
 
-    const options = storedDoctors.map((doc) => ({
-      label: doc.doctorName,
-      value: doc.doctorName,
-      address: doc.doctorAddress ?? doc.address ?? doc.clinicAddress ?? "",
-    }));
-    const updatedOptions = [
-      { label: "+ Add Doctor", value: "add_doctor", address: "" },
-      ...options,
-    ];
-    setDoctorOptions(updatedOptions);
+        const options = doctors.map((doc) => ({
+          label: doc.doctorName,
+          value: doc.doctorName,
+          address: doc.hospitalAddress,
+        }));
+
+        setDoctorOptions([
+          { label: "+ Add Doctor", value: "add_doctor", address: "" },
+          ...options,
+        ]);
+      } catch (error) {
+        console.error("Failed to fetch doctors", error);
+      }
+    };
+
+    fetchDoctors();
   }, []);
 
   const selectedDoctor = methods.watch("doctor");
@@ -113,41 +113,36 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       methods.reset(initialData);
     }
   }, [initialData, methods]);
-const handleActualSave = async (data: CustomerData) => {
-  try {
-    const formattedData = {
-  ...data,
-  age: String(data.age),   
-  phone: String(data.phone),
-  name: data.name,
-  email: data.email,
-  address: data.address,
-  date: data.date,
-  doctor: data.doctor,
-  doctorAddress: data.doctorAddress,
-};
+  const handleActualSave = async (data: CustomerData) => {
+    try {
+      const formattedData = {
+        ...data,
+        age: String(data.age),
+        phone: String(data.phone),
+        name: data.name,
+        email: data.email,
+        address: data.address,
+        date: data.date,
+        doctor: data.doctor,
+        doctorAddress: data.doctorAddress,
+      };
 
-    let savedData: CustomerData;
+      let savedData: CustomerData;
 
-    if (initialData && initialData.customerId) {
+      if (initialData && initialData.customerId) {
+        savedData = await updateCustomer(initialData.customerId, formattedData);
+      } else {
+        savedData = await createCustomer(formattedData);
+      }
+      onSave?.(savedData);
 
-      savedData = await updateCustomer(
-        initialData.customerId,
-        formattedData
-      );
-    } else {
-      savedData = await createCustomer(formattedData);
+      if (!initialData) {
+        navigate(URL_PATH.Billing);
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
     }
-
-    onSave?.(savedData);
-
-    if (!initialData) {
-      navigate(URL_PATH.Billing);
-    }
-  } catch (error) {
-    console.error("Save failed:", error);
-  }
-};
+  };
   return (
     <FormProvider {...methods}>
       <Box
