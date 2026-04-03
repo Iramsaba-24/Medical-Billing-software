@@ -194,3 +194,4 @@ export const deleteDistributor = async (id: number): Promise<void> => {
     getAuthHeaders()
   );
 };
+
