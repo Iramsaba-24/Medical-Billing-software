@@ -66,12 +66,18 @@ const getAuthHeaders = () => {
 
 
 export const getMedicines = async (search?: string) => {
-  const res = await axios.get(API_ENDPOINTS.MEDICINE, {
-    ...getAuthHeaders(),
-    params: { search },
-  });
-
-  return res.data.data; // backend format: { message, data }
+  try {
+    const res = await axios.get(API_ENDPOINTS.MEDICINE, {
+      ...getAuthHeaders(),
+      params: { search },
+    });
+    return res.data.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return []; // medicines नसतील तर empty array
+    }
+    throw error;
+  }
 };
 
 export const addMedicine = async (

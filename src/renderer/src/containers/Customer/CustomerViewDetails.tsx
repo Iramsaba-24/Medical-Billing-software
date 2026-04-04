@@ -3,7 +3,6 @@ import { CustomerData, PurchaseHistory } from "@/view/CustomerMaster";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
  
-// Interface to define what data this component needs to work
 interface ViewProps {
   customer: CustomerData;
   onBack: () => void; // Function to go back to the previous screen
@@ -13,7 +12,6 @@ interface ViewProps {
  
 const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice }: ViewProps) => {
  
-  //  table columns Headings and matching data keys
   const invoiceColumns: readonly Column<PurchaseHistory>[] = [
     { label: "Inv. No.", key: "id" },
     { label: "Medicines", key: "medicines" },
@@ -21,10 +19,10 @@ const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice 
     { label: "Total Price", key: "totalPrice" },
     { label: "Doctor", key: "doctor" },
     { label: "Date", key: "date" },
-    { label: "Actions", key: "actionbutton" as keyof PurchaseHistory } // Placeholder for Edit/Delete buttons
+    { label: "Actions", key: "actionbutton" as keyof PurchaseHistory } 
   ];
  
-  // Get the list of purchases from customer data if empty, use an empty array
+
   const invoiceData: PurchaseHistory[] = customer.history || [];
  
   return (
@@ -59,7 +57,7 @@ const CustomerViewDetails = ({ customer, onBack, onDeleteInvoice, onEditInvoice 
             Mobile
           </Typography>
           <Typography fontWeight={500} fontSize="14px">
-            {customer.mobile}
+            {customer.phone}
           </Typography>
         </Grid>
 

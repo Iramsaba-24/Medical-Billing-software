@@ -60,15 +60,21 @@ const InventoryList = () => {
 const fetchInventory = async () => {
   try {
     const token = localStorage.getItem("token");
-
-    const headers = {
-      Authorization: token ? `Bearer ${token}` : "",
-    };
+    const headers = { Authorization: token ? `Bearer ${token}` : "" };
 
     const [medRes, groupRes, distRes] = await Promise.all([
-      axios.get<{ data: MedicineApi[] }>(API_ENDPOINTS.MEDICINE, { headers }),
-      axios.get<{ data: GroupApi[] }>(API_ENDPOINTS.MEDICINE_GROUP, { headers }),
-      axios.get<{ data: DistributorApi[] }>(API_ENDPOINTS.DISTRIBUTOR, { headers }),
+      axios.get<{ data: MedicineApi[] }>(API_ENDPOINTS.MEDICINE, { headers })
+        .catch(e => axios.isAxiosError(e) && e.response?.status === 404 
+          ? { data: { data: [] as MedicineApi[] } } 
+          : Promise.reject(e)),
+
+      axios.get<{ data: GroupApi[] }>(API_ENDPOINTS.MEDICINE_GROUP, { headers })
+        .catch(e => axios.isAxiosError(e) && e.response?.status === 404 
+          ? { data: { data: [] as GroupApi[] } } 
+          : Promise.reject(e)),
+
+     axios.get<{ data: DistributorApi[] }>(API_ENDPOINTS.DISTRIBUTOR, { headers })
+  .catch(() => ({ data: { data: [] as DistributorApi[] } })),
     ]);
 
     const medicines = medRes.data?.data || [];
@@ -76,6 +82,7 @@ const fetchInventory = async () => {
     const distributorsData = Array.isArray(distRes.data)
       ? distRes.data
       : distRes.data?.data || [];
+
 
     const groupMap: Record<number, string> = {};
     groups.forEach((g) => {
