@@ -1,4 +1,3 @@
-
 import ReportCards from '@/containers/report/ReportCards';
 import SalesGraph from '@/containers/report/SalesGraph';
 import InvoiceTable from '@/containers/report/InvoiceTable';
