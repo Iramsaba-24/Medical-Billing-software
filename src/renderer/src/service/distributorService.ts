@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
-/* ================= TYPES ================= */
+/*TYPES */
 
 // frontend form data
 export interface DistributorFormData {
@@ -67,7 +67,7 @@ export interface DistributorResponse {
   };
 }
 
-/* ================= HELPERS ================= */
+/*  HELPERS */
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -79,7 +79,7 @@ const getAuthHeaders = () => {
   };
 };
 
-/* ================= API CALLS ================= */
+/* API CALLS  */
 
 // GET all distributors
 export const getDistributors = async (): Promise<DistributorResponse[]> => {

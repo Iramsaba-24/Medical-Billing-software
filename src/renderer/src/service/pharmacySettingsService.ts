@@ -2,9 +2,9 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
-// ==========================
+
 // TYPES
-// ==========================
+
 export interface PharmacySettingsRequest {
   userId: number;
 
@@ -42,9 +42,9 @@ export interface PharmacySettingsResponse {
 
 }
 
-// ==========================
+
 // SERVICE
-// ==========================
+
 const axiosInstance = axios.create({
   baseURL: API_ENDPOINTS.PHARMACY_SETTINGS,
   headers: { "Content-Type": "application/json" },

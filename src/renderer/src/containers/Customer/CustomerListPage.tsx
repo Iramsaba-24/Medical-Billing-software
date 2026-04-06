@@ -8,10 +8,6 @@ import { Box, Button, Typography, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import {
-  showToast,
-  showConfirmation,
-} from "@/components/uncontrolled/ToastMessage.tsx";
 
 interface CustomerListProps {
   data: CustomerData[];
@@ -24,20 +20,14 @@ export const CustomerListPage = ({
   data,
   onView,
   onEdit,
+  onDelete, 
 }: CustomerListProps) => {
   const navigate = useNavigate();
   const [searchTerm] = useState("");
   const [customers, setCustomers] = useState<CustomerData[]>([]);
 
   useEffect(() => {
-    const storedCustomers = localStorage.getItem("customers");
-
-    if (storedCustomers) {
-      setCustomers(JSON.parse(storedCustomers));
-    } else {
-      setCustomers(data);
-      localStorage.setItem("customers", JSON.stringify(data));
-    }
+    setCustomers(data);
   }, [data]);
 
   const filteredData = useMemo(() => {
@@ -46,38 +36,20 @@ export const CustomerListPage = ({
     return customers.filter(
       (item) =>
         item.name?.toLowerCase().includes(lowerSearch) ||
-        item.mobile?.toLowerCase().includes(lowerSearch)
+        item.phone?.toLowerCase().includes(lowerSearch)
     );
   }, [customers, searchTerm]);
 
   const columns: readonly Column<CustomerData>[] = [
     { label: "Name", key: "name" },
-    { label: "Mobile", key: "mobile" },
+    { label: "Mobile", key: "phone" }, 
     { label: "Doctor", key: "doctor" },
     { label: "Date", key: "date" },
     { label: "Actions", key: "actionbutton" },
   ];
 
   const handleDelete = async (customer: CustomerData) => {
-    const confirmed = await showConfirmation(
-      "Are you sure you want to delete this customer?",
-      "Confirm Delete"
-    );
-
-    if (!confirmed) return;
-
-    const storedCustomers: CustomerData[] = JSON.parse(
-      localStorage.getItem("customers") || "[]"
-    );
-
-    const updatedCustomers = storedCustomers.filter(
-      (item) => item.mobile !== customer.mobile
-    );
-
-    localStorage.setItem("customers", JSON.stringify(updatedCustomers));
-    setCustomers(updatedCustomers);
-
-    showToast("success", "Customer deleted successfully");
+    onDelete(customer);
   };
 
   return (
@@ -142,7 +114,7 @@ export const CustomerListPage = ({
             data={filteredData}
             showExport={true}
             showSearch={true}
-            getRowId={(row) => row.mobile}
+            getRowId={(row) => row.customerId || row.phone}
             actions={{
               view: (customer) => onView(customer),
               edit: (customer) => onEdit(customer),

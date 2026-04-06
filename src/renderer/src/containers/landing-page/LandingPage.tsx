@@ -242,7 +242,7 @@ useEffect(() => {
       const settings = await pharmacySettingsService.getSettings(userId);
 
       setPharmacyName(settings.pharmacyName ?? "User");
-      setLicenseNumber(settings.drugLicenseNumber ?? "Not Available");   // 💥 FIXED
+      setLicenseNumber(settings.drugLicenseNumber ?? "Not Available");  
       setUsername(settings.ownerName ?? "User");
 
       localStorage.setItem("pharmacyName", settings.pharmacyName ?? "");
