@@ -17,10 +17,22 @@ export type Distributor = {
   companyName: string;
   phone: string;
   email: string;
-  createdAt: string;
   registrationNumber: string;
   address: string;
   status: "Active" | "Inactive";
+   createdDate: string;
+  // createdAt: string;
+  ownerName: string;
+  website?: string;
+  gstin: string;
+  bankDetails?: { 
+    bankName: string;
+    accountNumber: string;
+    accountHolderName: string;
+    branch: string;
+    ifscCode: string;
+    upiId: string;
+  };
 };
 
 type Props = {
@@ -37,7 +49,8 @@ const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
       companyName: "",
       phone: "",
       email: "",
-      createdAt: "",
+     createdDate: "",
+    //  createdAt: "",
       registrationNumber: "",
       address: "",
       status: "Active",
