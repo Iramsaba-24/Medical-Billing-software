@@ -124,7 +124,7 @@ const saveInvoice = async () => {
       return;
     }
 
-    // ✅ LOOP (NO BULK)
+    //LOOP
     for (const r of state.rows) {
       await createSingleRetailInvoiceItem({
         retailInvoiceId: state.invoiceId,
@@ -136,10 +136,10 @@ const saveInvoice = async () => {
       });
     }
 
-    // ✅ update payment
+    // update payment
     await updatePaymentStatus(state.invoiceId, "Paid");
 
-    // ✅ navigate
+    // navigate
     navigate(`${URL_PATH.InvoiceView}/${state.invoiceId}`, {
       state: {
         invoice: {

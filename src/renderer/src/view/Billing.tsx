@@ -104,7 +104,7 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
       border: "2px solid #238878",
     },
   });
-  // saved to local storage
+  
  const onSubmit = async () => {
   setIsSubmitted(true);
 

@@ -9,7 +9,7 @@ import {
   Column,
   DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
-// import {  InvoiceStatus } from "@/types/invoice";
+
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 
 import { FormProvider, useForm } from "react-hook-form";

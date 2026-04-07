@@ -75,7 +75,7 @@ export const getMedicines = async (search?: string) => {
     return res.data.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
-      return []; // medicines नसतील तर empty array
+      return [];
     }
     throw error;
   }
