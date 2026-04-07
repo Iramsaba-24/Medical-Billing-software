@@ -6,7 +6,7 @@ import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 // frontend form data
 export interface DistributorFormData {
   companyName: string;
-  ownerName: string; // ✅ make required
+  ownerName: string; 
   phone: string;
   email: string;
   registrationNumber: string;
@@ -26,7 +26,7 @@ export interface DistributorFormData {
 // backend request (MATCH DTO EXACTLY)
 interface DistributorRequest {
   companyName: string;
-  ownerName: string; // ✅ REQUIRED
+  ownerName: string; 
   phone: string;
   email: string;
   registrationNumber: string;
@@ -102,22 +102,22 @@ export const getDistributorById = async (
   return res.data;
 };
 
-// ✅ ADD distributor (FIXED)
+// ADD distributor (FIXED)
 export const addDistributor = async (
   data: DistributorFormData
 ): Promise<DistributorResponse> => {
 
   const distributorData: DistributorRequest = {
     companyName: data.companyName,
-    ownerName: data.ownerName, // ✅ REQUIRED
+    ownerName: data.ownerName, 
     phone: data.phone,
     email: data.email,
     registrationNumber: data.registrationNumber,
-    website: data.website ? data.website : null, // ✅ fix URL issue
+    website: data.website ? data.website : null, 
     gstin: data.gstin,
     address: data.address,
 
-    bankDetails: { // ✅ MUST be nested
+    bankDetails: { 
       bankName: data.bankName,
       accountNumber: data.accountNumber,
       accountHolderName: data.accountHolderName,
@@ -136,7 +136,6 @@ export const addDistributor = async (
   return res.data;
 };
 
-// ✅ UPDATE distributor (FIXED)
 export const updateDistributor = async (
   id: number,
   data: DistributorFormData

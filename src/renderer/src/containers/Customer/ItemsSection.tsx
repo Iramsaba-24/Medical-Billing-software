@@ -10,10 +10,12 @@ import {
 import { Add, Remove } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import DropdownField from "@/components/controlled/DropdownField";
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
 
 export interface ItemRow {
   id: number;
   name: string;
+  medicineId?: number;
   quantity: number | "";
   mrp: number | "";
   expiry?: string;
@@ -21,12 +23,10 @@ export interface ItemRow {
 
 export type InventoryItem = {
   itemName: string;
-  itemId: string;
-  medicineGroup: string;
+  medicineId: number;
   quantity: number;
   pricePerUnit: number;
   expiryDate: string;
-  supplier: string;
 };
 
 interface ItemsSectionProps {
@@ -49,18 +49,26 @@ const ItemsSection = ({
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("inventory");
-    if (!stored) return setInventory([]);
+  const fetchInventory = async () => {
+    try {
+      const data: MedicineResponse[] = await getMedicines();
 
-    const parsed: InventoryItem[] = JSON.parse(stored).map(
-      (item: InventoryItem) => ({
-        ...item,
-        stockQty: Number(item.quantity),
-      })
-    );
+      const formatted: InventoryItem[] = data.map((item) => ({
+        itemName: item.itemName,
+        medicineId: item.medicineId,
+        quantity: item.quantity,
+        pricePerUnit: item.pricePerUnit,
+        expiryDate: item.expiryDate,
+      }));
 
-    setInventory(parsed);
-  }, []);
+      setInventory(formatted);
+    } catch (error) {
+      console.error("Inventory fetch error:", error);
+    }
+  };
+
+  fetchInventory();
+}, []);
 
   const itemOptions = inventory.map((item) => ({
     label: item.itemName,
@@ -105,6 +113,7 @@ const ItemsSection = ({
         if (r.id === id) {
           return {
             ...r,
+            medicineId: item?.medicineId || 0,   
             name: selectedName,
             mrp: item ? Number(item.pricePerUnit) : "",
             expiry: item ? item.expiryDate : "",
