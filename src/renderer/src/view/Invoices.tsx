@@ -6,6 +6,8 @@ import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
+import { getAllRetailInvoices } from "@/service/retailInvoiceService";
+
 
 const cardHover = {
   cursor: "pointer",
@@ -21,11 +23,35 @@ const cardHover = {
 
 const Billing = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  useEffect(() => {
-    const stored = localStorage.getItem("currentInvoice");
-    const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
-    setInvoices(parsed);
-  }, []);
+ useEffect(() => {
+  const fetchInvoices = async () => {
+    try {
+      const data = await getAllRetailInvoices();
+      const mapped: Invoice[] = data.map((inv: {
+        retailInvoiceId: number;
+        customerName?: string;
+        invoiceDate: string;
+        totalAmount: number;
+        paymentStatus: string;
+      }) => ({
+        invoice: String(inv.retailInvoiceId),
+        name: inv.customerName || "",
+        invoiceDate: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+        price: inv.totalAmount,
+        paymentStatus: inv.paymentStatus,
+        status: inv.paymentStatus,
+        medicines: [],
+        doctor: "",
+        address: "",
+        date: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+      }));
+      setInvoices(mapped);
+    } catch (error) {
+      console.error("Error fetching invoices", error);
+    }
+  };
+  fetchInvoices();
+}, []);
 
   // Memoized Calculations
 

@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { Typography, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
@@ -196,6 +195,3 @@ function DistributorReportTable() {
 }
 
 export default DistributorReportTable;
-
-
-

@@ -12,6 +12,8 @@ MEDICINE_GROUP: `${API_BASE_URL}/MedicineGroup`,
 
  PHARMACY_SETTINGS: `${API_BASE_URL}/pharmacySettings`,
   CUSTOMER: `${API_BASE_URL}/Customer`,
+  RETAIL_INVOICE: `${API_BASE_URL}/RetailInvoice`,
+RETAIL_INVOICE_ITEMS: `${API_BASE_URL}/RetailInvoiceItems`,
   
 };
  

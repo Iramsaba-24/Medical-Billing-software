@@ -11,6 +11,7 @@ export interface MedicineGroupResponse {
   groupId: number;
   groupName: string;
   category: string;
+   medicineCount: number;
 }
 
 // token helper

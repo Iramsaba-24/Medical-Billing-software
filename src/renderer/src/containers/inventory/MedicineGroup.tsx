@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { showConfirmation, showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-  import { getMedicineGroups } from "@/service/medicineGroupService";
+  import { getMedicineGroups, deleteMedicineGroup  } from "@/service/medicineGroupService";
 
 
 type MedicineGroupRow = {
@@ -23,31 +23,7 @@ const MedicineGroup = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const groups = JSON.parse(
-  //     localStorage.getItem("medicineGroups") || "[]"
-  //   );
 
-  //   const inventory = JSON.parse(
-  //     localStorage.getItem("inventory") || "[]"
-  //   );
-
-  //   const updatedGroups = groups.map(
-  //     (group: { groupId: number; groupName: string; category: string }) => {
-  //       const count = inventory.filter(
-  //         (item: { medicineGroup: string }) =>
-  //           item.medicineGroup === group.groupName
-  //       ).length;
-
-  //       return {
-  //         ...group,
-  //         count: count.toString(),
-  //       };
-  //     }
-  //   );
-
-  //   setMedicineGroups(updatedGroups);
-  // }, []);
 
 useEffect(() => {
   const fetchGroups = async () => {
@@ -58,7 +34,7 @@ useEffect(() => {
         groupId: g.groupId,
         groupName: g.groupName,
         category: g.category,
-        count: "0", 
+        count:g.medicineCount.toString(),
       }));
 
       setMedicineGroups(formatted);
@@ -159,20 +135,18 @@ useEffect(() => {
             edit: (row) => setEditGroup(row),
 
             delete: async (row) => {
-              const ok = await showConfirmation(
-                "Delete this group?",
-                "Confirm"
-              );
-              if (ok) {
-                saveGroups(
-                  medicineGroups.filter((g) => g.groupId !== row.groupId)
-                );
-                showSnackbar(
-                  "success",
-                  "Group deleted successfully"
-                );
-              }
-            },
+  const ok = await showConfirmation("Delete this group?", "Confirm");
+  if (ok) {
+    try {
+      await deleteMedicineGroup(row.groupId);
+      setMedicineGroups(prev => prev.filter((g) => g.groupId !== row.groupId));
+      showSnackbar("success", "Group deleted successfully");
+    } catch (err) {
+      console.error(err);
+      showSnackbar("error", "Delete failed");
+    }
+  }
+},
           }}
         />
       </Paper>
