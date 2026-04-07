@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:5158/api'; 
+export const API_BASE_URL = "http://localhost:5158/api";
 
 export const API_ENDPOINTS = {
   REGISTER: `${API_BASE_URL}/Auth/register`,
@@ -11,4 +11,8 @@ export const API_ENDPOINTS = {
     INVOICE: `${API_BASE_URL}/Invoice`,
   INVOICE_ITEM: `${API_BASE_URL}/InvoiceItem`,
 
+ PHARMACY_SETTINGS: `${API_BASE_URL}/pharmacySettings`,
+  CUSTOMER: `${API_BASE_URL}/Customer`,
+  
 };
+ 

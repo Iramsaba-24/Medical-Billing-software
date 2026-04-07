@@ -1,7 +1,11 @@
 import { Box, Button, Container, Typography } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import {  useNavigate } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg";
 import { URL_PATH } from "@/constants/UrlPath";
+import { pharmacySettingsService } from "@/service/pharmacySettingsService";
+import { useEffect, useState } from "react";
+
+
 const getGreeting = () => {
   const hour = new Date().getHours();
 
@@ -19,18 +23,43 @@ const getGreeting = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  // const location = useLocation();
   const greeting = getGreeting();
 
-  const { username, licenseKey } = location.state || {};
+  // const { username, licenseKey } = location.state || {};
 
-  const storedLicense = localStorage.getItem("drugLicense");
+  // const storedLicense = localStorage.getItem("drugLicense");
 
-  const finalLicense = storedLicense
-    ? storedLicense
-    : licenseKey || "Not Available";
+  // const finalLicense = storedLicense
+  //   ? storedLicense
+  //   : licenseKey || "Not Available";
 
-  const pharmacyName = localStorage.getItem("pharmacyName") || "User";
+  // const pharmacyName = localStorage.getItem("pharmacyName") || "User";
+
+const [pharmacyName, setPharmacyName] = useState("User");
+const [licenseNumber, setLicenseNumber] = useState("Not Available");
+const [username, setUsername] = useState("User");
+
+useEffect(() => {
+  const loadLandingPageData = async () => {
+    try {
+      const userId = Number(localStorage.getItem("userId"));
+      const settings = await pharmacySettingsService.getSettings(userId);
+
+      setPharmacyName(settings.pharmacyName ?? "User");
+      setLicenseNumber(settings.drugLicenseNumber ?? "Not Available");  
+      setUsername(settings.ownerName ?? "User");
+
+      localStorage.setItem("pharmacyName", settings.pharmacyName ?? "");
+      localStorage.setItem("drugLicense", settings.drugLicenseNumber ?? "");
+    } catch (error) {
+      console.error("Error loading landing page pharmacy info", error);
+    }
+  };
+
+  loadLandingPageData();
+}, []);
+  
 
   return (
     <>
@@ -68,11 +97,13 @@ const LandingPage = () => {
             {/* RIGHT SIDE */}
             <Box textAlign={{ xs: "center", md: "left" }}>
               <Typography fontSize={15} sx={{ pb: { xs: 0, md: 1 } }}>
+                {/* User Name : {username} */}
                 User Name : {username}
               </Typography>
 
               <Typography fontSize={15} sx={{ pb: { xs: 0, md: 1 } }}>
-                License No. : {finalLicense}
+                {/* License No. : {finalLicense} */}
+                License No. : {licenseNumber}
               </Typography>
 
               <Typography fontSize={15}>

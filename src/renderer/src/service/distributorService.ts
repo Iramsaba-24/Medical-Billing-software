@@ -1,12 +1,12 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
-/* ================= TYPES ================= */
+/*TYPES */
 
 // frontend form data
 export interface DistributorFormData {
   companyName: string;
-  ownerName: string; 
+  ownerName: string; //  make required
   phone: string;
   email: string;
   registrationNumber: string;
@@ -26,7 +26,7 @@ export interface DistributorFormData {
 // backend request (MATCH DTO EXACTLY)
 interface DistributorRequest {
   companyName: string;
-  ownerName: string; 
+  ownerName: string; //  REQUIRED
   phone: string;
   email: string;
   registrationNumber: string;
@@ -56,6 +56,7 @@ export interface DistributorResponse {
   gstin: string;
   address: string;
   createdDate: string;
+ //reatedAt: string;
   bankDetails?: { 
     bankName: string;
     accountNumber: string;
@@ -66,7 +67,7 @@ export interface DistributorResponse {
   };
 }
 
-/* ================= HELPERS ================= */
+/*  HELPERS */
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -78,7 +79,7 @@ const getAuthHeaders = () => {
   };
 };
 
-/* ================= API CALLS ================= */
+/* API CALLS  */
 
 // GET all distributors
 export const getDistributors = async (): Promise<DistributorResponse[]> => {
@@ -102,22 +103,22 @@ export const getDistributorById = async (
   return res.data;
 };
 
-// ADD distributor (FIXED)
+//  ADD distributor (FIXED)
 export const addDistributor = async (
   data: DistributorFormData
 ): Promise<DistributorResponse> => {
 
   const distributorData: DistributorRequest = {
     companyName: data.companyName,
-    ownerName: data.ownerName, 
+    ownerName: data.ownerName, //  REQUIRED
     phone: data.phone,
     email: data.email,
     registrationNumber: data.registrationNumber,
-    website: data.website ? data.website : null, 
+    website: data.website ? data.website : null, // fix URL issue
     gstin: data.gstin,
     address: data.address,
 
-    bankDetails: { 
+    bankDetails: { //  MUST be nested
       bankName: data.bankName,
       accountNumber: data.accountNumber,
       accountHolderName: data.accountHolderName,
@@ -136,6 +137,7 @@ export const addDistributor = async (
   return res.data;
 };
 
+//  UPDATE distributor (FIXED)
 export const updateDistributor = async (
   id: number,
   data: DistributorFormData
@@ -177,3 +179,4 @@ export const deleteDistributor = async (id: number): Promise<void> => {
     getAuthHeaders()
   );
 };
+

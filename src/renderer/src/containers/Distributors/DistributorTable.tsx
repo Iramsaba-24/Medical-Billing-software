@@ -1,3 +1,5 @@
+
+
 import { ACTION_KEY, Column, UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { URL_PATH } from "@/constants/UrlPath";
 import { Typography, Paper, MenuItem, Button, Select, Box } from "@mui/material";
@@ -6,7 +8,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { showToast, showConfirmation } from "@/components/uncontrolled/ToastMessage.tsx";
 import EditDistributorForm, { Distributor } from "./EditDistributorForm";
-import { getDistributors, deleteDistributor, DistributorResponse } from "@/service/distributorService";
+import { getDistributors, deleteDistributor, DistributorResponse, updateDistributor } from "@/service/distributorService";
 
 // Helper function to format date properly
 const formatDate = (dateString?: string): string => {
@@ -90,18 +92,97 @@ const Distributors = () => {
     }
   };
 
+  // const handleSave = async (updatedDistributor: Distributor) => {
+  //   try {
+  //     const updated = distributors.map((d) =>
+  //       d.id === updatedDistributor.id ? updatedDistributor : d
+  //     );
+  //     setDistributors(updated);
+  //     showToast("success", "Distributor updated successfully!");
+  //   } catch (error) {
+  //     console.error("Error updating distributor:", error);
+  //     showToast("error", "Failed to update distributor.");
+  //   }
+  // };
+
   const handleSave = async (updatedDistributor: Distributor) => {
-    try {
-      const updated = distributors.map((d) =>
-        d.id === updatedDistributor.id ? updatedDistributor : d
-      );
-      setDistributors(updated);
-      showToast("success", "Distributor updated successfully!");
-    } catch (error) {
-      console.error("Error updating distributor:", error);
-      showToast("error", "Failed to update distributor.");
-    }
-  };
+  try {
+    // Backend ला अपडेट पाठवा
+    await updateDistributor(
+      parseInt(updatedDistributor.id),
+      {
+        companyName: updatedDistributor.companyName,
+        ownerName: updatedDistributor.ownerName,
+        phone: updatedDistributor.phone,
+        email: updatedDistributor.email,
+        registrationNumber: updatedDistributor.registrationNumber,
+        website: updatedDistributor.website,
+        gstin: updatedDistributor.gstin,
+        address: updatedDistributor.address,
+
+        bankName: updatedDistributor.bankDetails?.bankName || "",
+        accountNumber: updatedDistributor.bankDetails?.accountNumber || "",
+        accountHolderName:
+          updatedDistributor.bankDetails?.accountHolderName || "",
+        branch: updatedDistributor.bankDetails?.branch || "",
+        ifscCode: updatedDistributor.bankDetails?.ifscCode || "",
+        upiId: updatedDistributor.bankDetails?.upiId || "",
+      }
+    );
+
+    // Update frontend table
+    const updated = distributors.map((d) =>
+      d.id === updatedDistributor.id ? updatedDistributor : d
+    );
+
+    setDistributors(updated);
+    showToast("success", "Distributor updated successfully!");
+  } catch (error) {
+    console.error("Error updating distributor:", error);
+    showToast("error", "Failed to update distributor.");
+  }
+};
+
+  // const columns: Column<Distributor>[] = [
+  //   { key: "companyName", label: "Company Name" },
+  //   { key: "registrationNumber", label: "Reg. No." },
+  //   { key: "phone", label: "Mobile" },
+  //   { key: "email", label: "Email" },
+  //   { key: "createdAt", label: "Date" },
+  //   { key: "address", label: "Address" },
+  //   {
+  //     key: "status",
+  //     label: "Status",
+  //     render: (row) => (
+  //       <Select
+  //         size="small"
+  //         value={row.status}
+  //         onChange={(e) =>
+  //           handleStatusChange(
+  //             row.id,
+  //             e.target.value as "Active" | "Inactive"
+  //           )
+  //         }
+  //         sx={{
+  //           minWidth: 100,
+  //           fontSize: 13,
+  //           fontWeight: 600,
+  //           "& .MuiSelect-select": {
+  //             color:
+  //               row.status === "Active"
+  //                 ? "success.main"
+  //                 : "error.main",
+  //           },
+  //         }}
+  //       >
+  //         <MenuItem value="Active">Active</MenuItem>
+  //         <MenuItem value="Inactive">Inactive</MenuItem>
+  //       </Select>
+  //     ),
+  //   },
+  //   { key: ACTION_KEY, label: "Action" },
+  // ];
+
 
   const columns: Column<Distributor>[] = [
     { key: "companyName", label: "Company Name" },

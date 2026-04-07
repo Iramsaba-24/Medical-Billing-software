@@ -62,7 +62,7 @@ export const getMedicines = async (search?: string) => {
     params: { search },
   });
 
-  return res.data.data; // backend format: { message, data }
+  return res.data.data; 
 };
 
 export const addMedicine = async (

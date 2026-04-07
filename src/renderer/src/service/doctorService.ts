@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
-
+ 
 // types
 // frontend form data
 export interface DoctorFormData {
@@ -13,14 +13,14 @@ export interface DoctorFormData {
     isActive?: boolean;
     IsActive?: boolean;
 }
-
+ 
 // backend request
 interface DoctorRequest extends DoctorFormData {
   userId: number;
   clinicName: string;
   IsActive: boolean;
 }
-
+ 
 // backend response
 export interface DoctorResponse {
   doctorId: number;
@@ -33,19 +33,19 @@ export interface DoctorResponse {
    isActive: boolean;
     IsActive?: boolean;
 }
-
+ 
 // helpers
 // token header
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
-
+ 
   return {
     headers: {
       Authorization: token ? `Bearer ${token}` : "",
     },
   };
 };
-
+ 
 // userId
 const getUserId = (): number => {
   const id = localStorage.getItem("userId");
@@ -54,7 +54,7 @@ const getUserId = (): number => {
   }
   return Number(id);
 };
-
+ 
 // api calling
 // GET all doctors
 export const getDoctors = async (): Promise<DoctorResponse[]> => {
@@ -64,19 +64,19 @@ export const getDoctors = async (): Promise<DoctorResponse[]> => {
   );
   return res.data;
 };
-
+ 
 // ADD doctor
 export const addDoctor = async (
   data: DoctorFormData
 ): Promise<DoctorResponse> => {
-
+ 
   const doctorData: DoctorRequest = {
     ...data,
     userId: getUserId(),
     clinicName: "Default Clinic",
     IsActive: data.isActive ?? data.IsActive ?? true,
   };
-
+ 
   const res = await axios.post(
     API_ENDPOINTS.DOCTOR,
     doctorData,
@@ -89,23 +89,23 @@ export const updateDoctor = async (
   id: number,
   data: DoctorFormData
 ): Promise<DoctorResponse> => {
-
+ 
   const doctorData: DoctorRequest = {
     ...data,
     userId: getUserId(),
     clinicName: "Default Clinic",
     IsActive: data.isActive ?? data.IsActive ?? true,
   };
-
+ 
   const res = await axios.put(
     `${API_ENDPOINTS.DOCTOR}/${id}`,
     doctorData,
     getAuthHeaders() // token
   );
-
+ 
   return res.data;
 };
-
+ 
 // DELETE doctor
 export const deleteDoctor = async (id: number): Promise<void> => {
   await axios.delete(
@@ -113,4 +113,3 @@ export const deleteDoctor = async (id: number): Promise<void> => {
     getAuthHeaders() // token
   );
 };
-
