@@ -2,14 +2,6 @@ import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 // types
-// export interface DistributorInvoiceItemFormData {
-//   retailInvoiceId: number;
-//   medicineId: number;
-//   quantity: number;
-//   price: number;
-//   gstPercent: number;
-//   discount: number;
-// }
 export interface DistributorInvoiceItemFormData {
   invoiceId: number;
   medicineId: number;
@@ -20,8 +12,8 @@ export interface DistributorInvoiceItemFormData {
 }
 
 export interface DistributorInvoiceItemResponse {
-  retailItemId: number;
-  retailInvoiceId: number;
+  invoiceItemId: number;
+  invoiceId: number;
   medicineId: number;
   quantity: number;
   price: number;
@@ -55,19 +47,6 @@ export const addDistributorInvoiceItem = async (
   );
   return res.data;
 };
-
-// BULK ADD
-// export const addBulkDistributorInvoiceItems = async (
-//   items: DistributorInvoiceItemFormData[]
-// ): Promise<DistributorInvoiceItemResponse[]> => {
-//   const res = await axios.post(
-//     `${API_ENDPOINTS.INVOICE_ITEM}/bulk`,
-//     items,
-//     getAuthHeaders()
-//   );
-//   return res.data;
-// };
-
 // GET by invoice ID
 export const getItemsByInvoiceId = async (
   invoiceId: number

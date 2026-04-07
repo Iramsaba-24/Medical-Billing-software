@@ -1,8 +1,10 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
+
 // frontend form data
 export interface MedicineFormData {
+   medicineId: number;
   itemName: string;
   unit: string;
   quantity: number;
@@ -14,6 +16,7 @@ export interface MedicineFormData {
 
 // backend request
 interface MedicineRequest {
+  medicineId: number;
   itemName: string;
   unit: string;
   quantity: number;
@@ -21,7 +24,6 @@ interface MedicineRequest {
   expiryDate: string;
   groupId: number;
   distributorId: number;
-
   batchNumber: string;
   company: string;
   gstPercentage: number;
@@ -35,13 +37,21 @@ export interface MedicineResponse {
   quantity: number;
   pricePerUnit: number;
   expiryDate: string;
-  unit: string;        
-  groupId: number;     
+  unit: string;
+  groupId: number;
   distributorId: number;
-
+  
+  gstPercentage: number;
+  totalPrice: number;
+  gst: number;
+  finalPrice: number;
+  status: string;
+  isLowStock: boolean;
+  distributorName?: string;
+  groupName?: string;
+  category?: string;
   
 }
-
 
 
 // token
@@ -57,12 +67,18 @@ const getAuthHeaders = () => {
 
 
 export const getMedicines = async (search?: string) => {
-  const res = await axios.get(API_ENDPOINTS.MEDICINE, {
-    ...getAuthHeaders(),
-    params: { search },
-  });
-
-  return res.data.data; 
+  try {
+    const res = await axios.get(API_ENDPOINTS.MEDICINE, {
+      ...getAuthHeaders(),
+      params: { search },
+    });
+    return res.data.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return [];
+    }
+    throw error;
+  }
 };
 
 export const addMedicine = async (
@@ -70,6 +86,7 @@ export const addMedicine = async (
 ): Promise<MedicineResponse> => {
 
   const payload: MedicineRequest = {
+     medicineId: data.medicineId,
     itemName: data.itemName,
     unit: data.unit,
     quantity: data.quantity,
@@ -99,6 +116,7 @@ export const updateMedicine = async (
   data: MedicineFormData
 ): Promise<MedicineResponse> => {
   const payload: MedicineRequest = {
+     medicineId: data.medicineId,
     itemName: data.itemName,
     unit: data.unit,
     quantity: data.quantity,
@@ -117,4 +135,11 @@ export const updateMedicine = async (
     getAuthHeaders()
   );
   return res.data.data;
+};
+
+export const deleteMedicine = async (id: number): Promise<void> => {
+  await axios.delete(
+    `${API_ENDPOINTS.MEDICINE}/${id}`,
+    getAuthHeaders()
+  );
 };

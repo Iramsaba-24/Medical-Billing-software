@@ -8,11 +8,12 @@ export const API_ENDPOINTS = {
   MEDICINE_GROUP: `${API_BASE_URL}/MedicineGroup`,
   DISTRIBUTOR: `${API_BASE_URL}/Distributor`,
   MEDICINE: `${API_BASE_URL}/Medicine`,
-    INVOICE: `${API_BASE_URL}/Invoice`,
+  INVOICE: `${API_BASE_URL}/Invoice`,
   INVOICE_ITEM: `${API_BASE_URL}/InvoiceItem`,
-
- PHARMACY_SETTINGS: `${API_BASE_URL}/pharmacySettings`,
+  PHARMACY_SETTINGS: `${API_BASE_URL}/pharmacySettings`,
   CUSTOMER: `${API_BASE_URL}/Customer`,
+  RETAIL_INVOICE: `${API_BASE_URL}/RetailInvoice`,
+  RETAIL_INVOICE_ITEMS: `${API_BASE_URL}/RetailInvoiceItems`,
   
 };
  

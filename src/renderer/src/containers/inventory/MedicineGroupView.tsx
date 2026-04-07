@@ -2,13 +2,15 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Paper, Typography } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
-import { getMedicineGroupById } from "@/service/medicineGroupService";
+import { getMedicines } from "@/service/medicineService";
+
 
 
 type InventoryItem = {
   itemName: string;
-  medicineId: string;
+  medicineId: number;
   medicineGroup: string;
+  groupId: number;
   quantity: number;
   pricePerUnit: number;
   expiryDate: string;
@@ -31,35 +33,23 @@ type InventoryItem = {
   };
 
 export default function MedicineGroupDetails() {
-const { id } = useParams<{ id: string }>();
+const { groupName } = useParams<{ groupName: string }>();
   const [items, setItems] = useState<InventoryItem[]>([]);
 
-  // useEffect(() => {
-  //   const inventory: InventoryItem[] =
-  //     JSON.parse(localStorage.getItem("inventory") || "[]");
 
-  //   const filtered = inventory.filter(
-  //     (item) => item.medicineGroup === groupName
-  //   );
-
-  //   setItems(filtered);
-  // }, [groupName]);
-
-  // fetch group details
-  useEffect(() => {
+useEffect(() => {
   const fetchData = async () => {
     try {
-      if (!id) return;
-
-      const res = await getMedicineGroupById(Number(id));
-      setItems(res.items || []);
+      if (!groupName) return;
+      const all: InventoryItem[] = await getMedicines();
+      const filtered = all.filter((m: InventoryItem) => m.groupId === Number(groupName));
+      setItems(filtered);
     } catch (err) {
       console.error(err);
     }
   };
-
   fetchData();
-}, [id]);
+}, [groupName]);
 
   const columns: Column<InventoryItem>[] = [
     { key: "itemName", label: "Item Name" },
@@ -78,7 +68,7 @@ const { id } = useParams<{ id: string }>();
   return (
     <Paper sx={{ p: 3, borderRadius: 2 }}>
     <Typography fontSize={20} fontWeight={600} mb={2}>
-      {id}
+      {groupName}
     </Typography>
 
 

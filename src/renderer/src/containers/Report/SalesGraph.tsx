@@ -1,5 +1,3 @@
-
-
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Typography, Paper, Divider, Grid } from "@mui/material";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -132,7 +130,3 @@ const SalesGraph = () => {
 };
 
 export default SalesGraph;
-
-
-
-

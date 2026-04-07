@@ -22,7 +22,14 @@ export interface InvoiceResponse {
   totalGST: number;
   paymentStatus: string;
 }
-
+ export type InvoiceListResponse = {
+  invoiceId: number;
+  invoiceDate: string;
+  totalAmount: number;
+  paymentStatus: string;
+  distributorName?: string;
+  distributorId: number;
+};
 // helpers
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -56,37 +63,11 @@ export const createInvoice = async (
 
   return res.data;
 };
-
-//update invoice
-
-// export const updateInvoiceStatus = async (
-//   invoiceId: number,
-//   status: string
-// ) => {
-//   // 1. Get existing invoice
-//   const existing = await axios.get(
-//     `${API_ENDPOINTS.INVOICE}/${invoiceId}`,
-//     getAuthHeaders()
-//   );
-
-//   const invoice = existing.data;
-
-//   // 2. Update only paymentStatus
-//   const updatedPayload = {
-//     ...invoice,
-//     paymentStatus: status,
-//   };
-
-//   // 3. Send PUT
-//   const res = await axios.put(
-//     `${API_ENDPOINTS.INVOICE}/${invoiceId}`,
-//     updatedPayload,
-//     getAuthHeaders()
-//   );
-
-//   return res.data;
-// };
 export const getInvoiceById = async (invoiceId: number) => {
   const res = await axios.get(`${API_ENDPOINTS.INVOICE}/${invoiceId}`);
+  return res.data;
+};
+export const getAllInvoices = async (): Promise<InvoiceListResponse[]> => {
+  const res = await axios.get(API_ENDPOINTS.INVOICE, getAuthHeaders());
   return res.data;
 };

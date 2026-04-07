@@ -9,7 +9,7 @@ import {
   Column,
   DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
-// import {  InvoiceStatus } from "@/types/invoice";
+
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 
 import { FormProvider, useForm } from "react-hook-form";
@@ -198,9 +198,7 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
           }}
           actions={{
             view: (invoice) =>
-              navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
-                state: { invoice },
-              }),
+              navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`),
             edit: (invoice) =>
               navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
                 state: { invoice },

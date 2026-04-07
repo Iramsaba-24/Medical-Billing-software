@@ -150,7 +150,7 @@ const onSubmit = async (data: FormData) => {
     const gstAmount = (finalTotal * gst) / 100;
     const grandTotal = finalTotal + gstAmount;
 
-    // 1. Create Invoice
+    // Create Invoice
     const invoiceRes = await createInvoice({
       distributorId: selectedDistributor.id,
       invoiceType: "DISTRIBUTOR",

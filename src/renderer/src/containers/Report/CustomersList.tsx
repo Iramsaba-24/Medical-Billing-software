@@ -1,218 +1,197 @@
 import { useState, useMemo, useEffect } from "react";
-import {
-  Typography,
-  Stack,
-  Paper,
-  Divider,
-} from "@mui/material";
+import { Typography, Stack, Paper, Divider } from "@mui/material";
+import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
 
-import {
-  UniversalTable,
-  Column,
-} from "@/components/uncontrolled/UniversalTable";
+import { useForm, FormProvider } from "react-hook-form"; 
+import DropdownField from "@/components/controlled/DropdownField"; 
 
-import DropdownField from "@/components/controlled/DropdownField";
-import { useForm, FormProvider } from "react-hook-form";
-
-// TYPES
-
-type CustomerItem = {
+// TYPES 
+type DistributorRow = {
   name: string;
-  qty: number | string;
-  price: number | string;
+  email: string;
+  contact: string;
+  lastPurchaseDate: string;
+  status: "Active" | "Inactive";
+   purchaseAmount?: number; // optional for old data safety
 };
 
-type SavedCustomer = {
-  id: number;
-  name?: string;
-  doctor?: string;
-  date?: string;
-  itemsList?: CustomerItem[];
-};
-
-type Customer = {
-  id: number;
-  name: string;
-  medicines: string;
-  quantity: number;
-  totalPrice: number;
-  referenceFrom: string;
+type DistributorStorage = {
+  companyName: string;
+  email: string;
+  mobile: string;
   date: string;
+  status?: "Active" | "Inactive";
+  purchaseAmount: number;
 };
 
 type FilterForm = {
+  statusFilter: string;
   timeFilter: string;
 };
 
-function CustomerTable() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+
+const columns = [
+  { key: "name", label: "Company Name" },
+  { key: "email", label: "Email" },
+  { key: "contact", label: "Contact" },
+  { key: "lastPurchaseDate", label: "Last Purchase Date" },
+  {
+    key: "status",
+    label: "Status",
+    render: (row: DistributorRow) => (
+      <span
+        style={{
+          color: row.status === "Active" ? "green" : "red",
+          fontWeight: 500,
+        }}
+      >
+        {row.status}
+      </span>
+    ),
+  },
+];
+
+function DistributorReportTable() {
+
+  const [distributorData, setDistributorData] = useState<DistributorRow[]>([]);
 
   const methods = useForm<FilterForm>({
     defaultValues: {
+      statusFilter: "All",
       timeFilter: "All Time",
     },
   });
 
-  const timeFilter = methods.watch("timeFilter");
+  const { watch } = methods;
+  const statusFilter = watch("statusFilter");
+  const timeFilter = watch("timeFilter");
 
-  
-  // LOAD DATA FROM LOCAL STORAGE
-  
+  // LOAD FROM LOCALSTORAGE
   useEffect(() => {
-    const savedData = localStorage.getItem("medical_customers");
+    const stored = localStorage.getItem("distributors");
 
-    if (!savedData) {
-      setCustomers([]);
-      return;
-    }
+    const parsed: DistributorStorage[] = stored
+      ? JSON.parse(stored)
+      : [];
 
-    const parsed: SavedCustomer[] = JSON.parse(savedData);
+    const formattedData: DistributorRow[] = parsed.map((item) => ({
+      name: item.companyName,
+      email: item.email,
+      contact: item.mobile,
+      lastPurchaseDate: item.date,
+      status: item.status ?? "Active",
+    }));
 
-    const formatted: Customer[] = parsed.map((item) => {
-      const items = item.itemsList || [];
-
-      const medicines = items.map((i) => i.name).join(", ");
-
-      const quantity = items.reduce(
-        (sum, i) => sum + (Number(i.qty) || 0),
-        0
-      );
-
-      const totalPrice = items.reduce(
-        (sum, i) =>
-          sum + (Number(i.qty) || 0) * (Number(i.price) || 0),
-        0
-      );
-
-      return {
-        id: item.id,
-        name: item.name || "",
-        medicines,
-        quantity,
-        totalPrice,
-        referenceFrom: item.doctor || "",
-        date: item.date || "",
-      };
-    });
-
-    setCustomers(formatted);
+    setDistributorData(formattedData);
   }, []);
 
-  
   // FILTER LOGIC
-  
   const filteredData = useMemo(() => {
-    return customers.filter((customer) => {
-      if (timeFilter === "All Time") return true;
+    return distributorData.filter((distributor) => {
 
-      const itemDate = new Date(customer.date);
+      const matchesStatus =
+        statusFilter === "All" || distributor.status === statusFilter;
+
+      const purchaseDate = new Date(distributor.lastPurchaseDate);
       const today = new Date();
+      let matchesTime = true;
 
       if (timeFilter === "This Month") {
-        return (
-          itemDate.getMonth() === today.getMonth() &&
-          itemDate.getFullYear() === today.getFullYear()
-        );
+        matchesTime =
+          purchaseDate.getMonth() === today.getMonth() &&
+          purchaseDate.getFullYear() === today.getFullYear();
+      } else if (timeFilter === "Last 30 Days") {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        matchesTime =
+          purchaseDate >= thirtyDaysAgo && purchaseDate <= today;
       }
 
-      if (timeFilter === "Last 7 Days") {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(today.getDate() - 7);
-        return itemDate >= sevenDaysAgo && itemDate <= today;
-      }
-
-      return true;
+      return matchesStatus && matchesTime;
     });
-  }, [customers, timeFilter]);
+  }, [statusFilter, timeFilter, distributorData]);
 
-  
-  // DELETE SELECTED ROWS FUNCTION
-  
-  const handleDeleteSelected = (rowsToDelete: Customer[]) => {
-    const updatedCustomers = customers.filter(
-      (customer) =>
-        !rowsToDelete.some((row) => row.id === customer.id)
+  //  DELETE SELECTED ROWS FUNCTION ADDED
+  const handleDeleteSelected = (rowsToDelete: DistributorRow[]) => {
+    const updatedData = distributorData.filter(
+      (dist) =>
+        !rowsToDelete.some(
+          (row) =>
+            row.name === dist.name &&
+            row.lastPurchaseDate === dist.lastPurchaseDate
+        )
     );
 
-    setCustomers(updatedCustomers);
+    setDistributorData(updatedData);
 
-    // Update localStorage
-    localStorage.setItem(
-      "medical_customers",
-      JSON.stringify(updatedCustomers)
-    );
+    //  Update localStorage
+    const updatedStorage = updatedData.map((item) => ({
+      companyName: item.name,
+      email: item.email,
+      mobile: item.contact,
+      date: item.lastPurchaseDate,
+      status: item.status,
+    }));
 
-    window.dispatchEvent(new Event("reportUpdated")); //added for cards
+    localStorage.setItem("distributors", JSON.stringify(updatedStorage));
+    window.dispatchEvent(new Event("reportUpdated"));
   };
 
-  
-  // TABLE COLUMNS
-  
-  const columns: Column<Customer>[] = [
-    { key: "name", label: "Name" },
-    { key: "medicines", label: "Medicines" },
-    { key: "quantity", label: "Quantity" },
-    {
-      key: "totalPrice",
-      label: "Total Price",
-      render: (row) => `₹${row.totalPrice.toFixed(2)}`,
-    },
-    { key: "referenceFrom", label: "Reference From" },
-    { key: "date", label: "Date" },
+  const statusOptions = [
+    { label: "All Status", value: "All" },
+    { label: "Active", value: "Active" },
+    { label: "Inactive", value: "Inactive" },
   ];
 
-  const filterOptions = [
+  const timeOptions = [
     { label: "All Time", value: "All Time" },
-    { label: "Last 7 Days", value: "Last 7 Days" },
     { label: "This Month", value: "This Month" },
+    { label: "Last 30 Days", value: "Last 30 Days" },
   ];
 
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-          Customers List
+          Distributors List
         </Typography>
 
         <Divider sx={{ mb: 3 }} />
 
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          sx={{ mb: 2 }}
-        >
+        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
+
+          <DropdownField
+            name="statusFilter"
+            label="Status"
+            options={statusOptions}
+            freeSolo={false}
+          />
+
           <DropdownField
             name="timeFilter"
-            label="Filter"
-            options={filterOptions}
+            label="Time Filter"
+            options={timeOptions}
+            freeSolo={false}
           />
         </Stack>
 
+        
         <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
-        <UniversalTable<Customer>
+        <UniversalTable<DistributorRow>
           data={filteredData}
+          showSearch={true}
+          showExport={true}
           columns={columns}
-          enableCheckbox
-          showSearch
-          showExport
-          getRowId={(row) => row.id}
+          enableCheckbox={true}
+          getRowId={(row) => `${row.name}-${row.lastPurchaseDate}`}
           
-          // DELETE FEATURE 
+          //  DELETE 
           onDeleteSelected={handleDeleteSelected}
-          
         />
-       
         </div>
       </Paper>
     </FormProvider>
   );
 }
 
-export default CustomerTable;
-
-
-
-
-
-
-
+export default DistributorReportTable;
