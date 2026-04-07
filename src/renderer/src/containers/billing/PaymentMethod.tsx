@@ -8,6 +8,8 @@ import RadioField from "@/components/controlled/RadioField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { updatePaymentStatus,createSingleRetailInvoiceItem } from "@/service/retailInvoiceService";
+
 
 type PaymentMethods = {
   paymentMethod: "debitCard" | "upi" | "cash";
@@ -21,6 +23,19 @@ type PaymentMethods = {
   upiId?: string;
 };
 
+type PaymentState = {
+  invoiceId: number;
+  rows: {
+    medicineId: string;
+    medicineName?: string;
+    expiryDate?: string;
+    quantity: number | "";
+    price: number | "";
+  }[];
+  totalFromInvoice: number;
+  customerName?: string;
+  doctorName?: string;
+};
 const radioStyle = {
   "& .MuiRadio-root": {
     color: "default.main",
@@ -94,123 +109,62 @@ const PaymentMethod = () => {
   }, [location.state, setValue]); 
 
 
- const saveInvoice = () => {
-  const storedRetail = localStorage.getItem("currentRetailInvoice");
-  const storedNew = localStorage.getItem("currentNewInvoice");
+   
 
-  function getTimeFormat(): string {
+const saveInvoice = async () => {
   try {
-    const saved = localStorage.getItem("generalSettings");
-    if (saved) {
-      const settings = JSON.parse(saved);
-      const timeZone = settings.timeZone || "India (IST)";
-      const twelveHourZones = ["US (EST)", "US (PST)", "Australia (AEST)"];
-      if (twelveHourZones.includes(timeZone)) {
-        return "12";  // 12-hour
-      }
-      return "24";  // 24-hour
+    const state = location.state as PaymentState;
+
+    console.log("location.state:", location.state);
+    console.log("state.rows:", state?.rows);
+    console.log("state.invoiceId:", state?.invoiceId);
+
+    if (!state?.rows || !state?.invoiceId) {
+      console.error("Missing rows or invoiceId in state");
+      return;
     }
-  } catch {
-    // ignore
-  }
-  return "24";
-}
 
-function getFormattedTime(): string {
-  const now = new Date();
-  const format = getTimeFormat();
-  
-  if (format === "12") {
-    // 12-hour format — hh:mm:ss AM/PM
-    return now.toLocaleTimeString("en-US", { 
-      hour: "2-digit", 
-      minute: "2-digit", 
-      second: "2-digit",
-      hour12: true 
+    // ✅ LOOP (NO BULK)
+    for (const r of state.rows) {
+      await createSingleRetailInvoiceItem({
+        retailInvoiceId: state.invoiceId,
+        medicineId: Number(r.medicineId),
+        quantity: Number(r.quantity),
+        price: Number(r.price),
+        gstPercent: 0,
+        discount: 0,
+      });
+    }
+
+    // ✅ update payment
+    await updatePaymentStatus(state.invoiceId, "Paid");
+
+    // ✅ navigate
+    navigate(`${URL_PATH.InvoiceView}/${state.invoiceId}`, {
+      state: {
+        invoice: {
+          invoice: String(state.invoiceId),
+          name: state.customerName || "",
+          doctor: state.doctorName || "",
+          address: "",
+          date: new Date().toLocaleDateString("en-GB"),
+          medicines: state.rows.map((r) => ({
+            name: r.medicineName || String(r.medicineId),
+            qty: Number(r.quantity),
+            amount: Number(r.quantity) * Number(r.price),
+            batch: "",
+            expiry: r.expiryDate
+              ? new Date(r.expiryDate).toLocaleDateString("en-GB")
+              : "",
+          })),
+          totalAmount: state.totalFromInvoice,
+        },
+      },
     });
-  } else {
-    // 24-hour format — HH:mm:ss
-    return now.toLocaleTimeString("en-GB", { 
-      hour: "2-digit", 
-      minute: "2-digit", 
-      second: "2-digit",
-      hour12: false 
-    });
-  }
-}
-
-  // Retail Flow
-  if (storedRetail) {
-    const existingInvoices = JSON.parse(
-      localStorage.getItem("currentInvoice") || "[]"
-    );
-    const retail = JSON.parse(storedRetail);
-
-    const newInvoice = {
-      invoice: retail.invoice,
-      name: retail.name,
-      doctor: retail.doctor,
-      address: retail.address,
-      doctorAddress: retail.doctorAddress,
-      invoiceDate: new Date().toLocaleDateString("en-GB"),
-        time: getFormattedTime(),
-      price: retail.totalAmount,
-      paymentStatus: "Paid",
-      medicines: retail.medicines,
-      gst: retail.gst,
-      type: "retail",
-      gstAmount: retail.gstAmount,
-      subTotal: retail.subTotal,
-      totalAmount: retail.totalAmount,
-    };
-
-    const updated = [newInvoice, ...existingInvoices];
-    localStorage.setItem("currentInvoice", JSON.stringify(updated));
-    localStorage.removeItem("currentRetailInvoice");
-    navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
-      state: { invoice: newInvoice },
-    });
-    return;
-  }
-
-  // New Invoice Flow
-  if (storedNew) {
-    const existingInvoices = JSON.parse(
-      localStorage.getItem("currentNewInvoiceList") || "[]"
-    );
-    const invoices = JSON.parse(storedNew);
-    const lastInvoice = invoices[invoices.length - 1];
-
-    const invoiceNumber = `INV-${lastInvoice.id || Date.now()}`;
-
-    const summaryInvoice = {
-      invoice: invoiceNumber,
-      name: lastInvoice.company,
-      date: new Date().toLocaleDateString(),
-        time: getFormattedTime(),
-      price: lastInvoice.totalAmount,
-      paymentStatus: "Paid", 
-      type: "distributor",
-      medicines: lastInvoice.medicines || [],
-      totalAmount: lastInvoice.totalAmount,
-    };
-
-    const billInvoice = {
-      ...lastInvoice,
-      invoice: invoiceNumber,
-      date: new Date().toLocaleDateString(),
-    };
-
-    const updated = [summaryInvoice, ...existingInvoices];
-    localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
-    localStorage.removeItem("currentNewInvoice");
-
-    navigate(URL_PATH.NewInvoiceBill, {
-      state: { invoice: billInvoice },
-    });
+  } catch (error) {
+    console.error("Payment save failed", error);
   }
 };
-   
   
 
   return (

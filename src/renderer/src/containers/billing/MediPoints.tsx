@@ -49,7 +49,7 @@ const MediPoints: React.FC = () => {
   const methods = useForm<MediPointsForm>({
     defaultValues: {
       totalAmount: totalFromInvoice.toString(),
-      mediPoints: "",
+      mediPoints: "", 
       discountedAmount: totalFromInvoice.toString(),
     },
   });
@@ -112,12 +112,16 @@ const MediPoints: React.FC = () => {
 
       localStorage.setItem("currentRetailInvoice", JSON.stringify(invoice));
     }
-
+ 
 
 navigate(URL_PATH.PaymentMethod, {
   state: {
     flow: location.state?.flow || "retail",
     totalFromInvoice: Number(data.discountedAmount),
+    invoiceId: location.state?.invoiceId,
+    rows: location.state?.rows,
+    customerName: location.state?.customerName,
+    doctorName: location.state?.doctorName,
   }
 });
   };

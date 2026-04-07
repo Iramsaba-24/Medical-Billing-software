@@ -7,7 +7,7 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
-import { addMedicine } from "@/service/medicineService";
+import { addMedicine, getMedicines  } from "@/service/medicineService";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
@@ -44,10 +44,36 @@ export default function AddInventoryItem() {
   const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
   const [groupIdMap, setGroupIdMap] = useState<Record<string, number>>({});
   const [supplierIdMap, setSupplierIdMap] = useState<Record<string, number>>({});
+  const [, setNextMedicineId] = useState<number>(1);
+
+
+useEffect(() => {
+  const fetchNextId = async () => {
+    try {
+      const medicines = await getMedicines();
+      const existingIds = medicines
+        .map((m: { medicineId: number }) => m.medicineId)
+        .sort((a: number, b: number) => a - b);
+
+      const nextId = existingIds.length > 0
+        ? existingIds[existingIds.length - 1] + 1
+        : 1;
+
+      setNextMedicineId(nextId);
+      methods.setValue("medicineId", nextId);
+    } catch (error) {
+      console.error("Error fetching next medicine ID:", error);
+    }
+  };
+
+  fetchNextId();
+}, [methods, setNextMedicineId]);
 
   // Load Medicine Groups
   useEffect(() => {
     const fetchGroups = async () => {
+
+      
       try {
         const token = localStorage.getItem("token");
 
@@ -156,6 +182,7 @@ export default function AddInventoryItem() {
               name="medicineId"
               label="Item ID"
               required
+              disabled
             />
 
             <DropdownField

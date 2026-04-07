@@ -155,6 +155,7 @@ const onSubmit = async (data: InventoryItem) => {
     const resolvedDistributorId = supplierIdMapRef.current[data.supplier] ?? item?.distributorId ?? 0;
 
     await updateMedicine(item?.medicineId ?? 0, {
+      medicineId: item?.medicineId ?? 0,
       itemName: data.itemName,
       unit: data.unit,
       quantity: data.quantity,

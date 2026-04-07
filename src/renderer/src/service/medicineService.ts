@@ -4,6 +4,7 @@ import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 // frontend form data
 export interface MedicineFormData {
+   medicineId: number;
   itemName: string;
   unit: string;
   quantity: number;
@@ -15,6 +16,7 @@ export interface MedicineFormData {
 
 // backend request
 interface MedicineRequest {
+  medicineId: number;
   itemName: string;
   unit: string;
   quantity: number;
@@ -22,7 +24,6 @@ interface MedicineRequest {
   expiryDate: string;
   groupId: number;
   distributorId: number;
-
   batchNumber: string;
   company: string;
   gstPercentage: number;
@@ -85,6 +86,7 @@ export const addMedicine = async (
 ): Promise<MedicineResponse> => {
 
   const payload: MedicineRequest = {
+     medicineId: data.medicineId,
     itemName: data.itemName,
     unit: data.unit,
     quantity: data.quantity,
@@ -114,6 +116,7 @@ export const updateMedicine = async (
   data: MedicineFormData
 ): Promise<MedicineResponse> => {
   const payload: MedicineRequest = {
+     medicineId: data.medicineId,
     itemName: data.itemName,
     unit: data.unit,
     quantity: data.quantity,
