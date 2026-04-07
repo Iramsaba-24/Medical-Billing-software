@@ -61,5 +61,5 @@ export const URL_PATH = {
   PaymentDetails: "/billing/payment-details",
 
   DoctorsSettings: "/settings/doctors-settings",
-  NewInvoiceBill: "/billing/invoice-bill",
+  NewInvoiceBill: "/billing/invoice-bill/:invoiceNo",
 };
