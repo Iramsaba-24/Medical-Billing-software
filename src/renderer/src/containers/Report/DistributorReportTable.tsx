@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { Typography, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
@@ -8,19 +7,19 @@ import DropdownField from "@/components/controlled/DropdownField";
 
 // TYPES 
 type DistributorRow = {
-  name: string;
+  companyName: string;
   email: string;
-  contact: string;
-  lastPurchaseDate: string;
+  phone: string;
+  createdAt: string;
   status: "Active" | "Inactive";
-   purchaseAmount?: number; // optional for old data safety
+  purchaseAmount?: number;
 };
 
 type DistributorStorage = {
   companyName: string;
   email: string;
-  mobile: string;
-  date: string;
+  phone: string;
+  createdAt: string;
   status?: "Active" | "Inactive";
   purchaseAmount: number;
 };
@@ -32,10 +31,10 @@ type FilterForm = {
 
 
 const columns = [
-  { key: "name", label: "Company Name" },
+  { key: "companyName", label: "Company Name" },
   { key: "email", label: "Email" },
-  { key: "contact", label: "Contact" },
-  { key: "lastPurchaseDate", label: "Last Purchase Date" },
+  { key: "phone", label: "Contact" },
+  { key: "createdAt", label: "Created Date" },
   {
     key: "status",
     label: "Status",
@@ -76,10 +75,10 @@ function DistributorReportTable() {
       : [];
 
     const formattedData: DistributorRow[] = parsed.map((item) => ({
-      name: item.companyName,
+      companyName: item.companyName,
       email: item.email,
-      contact: item.mobile,
-      lastPurchaseDate: item.date,
+      phone: item.phone,
+      createdAt: item.createdAt,
       status: item.status ?? "Active",
     }));
 
@@ -93,7 +92,7 @@ function DistributorReportTable() {
       const matchesStatus =
         statusFilter === "All" || distributor.status === statusFilter;
 
-      const purchaseDate = new Date(distributor.lastPurchaseDate);
+      const purchaseDate = new Date(distributor.createdAt);
       const today = new Date();
       let matchesTime = true;
 
@@ -112,25 +111,25 @@ function DistributorReportTable() {
     });
   }, [statusFilter, timeFilter, distributorData]);
 
-  //  DELETE SELECTED ROWS FUNCTION ADDED
+  // DELETE SELECTED ROWS
   const handleDeleteSelected = (rowsToDelete: DistributorRow[]) => {
     const updatedData = distributorData.filter(
       (dist) =>
         !rowsToDelete.some(
           (row) =>
-            row.name === dist.name &&
-            row.lastPurchaseDate === dist.lastPurchaseDate
+            row.companyName === dist.companyName &&
+            row.createdAt === dist.createdAt
         )
     );
 
     setDistributorData(updatedData);
 
-    //  Update localStorage
+    // Update localStorage
     const updatedStorage = updatedData.map((item) => ({
-      companyName: item.name,
+      companyName: item.companyName,
       email: item.email,
-      mobile: item.contact,
-      date: item.lastPurchaseDate,
+      phone: item.phone,
+      createdAt: item.createdAt,
       status: item.status,
     }));
 
@@ -176,19 +175,16 @@ function DistributorReportTable() {
           />
         </Stack>
 
-        
         <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
-        <UniversalTable<DistributorRow>
-          data={filteredData}
-          showSearch={true}
-          showExport={true}
-          columns={columns}
-          enableCheckbox={true}
-          getRowId={(row) => `${row.name}-${row.lastPurchaseDate}`}
-          
-          //  DELETE 
-          onDeleteSelected={handleDeleteSelected}
-        />
+          <UniversalTable<DistributorRow>
+            data={filteredData}
+            showSearch={true}
+            showExport={true}
+            columns={columns}
+            enableCheckbox={true}
+            getRowId={(row) => `${row.companyName}-${row.createdAt}`}
+            onDeleteSelected={handleDeleteSelected}
+          />
         </div>
       </Paper>
     </FormProvider>
@@ -196,6 +192,3 @@ function DistributorReportTable() {
 }
 
 export default DistributorReportTable;
-
-
-
