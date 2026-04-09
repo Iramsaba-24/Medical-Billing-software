@@ -16,7 +16,7 @@ export interface PurchaseHistory {
 
 export interface CustomerData {
   id?: string;
-    customerId?: number;
+    customerId: number;
   name: string;
   age: string;
   phone: string;
