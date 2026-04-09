@@ -141,7 +141,7 @@ const payload = {
   totalAmount: finalTotal,
   totalGST: 0,
   totalDiscount: 0,
-  medipointsEarned: 0, 
+ medipointsEarned: Math.floor(finalTotal / 200) * 5, 
   paymentStatus: "Pending",
 };
 

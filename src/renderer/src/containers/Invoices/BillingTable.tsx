@@ -19,12 +19,13 @@ import { deleteRetailInvoice } from "@/service/retailInvoiceService";
 type Props = {
   invoices: Invoice[];
   setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
+  refetchInvoices: () => Promise<void>;
 };
 
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ invoices, setInvoices }: Props) => {
+const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
  // const location = useLocation();
 
   const navigate = useNavigate();
@@ -112,12 +113,11 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
     "Are you sure you want to delete this invoice?",
     "Confirm Delete"
   );
-
   if (!confirmed) return;
 
   try {
     await deleteRetailInvoice(Number(invoiceNo));
-    setInvoices((prev) => prev.filter((inv) => inv.invoice !== invoiceNo));
+    await refetchInvoices();
     showToast("success", "Invoice deleted successfully");
   } catch (error) {
     console.error("Error deleting invoice", error);
@@ -171,21 +171,16 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
 
             options: statusOptions,
 
-            onChange: (row, value) => {
-              setInvoices((prev) => {
-                const updated = prev.map((inv) =>
-                  inv.invoice === row.invoice
-                    ? { ...inv, paymentStatus: value as InvoiceStatus }
-                    : inv
-                );
-
-                localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-                return updated;
-              });
-
-              showToast("success", "Status updated successfully");
-            },
+     onChange: (row, value) => {
+  setInvoices((prev) =>
+    prev.map((inv) =>
+      inv.invoice === row.invoice
+        ? { ...inv, paymentStatus: value as InvoiceStatus }
+        : inv
+    )
+  );
+  showToast("success", "Status updated successfully");
+},
           }}
           actions={{
             view: (invoice) =>
@@ -196,33 +191,24 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
               }),
             delete: (invoice) => handleDelete(invoice.invoice),
           }}
-          onDeleteSelected={async (rows) => {
-            const confirmed = await showConfirmation(
-              "Delete selected invoices?",
-
-              "Confirm Delete"
-            );
-
-            if (!confirmed) return;
-
-            setInvoices((prev) => {
-              const updated = prev.filter(
-                (inv) => !rows.some((r) => r.invoice === inv.invoice)
-              );
-
-             setInvoices((prev) => {
-  const updated = prev.filter(
-    (inv) => !rows.some((r) => r.invoice === inv.invoice)
+       onDeleteSelected={async (rows) => {
+  const confirmed = await showConfirmation(
+    "Delete selected invoices?",
+    "Confirm Delete"
   );
+  if (!confirmed) return;
 
-  return updated; 
-});
-
-              return updated;
-            });
-
-            showToast("success", "Selected invoices deleted");
-          }}
+  try {
+    for (const row of rows) {
+      await deleteRetailInvoice(Number(row.invoice));
+    }
+    await refetchInvoices();
+    showToast("success", "Selected invoices deleted");
+  } catch (error) {
+    console.error("Error deleting selected invoices", error);
+    showToast("error", "Failed to delete selected invoices");
+  }
+}}
         />
       </Paper>
     </FormProvider>

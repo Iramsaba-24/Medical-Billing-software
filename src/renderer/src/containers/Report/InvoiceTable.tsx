@@ -41,7 +41,6 @@ const InvoiceTable = () => {
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  //  FIXED SYNC LOGIC
   useEffect(() => {
     const loadInvoices = () => {
       const stored = localStorage.getItem("currentInvoice");

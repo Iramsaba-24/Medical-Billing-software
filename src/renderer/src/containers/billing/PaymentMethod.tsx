@@ -8,8 +8,7 @@ import RadioField from "@/components/controlled/RadioField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
-import { updatePaymentStatus,createSingleRetailInvoiceItem } from "@/service/retailInvoiceService";
-
+import { updatePaymentStatus, createSingleRetailInvoiceItem, updateRetailInvoice, getRetailInvoiceById } from "@/service/retailInvoiceService";
 
 type PaymentMethods = {
   paymentMethod: "debitCard" | "upi" | "cash";
@@ -50,9 +49,9 @@ const PaymentMethod = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const methods = useForm<PaymentMethods>({
-    
+
     defaultValues: {
-      paymentMethod: "debitCard",    
+      paymentMethod: "debitCard",
     },
     mode: "onChange",
   });
@@ -65,75 +64,101 @@ const PaymentMethod = () => {
 
   const [finalAmount, setFinalAmount] = useState(0);
 
- 
+
 
   useEffect(() => {
-  const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
+    const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
 
-  if (stateAmount && stateAmount > 0) {
-    setFinalAmount(stateAmount);
-  }
-}, [location.state]);
-
-
-   
-
-const saveInvoice = async () => {
-  try {
-    const state = location.state as PaymentState;
-
-    console.log("location.state:", location.state);
-    console.log("state.rows:", state?.rows);
-    
-    console.log("state.invoiceId:", state?.invoiceId);
-
-    if (!state?.rows || !state?.invoiceId) {
-      console.error("Missing rows or invoiceId in state");
-      return;
+    if (stateAmount && stateAmount > 0) {
+      setFinalAmount(stateAmount);
     }
+  }, [location.state]);
 
-    //LOOP
-    for (const r of state.rows) {
-      await createSingleRetailInvoiceItem({
-        retailInvoiceId: state.invoiceId,
-        medicineId: Number(r.medicineId),
-        quantity: Number(r.quantity),
-        price: Number(r.price),
-        gstPercent: 0,
-        discount: 0,
-      });
-    }
 
-    // update payment
-    await updatePaymentStatus(state.invoiceId, "Paid");
 
-    // navigate
-    navigate(`${URL_PATH.InvoiceView}/${state.invoiceId}`, {
-      state: {
-        invoice: {
-          invoice: String(state.invoiceId),
-          name: state.customerName || "",
-          doctor: state.doctorName || "",
-          address: "",
-          date: new Date().toLocaleDateString("en-GB"),
-          medicines: state.rows.map((r) => ({
-            name: r.medicineName || String(r.medicineId),
-            qty: Number(r.quantity),
-            amount: Number(r.quantity) * Number(r.price),
-            batch: "",
-            expiry: r.expiryDate
-              ? new Date(r.expiryDate).toLocaleDateString("en-GB")
-              : "",
-          })),
+
+  const saveInvoice = async () => {
+    console.log("SAVE INVOICE CALLED");
+    try {
+      const state = location.state as PaymentState & { flow?: string };
+
+      if (!state?.invoiceId) {
+        console.error("Missing invoiceId");
+        return;
+      }
+
+      // FLOW CHECK
+      if (state.flow === "retail") {
+        if (!state.rows) {
+          console.error("Missing rows for retail");
+          return;
+        }
+
+        // Retail Items Save
+        for (const r of state.rows) {
+          await createSingleRetailInvoiceItem({
+            retailInvoiceId: state.invoiceId,
+            medicineId: Number(r.medicineId),
+            quantity: Number(r.quantity),
+            price: Number(r.price),
+            gstPercent: 0,
+            discount: 0,
+          });
+        }
+
+        const invoiceData = await getRetailInvoiceById(state.invoiceId);
+        await updateRetailInvoice(state.invoiceId, {
+          userId: invoiceData.userId,
+          customerId: invoiceData.customerId,
+          invoiceType: invoiceData.invoiceType,
+          invoiceDate: invoiceData.invoiceDate,
           totalAmount: state.totalFromInvoice,
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Payment save failed", error);
-  }
-};
-  
+          totalGST: invoiceData.totalGST,
+          totalDiscount: invoiceData.totalDiscount,
+          medipointsEarned: invoiceData.medipointsEarned,
+          paymentStatus: "Paid",
+        });
+
+        navigate(`${URL_PATH.InvoiceView}/${state.invoiceId}`, {
+
+          state: {
+            invoice: {
+
+              invoice: String(state.invoiceId),
+              name: state.customerName || "",
+              doctor: state.doctorName || "",
+              address: "",
+              date: new Date().toLocaleDateString("en-GB"),
+              medicines: state.rows.map((r) => ({
+                name: r.medicineName || String(r.medicineId),
+                qty: Number(r.quantity),
+                amount: Number(r.quantity) * Number(r.price),
+                batch: "",
+                expiry: r.expiryDate
+                  ? new Date(r.expiryDate).toLocaleDateString("en-GB")
+                  : "",
+              })),
+              totalAmount: state.totalFromInvoice,
+            },
+          },
+        });
+
+      } else if (state.flow === "new") {
+        //  DISTRIBUTOR FLOW
+        await updatePaymentStatus(state.invoiceId, "Paid");
+        navigate(`/billing/invoice-bill/${state.invoiceId}`, {
+          state: {
+            invoiceId: state.invoiceId,
+            totalAmount: state.totalFromInvoice,
+          },
+        });
+
+      }
+    } catch (error) {
+      console.error("Payment save failed", error);
+    }
+  };
+
 
   return (
     <FormProvider {...methods}>

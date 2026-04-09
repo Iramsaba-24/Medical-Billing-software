@@ -12,7 +12,7 @@ export type InventoryItem = {
   medicineId: number;
   medicineGroup: string;
   groupId: number;
-  unit: string;        // ← हे add करा
+  unit: string;        
   quantity: number;
   pricePerUnit: number;
 
@@ -34,8 +34,8 @@ type MedicineApi = {
   groupId: number;
   distributorId: number;
   gstPercentage: number;
-  unit: string;        // ← हे add करा
-};
+  unit: string;        
+}
 
 type GroupApi = {
   groupId: number;

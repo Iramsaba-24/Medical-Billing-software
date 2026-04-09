@@ -37,12 +37,11 @@ const MediPoints: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const totalFromInvoice = location.state?.totalFromInvoice || 0;
-
-  const earned = 10;
+const totalFromInvoice = location.state?.totalFromInvoice || 0;
+const earned = Math.floor(totalFromInvoice / 200) * 5;
 
   const [used, setUsed] = useState(0);
-  const [remains, setRemains] = useState(10);
+  const [remains, setRemains] = useState(earned);
 
   const [isInvalid, setIsInvalid] = useState(false);
 

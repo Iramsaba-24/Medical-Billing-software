@@ -1,5 +1,3 @@
-
-
 import { Box, Button, Container, Typography } from "@mui/material";
 import {  useNavigate } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg";
@@ -25,7 +23,7 @@ const getGreeting = () => {
 
 const LandingPage = () => {
   const navigate = useNavigate();
- 
+  // const location = useLocation();
   const greeting = getGreeting();
 
   // const { username, licenseKey } = location.state || {};

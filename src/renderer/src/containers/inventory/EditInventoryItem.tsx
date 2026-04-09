@@ -1,7 +1,6 @@
 import { Box, Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
-
 import NumericField from "@/components/controlled/NumericField";
 import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";

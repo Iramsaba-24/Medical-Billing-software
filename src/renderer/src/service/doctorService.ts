@@ -113,6 +113,3 @@ export const deleteDoctor = async (id: number): Promise<void> => {
     getAuthHeaders() // token
   );
 };
- 
- 
- 

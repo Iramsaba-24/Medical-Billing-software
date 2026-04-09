@@ -186,3 +186,11 @@ export const updateRetailInvoice = async (
   );
   return res.data;
 };
+
+export const deleteRetailInvoiceItemsByInvoiceId = async (invoiceId: number) => {
+  const res = await axios.delete(
+    `${API_ENDPOINTS.RETAIL_INVOICE_ITEMS}/by-invoice/${invoiceId}`,
+    getAuthHeaders()
+  );
+  return res.data;
+};

@@ -7,10 +7,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
 import TextInputField from "@/components/controlled/TextInputField";
-import { getRetailInvoiceById, getRetailInvoiceItemsByInvoiceId, updateRetailInvoice  } from "@/service/retailInvoiceService";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
 import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat"; 
+import { getAllCustomers } from "@/service/customerService";
+import { updateRetailInvoice, getRetailInvoiceById, createSingleRetailInvoiceItem } from "@/service/retailInvoiceService";
+import { deleteRetailInvoiceItemsByInvoiceId, getRetailInvoiceItemsByInvoiceId  } from "@/service/retailInvoiceService";
 
 
 import { useEffect, useState } from "react";
@@ -81,19 +83,22 @@ const EditInvoice = () => {
   ];
 
   // Load Customers
-  useEffect(() => {
-    const stored = localStorage.getItem("medical_customers");
-    if (!stored) return;
-
-    const parsed: DropdownOption[] = JSON.parse(stored);
-
-    setCustomerOptions(
-      parsed.map((c) => ({
-        label: c.label,
-        value: c.value,
-      }))
-    );
-  }, []);
+useEffect(() => {
+  const fetchCustomers = async () => {
+    try {
+      const data = await getAllCustomers();
+      setCustomerOptions(
+        data.map((c) => ({
+          label: c.name,
+          value: c.name,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching customers", error);
+    }
+  };
+  fetchCustomers();
+}, []);
 
   // Load Inventory
   useEffect(() => {
@@ -113,7 +118,7 @@ const EditInvoice = () => {
     });
   }, [watchedItems, inventoryOptions, setValue]);
 
-  // Load inventory
+ 
 
 useEffect(() => {
   const fetchMedicines = async () => {
@@ -168,17 +173,43 @@ useEffect(() => {
 const onSubmit = async (data: InvoiceFormData) => {
   try {
     const invoice = await getRetailInvoiceById(Number(invoiceNo));
+
+   const newTotal = data.items.reduce(
+  (sum, item) => sum + Number(item.price),
+  0
+);
+
+    // invoice update 
     await updateRetailInvoice(Number(invoiceNo), {
       userId: invoice.userId,
       customerId: invoice.customerId,
       invoiceType: invoice.invoiceType,
       invoiceDate: invoice.invoiceDate,
-      totalAmount: invoice.totalAmount,
+      totalAmount: newTotal,
       totalGST: invoice.totalGST,
       totalDiscount: invoice.totalDiscount,
       medipointsEarned: invoice.medipointsEarned,
       paymentStatus: data.status,
     });
+
+   
+    await deleteRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
+
+  
+    for (const item of data.items) {
+      const selectedItem = inventoryOptions.find(i => i.value === item.item);
+      if (!selectedItem) continue;
+
+      await createSingleRetailInvoiceItem({
+        retailInvoiceId: Number(invoiceNo),
+        medicineId: Number(item.item),
+        quantity: Number(item.qty),
+        price: selectedItem.price,
+        gstPercent: 0,
+        discount: 0,
+      });
+    }
+
     navigate(URL_PATH.Invoices);
   } catch (error) {
     console.error("Error updating invoice", error);

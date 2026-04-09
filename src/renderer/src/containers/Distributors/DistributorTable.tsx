@@ -107,7 +107,7 @@ const Distributors = () => {
 
   const handleSave = async (updatedDistributor: Distributor) => {
   try {
-    // Backend ला अपडेट पाठवा
+    
     await updateDistributor(
       parseInt(updatedDistributor.id),
       {
