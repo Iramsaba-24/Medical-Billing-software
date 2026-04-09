@@ -1,14 +1,6 @@
-
 import { useState, useMemo, useEffect } from "react";
-import {
-  Paper,
-  Typography,
-  Chip,
-  Stack,
-  Divider,
-} from "@mui/material";
+import { Paper, Typography, Chip, Stack, Divider } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
-
 import { useForm, FormProvider } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
 
@@ -42,32 +34,24 @@ const InvoiceTable = () => {
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  //  FIXED SYNC LOGIC
+  // ✅ API CALL (NO LOCALSTORAGE)
   useEffect(() => {
-    const loadInvoices = () => {
-      const stored = localStorage.getItem("currentInvoice");
-      const parsed: InvoiceData[] = stored ? JSON.parse(stored) : [];
-      setInvoices(parsed);
+    const fetchInvoices = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/invoices");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch invoices");
+        }
+
+        const data: InvoiceData[] = await res.json();
+        setInvoices(data);
+      } catch (error) {
+        console.error("Error fetching invoices:", error);
+      }
     };
 
-    loadInvoices();
-
-    // cross-tab sync
-    const handleStorageChange = () => {
-      loadInvoices();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    // same-tab fallback sync
-    const interval = setInterval(() => {
-      loadInvoices();
-    }, 1000);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      clearInterval(interval);
-    };
+    fetchInvoices();
   }, []);
 
   // FILTER LOGIC
@@ -76,7 +60,11 @@ const InvoiceTable = () => {
       const matchesStatus =
         statusFilter === "All" || inv.status === statusFilter;
 
+      if (!inv.date) return false;
+
       const parts = inv.date.split("/");
+      if (parts.length !== 3) return false;
+
       const invDate = new Date(
         Number(parts[2]),
         Number(parts[1]) - 1,
@@ -103,21 +91,6 @@ const InvoiceTable = () => {
       return matchesStatus && matchesTime;
     });
   }, [invoices, statusFilter, timeFilter]);
-
-  // DELETE FUNCTION
-  const handleDeleteSelected = (rowsToDelete: InvoiceData[]) => {
-    const updatedInvoices = invoices.filter(
-      (inv) =>
-        !rowsToDelete.some((row) => row.invoice === inv.invoice)
-    );
-
-    setInvoices(updatedInvoices);
-
-    localStorage.setItem(
-      "currentInvoice",
-      JSON.stringify(updatedInvoices)
-    );
-  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -211,7 +184,6 @@ const InvoiceTable = () => {
             showExport
             enableCheckbox
             getRowId={(row) => row.invoice}
-            onDeleteSelected={handleDeleteSelected}
           />
         </div>
       </Paper>

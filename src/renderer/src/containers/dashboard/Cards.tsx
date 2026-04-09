@@ -44,7 +44,7 @@ const filterOptions = [
   { label: "6 Days", value: "6 Days" },
   { label: "This Month", value: "This Month" },
 ];
- 
+  
 const getGridArea = (title: string) => {
   switch (title) {
     case "Inventory":

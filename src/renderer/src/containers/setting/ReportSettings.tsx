@@ -107,26 +107,26 @@ const ReportSettings = () => {
         </Paper>
         {/*  Buttons- save reset*/}
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, gap: 4 }}>
-<Button
-  variant="outlined"
-  onClick={() => {
-    reset(DEFAULT_VALUES);
-    localStorage.setItem("report_settings", JSON.stringify(DEFAULT_VALUES));
-    showToast("success", "Settings reset to default");
-  }}
-  sx={{
-    color: "#238878",
-    border: "2px solid #238878",
-    textTransform: "none",
-    "&:hover": {
-      backgroundColor: "#238878",
-      color: "#fff",
-      border: "2px solid #238878",
-    },
-  }}
->
-  Reset
-</Button>
+        <Button
+          variant="outlined"
+          onClick={() => {
+            reset(DEFAULT_VALUES);
+            localStorage.setItem("report_settings", JSON.stringify(DEFAULT_VALUES));
+            showToast("success", "Settings reset to default");
+          }}
+          sx={{
+            color: "#238878",
+            border: "2px solid #238878",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+            },
+          }}
+        >
+          Reset
+        </Button>
           <Button 
               type="submit" 
               variant="contained" 

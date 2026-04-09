@@ -5,6 +5,9 @@ import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
 import { useForm, FormProvider } from "react-hook-form"; 
 import DropdownField from "@/components/controlled/DropdownField"; 
 
+// ✅ API IMPORT
+import { getDistributors, DistributorResponse } from "@/service/distributorService";
+
 // TYPES 
 type DistributorRow = {
   companyName: string;
@@ -15,20 +18,10 @@ type DistributorRow = {
   purchaseAmount?: number;
 };
 
-type DistributorStorage = {
-  companyName: string;
-  email: string;
-  phone: string;
-  createdAt: string;
-  status?: "Active" | "Inactive";
-  purchaseAmount: number;
-};
-
 type FilterForm = {
   statusFilter: string;
   timeFilter: string;
 };
-
 
 const columns = [
   { key: "companyName", label: "Company Name" },
@@ -66,26 +59,43 @@ function DistributorReportTable() {
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  // LOAD FROM LOCALSTORAGE
   useEffect(() => {
-    const stored = localStorage.getItem("distributors");
+    const fetchDistributors = async () => {
+      try {
+        const response: DistributorResponse[] = await getDistributors();
 
-    const parsed: DistributorStorage[] = stored
-      ? JSON.parse(stored)
-      : [];
+        const formattedData: DistributorRow[] = response.map((item) => ({
+          companyName: item.companyName || "",
+          email: item.email || "",
+          phone: item.phone || "",
+          createdAt: item.createdDate
+            ? new Date(item.createdDate).toISOString()
+            : "",
+          status: "Active",
+        }));
 
-    const formattedData: DistributorRow[] = parsed.map((item) => ({
-      companyName: item.companyName,
-      email: item.email,
-      phone: item.phone,
-      createdAt: item.createdAt,
-      status: item.status ?? "Active",
-    }));
+        setDistributorData(formattedData);
+      } catch (error) {
+        console.error("Failed to fetch distributors", error);
+        setDistributorData([]);
+      }
+    };
 
-    setDistributorData(formattedData);
+    // 🔥 initial load
+    fetchDistributors();
+
+    // 🔥 auto refetch on page focus (same as customer table logic)
+    const handleFocus = () => {
+      fetchDistributors();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
-  // FILTER LOGIC
   const filteredData = useMemo(() => {
     return distributorData.filter((distributor) => {
 
@@ -110,32 +120,6 @@ function DistributorReportTable() {
       return matchesStatus && matchesTime;
     });
   }, [statusFilter, timeFilter, distributorData]);
-
-  // DELETE SELECTED ROWS
-  const handleDeleteSelected = (rowsToDelete: DistributorRow[]) => {
-    const updatedData = distributorData.filter(
-      (dist) =>
-        !rowsToDelete.some(
-          (row) =>
-            row.companyName === dist.companyName &&
-            row.createdAt === dist.createdAt
-        )
-    );
-
-    setDistributorData(updatedData);
-
-    // Update localStorage
-    const updatedStorage = updatedData.map((item) => ({
-      companyName: item.companyName,
-      email: item.email,
-      phone: item.phone,
-      createdAt: item.createdAt,
-      status: item.status,
-    }));
-
-    localStorage.setItem("distributors", JSON.stringify(updatedStorage));
-    window.dispatchEvent(new Event("reportUpdated"));
-  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -181,9 +165,7 @@ function DistributorReportTable() {
             showSearch={true}
             showExport={true}
             columns={columns}
-            enableCheckbox={true}
             getRowId={(row) => `${row.companyName}-${row.createdAt}`}
-            onDeleteSelected={handleDeleteSelected}
           />
         </div>
       </Paper>

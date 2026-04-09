@@ -13,23 +13,25 @@ import DropdownField from "@/components/controlled/DropdownField";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
 
 export interface ItemRow {
-  id: number;
-  name: string;
-  medicineId?: number;
+  retailItemId: number;
+  retailInvoiceId?: number;
+  medicineId: string;
+  medicineName?: string;
+  expiryDate?: string;
   quantity: number | "";
-  mrp: number | "";
-  expiry?: string;
+  price: number | "";
+  amount?: number;
 }
 
 export type InventoryItem = {
   itemName: string;
-  medicineId: number;
+  medicineId: string;
   quantity: number;
   pricePerUnit: number;
   expiryDate: string;
 };
 
-interface ItemsSectionProps {
+interface RetailItemsSectionProps {
   rows: ItemRow[];
   setRows: (rows: ItemRow[]) => void;
   finalTotal: number;
@@ -38,36 +40,28 @@ interface ItemsSectionProps {
   setGst?: (value: number) => void;
 }
 
-const ItemsSection = ({
+const RetailItemSection = ({
   rows,
   setRows,
 
   isSubmitted,
   gst = 0,
   setGst,
-}: ItemsSectionProps) => {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+}: RetailItemsSectionProps) => {
 
-  useEffect(() => {
-  const fetchInventory = async () => {
+  
+const [inventory, setInventory] = useState<MedicineResponse[]>([]);
+
+ useEffect(() => {
+  const fetchMedicines = async () => {
     try {
-      const data: MedicineResponse[] = await getMedicines();
-
-      const formatted: InventoryItem[] = data.map((item) => ({
-        itemName: item.itemName,
-        medicineId: item.medicineId,
-        quantity: item.quantity,
-        pricePerUnit: item.pricePerUnit,
-        expiryDate: item.expiryDate,
-      }));
-
-      setInventory(formatted);
+      const data = await getMedicines();
+      setInventory(data);
     } catch (error) {
-      console.error("Inventory fetch error:", error);
+      console.error("Error fetching medicines", error);
     }
   };
-
-  fetchInventory();
+  fetchMedicines();
 }, []);
 
   const itemOptions = inventory.map((item) => ({
@@ -75,10 +69,19 @@ const ItemsSection = ({
     value: item.itemName,
   }));
 
-  const addRow = () =>
-    setRows([...rows, { id: Date.now(), name: "", quantity: "", mrp: "", expiry: "" }]);
+const addRow = () =>
+  setRows([
+    ...rows,
+    {
+      retailItemId: Date.now(),
+      medicineId: "",
+      quantity: "",
+      price: "",
+      amount: 0,
+    },
+  ]);
 
-  const removeRow = (id: number) => setRows(rows.filter((r) => r.id !== id));
+  const removeRow = (id: number) => setRows(rows.filter((r) => r.retailItemId  !== id));
 
   const updateRow = (
     id: number,
@@ -87,9 +90,9 @@ const ItemsSection = ({
   ) => {
     setRows(
       rows.map((r) => {
-        if (r.id === id) {
+        if (r.retailItemId  === id) {
           if (
-            (field === "quantity" || field === "mrp") &&
+            (field === "quantity" || field === "price") &&
             value !== "" &&
             Number(value) < 0
           )
@@ -102,30 +105,33 @@ const ItemsSection = ({
     );
   };
 
-  const handleNameChange = (id: number, selectedName: string) => {
-    const item = inventory.find(
-      (i) =>
-        i.itemName.trim().toLowerCase() === selectedName.trim().toLowerCase()
-    );
 
-    setRows(
-      rows.map((r) => {
-        if (r.id === id) {
-          return {
-            ...r,
-            medicineId: item?.medicineId || 0,   
-            name: selectedName,
-            mrp: item ? Number(item.pricePerUnit) : "",
-            expiry: item ? item.expiryDate : "",
-          };
-        }
-        return r;
-      })
-    );
-  };
+
+const handleNameChange = (id: number, selectedName: string) => {
+  const item = inventory.find(
+    (i) =>
+      i.itemName.trim().toLowerCase() === selectedName.trim().toLowerCase()
+  );
+
+  setRows(
+    rows.map((r) => {
+      if (r.retailItemId === id) {
+     return {
+  ...r,
+  medicineId: item ? String(item.medicineId) : "",
+  medicineName: item ? item.itemName : "",
+  expiryDate: item ? item.expiryDate : "",
+  price: item ? Number(item.pricePerUnit) : "",
+};
+      }
+      return r;
+    })
+  );
+};
+
 
   const subTotal = rows.reduce((acc, row) => {
-    return acc + Number(row.quantity) * Number(row.mrp);
+    return acc + Number(row.quantity) * Number(row.price);
   }, 0);
 
   const finalWithGst = subTotal + (subTotal * gst) / 100;
@@ -165,13 +171,13 @@ const ItemsSection = ({
           isSubmitted && (row.quantity === "" || Number(row.quantity) <= 0);
 
         const priceError =
-          isSubmitted && (row.mrp === "" || Number(row.mrp) <= 0);
+          isSubmitted && (row.price === "" || Number(row.price) <= 0);
 
-        const nameError = isSubmitted && row.name.trim() === "";
+        const nameError = isSubmitted && row.medicineId.trim() === "";
 
         return (
           <Box
-            key={row.id}
+            key={row.retailItemId}
             sx={{
               display: "grid",
               gridTemplateColumns: {
@@ -184,10 +190,10 @@ const ItemsSection = ({
             }}
           >
             <DropdownField
-              name={`item_${row.id}`}
+              name={`item_${row.retailItemId}`}
               label="Item Name"
               options={itemOptions}
-              value={row.name}
+              value={row.medicineId}
               editable
               freeSolo={false}
               alphanumeric
@@ -195,7 +201,7 @@ const ItemsSection = ({
               error={nameError}
               helperText={nameError ? "Please select item" : ""}
               onChangeCallback={(value) => {
-                handleNameChange(row.id, value);
+                handleNameChange(row.retailItemId, value);
               }}
             />
 
@@ -210,7 +216,7 @@ const ItemsSection = ({
               }
               onChange={(e) =>
                 updateRow(
-                  row.id,
+                  row.retailItemId,
                   "quantity",
                   e.target.value === "" ? "" : Number(e.target.value)
                 )
@@ -223,19 +229,19 @@ const ItemsSection = ({
               type="number"
               required
               disabled
-              value={row.mrp}
+              value={row.price}
               error={priceError}
             />
 
             <TextField
               label="Total"
-              value={(Number(row.quantity) * Number(row.mrp)).toFixed(2)}
+              value={(Number(row.quantity) * Number(row.price)).toFixed(2)}
               disabled
             />
 
             <Box display="flex" justifyContent="center">
               {rows.length > 1 && (
-                <IconButton onClick={() => removeRow(row.id)} color="error">
+                <IconButton onClick={() => removeRow(row.retailItemId)} color="error">
                   <Remove />
                 </IconButton>
               )}
@@ -297,4 +303,4 @@ const ItemsSection = ({
   );
 };
 
-export default ItemsSection;
+export default RetailItemSection;

@@ -4,29 +4,49 @@ import { URL_PATH } from "@/constants/UrlPath";
 import TotalItems from "@/assets/TotalItems.svg";
 import LowStock from "@/assets/warningsign.svg";
 import TotalValue from "@/assets/TotalValue.svg";
-import type { InventoryItem } from "@/containers/inventory/AddInventoryItem";
 import InventoryList from "@/containers/inventory/InventoryList";
 import GroupSummary from "@/containers/inventory/GroupSummary";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
+import { useState, useEffect } from "react";
+import type { MedicineResponse } from "@/service/medicineService";
+
  
 export default function InventoryPage() {
   const navigate = useNavigate();
  
-   const inventory: InventoryItem[] = JSON.parse(
-  localStorage.getItem("inventory") || "[]"
- );
- 
-  const totalItems = inventory.length;
- 
-  const lowStockItems = inventory.filter(
-  (item) => item.stockQty > 0 && item.stockQty < 10
-  ).length;
-  length;
- 
-  const totalValue = inventory.reduce(
-    (sum, item) => sum + item.stockQty * item.pricePerUnit,
-    0
-  );
- 
+
+const [stats, setStats] = useState({ totalItems: 0, lowStockItems: 0, totalValue: 0 });
+
+
+useEffect(() => {
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(API_ENDPOINTS.MEDICINE, {
+        headers: { Authorization: token ? `Bearer ${token}` : "" },
+      });
+
+      const medicines: MedicineResponse[] = res.data.data;
+
+    
+      console.log("isLowStock check:", medicines.map(m => ({
+        name: m.itemName,
+        isLowStock: m.isLowStock,
+        finalPrice: m.finalPrice
+      })));
+
+      const totalItems = medicines.length;
+      const lowStockItems = medicines.filter(m => m.quantity > 0 && m.quantity <= 10).length;
+      const totalValue = medicines.reduce((sum, m) => sum + m.finalPrice, 0);
+
+      setStats({ totalItems, lowStockItems, totalValue });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
+  };
+  fetchStats();
+}, []);
 return (
     <Box>
       <Box>
@@ -51,9 +71,9 @@ return (
         mb={3}
       >
         {[
-          { label: "Total Items", value: totalItems, img: TotalItems },
-          { label: "Low Stock Items", value: lowStockItems, img: LowStock },
-          { label: "Total Value", value: `₹ ${totalValue}`, img: TotalValue },
+          { label: "Total Items", value: stats.totalItems, img: TotalItems },
+{ label: "Low Stock Items", value: stats.lowStockItems, img: LowStock },
+{ label: "Total Value (GST incl.)", value: `₹ ${stats.totalValue.toFixed(2)}`, img: TotalValue },
         ].map((card) => (
           <Paper
             key={card.label}

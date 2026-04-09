@@ -1,10 +1,5 @@
 
-import {
-  Box,
-  Grid,
-  Paper,
-  Button,
-} from "@mui/material";
+import {Box,Grid,Paper,Button,} from "@mui/material";
 import { FormProvider, useForm, FieldErrors } from "react-hook-form";
 import { useState, useEffect } from "react";
 import EmailField from "@/components/controlled/EmailField";
@@ -14,8 +9,12 @@ import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
 import InvoiceTabButtons from "./InvoiceTabButtons";
-import ItemsSection from "@/containers/customer/ItemsSection";
+import ItemsSection from "@/containers/Customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
+import { getDistributors } from "@/service/distributorService";
+import { createInvoice } from "@/service/distributorInvoiceService";
+import { addDistributorInvoiceItem } from "@/service/distributorInvoiceItemService";
+
  
 const BORDER_COLOR = "#D1D5DB";
 const containerStyle = {
@@ -41,7 +40,7 @@ const PayNPrint = {
 };
  
 type Distributor = {
-  id: string;
+  id: number;
   companyName: string;
   ownerName?: string;
   mobile: string;
@@ -63,6 +62,7 @@ type FormData = {
 type ItemRow = {
   id: number;
   name: string;
+  medicineId?: number; 
   quantity: number | "";
   mrp: number | "";
   expiry?: string;
@@ -96,13 +96,30 @@ const NewInvoice = () => {
  
   /* LOAD DISTRIBUTORS */
  
-  useEffect(() => {
-    const saved = localStorage.getItem("distributors");
-    if (saved) {
-      const parsed: Distributor[] = JSON.parse(saved);
-      setDistributors(parsed);
+useEffect(() => {
+  const fetchDistributors = async () => {
+    try {
+      const data = await getDistributors();
+
+      const formatted = data.map((d) => ({
+        id: d.distributorId,
+        companyName: d.companyName,
+        ownerName: d.ownerName,
+        mobile: d.phone,
+        email: d.email,
+        address: d.address,
+        status: "Active" as const,
+        gstIn: d.gstin,
+      }));
+
+      setDistributors(formatted);
+    } catch (error) {
+      console.error("Distributor fetch error:", error);
     }
-  }, []);
+  };
+
+  fetchDistributors();
+}, []);
  
   const selectedCompany = watch("company");
   useEffect(() => {
@@ -114,52 +131,75 @@ const NewInvoice = () => {
   (d) => d.companyName === selectedCompany
 );
  
-  const onSubmit = (data: FormData) => {
-    setIsSubmitted(true);
-    if (rows.some((r) => !r.name || !r.quantity || !r.mrp)) {
-      showToast("error", "Please fill all item details");
-      return;
-    }
- 
+const onSubmit = async (data: FormData) => {
+  console.log("DATA:", data);
+
+  setIsSubmitted(true);
+
+  if (!selectedDistributor) {
+    showToast("error", "Please select distributor");
+    return;
+  }
+
+  if (rows.some((r) => !r.name || !r.quantity || !r.mrp)) {
+    showToast("error", "Please fill all item details");
+    return;
+  }
+
+  try {
     const gstAmount = (finalTotal * gst) / 100;
     const grandTotal = finalTotal + gstAmount;
-    const existingInvoices = JSON.parse(
-      localStorage.getItem("currentNewInvoice") || "[]"
-    );
- 
-    const newInvoice = {
-      id: Date.now(),
-      company: data.company,
-      supplier: data.supplier,
-      mobile: data.mobile,
-      email: data.email,
-      address: data.address,
-      gst: gst, 
-        gstIn: selectedDistributor?.gstIn || "",     
-  distributorId: selectedDistributor?.id || "",      
-      medicines: rows.map((r) => ({
-      name: r.name,
-        quantity: r.quantity,
-          mrp: r.mrp, 
-        amount: Number(r.quantity || 0) * Number(r.mrp || 0),
-        batch: "",
-        expiry: r.expiry || "",
-      })),
+
+    // Create Invoice
+    const invoiceRes = await createInvoice({
+      distributorId: selectedDistributor.id,
+      invoiceType: "DISTRIBUTOR",
+      invoiceDate: new Date().toISOString(),
       totalAmount: grandTotal,
-    };
- 
-    const updatedInvoices = [...existingInvoices, newInvoice];
-    localStorage.setItem("currentNewInvoice", JSON.stringify(updatedInvoices));
-    showToast("success", "Data saved successfully!");
- 
- 
-    navigate(URL_PATH.PaymentMethod, {
-  state: {
-    flow: "new",
-    totalFromInvoice: grandTotal,
-  },
-});
+      totalGST: gstAmount,
+      totalDiscount: 0,
+      medipointsEarned: 0,
+      paymentStatus: "PENDING",
+    });
+
+    const invoiceId = invoiceRes.invoiceId;
+
+    //  Save Items
+const itemsPayload = rows.map((r) => {
+  const qty = Number(r.quantity);
+  const mrp = Number(r.mrp);
+
+  return {
+    invoiceId: invoiceId,        
+    medicineId: r.medicineId || 0,
+    quantity: qty,
+    mrp: mrp,                    
+    discountPrice: 0,            
+    amount: qty * mrp            
   };
+});
+
+    console.log("Items Payload:", itemsPayload);
+
+for (const item of itemsPayload) {
+  await addDistributorInvoiceItem(item);
+}
+
+    showToast("success", "Invoice + Items saved!");
+
+    navigate(URL_PATH.PaymentMethod, {
+      state: {
+        flow: "new",
+        totalFromInvoice: grandTotal,
+        invoiceId: invoiceId, 
+      },
+    });
+
+  } catch (error) {
+    console.error(error);
+    showToast("error", "Failed to create invoice");
+  }
+};
  
   const onError = (formErrors: FieldErrors<FormData>) => {
     console.log("FORM ERRORS:", formErrors);

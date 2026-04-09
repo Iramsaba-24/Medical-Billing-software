@@ -3,51 +3,139 @@ import {ACTION_KEY,Column,UniversalTable,} from "@/components/uncontrolled/Unive
 import { useEffect, useState } from "react";
 import {showConfirmation,showSnackbar,} from "@/components/uncontrolled/ToastMessage";
 import EditInventoryItem from "@/containers/inventory/EditInventoryItem";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
+import axios from "axios";
+import { deleteMedicine } from "@/service/medicineService";
 
 export type InventoryItem = {
   itemName: string;
   medicineId: number;
   medicineGroup: string;
+  groupId: number;
+  unit: string;        
   quantity: number;
   pricePerUnit: number;
-  gst: "12%";
+
   expiryDate: string;
+
   supplier: string;
+  distributorId: number;
+
+  gst: string;
 };
+
+
+type MedicineApi = {
+  medicineId: number;
+  itemName: string;
+  quantity: number;
+  pricePerUnit: number;
+  expiryDate: string;
+  groupId: number;
+  distributorId: number;
+  gstPercentage: number;
+  unit: string;        
+}
+
+type GroupApi = {
+  groupId: number;
+  groupName: string;
+};
+
+type DistributorApi = {
+  distributorId: number;
+  companyName: string;
+};
+
 
 const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]);
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("inventory");
-    if (!stored) return setTableData([]);
 
-    const parsed: InventoryItem[] = JSON.parse(stored).map(
-      (item: InventoryItem) => ({
-        ...item,
-        quantity: Number(item.quantity),
-      }),
-    );
-    setTableData(parsed);
-  }, []);
+
+
+
+const fetchInventory = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const headers = { Authorization: token ? `Bearer ${token}` : "" };
+
+    const [medRes, groupRes, distRes] = await Promise.all([
+      axios.get<{ data: MedicineApi[] }>(API_ENDPOINTS.MEDICINE, { headers })
+        .catch(e => axios.isAxiosError(e) && e.response?.status === 404 
+          ? { data: { data: [] as MedicineApi[] } } 
+          : Promise.reject(e)),
+
+      axios.get<{ data: GroupApi[] }>(API_ENDPOINTS.MEDICINE_GROUP, { headers })
+        .catch(e => axios.isAxiosError(e) && e.response?.status === 404 
+          ? { data: { data: [] as GroupApi[] } } 
+          : Promise.reject(e)),
+
+     axios.get<{ data: DistributorApi[] }>(API_ENDPOINTS.DISTRIBUTOR, { headers })
+  .catch(() => ({ data: { data: [] as DistributorApi[] } })),
+    ]);
+
+    const medicines = medRes.data?.data || [];
+    const groups = groupRes.data?.data || [];
+    const distributorsData = Array.isArray(distRes.data)
+      ? distRes.data
+      : distRes.data?.data || [];
+
+
+    const groupMap: Record<number, string> = {};
+    groups.forEach((g) => {
+      groupMap[g.groupId] = g.groupName;
+    });
+
+    const distributorMap: Record<number, string> = {};
+    distributorsData.forEach((d: DistributorApi) => {
+      distributorMap[Number(d.distributorId)] = d.companyName;
+    });
+
+    const formatted: InventoryItem[] = medicines.map((item) => ({
+      itemName: item.itemName,
+      medicineId: item.medicineId,
+      medicineGroup: groupMap[item.groupId] || "N/A",
+      groupId: item.groupId,
+      unit: item.unit || "N/A",
+      quantity: item.quantity,
+      pricePerUnit: item.pricePerUnit,
+      expiryDate: item.expiryDate.split("T")[0],
+      supplier: distributorMap[item.distributorId] || "N/A",
+      distributorId: item.distributorId,
+      gst: `${item.gstPercentage}%`,
+    }));
+
+    setTableData(formatted);
+  } catch (error) {
+    console.error("Error fetching inventory:", error);
+  }
+};
+
+useEffect(() => {
+  fetchInventory();
+}, []);
+
 
   // DELETE
-  const handleDelete = (item: InventoryItem) => {
-    showConfirmation("Delete item?", "Confirm").then((ok) => {
-      if (!ok) return;
-
-      const updated = tableData.filter((i) => i.medicineId !== item.medicineId);
-
-      setTableData(updated);
-      localStorage.setItem("inventory", JSON.stringify(updated));
-
-      window.dispatchEvent(new Event("inventoryUpdated"));
-
+const handleDelete = (item: InventoryItem) => {
+  showConfirmation("Delete item?", "Confirm").then(async (ok) => {
+    if (!ok) return;
+    try {
+      await deleteMedicine(item.medicineId);
+      setTableData(prev => prev.filter((i) => i.medicineId !== item.medicineId));
       showSnackbar("success", "Item deleted successfully");
-    });
-  };
+    } catch (err) {
+      if (err instanceof Error) {
+        showSnackbar("error", err.message);
+      } else {
+        showSnackbar("error", "Delete failed");
+      }
+    }
+  });
+};
 
   const getStatus = (qty: number) => {
     if (qty === 0) return "Out of Stock";
@@ -182,10 +270,13 @@ const InventoryList = () => {
       </Dialog>
       <EditInventoryItem
         open={!!editItem}
-        onClose={() => setEditItem(null)}
+        onClose={() => {
+    setEditItem(null);
+    fetchInventory();
+  }}
         item={editItem}
-        tableData={tableData}
-        setTableData={setTableData}
+        // tableData={tableData}
+        // setTableData={setTableData}
       />
     </>
   );
