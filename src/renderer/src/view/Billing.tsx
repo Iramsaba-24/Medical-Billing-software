@@ -105,7 +105,6 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
     },
   });
  
- 
  const onSubmit = async () => {
   setIsSubmitted(true);
  
@@ -124,19 +123,27 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
     const now = new Date();
     const customerName = methods.getValues("name");
     const doctorName = methods.getValues("doctor");
+   
+   const selectedCustomer = customerOptions.find(
+  (c) => c.name === customerName
+);
  
-    const payload = {
-      userId: 1,
-      customerId: selectedCustomer?.customerId || 0,
-      customerName: customerName,
-      invoiceType: "Retail",
-      invoiceDate: now.toISOString(),
-      totalAmount: finalTotal,
-      totalGST: 0,
-      totalDiscount: 0,
-      medipointsEarned: 0,
-      paymentStatus: "Pending",
-    };
+if (!selectedCustomer) {
+  console.error("Customer not selected");
+  return;
+}
+const customerId: number = selectedCustomer.customerId;
+const payload = {
+  userId: 1,
+  customerId: customerId,
+  invoiceType: "Retail",
+  invoiceDate: now.toISOString(),
+  totalAmount: finalTotal,
+  totalGST: 0,
+  totalDiscount: 0,
+ medipointsEarned: Math.floor(finalTotal / 200) * 5,
+  paymentStatus: "Pending",
+};
  
     const res = await createRetailInvoice(payload);
  
@@ -185,7 +192,7 @@ useEffect(() => {
       },
     ]);
   }
-}, [activeInvoice]);
+}, [activeInvoice, invoiceDataMap]);
  
  
   const [doctorOptions, setDoctorOptions] = useState<
@@ -211,11 +218,7 @@ useEffect(() => {
   fetchDoctors();
 }, []);
   const selectedDoctorName = methods.watch("doctor");
-const selectedCustomerName = methods.watch("name");
- 
-const selectedCustomer = customerOptions.find(
-  (c) => c.name === selectedCustomerName
-);
+  const selectedCustomerName = methods.watch("name");
  
 const nameOptions = [
   { label: "+ Add Customer", value: "add_customer" },
@@ -233,6 +236,9 @@ useEffect(() => {
  
   if (!selectedCustomerName) return;
  
+  const selectedCustomer = customerOptions.find(
+    (c) => c.name === selectedCustomerName
+  );
  
   if (selectedCustomer) {
     methods.setValue("age", selectedCustomer.age || "");
@@ -257,7 +263,7 @@ useEffect(() => {
       );
     }
   }
-}, [selectedCustomerName, customerOptions, doctorList]);
+}, [selectedCustomerName, customerOptions, methods, navigate, doctorList]);
  
  
 useEffect(() => {

@@ -18,7 +18,7 @@ export interface RetailInvoiceResponse {
   totalAmount: number;
   paymentStatus: string;
   customerName: string;
-  invoiceDate: string;
+  invoiceDate: string; 
 }
  
 export interface RetailInvoiceItemPayload {
@@ -157,20 +157,35 @@ export const getRetailInvoiceItemsByInvoiceId = async (invoiceId: number) => {
     getAuthHeaders()
   );
   return res.data;
-};
- 
-//update invoice
+}; 
+
+
 export const updateRetailInvoice = async (
   id: number,
-  data: Partial<RetailInvoicePayload>
+  data: {
+    userId: number;
+    customerId: number;
+    invoiceType: string;
+    invoiceDate: string;
+    totalAmount: number;
+    totalGST: number;
+    totalDiscount: number;
+    medipointsEarned: number;
+    paymentStatus: string;
+  }
 ) => {
   const res = await axios.put(
     `${API_ENDPOINTS.RETAIL_INVOICE}/${id}`,
     data,
     getAuthHeaders()
   );
- 
   return res.data;
 };
- 
- 
+
+export const deleteRetailInvoiceItemsByInvoiceId = async (invoiceId: number) => {
+  const res = await axios.delete(
+    `${API_ENDPOINTS.RETAIL_INVOICE_ITEMS}/by-invoice/${invoiceId}`,
+    getAuthHeaders()
+  );
+  return res.data;
+};

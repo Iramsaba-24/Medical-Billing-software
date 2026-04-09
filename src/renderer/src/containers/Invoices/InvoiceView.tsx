@@ -1,4 +1,6 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, Box, TableRow, Typography, Button, GlobalStyles, useMediaQuery, useTheme } from "@mui/material"
+import { Paper, Table, TableBody, TableCell, TableContainer,
+   Box, TableRow, Typography, Button, GlobalStyles, useMediaQuery, 
+   useTheme } from "@mui/material"
 import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
 import {  useNavigate, useParams } from "react-router-dom";
@@ -125,11 +127,11 @@ if (data) {
 }, [invoiceNo, navigate]);
  
  
-  const subTotal = invoice?.medicines?.reduce(
-    (sum, med) => sum + Number(med.amount), 0) || 0;
+const subTotal = invoice?.medicines?.reduce(
+  (sum, med) => sum + Number(med.amount), 0) || 0;
 
- 
-  const netTotal = subTotal ;
+const discountedTotal = invoice?.totalAmount ?? subTotal;
+const netTotal = discountedTotal;
  
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
  
