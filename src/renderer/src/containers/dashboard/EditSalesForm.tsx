@@ -1,174 +1,3 @@
-// import {
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-//   Button,
-//   TextField,
-// } from "@mui/material";
-// import { useEffect, useState } from "react";
-// import { SalesData } from "./SalesTable";
-// import { InventoryItem } from "@/containers/inventory/AddInventoryItem";
-// import DropdownField from "@/components/controlled/DropdownField";
-// import { useForm, FormProvider } from "react-hook-form";
-// import DateTimeField from "@/components/controlled/DateTimeField";
-// import dayjs from "dayjs";
-
-// type Props = {
-//   editingRow: SalesData | null;
-//   onClose: () => void;
-//   onSave: (data: SalesData) => void;
-// };
-
-
-// const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
-//   const methods = useForm();
-
-//   const [formData, setFormData] = useState<SalesData | null>(null);
-//   const [inventory, setInventory] = useState<InventoryItem[]>([]);
-
-//   useEffect(() => {
-//     if (editingRow) {
-//       setFormData(editingRow);
-
-//       methods.reset({
-//         medicine: editingRow.medicine,
-//         date: dayjs(editingRow.date).format("YYYY-MM-DD"),
-//         time: dayjs(editingRow.time, "HH:mm").format("HH:mm"),
-//       });
-//     }
-//   }, [editingRow, methods]);
-
-//   useEffect(() => {
-//     const stored = localStorage.getItem("inventory");
-//     if (!stored) return;
-//     setInventory(JSON.parse(stored));
-//   }, []);
-
-//   if (!formData) return null;
-//   return (
-//     <FormProvider {...methods}>
-//       <Dialog
-//         open={Boolean(editingRow)}
-//         onClose={onClose}
-//         maxWidth="sm"
-//         fullWidth
-//       >
-//         <DialogTitle>Edit Sales Record</DialogTitle>
-
-//         <DialogContent
-//           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-//         >
-//           <TextField
-//             sx={{ mt: 1 }}
-//             label="Customer Name"
-//             value={formData.name}
-//             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-//             InputProps={{ readOnly: true }}
-//           />
-
-//           <DropdownField
-//             label="Medicine"
-//             name="medicine"
-//             options={inventory.map((item) => ({
-//               label: item.itemName,
-//               value: item.itemName,
-//             }))}
-//             required
-//             onChangeCallback={(selectedValue) => {
-//               const selectedItem = inventory.find(
-//                 (item) => item.itemName === selectedValue,
-//               );
-
-//               if (!selectedItem) return;
-
-//               setFormData((prev) => ({
-//                 ...prev!,
-//                 medicine: selectedValue,
-//                 quantity: 1,
-//                 totalPrice: selectedItem.pricePerUnit,
-//               }));
-//             }}
-//           />
-
-//           <TextField
-//             label="Quantity"
-//             type="number"
-//             value={formData.quantity}
-//             onChange={(e) => {
-//               const qty = Number(e.target.value);
-
-//               const selectedItem = inventory.find(
-//                 (item) => item.itemName === formData.medicine,
-//               );
-
-//               if (!selectedItem) return;
-
-//               setFormData({
-//                 ...formData,
-//                 quantity: qty,
-//                 totalPrice: qty * selectedItem.pricePerUnit, 
-//               });
-//             }}
-//           />
-
-//           <TextField
-//             label="Total Price"
-//             type="number"
-//             value={formData.totalPrice}
-//             InputProps={{ readOnly: true }}
-//           />
-
-//           <DateTimeField name="date" label="Date" viewMode="date" required />
-
-//           <DateTimeField name="time" label="Time" viewMode="time" required />
-//         </DialogContent>
-
-//         <DialogActions sx={{ gap: 2, px: 3, pb: 2 }}>
-//           <Button
-//             onClick={onClose}
-//             sx={{
-//               px: 4,
-//               width: "18%",
-//               textTransform: "none",
-//               border: "2px solid #1b7f6b",
-//               color: "#1b7f6b",
-//               "&:hover": {
-//                 backgroundColor: "#1b7f6b",
-//                 color: "#fff",
-//               },
-//             }}
-//           >
-//             Cancel
-//           </Button>
-
-//           <Button
-//             variant="contained"
-//             onClick={() => {
-//               onSave(formData);
-//               onClose();
-//             }}
-//             sx={{
-//               px: 4,
-//               width: "18%",
-//               textTransform: "none",
-//               backgroundColor: "#1b7f6b",
-//               "&:hover": {
-//                 backgroundColor: "#fff",
-//                 color: "#1b7f6b",
-//                 border: "2px solid #1b7f6b",
-//               },
-//             }}
-//           >
-//             Save
-//           </Button>
-//         </DialogActions>
-//       </Dialog>
-//     </FormProvider>
-//   );
-// };
-
-// export default EditSalesForm;
 import {
   Dialog,
   DialogTitle,
@@ -192,6 +21,7 @@ import {
 import TextInputField from "@/components/controlled/TextInputField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
+import DropdownField from "@/components/controlled/DropdownField";
 
 type Props = {
   editingRow: SalesData | null;
@@ -199,7 +29,7 @@ type Props = {
   onSave: (data: SalesData) => void;
 };
 
-// ✅ FORM TYPES (service aligned)
+// form type
 type InvoiceItemForm = {
   medicineId: number;
   itemName: string;
@@ -235,7 +65,7 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
 
   const [medicines, setMedicines] = useState<MedicineResponse[]>([]);
 
-  // ✅ Load medicines (for price calculation only)
+  //  Load medicines for dropdown
   useEffect(() => {
     const load = async () => {
       const data = await getMedicines();
@@ -244,7 +74,7 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
     load();
   }, []);
 
-  // ✅ Prefill data
+  //  Prefill data
   useEffect(() => {
     if (!editingRow) return;
 
@@ -266,7 +96,7 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
     });
   }, [editingRow, medicines, reset]);
 
-  // ✅ Auto price calculation
+  //  Auto price calculation
   useEffect(() => {
     watchedItems?.forEach((item, index) => {
       const med = medicines.find((m) => m.itemName === item.itemName);
@@ -276,8 +106,8 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
       const total = (item.quantity || 0) * med.pricePerUnit;
 
       if (item.price !== total) {
-        setValue(`items.${index}.price`, total);
-        setValue(`items.${index}.medicineId`, med.medicineId);
+setValue(`items.${index}.price`, total);
+setValue(`items.${index}.medicineId`, med.medicineId);
       }
     });
   }, [watchedItems, medicines, setValue]);
@@ -296,17 +126,33 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
             <DateTimeField name="date" label="Date" viewMode="date" />
             <DateTimeField name="time" label="Time" viewMode="time" />
 
-            {/* ✅ ITEM SECTION (NO DROPDOWN) */}
+            {/* item section drop down */}
             <Typography fontWeight={600}>Items</Typography>
 
             {fields.map((field, index) => (
               <Stack key={field.id} direction="row" spacing={2}>
-                {/* ✅ Item Name (manual input) */}
-                <TextInputField
-                  name={`items.${index}.itemName`}
-                  label="Item Name"
-                  sx={{ width: 250 }}
-                />
+                
+                <DropdownField
+  name={`items.${index}.itemName`}
+  label="Item"
+  options={medicines.map((m) => ({
+    label: m.itemName,
+    value: m.itemName,
+  }))}
+  sx={{ width: 250 }}
+  onChangeCallback={(val: string) => {
+    const selected = medicines.find((m) => m.itemName === val);
+    if (!selected) return;
+
+    const qty =
+      Number(methods.getValues(`items.${index}.quantity`)) || 1;
+
+    const total = qty * selected.pricePerUnit;
+
+    setValue(`items.${index}.price`, total);
+    setValue(`items.${index}.medicineId`, selected.medicineId);
+  }}
+/>
 
                 <TextInputField
                   name={`items.${index}.quantity`}
@@ -350,10 +196,34 @@ const EditSalesForm = ({ editingRow, onClose, onSave }: Props) => {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}
+           variant="outlined"
+           sx={{
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
+          >Cancel</Button>
 
           <Button
             variant="contained"
+             sx={{
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
             onClick={handleSubmit((data) => {
               const totalPrice = data.items.reduce(
                 (sum, i) => sum + i.price,

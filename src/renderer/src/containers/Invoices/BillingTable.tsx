@@ -1,38 +1,31 @@
-import {  useState } from "react";
-
+import { useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
-
 import {  useNavigate } from "react-router-dom";
-
 import {
   UniversalTable,
   Column,
   DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
-
 import { Invoice, InvoiceStatus } from "@/types/invoice";
-
 import { FormProvider, useForm } from "react-hook-form";
-
 import DropdownField from "@/components/controlled/DropdownField";
-
 import { URL_PATH } from "@/constants/UrlPath";
-
 import {
   showToast,
   showConfirmation,
 } from "@/components/uncontrolled/ToastMessage.tsx";
-import { deleteRetailInvoice, updateRetailInvoice } from "@/service/retailInvoiceService";
+import { deleteRetailInvoice } from "@/service/retailInvoiceService";
 
 type Props = {
   invoices: Invoice[];
   setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
+  refetchInvoices: () => Promise<void>;
 };
 
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ invoices, setInvoices }: Props) => {
+const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
  // const location = useLocation();
 
   const navigate = useNavigate();
@@ -115,25 +108,20 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
   });
 
   // delete invoice
-const handleDelete = async (invoiceNo: string) => {
+ const handleDelete = async (invoiceNo: string) => {
   const confirmed = await showConfirmation(
     "Are you sure you want to delete this invoice?",
     "Confirm Delete"
   );
-
   if (!confirmed) return;
 
   try {
-    await deleteRetailInvoice(Number(invoiceNo)); // ✅ API call
-
-    setInvoices((prev) =>
-      prev.filter((inv) => inv.invoice !== invoiceNo)
-    );
-
+    await deleteRetailInvoice(Number(invoiceNo));
+    await refetchInvoices();
     showToast("success", "Invoice deleted successfully");
-  } catch (err) {
-    console.error(err);
-    showToast("error", "Delete failed");
+  } catch (error) {
+    console.error("Error deleting invoice", error);
+    showToast("error", "Failed to delete invoice");
   }
 };
 
@@ -183,26 +171,17 @@ const handleDelete = async (invoiceNo: string) => {
 
             options: statusOptions,
 
-onChange: async (row, value) => {
-  try {
-    await updateRetailInvoice(Number(row.invoice), {
-      paymentStatus: value as InvoiceStatus,
-    });
-
-    setInvoices((prev) =>
-      prev.map((inv) =>
-        inv.invoice === row.invoice
-          ? { ...inv, paymentStatus: value as InvoiceStatus }
-          : inv
-      )
-    );
-
-    showToast("success", "Status updated successfully");
-  } catch (err) {
-    console.error(err);
-    showToast("error", "Update failed");
-  }
-}}}
+     onChange: (row, value) => {
+  setInvoices((prev) =>
+    prev.map((inv) =>
+      inv.invoice === row.invoice
+        ? { ...inv, paymentStatus: value as InvoiceStatus }
+        : inv
+    )
+  );
+  showToast("success", "Status updated successfully");
+},
+          }}
           actions={{
             view: (invoice) =>
               navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`),
@@ -212,29 +191,22 @@ onChange: async (row, value) => {
               }),
             delete: (invoice) => handleDelete(invoice.invoice),
           }}
-onDeleteSelected={async (rows) => {
+       onDeleteSelected={async (rows) => {
   const confirmed = await showConfirmation(
     "Delete selected invoices?",
     "Confirm Delete"
   );
-
   if (!confirmed) return;
 
   try {
-    await Promise.all(
-      rows.map((r) => deleteRetailInvoice(Number(r.invoice)))
-    );
-
-    setInvoices((prev) =>
-      prev.filter((inv) =>
-        !rows.some((r) => r.invoice === inv.invoice)
-      )
-    );
-
+    for (const row of rows) {
+      await deleteRetailInvoice(Number(row.invoice));
+    }
+    await refetchInvoices();
     showToast("success", "Selected invoices deleted");
-  } catch (err) {
-    console.error(err);
-    showToast("error", "Delete failed");
+  } catch (error) {
+    console.error("Error deleting selected invoices", error);
+    showToast("error", "Failed to delete selected invoices");
   }
 }}
         />

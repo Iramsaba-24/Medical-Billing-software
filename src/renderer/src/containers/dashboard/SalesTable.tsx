@@ -28,16 +28,16 @@ export interface SalesData extends Record<string, unknown> {
   totalPrice: number;
   date: string;
   time: string;
-    items?: RetailInvoiceItemResponse[]; // 👈 Add items here
+    items?: RetailInvoiceItemResponse[]; 
 }
-// FILTER OPTIONS
+// filter options
 const filterOptions = [
   { value: "Today", label: "Today" },
   { value: "6 Days", label: "6 Days" },
   { value: "This Month", label: "This Month" },
   { value: "All", label: "All" },
 ];
-// DATE FILTER LOGIC, this function filters data based on selected date range
+// date filter logic this function filters data based on selected date range
 const getFilteredDataByDate = (
   data: SalesData[],
   filter: string,
@@ -72,7 +72,7 @@ const getFilteredDataByDate = (
   }
 };
 
-// MAIN COMPONENT
+// main component
 const SalesTable: React.FC = () => {
   const [searchQuery] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("This Month");
@@ -173,7 +173,6 @@ useEffect(() => {
     { key: ACTION_KEY, label: "Actions" },
   ];
   //handle edit
-//   const handleEdit = (row: SalesData) => setEditingRow(row);
 const handleEdit = async (row: SalesData) => {
   try {
     const items = await getRetailInvoiceItemsByInvoiceId(row.id);
@@ -200,10 +199,10 @@ const handleSaveEdit = async (data: SalesData) => {
       invoiceDate: `${data.date}T${data.time}`,
     };
 
-    // 1. Update invoice
+    //Update invoice
     await updateRetailInvoice(data.id, payload);
 
-    // 2. Recreate items
+    //Recreate items
     if (data.items?.length) {
       await createRetailInvoiceItems(
         data.items.map((item) => ({
