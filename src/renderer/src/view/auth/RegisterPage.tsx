@@ -11,7 +11,8 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
  
 type RegisterFormInputs = {
-  fullName: string;
+   fullName: string;
+  
   email: string;
   mobileNumber: string;
   companyName: string;
@@ -23,6 +24,7 @@ const RegisterPage = () => {
   const methods = useForm<RegisterFormInputs>({
     defaultValues: {
       fullName: "",
+      
       email: "",
       mobileNumber: "",
       companyName: "",
