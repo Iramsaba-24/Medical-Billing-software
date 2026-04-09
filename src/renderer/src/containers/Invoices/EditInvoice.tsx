@@ -13,8 +13,6 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { getAllCustomers } from "@/service/customerService";
 import { updateRetailInvoice, getRetailInvoiceById, createSingleRetailInvoiceItem } from "@/service/retailInvoiceService";
 import { deleteRetailInvoiceItemsByInvoiceId, getRetailInvoiceItemsByInvoiceId  } from "@/service/retailInvoiceService";
-
-
 import { useEffect, useState } from "react";
 
 dayjs.extend(customParseFormat); 
@@ -31,6 +29,9 @@ type DropdownOption = {
 };
 
 type InventoryOption = DropdownOption & {
+ label: string;
+  value: string;
+  id: number;
   price: number;
 };
 
@@ -43,6 +44,7 @@ type InvoiceFormData = {
 
 type RetailInvoiceItemResponse = {
   medicineId: number;
+  
   quantity: number;
   amount: number;
   price: number;
@@ -125,12 +127,13 @@ useEffect(() => {
     const data: MedicineResponse[] = await getMedicines();
 
     setInventoryOptions(
-      data.map((i: MedicineResponse) => ({
-        label: i.itemName,
-        value: String(i.medicineId),
-        price: i.pricePerUnit,
-      }))
-    );
+  data.map((i: MedicineResponse) => ({
+    label: i.itemName,
+    value: i.itemName, 
+    id: i.medicineId,
+    price: i.pricePerUnit,
+  }))
+);
   };
 
   fetchMedicines();
@@ -146,11 +149,15 @@ useEffect(() => {
       const invoice = await getRetailInvoiceById(Number(invoiceNo));
       const items: RetailInvoiceItemResponse[] = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
 
-      const mappedItems = items.map((i: RetailInvoiceItemResponse) => ({
-        item: String(i.medicineId),
-        qty: i.quantity,
-        price: i.price,
-      }));
+     const mappedItems = items.map((i: RetailInvoiceItemResponse) => {
+  const med = inventoryOptions.find(m => m.id === i.medicineId);
+
+  return {
+    item: med?.value || "", 
+    qty: i.quantity,
+    price: i.price,
+  };
+});
 
       reset({
         name: invoice.customerName,
@@ -202,9 +209,9 @@ const onSubmit = async (data: InvoiceFormData) => {
 
       await createSingleRetailInvoiceItem({
         retailInvoiceId: Number(invoiceNo),
-        medicineId: Number(item.item),
+       medicineId: selectedItem?.id || 0,
         quantity: Number(item.qty),
-        price: selectedItem.price,
+         price: selectedItem?.price || 0,
         gstPercent: 0,
         discount: 0,
       });
@@ -230,7 +237,8 @@ const onSubmit = async (data: InvoiceFormData) => {
             options={customerOptions}
             fullWidth
              freeSolo={true}
-  editable={true}
+
+  disabled
           />
 
           <DateTimeField
@@ -353,4 +361,3 @@ const onSubmit = async (data: InvoiceFormData) => {
 };
 
 export default EditInvoice;
-

@@ -104,6 +104,7 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
       border: "2px solid #238878",
     },
   });
+
   
  const onSubmit = async () => {
   setIsSubmitted(true);
@@ -218,7 +219,11 @@ useEffect(() => {
   fetchDoctors();
 }, []);
   const selectedDoctorName = methods.watch("doctor");
-  const selectedCustomerName = methods.watch("name");
+const selectedCustomerName = methods.watch("name");
+
+const selectedCustomer = customerOptions.find(
+  (c) => c.name === selectedCustomerName
+);
 
 const nameOptions = [
   { label: "+ Add Customer", value: "add_customer" },
@@ -236,9 +241,6 @@ useEffect(() => {
 
   if (!selectedCustomerName) return;
 
-  const selectedCustomer = customerOptions.find(
-    (c) => c.name === selectedCustomerName
-  );
 
   if (selectedCustomer) {
     methods.setValue("age", selectedCustomer.age || "");
@@ -263,7 +265,7 @@ useEffect(() => {
       );
     }
   }
-}, [selectedCustomerName, customerOptions, methods, navigate, doctorList]);
+}, [selectedCustomerName, customerOptions, doctorList]);
 
 
 useEffect(() => {

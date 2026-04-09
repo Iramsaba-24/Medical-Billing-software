@@ -1,6 +1,4 @@
 
-
- 
 import React from 'react';
 import {
   Box,
@@ -12,8 +10,8 @@ import Revenue from '@/assets/revenue.svg';
 import Inventory from '@/assets/inventory.svg';
 import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
-import { InventoryItem } from '@/containers/inventory/InventoryList';
-type CustomerItem = {
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
+import { useEffect, useState } from "react";type CustomerItem = {
   qty: number;
   price: number;
 };
@@ -23,46 +21,25 @@ type CustomerStorage = {
 };
  
 const Dashboard: React.FC = () => {
- 
-// to fetch available medicine from inventory
-const availableMedicines = () :string =>
-{
-  const data = localStorage.getItem("inventory")
-  if(!data){
-    return "0"
-  }
-  const parseData : InventoryItem[] = JSON.parse(data)
-  const count = parseData.filter((item)=> Number(item.quantity) >0 ).length
-  return count.toString()
-}
- 
-// to fetch medicine shortage
-const medicineShoratage = () : string =>
-{
-  const data =localStorage.getItem("inventory")
-  if(!data){
-    return "0"
-  }
-  const parseData : InventoryItem[] = JSON.parse(data)
-  const count = parseData.filter((item)=> Number(item.quantity) <5 ).length
-  return count.toString()
-}
- 
-//inventory status
-const inventoryStatus = (): string =>
-{
-  const data = Number(medicineShoratage())
-  if(data ===0)
-  {
-    return "Good"
-  }
-  if(data<=3)
-  {
-    return "Average"
-  }
-  return "Critical"
-}
- 
+const [inventory, setInventory] = useState<MedicineResponse[]>([]);
+useEffect(() => {
+  const fetchInventory = async () => {
+    const data = await getMedicines(); // inventory fetch
+    setInventory(data);
+  };
+  fetchInventory();
+}, []);
+// available medicines count
+const availableMedicines = inventory.filter(item => item.quantity > 0).length;
+// shortage count
+const medicineShortage = inventory.filter(item => item.quantity < 5).length;
+// inventory status
+const inventoryStatus = (): string => {
+  if (medicineShortage === 0) return "Good";
+  if (medicineShortage <= 3) return "Average";
+  return "Critical";
+};
+
 // fetch total revenue
 const totalRevenue = (): string => {
   const customerData: CustomerStorage[] = JSON.parse(
@@ -83,7 +60,6 @@ const totalRevenue = (): string => {
   return `₹ ${sales.toLocaleString()}`;
 };
  
- 
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
     "totalRevenue",
@@ -92,23 +68,18 @@ const getVisibleKpis = (): string[] => {
     "medicinesShortage",
   ];
  
-  const data = localStorage.getItem("dashboardSettings");
- 
+  const data = localStorage.getItem("dashboardSettings") 
   if (!data) return defaultKpis;
  
   try {
     const parsed = JSON.parse(data);
- 
-    //  handle BOTH formats
+    //  handle both formats
     if (Array.isArray(parsed)) return parsed;
- 
     return parsed.visibleKpis || defaultKpis;
- 
   } catch {
     return defaultKpis;
   }
 };
- 
 const visibleKpis = getVisibleKpis();
  
   return (
@@ -168,28 +139,14 @@ const visibleKpis = getVisibleKpis();
 )}
  
 {visibleKpis.includes("inventoryStatus") && (
-  <StackCard
-    value={inventoryStatus()}
-    title="Inventory Status"
-    icon={Inventory}
-  />
-)}
- 
-{visibleKpis.includes("medicinesAvailable") && (
-  <StackCard
-    value={availableMedicines()}
-    title="Medicines Available"
-    icon={Medicines}
-  />
-)}
- 
-{visibleKpis.includes("medicinesShortage") && (
-  <StackCard
-    value={medicineShoratage()}
-    title="Medicine Shortage"
-    icon={Shortage}
-  />
-)}
+    <StackCard value={inventoryStatus()} title="Inventory Status" icon={Inventory} />
+  )}
+  {visibleKpis.includes("medicinesAvailable") && (
+    <StackCard value={availableMedicines.toString()} title="Medicines Available" icon={Medicines} />
+  )}
+  {visibleKpis.includes("medicinesShortage") && (
+    <StackCard value={medicineShortage.toString()} title="Medicine Shortage" icon={Shortage} />
+  )}
  
 </Box>
     </Box>
@@ -263,5 +220,6 @@ const StackCard: React.FC<StackCardProps> = ({ value, title, icon }) => {
     </Card>
   );
 };
+ 
  
  
