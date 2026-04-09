@@ -13,7 +13,7 @@ interface CustomerListProps {
   data: CustomerData[];
   onView: (data: CustomerData) => void;
   onEdit: (data: CustomerData) => void;
-  onDelete: (data: CustomerData) => void;
+  onDelete: (data: CustomerData) => Promise<void> | void;
 }
 
 export const CustomerListPage = ({
@@ -49,11 +49,20 @@ export const CustomerListPage = ({
   ];
 
   const handleDelete = async (customer: CustomerData) => {
-    await onDelete(customer);
-
-    setCustomers((prev) =>
-      prev.filter((item) => item.customerId !== customer.customerId)
-    );
+    try {
+  
+      await onDelete(customer);
+    
+      setCustomers((prev) =>
+        prev.filter(
+          (item) =>
+            item.customerId !== customer.customerId &&
+            item.phone !== customer.phone
+        )
+      );
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
   };
 
   return (

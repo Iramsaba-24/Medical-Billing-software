@@ -24,7 +24,7 @@ function ReportCards() {
       setTotalSales(0);
     }
 
-    // PURCHASE
+    
     const syncedPurchase = localStorage.getItem("global_total_purchase");
 
     if (syncedPurchase !== null) {

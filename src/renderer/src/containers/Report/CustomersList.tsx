@@ -8,10 +8,12 @@ import DropdownField from "@/components/controlled/DropdownField";
 import { useForm, FormProvider } from "react-hook-form";
 import { getAllCustomers } from "@/service/customerService";
 import { CustomerData } from "@/view/CustomerMaster";
+
 import {
   getAllRetailInvoices,
   getRetailInvoiceItemsByInvoiceId,
 } from "@/service/retailInvoiceService";
+
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
 
 type Customer = {
@@ -58,6 +60,7 @@ function CustomerTable() {
         const invoices: Invoice[] = await getAllRetailInvoices();
         const medicines: MedicineResponse[] = await getMedicines();
 
+        // medicine map
         const medicineMap = new Map<number, string>();
         medicines.forEach((m) => {
           medicineMap.set(m.medicineId, m.itemName);
@@ -75,9 +78,8 @@ function CustomerTable() {
           const medNames: string[] = [];
 
           for (const inv of custInvoices) {
-            const items: InvoiceItem[] = await getRetailInvoiceItemsByInvoiceId(
-              inv.retailInvoiceId
-            );
+            const items: InvoiceItem[] =
+              await getRetailInvoiceItemsByInvoiceId(inv.retailInvoiceId);
 
             items.forEach((item) => {
               totalQty += item.quantity;
@@ -100,18 +102,6 @@ function CustomerTable() {
         }
 
         setCustomers(formatted);
-
-        const totalSalesAmount = formatted.reduce(
-          (sum, item) => sum + (Number(item.totalPrice) || 0),
-          0
-        );
-
-        localStorage.setItem(
-          "global_total_sales",
-          JSON.stringify(totalSalesAmount)
-        );
-
-        window.dispatchEvent(new Event("reportUpdated"));
       } catch (error) {
         console.error("Failed to fetch customers", error);
         setCustomers([]);
@@ -120,10 +110,14 @@ function CustomerTable() {
 
     fetchData();
 
-    window.addEventListener("focus", fetchData);
+    const handleFocus = () => {
+      fetchData();
+    };
+
+    window.addEventListener("focus", handleFocus);
 
     return () => {
-      window.removeEventListener("focus", fetchData);
+      window.removeEventListener("focus", handleFocus);
     };
   }, []);
 
@@ -188,7 +182,7 @@ function CustomerTable() {
           />
         </Stack>
 
-        <div style={{ width: "100%", overflowX: "auto" }}>
+        <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
           <UniversalTable<Customer>
             data={filteredData}
             columns={columns}
