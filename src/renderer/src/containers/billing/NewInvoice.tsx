@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
 import InvoiceTabButtons from "./InvoiceTabButtons";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import ItemsSection from "@/containers/customer/ItemsSection";
 import DropdownField from "@/components/controlled/DropdownField";
 import { getDistributors } from "@/service/distributorService";
 import { createInvoice } from "@/service/distributorInvoiceService";
