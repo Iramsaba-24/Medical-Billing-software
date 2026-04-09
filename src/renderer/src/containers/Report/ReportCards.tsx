@@ -4,15 +4,6 @@ import TotalSalesReport from "@/assets/TotalSalesReport.svg";
 import TotalPurchaseReport from "@/assets/TotalPurchaseReport.svg";
 import ProfitReport from "@/assets/ProfitReport.svg";
 
-type CustomerItem = {
-  qty: number;
-  price: number;
-};
-
-type CustomerStorage = {
-  itemsList?: CustomerItem[];
-};
-
 type RetailInvoiceItem = {
   total?: number;
 };
@@ -20,53 +11,41 @@ type RetailInvoiceItem = {
 function ReportCards() {
   const [totalSales, setTotalSales] = useState<number>(0);
   const [totalPurchase, setTotalPurchase] = useState<number>(0);
-  //handle through setting
-  const settings = JSON.parse(localStorage.getItem("report_settings") || "{}");
 
+  const settings = JSON.parse(localStorage.getItem("report_settings") || "{}");
   const visibleCards: string[] = settings?.card_visibility_control || [];
 
   const calculateTotals = () => {
-    
-    //  SALES (From medical_customers)
-   
-    const customerData: CustomerStorage[] = JSON.parse(
-      localStorage.getItem("medical_customers") || "[]"
-    );
+    const syncedSales = localStorage.getItem("global_total_sales");
 
-    const sales = customerData.reduce((sum, customer) => {
-      const customerTotal =
-        customer.itemsList?.reduce(
-          (itemSum, item) =>
-            itemSum +
-            (Number(item.qty) || 0) *
-            (Number(item.price) || 0),
-          0
-        ) || 0;
+    if (syncedSales !== null) {
+      setTotalSales(Number(JSON.parse(syncedSales)));
+    } else {
+      setTotalSales(0);
+    }
 
-      return sum + customerTotal;
-    }, 0);
+    // PURCHASE
+    const syncedPurchase = localStorage.getItem("global_total_purchase");
 
-    setTotalSales(sales);
+    if (syncedPurchase !== null) {
+      setTotalPurchase(Number(JSON.parse(syncedPurchase)));
+    } else {
+      const retailInvoices: RetailInvoiceItem[] = JSON.parse(
+        localStorage.getItem("retailInvoices") || "[]"
+      );
 
-   
-    //  PURCHASE (From retailInvoices)
-   
-    const retailInvoices: RetailInvoiceItem[] = JSON.parse(
-      localStorage.getItem("retailInvoices") || "[]"
-    );
+      const purchase = retailInvoices.reduce(
+        (sum, invoice) => sum + (Number(invoice.total) || 0),
+        0
+      );
 
-    const purchase = retailInvoices.reduce(
-      (sum, invoice) => sum + (Number(invoice.total) || 0),
-      0
-    );
-
-    setTotalPurchase(purchase);
+      setTotalPurchase(purchase);
+    }
   };
 
   useEffect(() => {
     calculateTotals();
 
-    // Auto refresh when data updates
     window.addEventListener("reportUpdated", calculateTotals);
 
     return () => {
@@ -101,32 +80,29 @@ function ReportCards() {
       gap={3}
       mb={4}
     >
-      {cards 
-      .filter((card) => visibleCards.includes(card.label))
-      .map((card) => (
-        <Paper
-          key={card.label}
-          sx={{
-            p: 3,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderRadius: 3,
-            boxShadow: 3,
-          }}
-        >
-          <Box>
-            <Typography variant="h6" fontWeight="bold">
-              {card.value}
-            </Typography>
-            <Typography variant="body2">
-              {card.label}
-            </Typography>
-          </Box>
-
-          <Box component="img" src={card.img} width={55} />
-        </Paper>
-      ))}
+      {cards
+        .filter((card) => visibleCards.includes(card.label))
+        .map((card) => (
+          <Paper
+            key={card.label}
+            sx={{
+              p: 3,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              borderRadius: 3,
+              boxShadow: 3,
+            }}
+          >
+            <Box>
+              <Typography variant="h6" fontWeight="bold">
+                {card.value}
+              </Typography>
+              <Typography variant="body2">{card.label}</Typography>
+            </Box>
+            <Box component="img" src={card.img} width={55} />
+          </Paper>
+        ))}
     </Box>
   );
 }

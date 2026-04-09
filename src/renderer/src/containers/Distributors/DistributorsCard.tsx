@@ -1,4 +1,5 @@
 import { Box, Typography, Paper } from "@mui/material";
+import { useEffect } from "react";
 import TotalDistributors from "@/assets/TotalDistributers.svg";
 import TotalPurchase from "@/assets/warningsign.svg";
 import NewDistributors from "@/assets/NewDistributors.svg";
@@ -9,6 +10,16 @@ type Props = {
 };
 
 function DistributorCards({ totalCount, totalPurchase }: Props) {
+
+  useEffect(() => {
+    localStorage.setItem(
+      "global_total_purchase",
+      JSON.stringify(totalPurchase)
+    );
+
+    window.dispatchEvent(new Event("reportUpdated"));
+  }, [totalPurchase]);
+
   const cardData = [
     {
       label: "Total Distributors",
@@ -29,7 +40,6 @@ function DistributorCards({ totalCount, totalPurchase }: Props) {
 
   return (
     <Box>
-      {/* Heading */}
       <Typography
         sx={{
           fontSize: { xs: 20, sm: 24, md: 28 },
@@ -41,7 +51,6 @@ function DistributorCards({ totalCount, totalPurchase }: Props) {
         Distributors
       </Typography>
 
-      {/* Cards */}
       <Box
         display="grid"
         gridTemplateColumns={{ xs: "1fr", sm: "repeat(3, 1fr)" }}
@@ -71,11 +80,7 @@ function DistributorCards({ totalCount, totalPurchase }: Props) {
               </Typography>
               <Typography color="text.secondary">{card.label}</Typography>
             </Box>
-            <Box
-              component="img"
-              src={card.img}
-              sx={{ width: 60, height: 60 }}
-            />
+            <Box component="img" src={card.img} sx={{ width: 60, height: 60 }} />
           </Paper>
         ))}
       </Box>

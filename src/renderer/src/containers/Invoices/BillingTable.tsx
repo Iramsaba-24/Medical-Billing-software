@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
-import {  useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   UniversalTable,
   Column,
@@ -22,31 +22,25 @@ type Props = {
   refetchInvoices: () => Promise<void>;
 };
 
-
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
 const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
- // const location = useLocation();
+  // const location = useLocation();
 
   const navigate = useNavigate();
-  
   const [filterType, setFilterType] = useState<FilterType>("all");
-
   const filterOptions = [
     { label: "All", value: "all" },
-
     { label: "Daily", value: "daily" },
-
     { label: "Monthly", value: "monthly" },
-
     { label: "Yearly", value: "yearly" },
   ];
 
   const filteredInvoices = invoices.filter((invoice) => {
     if (!filterType || filterType === "all") return true;
 
-      const dateStr = invoice.invoiceDate ?? ""; 
-  if (!dateStr) return false; 
+    const dateStr = invoice.invoiceDate ?? "";
+    if (!dateStr) return false;
 
     const parts = dateStr.split("/");
     const invoiceDate = new Date(
@@ -76,7 +70,7 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
       return invoiceDate.getFullYear() === today.getFullYear();
     }
 
-    return true; 
+    return true;
   });
   console.log("Filtered Invoices →", filteredInvoices);
 
@@ -108,22 +102,23 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
   });
 
   // delete invoice
- const handleDelete = async (invoiceNo: string) => {
-  const confirmed = await showConfirmation(
-    "Are you sure you want to delete this invoice?",
-    "Confirm Delete"
-  );
-  if (!confirmed) return;
+  const handleDelete = async (invoiceNo: string) => {
+    const confirmed = await showConfirmation(
+      "Are you sure you want to delete this invoice?",
+      "Confirm Delete"
+    );
+    if (!confirmed) return;
 
-  try {
-    await deleteRetailInvoice(Number(invoiceNo));
-    await refetchInvoices();
-    showToast("success", "Invoice deleted successfully");
-  } catch (error) {
-    console.error("Error deleting invoice", error);
-    showToast("error", "Failed to delete invoice");
-  }
-};
+    try {
+      await deleteRetailInvoice(Number(invoiceNo));
+      await refetchInvoices();
+      window.dispatchEvent(new Event("invoiceUpdated"));
+      showToast("success", "Invoice deleted successfully");
+    } catch (error) {
+      console.error("Error deleting invoice", error);
+      showToast("error", "Failed to delete invoice");
+    }
+  };
 
   return (
     <FormProvider {...methods}>
@@ -160,7 +155,7 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
         </Box>
 
         <UniversalTable<Invoice>
-         data={filteredInvoices}
+          data={filteredInvoices}
           columns={columns}
           showSearch
           showExport
@@ -171,16 +166,16 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
 
             options: statusOptions,
 
-     onChange: (row, value) => {
-  setInvoices((prev) =>
-    prev.map((inv) =>
-      inv.invoice === row.invoice
-        ? { ...inv, paymentStatus: value as InvoiceStatus }
-        : inv
-    )
-  );
-  showToast("success", "Status updated successfully");
-},
+            onChange: (row, value) => {
+              setInvoices((prev) =>
+                prev.map((inv) =>
+                  inv.invoice === row.invoice
+                    ? { ...inv, paymentStatus: value as InvoiceStatus }
+                    : inv
+                )
+              );
+              showToast("success", "Status updated successfully");
+            },
           }}
           actions={{
             view: (invoice) =>
@@ -193,24 +188,24 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
               }),
             delete: (invoice) => handleDelete(invoice.invoice),
           }}
-       onDeleteSelected={async (rows) => {
-  const confirmed = await showConfirmation(
-    "Delete selected invoices?",
-    "Confirm Delete"
-  );
-  if (!confirmed) return;
+          onDeleteSelected={async (rows) => {
+            const confirmed = await showConfirmation(
+              "Delete selected invoices?",
+              "Confirm Delete"
+            );
+            if (!confirmed) return;
 
-  try {
-    for (const row of rows) {
-      await deleteRetailInvoice(Number(row.invoice));
-    }
-    await refetchInvoices();
-    showToast("success", "Selected invoices deleted");
-  } catch (error) {
-    console.error("Error deleting selected invoices", error);
-    showToast("error", "Failed to delete selected invoices");
-  }
-}}
+            try {
+              for (const row of rows) {
+                await deleteRetailInvoice(Number(row.invoice));
+              }
+              await refetchInvoices();
+              showToast("success", "Selected invoices deleted");
+            } catch (error) {
+              console.error("Error deleting selected invoices", error);
+              showToast("error", "Failed to delete selected invoices");
+            }
+          }}
         />
       </Paper>
     </FormProvider>

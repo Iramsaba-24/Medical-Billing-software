@@ -1,14 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { Typography, Stack, Paper, Divider } from "@mui/material";
 import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
+import { useForm, FormProvider } from "react-hook-form";
+import DropdownField from "@/components/controlled/DropdownField";
+import {
+  getDistributors,
+  DistributorResponse,
+} from "@/service/distributorService";
 
-import { useForm, FormProvider } from "react-hook-form"; 
-import DropdownField from "@/components/controlled/DropdownField"; 
-
-// ✅ API IMPORT
-import { getDistributors, DistributorResponse } from "@/service/distributorService";
-
-// TYPES 
 type DistributorRow = {
   companyName: string;
   email: string;
@@ -45,9 +44,7 @@ const columns = [
 ];
 
 function DistributorReportTable() {
-
   const [distributorData, setDistributorData] = useState<DistributorRow[]>([]);
-
   const methods = useForm<FilterForm>({
     defaultValues: {
       statusFilter: "All",
@@ -81,10 +78,8 @@ function DistributorReportTable() {
       }
     };
 
-    // 🔥 initial load
     fetchDistributors();
 
-    // 🔥 auto refetch on page focus (same as customer table logic)
     const handleFocus = () => {
       fetchDistributors();
     };
@@ -98,7 +93,6 @@ function DistributorReportTable() {
 
   const filteredData = useMemo(() => {
     return distributorData.filter((distributor) => {
-
       const matchesStatus =
         statusFilter === "All" || distributor.status === statusFilter;
 
@@ -113,8 +107,7 @@ function DistributorReportTable() {
       } else if (timeFilter === "Last 30 Days") {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(today.getDate() - 30);
-        matchesTime =
-          purchaseDate >= thirtyDaysAgo && purchaseDate <= today;
+        matchesTime = purchaseDate >= thirtyDaysAgo && purchaseDate <= today;
       }
 
       return matchesStatus && matchesTime;
@@ -142,8 +135,12 @@ function DistributorReportTable() {
 
         <Divider sx={{ mb: 3 }} />
 
-        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          sx={{ mb: 2 }}
+        >
           <DropdownField
             name="statusFilter"
             label="Status"

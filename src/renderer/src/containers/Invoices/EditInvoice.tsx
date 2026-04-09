@@ -1,7 +1,19 @@
-import {Paper,Button,Stack,Typography,Box,IconButton,} from "@mui/material";
+import {
+  Paper,
+  Button,
+  Stack,
+  Typography,
+  Box,
+  IconButton,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import {
+  FormProvider,
+  useFieldArray,
+  useForm,
+  useWatch,
+} from "react-hook-form";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate, useParams } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -9,15 +21,20 @@ import DropdownField from "@/components/controlled/DropdownField";
 import TextInputField from "@/components/controlled/TextInputField";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
 import dayjs, { Dayjs } from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat"; 
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { getAllCustomers } from "@/service/customerService";
-import { updateRetailInvoice, getRetailInvoiceById, createSingleRetailInvoiceItem } from "@/service/retailInvoiceService";
-import { deleteRetailInvoiceItemsByInvoiceId, getRetailInvoiceItemsByInvoiceId  } from "@/service/retailInvoiceService";
-
-
+import {
+  updateRetailInvoice,
+  getRetailInvoiceById,
+  createSingleRetailInvoiceItem,
+} from "@/service/retailInvoiceService";
+import {
+  deleteRetailInvoiceItemsByInvoiceId,
+  getRetailInvoiceItemsByInvoiceId,
+} from "@/service/retailInvoiceService";
 import { useEffect, useState } from "react";
 
-dayjs.extend(customParseFormat); 
+dayjs.extend(customParseFormat);
 
 type InvoiceItem = {
   item: string;
@@ -31,6 +48,9 @@ type DropdownOption = {
 };
 
 type InventoryOption = DropdownOption & {
+  label: string;
+  value: string;
+  id: number;
   price: number;
 };
 
@@ -43,6 +63,7 @@ type InvoiceFormData = {
 
 type RetailInvoiceItemResponse = {
   medicineId: number;
+
   quantity: number;
   amount: number;
   price: number;
@@ -74,7 +95,9 @@ const EditInvoice = () => {
   });
 
   const [customerOptions, setCustomerOptions] = useState<DropdownOption[]>([]);
-  const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>([]);
+  const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>(
+    []
+  );
 
   const statusOptions: DropdownOption[] = [
     { label: "Paid", value: "Paid" },
@@ -83,29 +106,27 @@ const EditInvoice = () => {
   ];
 
   // Load Customers
-useEffect(() => {
-  const fetchCustomers = async () => {
-    try {
-      const data = await getAllCustomers();
-      setCustomerOptions(
-        data.map((c) => ({
-          label: c.name,
-          value: c.name,
-        }))
-      );
-    } catch (error) {
-      console.error("Error fetching customers", error);
-    }
-  };
-  fetchCustomers();
-}, []);
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const data = await getAllCustomers();
+        setCustomerOptions(
+          data.map((c) => ({
+            label: c.name,
+            value: c.name,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching customers", error);
+      }
+    };
+    fetchCustomers();
+  }, []);
 
   // Load Inventory
   useEffect(() => {
     watchedItems?.forEach((item, index) => {
-      const selectedItem = inventoryOptions.find(
-        (i) => i.value === item.item
-      );
+      const selectedItem = inventoryOptions.find((i) => i.value === item.item);
 
       if (!selectedItem) return;
 
@@ -118,103 +139,106 @@ useEffect(() => {
     });
   }, [watchedItems, inventoryOptions, setValue]);
 
- 
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      const data: MedicineResponse[] = await getMedicines();
 
-useEffect(() => {
-  const fetchMedicines = async () => {
-    const data: MedicineResponse[] = await getMedicines();
+      setInventoryOptions(
+        data.map((i: MedicineResponse) => ({
+          label: i.itemName,
+          value: i.itemName,
+          id: i.medicineId,
+          price: i.pricePerUnit,
+        }))
+      );
+    };
 
-    setInventoryOptions(
-      data.map((i: MedicineResponse) => ({
-        label: i.itemName,
-        value: String(i.medicineId),
-        price: i.pricePerUnit,
-      }))
-    );
-  };
-
-  fetchMedicines();
-}, []);
+    fetchMedicines();
+  }, []);
   // Load invoice
 
-useEffect(() => {
-  if (!invoiceNo) return;
-  if (inventoryOptions.length === 0) return;
+  useEffect(() => {
+    if (!invoiceNo) return;
+    if (inventoryOptions.length === 0) return;
 
-  const fetchInvoice = async () => {
+    const fetchInvoice = async () => {
+      try {
+        const invoice = await getRetailInvoiceById(Number(invoiceNo));
+        const items: RetailInvoiceItemResponse[] =
+          await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
+
+        const mappedItems = items.map((i: RetailInvoiceItemResponse) => {
+          const med = inventoryOptions.find((m) => m.id === i.medicineId);
+
+          return {
+            item: med?.value || "",
+            qty: i.quantity,
+            price: i.price,
+          };
+        });
+
+        reset({
+          name: invoice.customerName,
+          date: dayjs(invoice.invoiceDate),
+          status: invoice.paymentStatus,
+          items:
+            mappedItems.length > 0
+              ? mappedItems
+              : [{ item: "", qty: 1, price: 0 }],
+        });
+      } catch (error) {
+        console.error("Error fetching invoice", error);
+      }
+    };
+
+    fetchInvoice();
+  }, [invoiceNo, reset, inventoryOptions]);
+
+  const onSubmit = async (data: InvoiceFormData) => {
     try {
       const invoice = await getRetailInvoiceById(Number(invoiceNo));
-      const items: RetailInvoiceItemResponse[] = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
 
-      const mappedItems = items.map((i: RetailInvoiceItemResponse) => ({
-        item: String(i.medicineId),
-        qty: i.quantity,
-        price: i.price,
-      }));
+      const newTotal = data.items.reduce(
+        (sum, item) => sum + Number(item.price),
+        0
+      );
 
-      reset({
-        name: invoice.customerName,
-        date: dayjs(invoice.invoiceDate),
-        status: invoice.paymentStatus,
-        items: mappedItems.length > 0
-          ? mappedItems
-          : [{ item: "", qty: 1, price: 0 }],
+      // invoice update
+      await updateRetailInvoice(Number(invoiceNo), {
+        userId: invoice.userId,
+        customerId: invoice.customerId,
+        invoiceType: invoice.invoiceType,
+        invoiceDate: invoice.invoiceDate,
+        totalAmount: newTotal,
+        totalGST: invoice.totalGST,
+        totalDiscount: invoice.totalDiscount,
+        medipointsEarned: invoice.medipointsEarned,
+        paymentStatus: data.status,
       });
 
+      await deleteRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
+
+      for (const item of data.items) {
+        const selectedItem = inventoryOptions.find(
+          (i) => i.value === item.item
+        );
+        if (!selectedItem) continue;
+
+        await createSingleRetailInvoiceItem({
+          retailInvoiceId: Number(invoiceNo),
+          medicineId: selectedItem?.id || 0,
+          quantity: Number(item.qty),
+          price: selectedItem?.price || 0,
+          gstPercent: 0,
+          discount: 0,
+        });
+      }
+
+      navigate(URL_PATH.Invoices);
     } catch (error) {
-      console.error("Error fetching invoice", error);
+      console.error("Error updating invoice", error);
     }
   };
-
-  fetchInvoice();
-}, [invoiceNo, reset, inventoryOptions]);
-
-
-const onSubmit = async (data: InvoiceFormData) => {
-  try {
-    const invoice = await getRetailInvoiceById(Number(invoiceNo));
-
-   const newTotal = data.items.reduce(
-  (sum, item) => sum + Number(item.price),
-  0
-);
-
-    // invoice update 
-    await updateRetailInvoice(Number(invoiceNo), {
-      userId: invoice.userId,
-      customerId: invoice.customerId,
-      invoiceType: invoice.invoiceType,
-      invoiceDate: invoice.invoiceDate,
-      totalAmount: newTotal,
-      totalGST: invoice.totalGST,
-      totalDiscount: invoice.totalDiscount,
-      medipointsEarned: invoice.medipointsEarned,
-      paymentStatus: data.status,
-    });
-
-   
-    await deleteRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
-
-  
-    for (const item of data.items) {
-      const selectedItem = inventoryOptions.find(i => i.value === item.item);
-      if (!selectedItem) continue;
-
-      await createSingleRetailInvoiceItem({
-        retailInvoiceId: Number(invoiceNo),
-        medicineId: Number(item.item),
-        quantity: Number(item.qty),
-        price: selectedItem.price,
-        gstPercent: 0,
-        discount: 0,
-      });
-    }
-
-    navigate(URL_PATH.Invoices);
-  } catch (error) {
-    console.error("Error updating invoice", error);
-  }
-};
 
   return (
     <FormProvider {...methods}>
@@ -229,17 +253,17 @@ const onSubmit = async (data: InvoiceFormData) => {
             label="Customer"
             options={customerOptions}
             fullWidth
-             freeSolo={true}
-  editable={true}
+            freeSolo={true}
+            disabled
           />
 
           <DateTimeField
-  name="date"
-  label="Invoice Date"
-  viewMode="date"
-  useCurrentDate={true}
-  disabled
-/>
+            name="date"
+            label="Invoice Date"
+            viewMode="date"
+            useCurrentDate={true}
+            disabled
+          />
 
           <DropdownField
             name="status"
@@ -353,4 +377,3 @@ const onSubmit = async (data: InvoiceFormData) => {
 };
 
 export default EditInvoice;
-

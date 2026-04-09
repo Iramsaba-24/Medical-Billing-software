@@ -1,10 +1,14 @@
 import { useState, useMemo, useEffect } from "react";
 import { Paper, Typography, Chip, Stack, Divider } from "@mui/material";
-import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
+import {
+  UniversalTable,
+  Column,
+} from "@/components/uncontrolled/UniversalTable";
 import { useForm, FormProvider } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
-// TYPES
 export type InvoiceData = {
   invoice: string;
   name: string;
@@ -18,6 +22,14 @@ export type InvoiceData = {
 type FilterForm = {
   statusFilter: string;
   timeFilter: string;
+};
+
+type InvoiceApi = {
+  retailInvoiceId: number;
+  customerName: string;
+  invoiceDate: string;
+  totalAmount: number;
+  paymentStatus: "Paid" | "Pending" | "Overdue";
 };
 
 const InvoiceTable = () => {
@@ -34,27 +46,44 @@ const InvoiceTable = () => {
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  // ✅ API CALL (NO LOCALSTORAGE)
+  const fetchInvoices = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: token ? `Bearer ${token}` : "" };
+
+      const res = await axios.get<InvoiceApi[]>(API_ENDPOINTS.RETAIL_INVOICE, {
+        headers,
+      });
+
+      const apiData: InvoiceApi[] = res.data || [];
+
+      const formatted: InvoiceData[] = apiData.map((inv) => ({
+        invoice: String(inv.retailInvoiceId),
+        name: inv.customerName,
+        date: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+        price: inv.totalAmount,
+        gst: 0,
+        total: inv.totalAmount,
+        status: inv.paymentStatus,
+      }));
+
+      setInvoices(formatted);
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      setInvoices([]);
+    }
+  };
+
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const res = await fetch("http://localhost:3000/invoices");
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch invoices");
-        }
-
-        const data: InvoiceData[] = await res.json();
-        setInvoices(data);
-      } catch (error) {
-        console.error("Error fetching invoices:", error);
-      }
-    };
-
     fetchInvoices();
+
+    window.addEventListener("invoiceUpdated", fetchInvoices);
+
+    return () => {
+      window.removeEventListener("invoiceUpdated", fetchInvoices);
+    };
   }, []);
 
-  // FILTER LOGIC
   const filteredData = useMemo(() => {
     return invoices.filter((inv) => {
       const matchesStatus =
@@ -63,6 +92,7 @@ const InvoiceTable = () => {
       if (!inv.date) return false;
 
       const parts = inv.date.split("/");
+
       if (parts.length !== 3) return false;
 
       const invDate = new Date(
@@ -92,6 +122,16 @@ const InvoiceTable = () => {
     });
   }, [invoices, statusFilter, timeFilter]);
 
+  const handleDeleteSelected = (rowsToDelete: InvoiceData[]) => {
+    const updatedInvoices = invoices.filter(
+      (inv) => !rowsToDelete.some((row) => row.invoice === inv.invoice)
+    );
+
+    setInvoices(updatedInvoices);
+
+    window.dispatchEvent(new Event("invoiceUpdated"));
+  };
+
   const statusOptions = [
     { label: "All Status", value: "All" },
     { label: "Paid", value: "Paid" },
@@ -107,23 +147,12 @@ const InvoiceTable = () => {
 
   const columns: Column<InvoiceData>[] = [
     { key: "invoice", label: "Invoice" },
-    { key: "name", label: "Patient Name" },
+    { key: "name", label: "Name" },
     { key: "date", label: "Date" },
     {
       key: "price",
       label: "Price",
-      render: (row) => `₹ ${row.price?.toFixed(2)}`,
-    },
-    {
-      key: "gst",
-      label: "GST(%)",
-      render: (row) => `${row.gst ?? 0}%`,
-    },
-    {
-      key: "total",
-      label: "Total",
-      render: (row) =>
-        `₹ ${row.total?.toFixed(2) ?? row.price?.toFixed(2)}`,
+      render: (row) => `₹ ${row.price.toFixed(2)}`,
     },
     {
       key: "status",
@@ -162,7 +191,12 @@ const InvoiceTable = () => {
 
         <Divider sx={{ mb: 3 }} />
 
-        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
+        <Stack
+          direction="row"
+          justifyContent="flex-end"
+          spacing={2}
+          sx={{ mb: 2 }}
+        >
           <DropdownField
             name="statusFilter"
             label="Status"
@@ -182,8 +216,8 @@ const InvoiceTable = () => {
             columns={columns}
             showSearch
             showExport
-            enableCheckbox
             getRowId={(row) => row.invoice}
+            onDeleteSelected={handleDeleteSelected}
           />
         </div>
       </Paper>

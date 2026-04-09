@@ -20,7 +20,7 @@ export const CustomerListPage = ({
   data,
   onView,
   onEdit,
-  onDelete, 
+  onDelete,
 }: CustomerListProps) => {
   const navigate = useNavigate();
   const [searchTerm] = useState("");
@@ -42,14 +42,18 @@ export const CustomerListPage = ({
 
   const columns: readonly Column<CustomerData>[] = [
     { label: "Name", key: "name" },
-    { label: "Mobile", key: "phone" }, 
+    { label: "Mobile", key: "phone" },
     { label: "Doctor", key: "doctor" },
     { label: "Date", key: "date" },
     { label: "Actions", key: "actionbutton" },
   ];
 
   const handleDelete = async (customer: CustomerData) => {
-    onDelete(customer);
+    await onDelete(customer);
+
+    setCustomers((prev) =>
+      prev.filter((item) => item.customerId !== customer.customerId)
+    );
   };
 
   return (
