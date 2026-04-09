@@ -1,27 +1,20 @@
-import {  useState } from "react";
-
+import { useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
-
 import {  useNavigate } from "react-router-dom";
-
 import {
   UniversalTable,
   Column,
   DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
-
 import { Invoice, InvoiceStatus } from "@/types/invoice";
-
 import { FormProvider, useForm } from "react-hook-form";
-
 import DropdownField from "@/components/controlled/DropdownField";
-
 import { URL_PATH } from "@/constants/UrlPath";
-
 import {
   showToast,
   showConfirmation,
 } from "@/components/uncontrolled/ToastMessage.tsx";
+import { deleteRetailInvoice } from "@/service/retailInvoiceService";
 
 type Props = {
   invoices: Invoice[];
@@ -114,25 +107,23 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
   });
 
   // delete invoice
-  const handleDelete = async (invoiceNo: string) => {
-    const confirmed = await showConfirmation(
-      "Are you sure you want to delete this invoice?",
+ const handleDelete = async (invoiceNo: string) => {
+  const confirmed = await showConfirmation(
+    "Are you sure you want to delete this invoice?",
+    "Confirm Delete"
+  );
 
-      "Confirm Delete"
-    );
+  if (!confirmed) return;
 
-    if (!confirmed) return;
-
-    setInvoices((prev) => {
-      const updated = prev.filter((inv) => inv.invoice !== invoiceNo);
-
-      localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-      return updated;
-    });
-
+  try {
+    await deleteRetailInvoice(Number(invoiceNo));
+    setInvoices((prev) => prev.filter((inv) => inv.invoice !== invoiceNo));
     showToast("success", "Invoice deleted successfully");
-  };
+  } catch (error) {
+    console.error("Error deleting invoice", error);
+    showToast("error", "Failed to delete invoice");
+  }
+};
 
   return (
     <FormProvider {...methods}>
@@ -219,7 +210,13 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
                 (inv) => !rows.some((r) => r.invoice === inv.invoice)
               );
 
-              localStorage.setItem("currentInvoice", JSON.stringify(updated));
+             setInvoices((prev) => {
+  const updated = prev.filter(
+    (inv) => !rows.some((r) => r.invoice === inv.invoice)
+  );
+
+  return updated; 
+});
 
               return updated;
             });

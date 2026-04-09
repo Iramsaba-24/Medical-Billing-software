@@ -54,9 +54,6 @@ const InventoryList = () => {
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
 
 
-
-
-
 const fetchInventory = async () => {
   try {
     const token = localStorage.getItem("token");

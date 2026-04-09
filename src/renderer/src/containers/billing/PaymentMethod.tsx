@@ -65,48 +65,15 @@ const PaymentMethod = () => {
 
   const [finalAmount, setFinalAmount] = useState(0);
 
-  const { setValue } = methods;
+ 
 
   useEffect(() => {
-   
-    const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
-    if (stateAmount && stateAmount > 0) {
-      setFinalAmount(stateAmount);
-    } else {
-      const storedRetail = localStorage.getItem("currentRetailInvoice");
-      const storedInvoice = localStorage.getItem("currentNewInvoice");
-      if (storedRetail) {
-        const retail = JSON.parse(storedRetail);
-        setFinalAmount(retail.totalAmount || 0);
-      } else if (storedInvoice) {
-        const invoices = JSON.parse(storedInvoice);
-        const lastInvoice = invoices[invoices.length - 1];
-        setFinalAmount(lastInvoice?.totalAmount || 0);
-      }
-    }
+  const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
 
-    
-    const flow = (location.state as { flow?: string })?.flow;
-
-    if (flow === "retail") {
-      const invoiceSettings = localStorage.getItem("invoiceSettings");
-      if (invoiceSettings) {
-        const settings = JSON.parse(invoiceSettings);
-        if (["cash", "upi", "credit-card"].includes(settings.payment_method)) {
-          setValue("paymentMethod", settings.payment_method);
-        }
-      }
-    } else if (flow === "new") {
-      const distributorSettings = localStorage.getItem("distributorSettings");
-      if (distributorSettings) {
-        const settings = JSON.parse(distributorSettings);
-        if (["cash", "upi", "credit-card"].includes(settings.payment_method)) {
-          setValue("paymentMethod", settings.payment_method);
-        }
-      }
-    }
-
-  }, [location.state, setValue]); 
+  if (stateAmount && stateAmount > 0) {
+    setFinalAmount(stateAmount);
+  }
+}, [location.state]);
 
 
    
@@ -117,6 +84,7 @@ const saveInvoice = async () => {
 
     console.log("location.state:", location.state);
     console.log("state.rows:", state?.rows);
+    
     console.log("state.invoiceId:", state?.invoiceId);
 
     if (!state?.rows || !state?.invoiceId) {

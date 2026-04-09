@@ -7,44 +7,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
 import TextInputField from "@/components/controlled/TextInputField";
-
+import { getRetailInvoiceById, getRetailInvoiceItemsByInvoiceId, updateRetailInvoice  } from "@/service/retailInvoiceService";
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
 import dayjs, { Dayjs } from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat"; // ✅ ADD
+import customParseFormat from "dayjs/plugin/customParseFormat"; 
+
 
 import { useEffect, useState } from "react";
 
-dayjs.extend(customParseFormat); // ✅ ADD
+dayjs.extend(customParseFormat); 
 
 type InvoiceItem = {
   item: string;
   qty: number;
   price: number;
-};
-
-type StoredMedicine = {
-  name: string;
-  qty: string;
-  amount: number;
-  price?: number;
-};
-
-type StoredInvoice = {
-  invoice: string;
-  name: string;
-  date: string;
-  price: number;
-  status: "Paid" | "Pending" | "Overdue";
-  medicines?: StoredMedicine[];
-  items?: InvoiceItem[];
-};
-
-type Customer = {
-  name: string;
-};
-
-type InventoryItem = {
-  itemName: string;
-  pricePerUnit: number;
 };
 
 type DropdownOption = {
@@ -61,6 +37,13 @@ type InvoiceFormData = {
   date: Dayjs;
   status: "Paid" | "Pending" | "Overdue";
   items: InvoiceItem[];
+};
+
+type RetailInvoiceItemResponse = {
+  medicineId: number;
+  quantity: number;
+  amount: number;
+  price: number;
 };
 
 const EditInvoice = () => {
@@ -102,12 +85,12 @@ const EditInvoice = () => {
     const stored = localStorage.getItem("medical_customers");
     if (!stored) return;
 
-    const parsed: Customer[] = JSON.parse(stored);
+    const parsed: DropdownOption[] = JSON.parse(stored);
 
     setCustomerOptions(
       parsed.map((c) => ({
-        label: c.name,
-        value: c.name,
+        label: c.label,
+        value: c.value,
       }))
     );
   }, []);
@@ -131,90 +114,76 @@ const EditInvoice = () => {
   }, [watchedItems, inventoryOptions, setValue]);
 
   // Load inventory
-  useEffect(() => {
-    const stored = localStorage.getItem("inventory") || "[]";
-    if (!stored) return;
 
-    const parsed: InventoryItem[] = JSON.parse(stored);
+useEffect(() => {
+  const fetchMedicines = async () => {
+    const data: MedicineResponse[] = await getMedicines();
 
     setInventoryOptions(
-      parsed.map((i) => ({
+      data.map((i: MedicineResponse) => ({
         label: i.itemName,
-        value: i.itemName,
+        value: String(i.medicineId),
         price: i.pricePerUnit,
       }))
     );
-  }, []);
+  };
 
+  fetchMedicines();
+}, []);
   // Load invoice
+
 useEffect(() => {
   if (!invoiceNo) return;
+  if (inventoryOptions.length === 0) return;
 
+  const fetchInvoice = async () => {
+    try {
+      const invoice = await getRetailInvoiceById(Number(invoiceNo));
+      const items: RetailInvoiceItemResponse[] = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
 
-  const storedInvoices = localStorage.getItem("currentInvoice");
-  if (!storedInvoices) return;
+      const mappedItems = items.map((i: RetailInvoiceItemResponse) => ({
+        item: String(i.medicineId),
+        qty: i.quantity,
+        price: i.price,
+      }));
 
-  const invoices: StoredInvoice[] = JSON.parse(storedInvoices);
-  const foundInvoice = invoices.find(
-    (inv) => String(inv.invoice) === String(invoiceNo)
-  );
+      reset({
+        name: invoice.customerName,
+        date: dayjs(invoice.invoiceDate),
+        status: invoice.paymentStatus,
+        items: mappedItems.length > 0
+          ? mappedItems
+          : [{ item: "", qty: 1, price: 0 }],
+      });
 
-  if (!foundInvoice) return;
-
-  let items: InvoiceItem[] = [];
-
-  if (foundInvoice.medicines && foundInvoice.medicines.length > 0) {
-    items = foundInvoice.medicines.map((m) => ({
-      item: m.name,
-      qty: Number(m.qty),
-     price: Number(m.amount ?? m.price), 
-    }));
-  } else if (foundInvoice.items && foundInvoice.items.length > 0) {
-    items = foundInvoice.items.map((i) => ({
-      item: i.item,
-      qty: Number(i.qty),
-      price: Number(i.price),
-    }));
-  }
-
-  const finalItems = items.length > 0 ? items : [{ item: "", qty: 1, price: 0 }];
-
-  reset({
-    name: foundInvoice.name,
-    date: dayjs(foundInvoice.date, "DD/MM/YYYY"),
-    status: foundInvoice.status,
-    items: finalItems,
-  });
-}, [invoiceNo, reset]); 
-
-
-  const onSubmit = (data: InvoiceFormData) => {
-    const stored = localStorage.getItem("currentInvoice");
-    const invoices: StoredInvoice[] = stored ? JSON.parse(stored) : [];
-
-    const totalPrice = data.items.reduce((sum, i) => sum + Number(i.price), 0);
-
-    const updated = invoices.map((inv) =>
-      inv.invoice === invoiceNo
-        ? {
-          ...inv,
-          name: data.name,
-          date: dayjs(data.date).format("DD/MM/YYYY"),
-          price: totalPrice,
-          status: data.status,
-          medicines: data.items.map((i) => ({
-            name: i.item,
-            qty: `${i.qty}`,
-            amount: i.price,
-          })),
-        }
-        : inv
-    );
-
-    localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-    navigate(URL_PATH.Invoices);
+    } catch (error) {
+      console.error("Error fetching invoice", error);
+    }
   };
+
+  fetchInvoice();
+}, [invoiceNo, reset, inventoryOptions]);
+
+
+const onSubmit = async (data: InvoiceFormData) => {
+  try {
+    const invoice = await getRetailInvoiceById(Number(invoiceNo));
+    await updateRetailInvoice(Number(invoiceNo), {
+      userId: invoice.userId,
+      customerId: invoice.customerId,
+      invoiceType: invoice.invoiceType,
+      invoiceDate: invoice.invoiceDate,
+      totalAmount: invoice.totalAmount,
+      totalGST: invoice.totalGST,
+      totalDiscount: invoice.totalDiscount,
+      medipointsEarned: invoice.medipointsEarned,
+      paymentStatus: data.status,
+    });
+    navigate(URL_PATH.Invoices);
+  } catch (error) {
+    console.error("Error updating invoice", error);
+  }
+};
 
   return (
     <FormProvider {...methods}>
@@ -229,6 +198,8 @@ useEffect(() => {
             label="Customer"
             options={customerOptions}
             fullWidth
+             freeSolo={true}
+  editable={true}
           />
 
           <DateTimeField

@@ -117,36 +117,6 @@ export default function EditInventoryItem({ open, onClose, item }: Props) {
   }
 }, [item, groupOptions, supplierOptions, methods]);
 
-//   const onSubmit = async (data: InventoryItem) => {
-//     try {
-//       const resolvedGroupId = groupIdMapRef.current[data.medicineGroup] ?? item?.groupId ?? 0;
-//       const resolvedDistributorId = supplierIdMapRef.current[data.supplier] ?? item?.distributorId ?? 0;
-
-// await updateMedicine(item?.medicineId ?? 0, {
-//         itemName: data.itemName,
-//         unit: data.unit,
-//         quantity: data.quantity,
-//         pricePerUnit: data.pricePerUnit,
-//         expiryDate: data.expiryDate,
-//         medicineGroup: resolvedGroupId.toString(),
-//         supplier: resolvedDistributorId.toString(),
-//       });
-
-//       showSnackbar("success", "Item updated successfully");
-//       onClose();
-//     }
-//     //  catch (error) {
-//     //   console.error("Update failed:", error);
-//     //   showSnackbar("error", "Update failed");
-//     // }
-//     catch (error) {
-//   if (typeof error === "object" && error !== null && "response" in error) {
-//     const err = error as { response?: { data?: unknown } };
-//     console.error("BACKEND ERROR:", err.response?.data);
-//   }
-//   showSnackbar("error", "Update failed");
-// }
-//   };
 
 
 const onSubmit = async (data: InventoryItem) => {

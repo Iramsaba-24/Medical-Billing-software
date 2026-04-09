@@ -100,31 +100,20 @@ const MediPoints: React.FC = () => {
     </Box>
   );
 
-  const onSubmit = (data: MediPointsForm) => {
-    if (isInvalid) return;
+ const onSubmit = (data: MediPointsForm) => {
+  if (isInvalid) return;
 
-    const storedInvoice = localStorage.getItem("currentRetailInvoice");
-
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
-
-      invoice.totalAmount = Number(data.discountedAmount);
-
-      localStorage.setItem("currentRetailInvoice", JSON.stringify(invoice));
+  navigate(URL_PATH.PaymentMethod, {
+    state: {
+      flow: location.state?.flow || "retail",
+      totalFromInvoice: Number(data.discountedAmount),
+      invoiceId: location.state?.invoiceId,
+      rows: location.state?.rows,
+      customerName: location.state?.customerName,
+      doctorName: location.state?.doctorName,
     }
- 
-
-navigate(URL_PATH.PaymentMethod, {
-  state: {
-    flow: location.state?.flow || "retail",
-    totalFromInvoice: Number(data.discountedAmount),
-    invoiceId: location.state?.invoiceId,
-    rows: location.state?.rows,
-    customerName: location.state?.customerName,
-    doctorName: location.state?.doctorName,
-  }
-});
-  };
+  });
+};
 
   return (
     <FormProvider {...methods}>

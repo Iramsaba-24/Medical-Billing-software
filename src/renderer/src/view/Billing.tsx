@@ -123,18 +123,27 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
     const now = new Date();
     const customerName = methods.getValues("name");
     const doctorName = methods.getValues("doctor");
+    
+   const selectedCustomer = customerOptions.find(
+  (c) => c.name === customerName
+);
 
-    const payload = {
-      userId: 1,
-      customerId: 1,
-      invoiceType: "Retail",
-      invoiceDate: now.toISOString(),
-      totalAmount: finalTotal,
-      totalGST: 0,
-      totalDiscount: 0,
-      medipointsEarned: 0, 
-      paymentStatus: "Pending",
-    };
+if (!selectedCustomer) {
+  console.error("Customer not selected");
+  return;
+}
+const customerId: number = selectedCustomer.customerId;
+const payload = {
+  userId: 1,
+  customerId: customerId, 
+  invoiceType: "Retail",
+  invoiceDate: now.toISOString(),
+  totalAmount: finalTotal,
+  totalGST: 0,
+  totalDiscount: 0,
+  medipointsEarned: 0, 
+  paymentStatus: "Pending",
+};
 
     const res = await createRetailInvoice(payload);
 
@@ -183,7 +192,7 @@ useEffect(() => {
       },
     ]);
   }
-}, [activeInvoice]);
+}, [activeInvoice, invoiceDataMap]);
 
 
   const [doctorOptions, setDoctorOptions] = useState<
