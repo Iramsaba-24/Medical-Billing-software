@@ -22,6 +22,7 @@ import {
   showToast,
   showConfirmation,
 } from "@/components/uncontrolled/ToastMessage.tsx";
+import { deleteRetailInvoice, updateRetailInvoice } from "@/service/retailInvoiceService";
 
 type Props = {
   invoices: Invoice[];
@@ -114,25 +115,27 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
   });
 
   // delete invoice
-  const handleDelete = async (invoiceNo: string) => {
-    const confirmed = await showConfirmation(
-      "Are you sure you want to delete this invoice?",
+const handleDelete = async (invoiceNo: string) => {
+  const confirmed = await showConfirmation(
+    "Are you sure you want to delete this invoice?",
+    "Confirm Delete"
+  );
 
-      "Confirm Delete"
+  if (!confirmed) return;
+
+  try {
+    await deleteRetailInvoice(Number(invoiceNo)); // ✅ API call
+
+    setInvoices((prev) =>
+      prev.filter((inv) => inv.invoice !== invoiceNo)
     );
 
-    if (!confirmed) return;
-
-    setInvoices((prev) => {
-      const updated = prev.filter((inv) => inv.invoice !== invoiceNo);
-
-      localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-      return updated;
-    });
-
     showToast("success", "Invoice deleted successfully");
-  };
+  } catch (err) {
+    console.error(err);
+    showToast("error", "Delete failed");
+  }
+};
 
   return (
     <FormProvider {...methods}>
@@ -180,22 +183,26 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
 
             options: statusOptions,
 
-            onChange: (row, value) => {
-              setInvoices((prev) => {
-                const updated = prev.map((inv) =>
-                  inv.invoice === row.invoice
-                    ? { ...inv, paymentStatus: value as InvoiceStatus }
-                    : inv
-                );
+onChange: async (row, value) => {
+  try {
+    await updateRetailInvoice(Number(row.invoice), {
+      paymentStatus: value as InvoiceStatus,
+    });
 
-                localStorage.setItem("currentInvoice", JSON.stringify(updated));
+    setInvoices((prev) =>
+      prev.map((inv) =>
+        inv.invoice === row.invoice
+          ? { ...inv, paymentStatus: value as InvoiceStatus }
+          : inv
+      )
+    );
 
-                return updated;
-              });
-
-              showToast("success", "Status updated successfully");
-            },
-          }}
+    showToast("success", "Status updated successfully");
+  } catch (err) {
+    console.error(err);
+    showToast("error", "Update failed");
+  }
+}}}
           actions={{
             view: (invoice) =>
               navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`),
@@ -205,27 +212,31 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
               }),
             delete: (invoice) => handleDelete(invoice.invoice),
           }}
-          onDeleteSelected={async (rows) => {
-            const confirmed = await showConfirmation(
-              "Delete selected invoices?",
+onDeleteSelected={async (rows) => {
+  const confirmed = await showConfirmation(
+    "Delete selected invoices?",
+    "Confirm Delete"
+  );
 
-              "Confirm Delete"
-            );
+  if (!confirmed) return;
 
-            if (!confirmed) return;
+  try {
+    await Promise.all(
+      rows.map((r) => deleteRetailInvoice(Number(r.invoice)))
+    );
 
-            setInvoices((prev) => {
-              const updated = prev.filter(
-                (inv) => !rows.some((r) => r.invoice === inv.invoice)
-              );
+    setInvoices((prev) =>
+      prev.filter((inv) =>
+        !rows.some((r) => r.invoice === inv.invoice)
+      )
+    );
 
-              localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-              return updated;
-            });
-
-            showToast("success", "Selected invoices deleted");
-          }}
+    showToast("success", "Selected invoices deleted");
+  } catch (err) {
+    console.error(err);
+    showToast("error", "Delete failed");
+  }
+}}
         />
       </Paper>
     </FormProvider>

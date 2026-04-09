@@ -5,7 +5,6 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { pharmacySettingsService } from "@/service/pharmacySettingsService";
 import { useEffect, useState } from "react";
 
-
 const getGreeting = () => {
   const hour = new Date().getHours();
 

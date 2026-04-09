@@ -351,16 +351,10 @@ import { useNavigate } from "react-router-dom";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 
 import DoctorEdit from "@/containers/doctors/DoctorEdit";
-
 import { URL_PATH } from "@/constants/UrlPath";
-
 import { getDoctors } from "@/service/doctorService";
-
 import { deleteDoctor } from "@/service/doctorService";
-
 import { updateDoctor } from "@/service/doctorService";
-
-
 type Doctor = {
 
   doctorId: number;
@@ -681,87 +675,61 @@ const handleStatusChange = async (
 <Dialog
 
         open={!!viewItem}
-
         onClose={() => setViewItem(null)}
-
         maxWidth="md"
-
         fullWidth
 >
-
           {viewItem && (
 <Paper
-
       sx={{
-
         p: { xs:4, md:6 },
-
         mx: { xs:1, md:10 },
-
         mt: { xs:2, md:4 },
-
       }}
 >
 <Typography
-
         fontSize={{ xs:18, md:22 }}
-
         fontWeight={600}
-
         mb={4}
 >
-
         Doctor Details
 </Typography>
 <Box
-
         display="flex"
-
         flexDirection={{ xs:"column", md:"row" }}
-
         gap={{ xs:2, md:20 }}
-
         mb={2}
 >
 <Typography>
 <strong>Name:</strong>
 <br />
-
           {viewItem?.doctorName}
 </Typography>
 <Typography>
 <strong>Degree:</strong>
 <br />
-
           {viewItem?.degree}
 </Typography>
 <Typography>
 <strong>Registration No.:</strong>
 <br />
-
           {viewItem?.registrationNumber}
 </Typography>
 </Box>
 <Box
-
         display="flex"
-
         flexDirection={{ xs: "column", md: "row" }}
-
         gap={{ xs: 2, md: 16 }}
-
         mb={2}
 >
 <Typography>
 <strong>Phone:</strong>
 <br />
-
           {viewItem?.phone}
 </Typography>
 <Typography>
 <strong>Email:</strong>
 <br />
-
           {viewItem?.email}
 </Typography>
 </Box>
@@ -769,40 +737,26 @@ const handleStatusChange = async (
 <Typography>
 <strong>Address:</strong>
 <br />
-
           {viewItem?.hospitalAddress}
 </Typography>
 </Box>
 </Paper>
-
           )}
 <DialogActions>
 <Button
 
             sx={{
-
               px: 2.5,
-
               minWidth: 100,
-
               backgroundColor: "#238878",
-
               color: "#fff",
-
               border: "2px solid #238878",
-
               textTransform: "none",
-
               "&:hover": {
-
                 backgroundColor: "#fff",
-
                 color: "#238878",
-
               },
-
             }}
-
             onClick={() => setViewItem(null)}
 >
 
