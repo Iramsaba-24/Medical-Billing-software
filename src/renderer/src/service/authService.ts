@@ -27,6 +27,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  ownerName: string;
   message: string;
   token: string;
   userId?: number;
@@ -263,3 +264,6 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   },
 );
+
+
+
