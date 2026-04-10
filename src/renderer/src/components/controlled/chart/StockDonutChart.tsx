@@ -4,14 +4,14 @@
 // import { useDrawingArea } from "@mui/x-charts/hooks";
 // import { FormProvider, useForm } from "react-hook-form";
 // import DropdownField from "@/components/controlled/DropdownField";
-
+ 
 // function CenterLabel({ children }: { children: React.ReactNode }) {
 //   const { width, height, left, top } = useDrawingArea();
-
+ 
 //   return (
 //     <text
 //       x={left + width / 2}
-//       y={top + height / 2}
+//       y={top + height / 2} 
 //       textAnchor="middle"
 //       dominantBaseline="central"
 //       style={{
@@ -23,9 +23,9 @@
 //     </text>
 //   );
 // }
-
+ 
 // type FilterType = "Today" | "6 Days" | "This Month";
-
+ 
 // const chartDataMap = {
 //   Today: [
 //     { label: "Purchases", value: 20, color: "#6EE700" },
@@ -46,13 +46,13 @@
 //     { label: "No Sales", value: 12, color: "#FFD200" },
 //   ],
 // };
-
+ 
 // const filterOptions = [
 //   { label: "Today", value: "Today" },
 //   { label: "6 Days", value: "6 Days" },
 //   { label: "This Month", value: "This Month" },
 // ];
-
+ 
 // const StockDonutChart = ({
 //   title,
 //   isOnlyDonutSelected = false,
@@ -61,19 +61,20 @@
 //   isOnlyDonutSelected?: boolean;
 // }) => {
 //   const [filter, setFilter] = useState<FilterType>("This Month");
-
+ 
 //   const methods = useForm({
 //     defaultValues: {
 //       filterSelect: "This Month",
 //     },
 //   });
-
-//   const total = chartDataMap[filter].reduce((sum, d) => sum + d.value, 0);
-
+ 
+//   const total =
+//     chartDataMap[filter]?.reduce((sum, d) => sum + d.value, 0) || 0;
+ 
 //   const theme = useTheme();
 //   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 //   const isSmallMobile = useMediaQuery("(max-width:360px)");
-
+ 
 //   const chartSize = isOnlyDonutSelected
 //     ? isSmallMobile
 //       ? 240
@@ -85,7 +86,7 @@
 //     : isMobile
 //     ? 180
 //     : 260;
-
+ 
 //   const innerRadius = isOnlyDonutSelected
 //     ? isSmallMobile
 //       ? 58
@@ -97,7 +98,7 @@
 //     : isMobile
 //     ? 45
 //     : 70;
-
+ 
 //   const outerRadius = isOnlyDonutSelected
 //     ? isSmallMobile
 //       ? 95
@@ -109,11 +110,12 @@
 //     : isMobile
 //     ? 75
 //     : 110;
-
+ 
 //   const handleFilterChange = (value: string) => {
+//     if (!value || !(value in chartDataMap)) return;
 //     setFilter(value as FilterType);
 //   };
-
+ 
 //   return (
 //     <Card
 //       variant="outlined"
@@ -140,7 +142,7 @@
 //         >
 //           {title}
 //         </Typography>
-
+ 
 //         <FormProvider {...methods}>
 //           <Box sx={{ width: { xs: "100%", sm: 200 }, mr: { sm: 1 } }}>
 //             <DropdownField
@@ -151,7 +153,7 @@
 //           </Box>
 //         </FormProvider>
 //       </Box>
-
+ 
 //       {isOnlyDonutSelected ? (
 //         <Box
 //           sx={{
@@ -190,7 +192,7 @@
 //               <CenterLabel>{total}%</CenterLabel>
 //             </PieChart>
 //           </Box>
-
+ 
 //           <Box
 //             sx={{
 //               display: "grid",
@@ -256,16 +258,18 @@
 //     </Card>
 //   );
 // };
-
+ 
 // export default StockDonutChart;
 
-
-import React, { useState } from "react";
 import { Card, Typography, Box, useTheme, useMediaQuery } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
+import React, { useState, useEffect } from "react";
+
+import { DistributorResponse, getDistributors } from "@/service/distributorService";
+import { RetailInvoiceResponse, getAllRetailInvoices } from "@/service/retailInvoiceService";
  
 function CenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
@@ -273,7 +277,7 @@ function CenterLabel({ children }: { children: React.ReactNode }) {
   return (
     <text
       x={left + width / 2}
-      y={top + height / 2}
+      y={top + height / 2} 
       textAnchor="middle"
       dominantBaseline="central"
       style={{
@@ -287,27 +291,6 @@ function CenterLabel({ children }: { children: React.ReactNode }) {
 }
  
 type FilterType = "Today" | "6 Days" | "This Month";
- 
-const chartDataMap = {
-  Today: [
-    { label: "Purchases", value: 20, color: "#6EE700" },
-    { label: "Suppliers", value: 30, color: "#8B5CF6" },
-    { label: "Sales", value: 25, color: "#00F5C8" },
-    { label: "No Sales", value: 25, color: "#FFD200" },
-  ],
-  "6 Days": [
-    { label: "Purchases", value: 35, color: "#6EE700" },
-    { label: "Suppliers", value: 25, color: "#8B5CF6" },
-    { label: "Sales", value: 30, color: "#00F5C8" },
-    { label: "No Sales", value: 10, color: "#FFD200" },
-  ],
-  "This Month": [
-    { label: "Purchases", value: 42, color: "#6EE700" },
-    { label: "Suppliers", value: 28, color: "#8B5CF6" },
-    { label: "Sales", value: 18, color: "#00F5C8" },
-    { label: "No Sales", value: 12, color: "#FFD200" },
-  ],
-};
  
 const filterOptions = [
   { label: "Today", value: "Today" },
@@ -329,6 +312,47 @@ const StockDonutChart = ({
       filterSelect: "This Month",
     },
   });
+  const handleFilterChange = (value: string) => {
+    if (!value || !(value in chartDataMap)) return;
+    setFilter(value as FilterType);
+  };
+  const [suppliersCount, setSuppliersCount] = useState<number>(0);
+const [salesCount, setSalesCount] = useState<number>(0);
+const chartDataMap = {
+  Today: [
+    { label: "Purchases", value: 20, color: "#6EE700" },
+    { label: "Suppliers", value: suppliersCount, color: "#8B5CF6" },
+    { label: "Sales", value: salesCount, color: "#00F5C8" },
+    { label: "No Sales", value: 25, color: "#FFD200" },
+  ],
+  "6 Days": [
+    { label: "Purchases", value: 35, color: "#6EE700" },
+    { label: "Suppliers", value: suppliersCount, color: "#8B5CF6" },
+    { label: "Sales", value: salesCount, color: "#00F5C8" },
+    { label: "No Sales", value: 10, color: "#FFD200" },
+  ],
+  "This Month": [
+    { label: "Purchases", value: 42, color: "#6EE700" },
+    { label: "Suppliers", value: suppliersCount, color: "#8B5CF6" },
+    { label: "Sales", value: salesCount, color: "#00F5C8" },
+    { label: "No Sales", value: 12, color: "#FFD200" },
+  ],
+};
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const suppliers: DistributorResponse[] = await getDistributors();
+      const invoices: RetailInvoiceResponse[] = await getAllRetailInvoices();
+
+      setSuppliersCount(suppliers.length);
+      setSalesCount(invoices.length);
+    } catch (error) {
+      console.error("API Error:", error);
+    }
+  };
+
+  fetchData();
+}, []);
  
   const total =
     chartDataMap[filter]?.reduce((sum, d) => sum + d.value, 0) || 0;
@@ -373,11 +397,7 @@ const StockDonutChart = ({
     ? 75
     : 110;
  
-  const handleFilterChange = (value: string) => {
-    if (!value || !(value in chartDataMap)) return;
-    setFilter(value as FilterType);
-  };
- 
+  
   return (
     <Card
       variant="outlined"

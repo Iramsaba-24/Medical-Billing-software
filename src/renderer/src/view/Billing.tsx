@@ -1,18 +1,22 @@
-
 import { Box, Button, Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
-import ItemsSection from "@/containers/Customer/ItemsSection";
+import RetailItemSection from "@/containers/billing/RetailItemSection";
+import type { ItemRow } from "@/containers/billing/RetailItemSection";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import InvoiceTabButtons from "@/containers/billing/InvoiceTabButtons";
 import NewInvoice from "@/containers/billing/NewInvoice";
 import EmailField from "@/components/controlled/EmailField";
-
+import { createRetailInvoice } from "@/service/retailInvoiceService";
+import { getAllCustomers  } from "@/service/customerService";
+import { CustomerData } from "@/view/CustomerMaster";
+import { getDoctors, DoctorResponse } from "@/service/doctorService";
+ 
 // Payprint button reuse sx
 const PayNPrint = {
   backgroundColor: "#238878",
@@ -27,17 +31,16 @@ const PayNPrint = {
     border: "2px solid #238878",
   },
 };
-type Doctor = {
-  id: number;
+ 
+type PaymentNavigationState = {
+  invoiceId: number;
+  rows: ItemRow[];
+  totalFromInvoice: number;
+  customerName: string;
   doctorName: string;
-  degree: string;
-  phone: string;
-  email: string;
-  registrationNo: string;
-  hospitalAddress: string;
-  status: "Active";
 };
-
+ 
+ 
 type RetailInvoiceFormValues = {
   name: string;
   age: string;
@@ -48,7 +51,7 @@ type RetailInvoiceFormValues = {
   addressLeft: string;
   addressRight: string;
 };
-
+ 
 function RetailInvoice() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,19 +68,28 @@ function RetailInvoice() {
     },
     mode: "onChange",
   });
-
+ 
   const isRetail = location.pathname.includes("retail-invoice");
-
-
+ 
+const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
   const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const [invoiceForms, setInvoiceForms] = useState<Record<string, InvoiceData>>(
-    {}
-  );
-
-  const [doctorList, setDoctorList] = useState<Doctor[]>([]);
-
+ 
+ 
+ const [doctorList, setDoctorList] = useState<DoctorResponse[]>([]);
+  useEffect(() => {
+  const fetchCustomers = async () => {
+    try {
+      const data = await getAllCustomers();
+      setCustomerOptions(data);
+    } catch (error) {
+      console.error("Error fetching customers", error);
+    }
+  };
+ 
+  fetchCustomers();
+}, []);
+ 
   // Invoice button reusable sx
   const invoiceButtonSx = (isActive: boolean) => ({
     backgroundColor: isActive ? "#fff" : "#238878",
@@ -92,194 +104,191 @@ function RetailInvoice() {
       border: "2px solid #238878",
     },
   });
-  // saved to local storage
-  const onSubmit = (data: RetailInvoiceFormValues) => {
-    setIsSubmitted(true);
-
-    const hasInvalidItems = rows.some(
-      (row) =>
-        row.name.trim() === "" ||
-        row.quantity === "" ||
-        Number(row.quantity) <= 0 ||
-        row.mrp === "" ||
-        Number(row.mrp) <= 0
-    );
-
-    if (hasInvalidItems) return;
-
-    const now = new Date();
-    const invoiceData = {
-      invoice: `INV-${Date.now()}`,
-      name: data.name,
-      age: data.age,
-      mobile: data.mobile,
-      email: data.email,
-      doctor: data.doctor,
-      address: data.addressLeft,
-      doctorAddress: data.addressRight,
-      medicines: rows.map((r) => ({
-        name: r.name,
-        qty: r.quantity,
-        price: r.mrp,
-        amount: Number(r.quantity || 0) * Number(r.mrp || 0),
-         expiry: r.expiry || "",
-      })),
-      subTotal: subTotal,
-      
-      totalAmount: finalTotal,
-      paymentStatus: "Paid",
-      // invoiceate: now.toLocaleDateString(),
-      invoiceDate: now.toLocaleDateString(), 
-      time: now.toLocaleTimeString(),
-      paymentMode,
-    };
-
-    localStorage.setItem("currentRetailPayment", paymentMode);
-    localStorage.setItem("currentRetailInvoice", JSON.stringify(invoiceData));
-    navigate(URL_PATH.MediPoints, {
-      state: { totalFromInvoice: finalTotal }
-    });
-  };
-  type ItemRow = {
-    id: number;
-    name: string;
-    quantity: number | "";
-    mrp: number | "";
-      expiry?: string;
-  };
-  type InvoiceData = {
-    form: RetailInvoiceFormValues;
-    rows: ItemRow[];
-   
-    paymentMode: string;
-  };
-  type Customer = {
-    name: string;
-    age: string;
-    mobile: string;
-    email: string;
-    address: string;
-    doctor: string;
-  };
-
-  const [rows, setRows] = useState<ItemRow[]>([
-    { id: Date.now(), name: "", quantity: 1, mrp: "", expiry: ""  },
-  ]);
-
  
-
-  const [paymentMode, setPaymentMode] = useState("Cash");
-
+ const onSubmit = async () => {
+  setIsSubmitted(true);
+ 
+  const hasInvalidItems = rows.some(
+    (row) =>
+      row.medicineId === "" ||
+      row.quantity === "" ||
+      Number(row.quantity) <= 0 ||
+      row.price === "" ||
+      Number(row.price) <= 0
+  );
+ 
+  if (hasInvalidItems) return;
+ 
+  try {
+    const now = new Date();
+    const customerName = methods.getValues("name");
+    const doctorName = methods.getValues("doctor");
+   
+   const selectedCustomer = customerOptions.find(
+  (c) => c.name === customerName
+);
+ 
+if (!selectedCustomer) {
+  console.error("Customer not selected");
+  return;
+}
+const customerId: number = selectedCustomer.customerId;
+const payload = {
+  userId: 1,
+  customerId: customerId,
+  invoiceType: "Retail",
+  invoiceDate: now.toISOString(),
+  totalAmount: finalTotal,
+  totalGST: 0,
+  totalDiscount: 0,
+ medipointsEarned: Math.floor(finalTotal / 200) * 5,
+  paymentStatus: "Pending",
+};
+ 
+    const res = await createRetailInvoice(payload);
+ 
+    navigate(URL_PATH.MediPoints, {
+      state: {
+        invoiceId: res.retailInvoiceId,
+        rows,
+        totalFromInvoice: finalTotal,
+        customerName,
+        doctorName,
+      } as PaymentNavigationState,
+    });
+  } catch (error) {
+    console.error("Create invoice failed", error);
+  }
+};
+const [invoiceDataMap, setInvoiceDataMap] = useState<Record<string, ItemRow[]>>({});
+ 
+const [rows, setRows] = useState<ItemRow[]>([
+  {
+    retailItemId: Date.now(),
+    medicineId: "",
+    quantity: 1,
+    price: "",
+    amount: 0,
+  },
+]);
+ 
+const setRowsAndSave = (newRows: ItemRow[]) => {
+  setRows(newRows);
+  setInvoiceDataMap((prev) => ({ ...prev, [activeInvoice]: newRows }));
+};
+ 
+useEffect(() => {
+  const savedRows = invoiceDataMap[activeInvoice];
+  if (savedRows && savedRows.length > 0) {
+    setRows(savedRows);
+  } else {
+    setRows([
+      {
+        retailItemId: Date.now(),
+        medicineId: "",
+        quantity: 1,
+        price: "",
+        amount: 0,
+      },
+    ]);
+  }
+}, [activeInvoice, invoiceDataMap]);
+ 
+ 
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string }[]
   >([]);
-
-  const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
-
-  // when invoice button change
-  useEffect(() => {
-    const savedData = invoiceForms[activeInvoice];
-    if (savedData) {
-      methods.reset(savedData.form);
-      setRows(savedData.rows);
-     
-      setPaymentMode(savedData.paymentMode);
-    } else {
-      methods.reset({
-        name: "",
-        age: "",
-        mobile: "",
-        email: "",
-        doctor: "",
-        reference: "",
-        addressLeft: "",
-        addressRight: "",
-      });
-      setRows([{ id: Date.now(), name: "", quantity: 1, mrp: "" }]);
-     
-      setPaymentMode("Cash");
-    }
-  }, [activeInvoice, invoiceForms, methods]);
-
+ 
+ 
   // load doctor list
-  useEffect(() => {
-    const storedDoctors = localStorage.getItem("doctors");
-
-    if (storedDoctors) {
-      const parsedDoctors: Doctor[] = JSON.parse(storedDoctors);
-      setDoctorList(parsedDoctors);
-      const options = parsedDoctors.map((doc) => ({
+ useEffect(() => {
+  const fetchDoctors = async () => {
+    try {
+      const data = await getDoctors();
+      setDoctorList(data);
+      const options = data.map((doc: DoctorResponse) => ({
         label: `Dr. ${doc.doctorName}`,
         value: doc.doctorName,
       }));
-
       setDoctorOptions(options);
+    } catch (error) {
+      console.error("Error fetching doctors", error);
     }
-  }, []);
-
+  };
+  fetchDoctors();
+}, []);
   const selectedDoctorName = methods.watch("doctor");
-
-  const nameOptions = [
-    { label: "+ Add Customer", value: "add_customer" },
-    ...customerOptions.map((customer) => ({
-      label: customer.name,
-      value: customer.name,
-    })),
-  ];
-
   const selectedCustomerName = methods.watch("name");
-  // when name change
-  useEffect(() => {
-    if (selectedCustomerName === "add_customer") {
-      navigate(URL_PATH.AddCustomerForm);
-      return;
-    }
-    if (!selectedCustomerName) return;
-    const selectedCustomer = customerOptions.find(
-      (c) => c.name === selectedCustomerName
+ 
+const nameOptions = [
+  { label: "+ Add Customer", value: "add_customer" },
+  ...customerOptions.map((customer) => ({
+    label: customer.name,
+    value: customer.name,
+  })),
+];
+ 
+useEffect(() => {
+  if (selectedCustomerName === "add_customer") {
+    navigate(URL_PATH.AddCustomerForm);
+    return;
+  }
+ 
+  if (!selectedCustomerName) return;
+ 
+  const selectedCustomer = customerOptions.find(
+    (c) => c.name === selectedCustomerName
+  );
+ 
+  if (selectedCustomer) {
+    methods.setValue("age", selectedCustomer.age || "");
+    methods.setValue("mobile", selectedCustomer.phone || "");
+    methods.setValue("email", selectedCustomer.email || "");
+    methods.setValue("addressLeft", selectedCustomer.address || "");
+    methods.setValue("doctor", selectedCustomer.doctor || "");
+ 
+    const normalize = (str: string) =>
+      str.replace("Dr.", "").replace("dr.", "").trim().toLowerCase();
+ 
+    const matchedDoctor = doctorList.find(
+      (doc) =>
+        normalize(doc.doctorName) ===
+        normalize(selectedCustomer.doctor || "")
     );
-    if (selectedCustomer) {
-
-      methods.setValue("age", selectedCustomer.age || "");
-      methods.setValue("mobile", selectedCustomer.mobile || "");
-      methods.setValue("email", selectedCustomer.email || "");
-      methods.setValue("addressLeft", selectedCustomer.address || "");
-      methods.setValue("doctor", selectedCustomer.doctor || "");
-    } else {
-
-      methods.setValue("age", "");
-      methods.setValue("mobile", "");
-      methods.setValue("email", "");
-      methods.setValue("addressLeft", "");
-      methods.setValue("doctor", "");
-    }
-  }, [selectedCustomerName, customerOptions, methods, navigate]);
-  // data load
-  useEffect(() => {
-    const saved = localStorage.getItem("customers");
-    if (saved) {
-      setCustomerOptions(JSON.parse(saved));
-    }
-  }, []);
-
-
-  useEffect(() => {
-    if (selectedDoctorName) {
-      const selectedDoctor = doctorList.find(
-        (doc) => doc.doctorName === selectedDoctorName
+ 
+    if (matchedDoctor) {
+      methods.setValue(
+        "addressRight",
+        matchedDoctor.hospitalAddress || ""
       );
-      if (selectedDoctor) {
-        methods.setValue("addressRight", selectedDoctor.hospitalAddress || "");
-      }
     }
-  }, [selectedDoctorName, doctorList, methods]);
-  const subTotal = rows.reduce(
-    (sum, r) => sum + (Number(r.quantity) * Number(r.mrp) || 0),
+  }
+}, [selectedCustomerName, customerOptions, methods, navigate, doctorList]);
+ 
+ 
+useEffect(() => {
+  if (!selectedDoctorName) return;
+  if (selectedCustomerName && selectedCustomerName !== "add_customer") return;
+ 
+  const normalize = (str: string) =>
+    str.replace("Dr.", "").replace("dr.", "").trim().toLowerCase();
+ 
+  const selectedDoctor = doctorList.find(
+    (doc) => normalize(doc.doctorName) === normalize(selectedDoctorName)
+  );
+  if (selectedDoctor) {
+    methods.setValue("addressRight", selectedDoctor.hospitalAddress || "");
+  }
+}, [selectedDoctorName, doctorList, methods, selectedCustomerName]);
+ 
+ 
+ const subTotal = rows.reduce(
+    (sum, r) => sum + (Number(r.quantity) * Number(r.price) || 0),
     0
   );
-
+ 
   const finalTotal = subTotal;
-
+ 
   return (
     <FormProvider {...methods}>
       {/* invoice tab button */}
@@ -317,22 +326,11 @@ function RetailInvoice() {
                     minWidth: { xs: "unset", md: "19%" },
                     fontSize: { xs: "12px", md: "14px" },
                   }}
-                  onClick={() => {
-                    setInvoiceForms((prev) => ({
-                      ...prev,
-                      [activeInvoice]: {
-                        form: methods.getValues(),
-                        rows,
-                        
-                        paymentMode,
-                      },
-                    }));
-
-                    navigate(URL_PATH.PaymentMethod, {
-                      state: { flow: "retail", totalFromInvoice: finalTotal }
-                    });
-                  }}>
-
+onClick={() => {
+  setInvoiceDataMap((prev) => ({ ...prev, [activeInvoice]: rows }));
+  navigate(`${URL_PATH.Billing}${invoiceNumber}`);
+}}>
+ 
                   Invoice {invoiceNumber}
                 </Button>
               );
@@ -362,16 +360,16 @@ function RetailInvoice() {
                         onlyAlphabet
                         // freeSolo
                         editable={true}
-                        
-
+                       
+ 
                       />
                     </Box>
-
+ 
                     <Box width={{ xs: "100%", sm: "260px" }}>
                       <NumericField name="age" label="Age" min={15} max={100} />
                     </Box>
                   </Box>
-
+ 
                   <Box
                     display="flex"
                     gap={2}
@@ -406,7 +404,7 @@ function RetailInvoice() {
                   display="flex"
                   flexDirection="column"
                   gap={{ xs: 2, md: 1.5 }}>
-
+ 
                   <Box width={{ xs: "100%", sm: "260px" }}>
                     <DropdownField
                       name="doctor"
@@ -425,23 +423,23 @@ function RetailInvoice() {
                       minLength={10}
                       maxLength={50}
                       rows={3} />
-
+ 
                   </Box>
                 </Box>
               </Box>
             </Paper>
-
+ 
             <Box mt={3}>
-
-              <ItemsSection
+ 
+              <RetailItemSection
                 rows={rows}
-                setRows={setRows}
+                setRows={setRowsAndSave}
                 finalTotal={finalTotal}
                 isSubmitted={isSubmitted}
               />
-
+ 
             </Box>
-
+ 
             {/* Bottom pay print button */}
             <Box
               sx={{
@@ -470,5 +468,6 @@ function RetailInvoice() {
     </FormProvider>
   );
 }
-
+ 
 export default RetailInvoice;
+ 

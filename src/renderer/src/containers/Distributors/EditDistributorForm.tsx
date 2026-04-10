@@ -1,4 +1,3 @@
-
 import {
   Dialog,
   DialogTitle,
@@ -11,16 +10,17 @@ import { useForm, FormProvider } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
 import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";
-
 export type Distributor = {
   id: string;
+ // distributorId: number;
   companyName: string;
   phone: string;
   email: string;
   registrationNumber: string;
   address: string;
   status: "Active" | "Inactive";
-  createdDate: string;
+   createdDate: string;
+  // createdAt: string;
   ownerName: string;
   website?: string;
   gstin: string;
@@ -43,11 +43,13 @@ type Props = {
 const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
   const methods = useForm<Distributor>({
     defaultValues: {
-      id: "",
+       id: "",
+     // distributorId: 0,
       companyName: "",
       phone: "",
       email: "",
-      createdDate: "",
+     createdDate: "",
+    //  createdAt: "",
       registrationNumber: "",
       address: "",
       status: "Active",
@@ -96,14 +98,14 @@ const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
             maxLength={15}
           />
 
-          <TextInputField name="mobile" label="Mobile Number" maxLength={10} />
+          <TextInputField name="phone" label="Mobile Number" maxLength={10} />
 
           <TextInputField name="email" label="Email" />
 
           <DateTimeField
             useCurrentDate={true}
             disabled
-            name="date"
+            name="createdAt"
             label="Date"
           />
 

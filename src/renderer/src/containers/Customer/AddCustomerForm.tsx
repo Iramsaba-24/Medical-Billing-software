@@ -10,12 +10,8 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import DropdownField from "@/components/controlled/DropdownField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-interface StoredDoctor {
-  doctorName: string;
-  hospitalAddress?: string;
-  address?: string;
-  clinicAddress?: string;
-}
+import { getDoctors, DoctorResponse } from "@/service/doctorService";
+import { createCustomer, updateCustomer } from "@/service/customerService";
 
 interface Props {
   onBack?: () => void;
@@ -33,7 +29,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     defaultValues: {
       name: "",
       age: "",
-      mobile: "",
+      phone: "",
       email: "",
       address: "",
       doctor: "",
@@ -70,20 +66,30 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   };
 
   useEffect(() => {
-    const storedDoctors: StoredDoctor[] = JSON.parse(
-      localStorage.getItem("doctors") || "[]"
-    );
+    const fetchDoctors = async () => {
+      try {
+        const doctors: DoctorResponse[] = await getDoctors();
 
-    const options = storedDoctors.map((doc) => ({
-      label: doc.doctorName,
-      value: doc.doctorName,
-      address: doc.hospitalAddress ?? doc.address ?? doc.clinicAddress ?? "",
-    }));
-    const updatedOptions = [
-      { label: "+ Add Doctor", value: "add_doctor", address: "" },
-      ...options,
-    ];
-    setDoctorOptions(updatedOptions);
+        const options = doctors.map((doc) => ({
+          label: doc.doctorName,
+          value: doc.doctorName,
+          address: doc.hospitalAddress,
+        }));
+
+        setDoctorOptions([
+          { label: "+ Add Doctor", value: "add_doctor", address: "" },
+          ...options,
+        ]);
+      } catch (error) {
+        console.error("Failed to fetch doctors", error);
+
+        setDoctorOptions([
+          { label: "+ Add Doctor", value: "add_doctor", address: "" },
+        ]);
+      }
+    };
+
+    fetchDoctors();
   }, []);
 
   const selectedDoctor = methods.watch("doctor");
@@ -110,27 +116,34 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       methods.reset(initialData);
     }
   }, [initialData, methods]);
-  const handleActualSave = (data: CustomerData) => {
-    const existingCustomers: CustomerData[] = JSON.parse(
-      localStorage.getItem("customers") || "[]"
-    );
+  const handleActualSave = async (data: CustomerData) => {
+    try {
+      const formattedData = {
+        ...data,
+        age: String(data.age),
+        phone: String(data.phone),
+        name: data.name,
+        email: data.email,
+        address: data.address,
+        date: data.date,
+        doctor: data.doctor,
+        doctorAddress: data.doctorAddress,
+      };
 
-    let updatedCustomers: CustomerData[];
+      let savedData: CustomerData;
 
-    if (initialData) {
-      updatedCustomers = existingCustomers.map((customer) =>
-        customer.mobile === initialData.mobile ? data : customer
-      );
-    } else {
-      updatedCustomers = [...existingCustomers, data];
-    }
+      if (initialData && initialData.customerId) {
+        savedData = await updateCustomer(initialData.customerId, formattedData);
+      } else {
+        savedData = await createCustomer(formattedData);
+      }
+      onSave?.(savedData);
 
-    localStorage.setItem("customers", JSON.stringify(updatedCustomers));
-
-    onSave?.(data);
-
-    if (!initialData) {
-      navigate(URL_PATH.Billing);
+      if (!initialData) {
+        navigate(URL_PATH.Billing);
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
     }
   };
   return (
@@ -217,7 +230,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   }}
                 />
                 <MobileField
-                  name="mobile"
+                  name="phone"
                   label="Mobile"
                   countryCode
                   preventDuplicate={!initialData}

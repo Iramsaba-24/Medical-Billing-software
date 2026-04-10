@@ -1,11 +1,13 @@
 import { Box, Divider, Typography } from "@mui/material";
 import { useEffect, useState, useMemo } from "react";
-import BillingTable from "@/containers/invoices/BillingTable.tsx";
+import BillingTable from "@/containers/Invoices/BillingTable.tsx";
 import { Invoice } from "@/types/invoice";
 import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
+import { getAllRetailInvoices } from "@/service/retailInvoiceService";
+
 
 const cardHover = {
   cursor: "pointer",
@@ -20,14 +22,44 @@ const cardHover = {
 
 
 const Billing = () => {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  useEffect(() => {
-    const stored = localStorage.getItem("currentInvoice");
-    const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
-    setInvoices(parsed);
-  }, []);
+ const [invoices, setInvoices] = useState<Invoice[]>([]);
 
-  // Memoized Calculations
+const fetchInvoices = async () => {
+  try {
+    const data = await getAllRetailInvoices();
+    const mapped: Invoice[] = data
+  .sort((a: { retailInvoiceId: number }, b: { retailInvoiceId: number }) => 
+    a.retailInvoiceId - b.retailInvoiceId
+  )
+  .map((inv: {
+      retailInvoiceId: number;
+      customerName?: string;
+      invoiceDate: string;
+      totalAmount: number;
+      paymentStatus: string;
+    }) => ({
+      invoice: String(inv.retailInvoiceId),
+      name: inv.customerName || "",
+      invoiceDate: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+      price: inv.totalAmount,
+      paymentStatus: inv.paymentStatus,
+      status: inv.paymentStatus,
+      medicines: [],
+      doctor: "",
+      address: "",
+      date: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+    }));
+    setInvoices(mapped);
+  } catch (error) {
+    console.error("Error fetching invoices", error);
+  }
+};
+
+useEffect(() => {
+  fetchInvoices();
+}, []);
+
+  
 
   const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
     const revenue = invoices
@@ -179,8 +211,8 @@ const Billing = () => {
 
       <BillingTable
         invoices={invoices}
-
         setInvoices={setInvoices}
+          refetchInvoices={fetchInvoices}
       />
 </Box>
 
