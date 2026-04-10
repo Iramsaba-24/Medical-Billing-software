@@ -20,14 +20,14 @@ interface DoctorRequest extends DoctorFormData {
 
 }
 
-// backend response
+// backend response 
 export interface DoctorResponse {
   doctorId: number;
   doctorName: string;
-  degree: string;
+  degree: string; 
   phone: string;
   email: string;
-  registrationNumber: string;
+  registrationNumber: string; 
   hospitalAddress: string;
 }
 
