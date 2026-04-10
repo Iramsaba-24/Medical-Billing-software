@@ -1,8 +1,8 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Paper, Typography, Button } from "@mui/material";
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
-import DropdownField from "@/components/controlled/DropdownField";
+// import DropdownField from "@/components/controlled/DropdownField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
  
 type DashboardSettingsForm = {
@@ -17,32 +17,32 @@ type DashboardSettingsForm = {
   autoRefreshInterval: string;
 };
  
-type InventoryItem = {
-  itemName: string;
-};
+// type InventoryItem = {
+//   itemName: string;
+// };
  
-type MedicineOption = {
-  label: string;
-  value: string;
-};
+// type MedicineOption = {
+//   label: string;
+//   value: string;
+// };
  
  
-const getMedicineOptions = (): MedicineOption[] => {
-  try {
-    const stored = localStorage.getItem("inventory");
-    if (!stored) return [];
+// const getMedicineOptions = (): MedicineOption[] => {
+//   try {
+//     const stored = localStorage.getItem("inventory");
+//     if (!stored) return [];
  
-    const parsed: InventoryItem[] = JSON.parse(stored);
+//     const parsed: InventoryItem[] = JSON.parse(stored);
  
-    return parsed.map((item) => ({
-      label: item.itemName,
-      value: item.itemName,
-    }));
-  } catch (e) {
-    console.error("Inventory parse error", e);
-    return [];
-  }
-};
+//     return parsed.map((item) => ({
+//       label: item.itemName,
+//       value: item.itemName,
+//     }));
+//   } catch (e) {
+//     console.error("Inventory parse error", e);
+//     return [];
+//   }
+// };
  
  
 const kpiOptions = [
@@ -104,9 +104,9 @@ const defaultValues: DashboardSettingsForm = {
 };
  
 const DashboardSettings = () => {
-  const [medicineDropdownOptions, setMedicineDropdownOptions] = useState<
-    MedicineOption[]
-  >([]);
+  // const [medicineDropdownOptions, setMedicineDropdownOptions] = useState<
+  //   MedicineOption[]
+  // >([]);
  
   const savedSettings = localStorage.getItem("dashboardSettings");
  
@@ -126,20 +126,20 @@ const DashboardSettings = () => {
   const { handleSubmit, reset } = methods;
  
   // auto update medicines
-  useEffect(() => {
-    const loadMedicines = () => {
-      const data = getMedicineOptions();
-      setMedicineDropdownOptions(data);
-    };
+  // useEffect(() => {
+  //   const loadMedicines = () => {
+  //     const data = getMedicineOptions();
+  //     setMedicineDropdownOptions(data);
+  //   };
  
-    loadMedicines();
+  //   loadMedicines();
  
-    window.addEventListener("inventoryUpdated", loadMedicines);
+  //   window.addEventListener("inventoryUpdated", loadMedicines);
  
-    return () => {
-      window.removeEventListener("inventoryUpdated", loadMedicines);
-    };
-  }, []);
+  //   return () => {
+  //     window.removeEventListener("inventoryUpdated", loadMedicines);
+  //   };
+  // }, []);
  
   const onSubmit = (data: DashboardSettingsForm) => {
     console.log("Submitted", data);
@@ -223,7 +223,7 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
           </Paper>
  
           {/* Top Selling Medicines */}
-          <Paper sx={cardStyle}>
+          {/* <Paper sx={cardStyle}>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -241,7 +241,7 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
                 sx={{ width: 150, minWidth: 150 }}
               />
             </Box>
-          </Paper>
+          </Paper> */}
  
           {/* Chart Preferences */}
           <Paper sx={cardStyle}>
