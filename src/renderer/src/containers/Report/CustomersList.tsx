@@ -60,7 +60,6 @@ function CustomerTable() {
         const invoices: Invoice[] = await getAllRetailInvoices();
         const medicines: MedicineResponse[] = await getMedicines();
 
-        // medicine map
         const medicineMap = new Map<number, string>();
         medicines.forEach((m) => {
           medicineMap.set(m.medicineId, m.itemName);

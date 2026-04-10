@@ -6,7 +6,7 @@ import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 // frontend form data
 export interface DistributorFormData {
   companyName: string;
-  ownerName: string; //  make required
+  ownerName: string; 
   phone: string;
   email: string;
   registrationNumber: string;
@@ -68,10 +68,8 @@ export interface DistributorResponse {
 }
 
 /*  HELPERS */
-
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
-
   return {
     headers: {
       Authorization: token ? `Bearer ${token}` : "",

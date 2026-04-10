@@ -1,56 +1,79 @@
 import { Box, Typography, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
+
 import TotalSalesReport from "@/assets/TotalSalesReport.svg";
 import TotalPurchaseReport from "@/assets/TotalPurchaseReport.svg";
 import ProfitReport from "@/assets/ProfitReport.svg";
 
+import {
+  getAllRetailInvoices,
+  getRetailInvoiceItemsByInvoiceId,
+} from "@/service/retailInvoiceService";
+
+import {
+  getDistributors,
+  DistributorResponse,
+} from "@/service/distributorService";
+
+type RetailInvoice = {
+  retailInvoiceId: number;
+  customerId: number;
+  invoiceDate: string;
+};
+
 type RetailInvoiceItem = {
-  total?: number;
+  medicineId: number;
+  quantity: number;
+  price: number;
+};
+
+type DistributorWithPurchase = DistributorResponse & {
+  totalPurchase?: number;
 };
 
 function ReportCards() {
   const [totalSales, setTotalSales] = useState<number>(0);
   const [totalPurchase, setTotalPurchase] = useState<number>(0);
 
-  const settings = JSON.parse(localStorage.getItem("report_settings") || "{}");
-  const visibleCards: string[] = settings?.card_visibility_control || [];
+  const calculateSales = async () => {
+    try {
+      const invoices: RetailInvoice[] = await getAllRetailInvoices();
 
-  const calculateTotals = () => {
-    const syncedSales = localStorage.getItem("global_total_sales");
+      let sales = 0;
 
-    if (syncedSales !== null) {
-      setTotalSales(Number(JSON.parse(syncedSales)));
-    } else {
+      for (const inv of invoices) {
+        const items: RetailInvoiceItem[] =
+          await getRetailInvoiceItemsByInvoiceId(inv.retailInvoiceId);
+
+        for (const item of items) {
+          sales += (item.price || 0) * (item.quantity || 0);
+        }
+      }
+
+      setTotalSales(sales);
+    } catch (error) {
+      console.error("Error calculating sales:", error);
       setTotalSales(0);
     }
+  };
 
-    
-    const syncedPurchase = localStorage.getItem("global_total_purchase");
+  const calculatePurchase = async () => {
+    try {
+      const distributors: DistributorWithPurchase[] = await getDistributors();
 
-    if (syncedPurchase !== null) {
-      setTotalPurchase(Number(JSON.parse(syncedPurchase)));
-    } else {
-      const retailInvoices: RetailInvoiceItem[] = JSON.parse(
-        localStorage.getItem("retailInvoices") || "[]"
-      );
+      const purchaseValue =
+        distributors?.[0]?.totalPurchase ?? 0;
 
-      const purchase = retailInvoices.reduce(
-        (sum, invoice) => sum + (Number(invoice.total) || 0),
-        0
-      );
-
-      setTotalPurchase(purchase);
+      setTotalPurchase(purchaseValue);
+    } catch (error) {
+      console.error("Error fetching purchase:", error);
+      setTotalPurchase(0);
     }
   };
 
   useEffect(() => {
-    calculateTotals();
-
-    window.addEventListener("reportUpdated", calculateTotals);
-
-    return () => {
-      window.removeEventListener("reportUpdated", calculateTotals);
-    };
+    calculateSales();
+    calculatePurchase();
   }, []);
 
   const profit = totalSales - totalPurchase;
@@ -80,29 +103,28 @@ function ReportCards() {
       gap={3}
       mb={4}
     >
-      {cards
-        .filter((card) => visibleCards.includes(card.label))
-        .map((card) => (
-          <Paper
-            key={card.label}
-            sx={{
-              p: 3,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              borderRadius: 3,
-              boxShadow: 3,
-            }}
-          >
-            <Box>
-              <Typography variant="h6" fontWeight="bold">
-                {card.value}
-              </Typography>
-              <Typography variant="body2">{card.label}</Typography>
-            </Box>
-            <Box component="img" src={card.img} width={55} />
-          </Paper>
-        ))}
+      {cards.map((card) => (
+        <Paper
+          key={card.label}
+          sx={{
+            p: 3,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            borderRadius: 3,
+            boxShadow: 3,
+          }}
+        >
+          <Box>
+            <Typography variant="h6" fontWeight="bold">
+              {card.value}
+            </Typography>
+            <Typography variant="body2">{card.label}</Typography>
+          </Box>
+
+          <Box component="img" src={card.img} width={55} />
+        </Paper>
+      ))}
     </Box>
   );
 }
