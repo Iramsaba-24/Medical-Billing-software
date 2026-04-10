@@ -104,8 +104,7 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
       border: "2px solid #238878",
     },
   });
-
-  
+ 
  const onSubmit = async () => {
   setIsSubmitted(true);
  
@@ -219,12 +218,8 @@ useEffect(() => {
   fetchDoctors();
 }, []);
   const selectedDoctorName = methods.watch("doctor");
-const selectedCustomerName = methods.watch("name");
-
-const selectedCustomer = customerOptions.find(
-  (c) => c.name === selectedCustomerName
-);
-
+  const selectedCustomerName = methods.watch("name");
+ 
 const nameOptions = [
   { label: "+ Add Customer", value: "add_customer" },
   ...customerOptions.map((customer) => ({
@@ -240,8 +235,11 @@ useEffect(() => {
   }
  
   if (!selectedCustomerName) return;
-
-
+ 
+  const selectedCustomer = customerOptions.find(
+    (c) => c.name === selectedCustomerName
+  );
+ 
   if (selectedCustomer) {
     methods.setValue("age", selectedCustomer.age || "");
     methods.setValue("mobile", selectedCustomer.phone || "");
@@ -265,9 +263,9 @@ useEffect(() => {
       );
     }
   }
-}, [selectedCustomerName, customerOptions, doctorList]);
-
-
+}, [selectedCustomerName, customerOptions, methods, navigate, doctorList]);
+ 
+ 
 useEffect(() => {
   if (!selectedDoctorName) return;
   if (selectedCustomerName && selectedCustomerName !== "add_customer") return;
@@ -470,5 +468,6 @@ onClick={() => {
     </FormProvider>
   );
 }
-
+ 
 export default RetailInvoice;
+ 
