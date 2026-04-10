@@ -8,7 +8,7 @@ import { showConfirmation, showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
   import { getMedicineGroups, deleteMedicineGroup  } from "@/service/medicineGroupService";
-
+import { updateMedicineGroup } from "@/service/medicineGroupService";
 
 type MedicineGroupRow = {
   groupId: number;
@@ -46,22 +46,35 @@ useEffect(() => {
   fetchGroups();
 }, []);
 
-  const saveGroups = (updated: MedicineGroupRow[]) => {
-    localStorage.setItem("medicineGroups", JSON.stringify(updated));
-    setMedicineGroups(updated);
-  };
+  
+const handleUpdate = async () => {
+  if (!editGroup) return;
 
-  const handleUpdate = () => {
-    if (!editGroup) return;
+  try {
+    await updateMedicineGroup(editGroup.groupId, {
+      groupName: editGroup.groupName,
+      category: editGroup.category,
+    });
 
-    const updated = medicineGroups.map((g) =>
-      g.groupId === editGroup.groupId ? editGroup : g
-    );
+    // 🔥 backend मधून fresh data घे
+    const res = await getMedicineGroups();
 
-    saveGroups(updated);
+    const formatted = res.map((g) => ({
+      groupId: g.groupId,
+      groupName: g.groupName,
+      category: g.category,
+      count: g.medicineCount.toString(),
+    }));
+
+    setMedicineGroups(formatted);
+
     showSnackbar("success", "Group updated successfully");
     setEditGroup(null);
-  };
+  } catch (err) {
+    console.error(err);
+    showSnackbar("error", "Update failed");
+  }
+};
 
   const columns: Column<MedicineGroupRow>[] = [
     { key: "groupName", label: "Group Name" },

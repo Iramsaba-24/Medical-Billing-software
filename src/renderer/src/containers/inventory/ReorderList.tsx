@@ -161,3 +161,353 @@ const ReorderList = () => {
   );
 };
 export default ReorderList;
+
+ 
+
+
+
+
+
+
+
+
+
+// import { Box, Typography, Button, Paper, IconButton } from "@mui/material";
+// import { Add, Remove } from "@mui/icons-material";
+// import { FormProvider, useForm, SubmitHandler } from "react-hook-form";
+// import { useState, useEffect } from "react";
+// import DropdownField from "@/components/controlled/DropdownField";
+// import EmailField from "@/components/controlled/EmailField";
+// import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
+// import axios from "axios";
+// import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
+// import { getMedicines } from "@/service/medicineService";
+// import { createReorder, getLowStock, getLastPurchases, ReorderLevelsResponse, LowStockResponse } from "@/service/reorderService";
+
+// // TYPES
+// type ItemRow = {
+//   id: number;
+//   medicine: string;
+//   medicineId?: number;
+//   quantity: number | "";
+// };
+
+// type InventoryRow = {
+//   id: number;
+//   supplierName: string;
+//   medicineName: string;
+//   quantity: number;
+// };
+
+// type ReorderForm = {
+//   distributor: string;
+//   email: string;
+//   items: {
+//     medicineId: number;
+//     quantity: number;
+//   }[];
+// };
+
+// type OptionType = {
+//   label: string;
+//   value: string;
+//   email?: string;
+// };
+
+
+
+
+// export default function InventoryDashboard() {
+//   const methods = useForm<ReorderForm>();
+
+//   const [rows, setRows] = useState<ItemRow[]>([
+//     { id: Date.now(), medicine: "", quantity: "" },
+//   ]);
+
+//   const [lowStockData, setLowStockData] = useState<InventoryRow[]>([]);
+//   const [lastPurchaseData, setLastPurchaseData] = useState<InventoryRow[]>([]);
+
+//  const inventoryColumns = [
+//   { key: "supplierName", label: "Supplier" },
+//   { key: "medicineName", label: "Medicine Name" },
+//   { key: "quantity", label: "Quantity" },
+// ];
+
+//   const [distributorOptions, setDistributorOptions] = useState<OptionType[]>([]);
+//   const [medicineOptions, setMedicineOptions] = useState<OptionType[]>([]);
+
+//   const addRow = () => {
+//     setRows([...rows, { id: Date.now(), medicine: "", quantity: "" }]);
+//   };
+
+//   const removeRow = (id: number) => {
+//     setRows(rows.filter((r) => r.id !== id));
+//   };
+
+//   const updateRow = (
+//     id: number,
+//     field: keyof ItemRow,
+//     value: string | number
+//   ) => {
+//     setRows(
+//       rows.map((r) =>
+//         r.id === id ? { ...r, [field]: value } : r
+//       )
+//     );
+//   };
+
+//   const handleMedicineChange = (id: number, value: string) => {
+//     const selected = medicineOptions.find((m: OptionType) => m.value === value);
+
+//     setRows(
+//       rows.map((r) =>
+//         r.id === id
+//           ? {
+//               ...r,
+//               medicine: value,
+//               medicineId: selected ? Number(selected.value) : 0,
+//             }
+//           : r
+//       )
+//     );
+//   };
+// const selectedDistributor = methods.watch("distributor");
+
+// const { setValue } = methods; 
+
+// useEffect(() => {
+//   const selected = distributorOptions.find(
+//     (d) => d.value === selectedDistributor
+//   );
+//   if (selected?.email) {
+//     setValue("email", selected.email);
+//   }
+// }, [selectedDistributor, distributorOptions, setValue]);
+
+
+//  const onSubmit: SubmitHandler<ReorderForm> = async (data) => {
+//   const items = rows
+//     .filter((r) => r.medicineId && r.quantity)
+//     .map((r) => ({
+//       medicineId: r.medicineId as number,
+//       quantity: Number(r.quantity),
+//     }));
+
+//   try {
+//     await createReorder({
+//       distributorId: Number(data.distributor),
+//       email: data.email,
+//       items: items,
+//     });
+
+//     alert("Reorder placed successfully");
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
+// useEffect(() => {
+//   const fetchData = async () => {
+//     try {
+//       const token = localStorage.getItem("token");
+
+//       // MEDICINES
+//       const meds = await getMedicines();
+//       setMedicineOptions(
+//         meds.map((m: { itemName: string; medicineId: number }) => ({
+//           label: m.itemName,
+//           value: m.medicineId.toString(),
+//         }))
+//       );
+
+//       //  DISTRIBUTORS
+//       const distRes = await axios.get(API_ENDPOINTS.DISTRIBUTOR, {
+//         headers: {
+//           Authorization: token ? `Bearer ${token}` : "",
+//         },
+//       });
+
+//       setDistributorOptions(
+//         distRes.data.map((d: {
+//           companyName: string;
+//           distributorId: number;
+//           email: string;
+//         }) => ({
+//           label: d.companyName,
+//           value: d.distributorId.toString(),
+//           email: d.email,
+//         }))
+//       );
+
+//       //  LOW STOCK
+//   const lowStock = await getLowStock();
+// const lowStockArray: InventoryRow[] = (lowStock?.data ?? [])
+//   .map((item: LowStockResponse) => ({
+//     id: item.medicineId,
+//     supplierName: item.unit ?? "",
+//     medicineName: item.itemName ?? "",
+//     quantity: item.quantity ?? 0,
+//   }));
+// setLowStockData(lowStockArray);
+
+//       //  LAST PURCHASE
+//    const lastPurchase = await getLastPurchases();
+// const lastPurchaseArray: InventoryRow[] = (lastPurchase?.data ?? [])
+//   .map((item: ReorderLevelsResponse) => ({
+//     id: item.reorderId,
+//     supplierName: item.companyName ?? "",
+//     medicineName: item.medicineName ?? "",
+//     quantity: item.reorderQuantity ?? 0,
+//   }));
+// setLastPurchaseData(lastPurchaseArray);
+
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   fetchData();
+// }, []);
+
+//   return (
+//     <FormProvider {...methods}>
+//       <Box p={3} component="form" onSubmit={methods.handleSubmit(onSubmit)}>
+
+//         <Paper sx={{ p: 3, borderRadius: 3, mb: 4 }}>
+//           <Typography fontSize={16} fontWeight={600} mb={2}>
+//             Reorder
+//           </Typography>
+
+//           <Box display="flex" gap={2} mb={2}>
+//             <Typography sx={{ minWidth: 180 }}>
+//               Distributor
+//             </Typography>
+//             <Box sx={{ width: 300 }}>
+//               <DropdownField name="distributor" label="" options={distributorOptions} />
+//             </Box>
+//           </Box>
+
+//           <Box display="flex" gap={2} mb={3}>
+//             <Typography sx={{ minWidth: 180 }}>
+//               Email
+//             </Typography>
+//             <Box sx={{ width: 300 }}>
+//               <EmailField name="email" label="" />
+//             </Box>
+//           </Box>
+
+//           <Box display="flex" justifyContent="space-between" mb={2}>
+//             <Typography fontWeight={600}>Items</Typography>
+
+//             <Button
+//               startIcon={<Add />}
+//               onClick={addRow}
+//               sx={{
+//                 color: "#238878",
+//                 fontWeight: "bold",
+//                 textTransform: "none",
+//               }}
+//             >
+//               ADD
+//             </Button>
+//           </Box>
+
+//           <Box display="grid" gridTemplateColumns="2fr 1fr 120px" mb={1}>
+//             <Typography fontWeight={500}>Medicine</Typography>
+//             <Typography fontWeight={500}>Qty</Typography>
+//             <Typography />
+//           </Box>
+
+//           {rows.map((row) => (
+//             <Box
+//               key={row.id}
+//               display="grid"
+//               gridTemplateColumns="2fr 1fr 120px"
+//               gap={2}
+//               mb={2}
+//               alignItems="center"
+//             >
+//               <DropdownField
+//                 name={`medicine_${row.id}`}
+//                 label=""
+//                 options={medicineOptions}
+//                 value={row.medicine}
+//                 onChangeCallback={(val) =>
+//                   handleMedicineChange(row.id, val)
+//                 }
+//               />
+
+//               <Box sx={{ width: "100%" }}>
+//                 <input
+//                   type="number"
+//                   value={row.quantity}
+//                   onChange={(e) =>
+//                     updateRow(
+//                       row.id,
+//                       "quantity",
+//                       e.target.value === "" ? "" : Number(e.target.value)
+//                     )
+//                   }
+//                   style={{
+//                     width: "100%",
+//                     height: "56px",
+//                     border: "1px solid #ccc",
+//                     borderRadius: "4px",
+//                     padding: "0 14px",
+//                     boxSizing: "border-box",
+//                     fontSize: "14px",
+//                     marginBottom: 25,
+//                   }}
+//                 />
+//               </Box>
+
+//               <Box display="flex" justifyContent="center">
+//                 {rows.length > 1 && (
+//                   <IconButton
+//                     onClick={() => removeRow(row.id)}
+//                     sx={{ color: "red" }}
+//                   >
+//                     <Remove />
+//                   </IconButton>
+//                 )}
+//               </Box>
+//             </Box>
+//           ))}
+
+//           <Box display="flex" justifyContent="flex-end">
+//             <Button type="submit" sx={{ background: "#238878", color: "#fff" }}>
+//               Reorder
+//             </Button>
+//           </Box>
+//         </Paper>
+
+//         <Box mb={4}>
+//           <Typography fontSize={18} fontWeight={600} mb={2}>
+//             Low Stock List
+//           </Typography>
+
+//           <UniversalTable
+//            data={lowStockData || []}
+//             columns={inventoryColumns}
+//             getRowId={(row, index) => row.id ?? index}
+//             actions={{}}
+//           />
+//         </Box>
+
+//         <Box>
+//           <Typography fontSize={18} fontWeight={600} mb={2}>
+//             Last Purchase
+//           </Typography>
+
+//           <UniversalTable
+//              data={lastPurchaseData || []}
+//             columns={inventoryColumns}
+//             getRowId={(row) => row.id}
+//             actions={{}}
+//           />
+//         </Box>
+
+//       </Box>
+//     </FormProvider>
+//   );
+// }
