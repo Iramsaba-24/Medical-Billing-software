@@ -123,6 +123,7 @@ const handleDelete = (item: InventoryItem) => {
     try {
       await deleteMedicine(item.medicineId);
       setTableData(prev => prev.filter((i) => i.medicineId !== item.medicineId));
+      window.dispatchEvent(new Event("inventoryUpdated"));
       showSnackbar("success", "Item deleted successfully");
     } catch (err) {
       if (err instanceof Error) {

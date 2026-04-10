@@ -69,7 +69,7 @@ import { getDistributors } from "@/service/distributorService";
 
 function DistributorsPage() {
   const [count, setCount] = useState(0);
-
+ 
   useEffect(() => {
     const storedData = localStorage.getItem("distributors");
     if (storedData) {
@@ -88,7 +88,6 @@ function DistributorsPage() {
     console.error("Failed to fetch distributors", err);
   }
 };
-
 const fetchTotalPurchase = async () => {
   try {
     const invoices = await getAllInvoices();
@@ -98,7 +97,6 @@ const fetchTotalPurchase = async () => {
     console.error("Failed to fetch invoices", err);
   }
 };
-
 useEffect(() => {
   fetchDistributorCount();
   fetchTotalPurchase();

@@ -49,26 +49,26 @@ const ItemsSection = ({
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
   useEffect(() => {
-  const fetchInventory = async () => {
-    try {
-      const data: MedicineResponse[] = await getMedicines();
+    const fetchInventory = async () => {
+      try {
+        const data: MedicineResponse[] = await getMedicines();
 
-      const formatted: InventoryItem[] = data.map((item) => ({
-        itemName: item.itemName,
-        medicineId: item.medicineId,
-        quantity: item.quantity,
-        pricePerUnit: item.pricePerUnit,
-        expiryDate: item.expiryDate,
-      }));
+        const formatted: InventoryItem[] = data.map((item) => ({
+          itemName: item.itemName,
+          medicineId: item.medicineId,
+          quantity: item.quantity,
+          pricePerUnit: item.pricePerUnit,
+          expiryDate: item.expiryDate,
+        }));
 
-      setInventory(formatted);
-    } catch (error) {
-      console.error("Inventory fetch error:", error);
-    }
-  };
+        setInventory(formatted);
+      } catch (error) {
+        console.error("Inventory fetch error:", error);
+      }
+    };
 
-  fetchInventory();
-}, []);
+    fetchInventory();
+  }, []);
 
   const itemOptions = inventory.map((item) => ({
     label: item.itemName,
@@ -76,7 +76,10 @@ const ItemsSection = ({
   }));
 
   const addRow = () =>
-    setRows([...rows, { id: Date.now(), name: "", quantity: "", mrp: "", expiry: "" }]);
+    setRows([
+      ...rows,
+      { id: Date.now(), name: "", quantity: "", mrp: "", expiry: "" },
+    ]);
 
   const removeRow = (id: number) => setRows(rows.filter((r) => r.id !== id));
 
@@ -113,7 +116,7 @@ const ItemsSection = ({
         if (r.id === id) {
           return {
             ...r,
-            medicineId: item?.medicineId || 0,   
+            medicineId: item?.medicineId || 0,
             name: selectedName,
             mrp: item ? Number(item.pricePerUnit) : "",
             expiry: item ? item.expiryDate : "",

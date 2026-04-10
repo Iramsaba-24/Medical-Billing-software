@@ -4,12 +4,14 @@ import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable
 
 import { useForm, FormProvider } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 type InventoryItem = {
   itemName: string;
   itemId: string;
   medicineGroup: string;
-  stockQty: number | string; // allow string (safety)
+  stockQty: number;
   pricePerUnit: number;
   expiryDate: string;
   supplier: string;
@@ -19,6 +21,28 @@ type InventoryItem = {
 type FilterForm = {
   stockStatus: string;
   timeFilter: string;
+};
+
+type MedicineApi = {
+  medicineId: number;
+  itemName: string;
+  quantity: number;
+  pricePerUnit: number;
+  expiryDate: string;
+  groupId: number;
+  distributorId: number;
+  gstPercentage: number;
+  unit: string;
+};
+
+type GroupApi = {
+  groupId: number;
+  groupName: string;
+};
+
+type DistributorApi = {
+  distributorId: number;
+  companyName: string;
 };
 
 function InventoryTable() {
@@ -35,26 +59,85 @@ function InventoryTable() {
   const stockStatus = watch("stockStatus");
   const timeFilter = watch("timeFilter");
 
-  useEffect(() => {
-    const loadInventory = () => {
-      const storedInventory: InventoryItem[] = JSON.parse(
-        localStorage.getItem("inventory") || "[]"
-      );
-      setInventoryData(storedInventory);
-    };
+  const fetchInventory = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = { Authorization: token ? `Bearer ${token}` : "" };
 
-    loadInventory();
-    window.addEventListener("inventoryUpdated", loadInventory);
+      const [medRes, groupRes, distRes] = await Promise.all([
+        axios.get<{ data: MedicineApi[] }>(API_ENDPOINTS.MEDICINE, { headers })
+          .catch(() => ({ data: { data: [] as MedicineApi[] } })),
+
+        axios.get<{ data: GroupApi[] }>(API_ENDPOINTS.MEDICINE_GROUP, { headers })
+          .catch(() => ({ data: { data: [] as GroupApi[] } })),
+
+        axios.get<{ data: DistributorApi[] }>(API_ENDPOINTS.DISTRIBUTOR, { headers })
+          .catch(() => ({ data: { data: [] as DistributorApi[] } })),
+      ]);
+
+      const medicines: MedicineApi[] =
+        Array.isArray(medRes.data)
+          ? medRes.data
+          : medRes.data?.data || [];
+
+      const groups: GroupApi[] =
+        Array.isArray(groupRes.data)
+          ? groupRes.data
+          : groupRes.data?.data || [];
+
+      const distributors: DistributorApi[] =
+        Array.isArray(distRes.data)
+          ? distRes.data
+          : distRes.data?.data || [];
+
+      const groupMap: Record<number, string> = {};
+      groups.forEach((g) => {
+        groupMap[g.groupId] = g.groupName;
+      });
+
+      const distributorMap: Record<number, string> = {};
+      distributors.forEach((d) => {
+        distributorMap[d.distributorId] = d.companyName;
+      });
+
+      const getStatus = (qty: number): "In Stock" | "Low Stock" | "Out of Stock" => {
+        if (qty === 0) return "Out of Stock";
+        if (qty < 20) return "Low Stock";
+        return "In Stock";
+      };
+
+      const formatted: InventoryItem[] = medicines.map((item) => ({
+        itemName: item.itemName,
+        itemId: String(item.medicineId),
+        medicineGroup: groupMap[item.groupId] || "N/A",
+        stockQty: item.quantity,
+        pricePerUnit: item.pricePerUnit,
+        expiryDate: item.expiryDate.split("T")[0],
+        supplier: distributorMap[item.distributorId] || "N/A",
+        status: getStatus(item.quantity),
+      }));
+
+      console.log("FINAL DATA:", formatted);
+
+      setInventoryData(formatted);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventory();
+
+    window.addEventListener("inventoryUpdated", fetchInventory);
 
     return () => {
-      window.removeEventListener("inventoryUpdated", loadInventory);
+      window.removeEventListener("inventoryUpdated", fetchInventory);
     };
   }, []);
 
-  //  FILTER FIXED (number force conversion)
   const filteredData = useMemo(() => {
     return inventoryData.filter((item) => {
-      const qty = Number(item.stockQty);
+      const qty = item.stockQty;
 
       const matchesStock = (() => {
         if (stockStatus === "All") return true;
@@ -81,23 +164,6 @@ function InventoryTable() {
       return matchesStock && matchesTime;
     });
   }, [inventoryData, stockStatus, timeFilter]);
-
-  //  DELETE FUNCTION
-  const handleDeleteSelected = (rowsToDelete: InventoryItem[]) => {
-    const updatedInventory = inventoryData.filter(
-      (item) =>
-        !rowsToDelete.some((row) => row.itemId === item.itemId)
-    );
-
-    setInventoryData(updatedInventory);
-
-    localStorage.setItem(
-      "inventory",
-      JSON.stringify(updatedInventory)
-    );
-
-    window.dispatchEvent(new Event("inventoryUpdated"));
-  };
 
   const stockOptions = [
     { label: "All Stock", value: "All" },
@@ -154,37 +220,20 @@ function InventoryTable() {
     },
     { key: "supplier", label: "Supplier" },
     { key: "expiryDate", label: "Expiry Date" },
-
-    // STATUS FIXED COMPLETELY
     {
       key: "status",
       label: "Status",
       render: (row) => {
-        const qty = Number(row.stockQty);
-
-        const calculatedStatus =
-          qty === 0
-            ? "Out of Stock"
-            : qty < 20
-            ? "Low Stock"
-            : "In Stock";
-
         const statusColor =
-          calculatedStatus === "Out of Stock"
+          row.status === "Out of Stock"
             ? "#ef4444"
-            : calculatedStatus === "Low Stock"
+            : row.status === "Low Stock"
             ? "#f97316"
             : "#16a34a";
 
         return (
-          <Typography
-            sx={{
-              color: statusColor,
-              fontWeight: 600,
-              fontSize: "0.85rem",
-            }}
-          >
-            {calculatedStatus}
+          <Typography sx={{ color: statusColor, fontWeight: 600 }}>
+            {row.status}
           </Typography>
         );
       },
@@ -201,38 +250,19 @@ function InventoryTable() {
         <Divider sx={{ mb: 3 }} />
 
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-          <DropdownField
-            name="stockStatus"
-            label="Stock Status"
-            options={stockOptions}
-            freeSolo={false}
-          />
-
-          <DropdownField
-            name="timeFilter"
-            label="Expiry Filter"
-            options={timeOptions}
-            freeSolo={false}
-          />
+          <DropdownField name="stockStatus" label="Stock Status" options={stockOptions} />
+          <DropdownField name="timeFilter" label="Expiry Filter" options={timeOptions} />
         </Stack>
 
-
-        <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
-
-        
-        <UniversalTable<InventoryItem>
-          data={filteredData}
-          columns={columns}
-          showSearch
-          showExport
-          enableCheckbox
-          rowsPerPage={5}
-          getRowId={(row, index) => `${row.itemId}-${index}`}
-
-          //getRowId={(row) => row.itemId}
-  
-          onDeleteSelected={handleDeleteSelected}
-        />
+        <div style={{ width: "100%", overflowX: "auto" }}>
+          <UniversalTable<InventoryItem>
+            data={filteredData}
+            columns={columns}
+            showSearch
+            showExport
+            rowsPerPage={5}
+            getRowId={(row, index) => `${row.itemId}-${index}`}
+          />
         </div>
       </Paper>
     </FormProvider>
