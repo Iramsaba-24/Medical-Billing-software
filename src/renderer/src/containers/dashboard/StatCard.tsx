@@ -11,23 +11,28 @@ import Inventory from '@/assets/inventory.svg';
 import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
-import { useEffect, useState } from "react";type CustomerItem = {
-  qty: number;
-  price: number;
-};
- 
-type CustomerStorage = {
-  itemsList?: CustomerItem[];
-};
- 
+import { getAllRetailInvoices, RetailInvoiceResponse } from "@/service/retailInvoiceService";
+import { useEffect, useState } from "react";
+
 const Dashboard: React.FC = () => {
-const [inventory, setInventory] = useState<MedicineResponse[]>([]);
+const [inventory, setInventory] = useState<MedicineResponse[]>([]);// inventory data
+const [invoices, setInvoices] = useState<RetailInvoiceResponse[]>([]);// fetch invoices for revenue calculation
+// fetch inventory data
 useEffect(() => {
   const fetchInventory = async () => {
-    const data = await getMedicines(); // inventory fetch
+    const data = await getMedicines(); 
     setInventory(data);
   };
   fetchInventory();
+}, []);
+// fetch invoices data
+useEffect(() => {
+  const fetchInvoices = async () => {
+    const data = await getAllRetailInvoices();
+    setInvoices(data);
+  };
+
+  fetchInvoices();
 }, []);
 // available medicines count
 const availableMedicines = inventory.filter(item => item.quantity > 0).length;
@@ -39,27 +44,15 @@ const inventoryStatus = (): string => {
   if (medicineShortage <= 3) return "Average";
   return "Critical";
 };
-
 // fetch total revenue
 const totalRevenue = (): string => {
-  const customerData: CustomerStorage[] = JSON.parse(
-    localStorage.getItem("medical_customers") || "[]"
-  );
- 
-  const sales = customerData.reduce((sum, customer) => {
-    const customerTotal =
-      customer.itemsList?.reduce(
-        (itemSum, item) =>
-          itemSum + (Number(item.qty) || 0) * (Number(item.price) || 0),
-        0
-      ) || 0;
- 
-    return sum + customerTotal;
-  }, 0);
- 
-  return `₹ ${sales.toLocaleString()}`;
+  const total = invoices
+    .filter((inv) => inv.paymentStatus === "Paid")
+    .reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+
+  return `₹ ${total.toLocaleString()}`;
 };
- 
+// fetch visible kpis-settings
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
     "totalRevenue",
