@@ -56,34 +56,21 @@ export interface CreateSubscriptionResponse {
   isActive: boolean;
 }
 
-// interface SubscriptionResponse {
-//   subscriptionId: number;
-//   message?: string;
-//   status?: string;
-// }
-
-// interface ApiErrorResponse {
-//   message?: string;
-//   errors?: Record<string, string[]>;
-//   statusCode?: number;
-// }
-
 export interface PaymentRequest {
   userId: number;
   subscriptionId: number;
   amount: number;
   paymentMethod: string;
-  couponCode?: string;
 }
 
 export interface PaymentResponse {
+  success: boolean;
   SrNo: number;
   userPaymentId: number;
   userId: number;
   subscriptionId: number;
   amount: number;
   paymentMethod: string;
-  couponCode: string;
   paymentStatus: string;
   paymentDate: string;
 }
@@ -95,6 +82,13 @@ export interface SubscriptionResponse {
   endDate?: string;
   message?: string;
   status?: string;
+
+   data?: {  
+    subscriptionId: number;
+    isActive?: boolean;
+    startDate?: string;
+    endDate?: string;
+  };
 }
 
 export interface UserSubscription {
@@ -107,7 +101,6 @@ export interface UserSubscription {
 }
 
 export const authService = {
-  // Complete registration with all steps
   register: async (userData: RegisterRequest): Promise<RegisterResponse> => {
     const response = await axios.post(
       `${API_BASE_URL}/Auth/register`,
@@ -116,7 +109,6 @@ export const authService = {
     return response.data;
   },
 
-  // Login
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const response = await axios.post(
       `${API_BASE_URL}/Auth/login`,
@@ -130,7 +122,6 @@ export const authService = {
     }
     return response.data;
   },
-
 
   getUserSubscriptions: async (userId: number): Promise<UserSubscription[]> => {
     try {
@@ -157,7 +148,6 @@ export const authService = {
     } catch (error: unknown) {
       console.error("Create subscription error:", error);
       
-      // Type guard for AxiosError
       if (error instanceof AxiosError && error.response?.status === 400) {
         console.log("Attempting to fetch existing subscription...");
         const subscriptions = await authService.getUserSubscriptions(data.userId);
@@ -175,83 +165,31 @@ export const authService = {
     }
   },
 
- processPayment: async (
-  paymentData: PaymentRequest,
-  sendVia: "email" | "whatsapp",
-  email?: string,
-  whatsapp?: string
-): Promise<PaymentResponse> => {
-  // Include the receipt delivery info in the request body
-  const requestData = {
-    userId: paymentData.userId,
-    subscriptionId: paymentData.subscriptionId,
-    amount: paymentData.amount,
-    paymentMethod: paymentData.paymentMethod,
-    couponCode: paymentData.couponCode || "",
-    sendVia: sendVia,
-    email: email || "",
-    whatsapp: whatsapp || ""
-  };
-  
-  console.log("Sending payment request:", requestData);
-  
-  const response = await axiosInstance.post("/Payments", requestData);
-  return response.data;
-}
+  processPayment: async (
+    paymentData: PaymentRequest,
+    sendVia: "email" | "whatsapp",
+    email?: string,
+  ): Promise<PaymentResponse> => {
+    const requestData = {
+      userId: paymentData.userId,
+      subscriptionId: paymentData.subscriptionId,
+      amount: paymentData.amount,
+      paymentMethod: paymentData.paymentMethod,
+      sendVia: sendVia,
+      email: email || "",
+    };
+    
+    console.log("Sending payment request:", requestData);
+    
+    const response = await axiosInstance.post("/Payments", requestData);
+    return response.data;
+  }
 };
 
-
-  // Create subscription after payment
-  // createSubscription: async (
-  //   subscriptionData: CreateSubscriptionRequest,
-  // ): Promise<CreateSubscriptionResponse> => {
-  //   const response = await axios.post(
-  //     `${API_BASE_URL}/UserSubscription`,
-  //     subscriptionData,
-  //   );
-  //   return response.data;
-  // },
-
-  // Process payment
-//   processPayment: async (
-//     paymentData: PaymentRequest,
-//   ): Promise<PaymentResponse> => {
-//     const response = await axios.post(`${API_BASE_URL}/Payments`, paymentData);
-//     return response.data;
-//   },
-// };
-
-//  Payment (with headers)
-// Update the processPayment method in authService.ts
-
-
-// processPayment: async (
-//   paymentData: PaymentRequest,
-//   sendVia: "email" | "whatsapp",
-//   email?: string,
-//   whatsapp?: string
-// ): Promise<PaymentResponse> => {
-//   // Include the receipt delivery info in the request body
-//   const requestData = {
-//       ...paymentData,
-//       sendVia: sendVia,
-//       email: email || "", // Convert undefined to empty string
-//       whatsapp: whatsapp || "" // Convert undefined to empty string
-//   };
-  
-//   const response = await axiosInstance.post("/Payments", requestData);
-//   return response.data;
-// }
-
-// };
-
-
-// Optional: Create axios instance with interceptors
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Add token to requests if it exists
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -264,6 +202,3 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   },
 );
-
-
-

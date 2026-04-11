@@ -25,10 +25,10 @@ interface DoctorRequest extends DoctorFormData {
 export interface DoctorResponse {
   doctorId: number;
   doctorName: string;
-  degree: string;
+  degree: string; 
   phone: string;
   email: string;
-  registrationNumber: string;
+  registrationNumber: string; 
   hospitalAddress: string;
    isActive: boolean;
     IsActive?: boolean;
