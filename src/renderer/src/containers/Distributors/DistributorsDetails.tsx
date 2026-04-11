@@ -3,22 +3,22 @@ import { Box, Typography, Paper,} from "@mui/material";
 import BankInfo from "@/containers/distributors/BankInfo";
 import NewInvoiceList from "@/containers/distributors/NewInvoiceList";
 import { useEffect, useState } from "react";
-
+ 
 const DistributorDetails = () => {
   const { state } = useLocation();
   const data = state?.distributor;
 const [showBankDetails, setShowBankDetails] = useState(false);
-
+ 
   useEffect(() => {
     const stored = localStorage.getItem("distributorSettings");
-
+ 
     if (stored) {
       const settings = JSON.parse(stored);
-
+ 
       setShowBankDetails(settings.bank_details?.includes("bank_details"));
     }
   }, []);
-
+ 
   if (!data) return <Typography p={3}>Distributor not found!</Typography>;
 // fields for BankInfo and DistributorDetails
   const distributorFields = [
@@ -48,7 +48,6 @@ const [showBankDetails, setShowBankDetails] = useState(false);
   { label: "IFSC", value: data.bankDetails?.ifscCode },
   { label: "UPI ID", value: data.bankDetails?.upiId },
 ];
-
   return (
     <Box p={-2}>
      {/* DistributorsDetails */}
@@ -63,9 +62,10 @@ const [showBankDetails, setShowBankDetails] = useState(false);
       )}
       {/* InventoryList call */}
         <NewInvoiceList/>
-      
+     
     </Box>
   );
 };
-
+ 
 export default DistributorDetails;
+ 

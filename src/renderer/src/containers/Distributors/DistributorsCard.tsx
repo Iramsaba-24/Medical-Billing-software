@@ -3,11 +3,12 @@ import TotalDistributors from "@/assets/TotalDistributers.svg";
 import TotalPurchase from "@/assets/warningsign.svg";
 import NewDistributors from "@/assets/NewDistributors.svg";
 
+ 
 type Props = {
   totalCount: number;
   totalPurchase: number;
 };
-
+ 
 function DistributorCards({ totalCount, totalPurchase }: Props) {
   const cardData = [
     {
@@ -26,7 +27,7 @@ function DistributorCards({ totalCount, totalPurchase }: Props) {
       img: NewDistributors,
     },
   ];
-
+ 
   return (
     <Box>
       {/* Heading */}
@@ -40,7 +41,7 @@ function DistributorCards({ totalCount, totalPurchase }: Props) {
       >
         Distributors
       </Typography>
-
+ 
       {/* Cards */}
       <Box
         display="grid"
@@ -82,5 +83,7 @@ function DistributorCards({ totalCount, totalPurchase }: Props) {
     </Box>
   );
 }
-
+ 
 export default DistributorCards;
+ 
+ 

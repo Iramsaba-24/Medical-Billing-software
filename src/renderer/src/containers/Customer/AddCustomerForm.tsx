@@ -82,6 +82,10 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         ]);
       } catch (error) {
         console.error("Failed to fetch doctors", error);
+
+        setDoctorOptions([
+          { label: "+ Add Doctor", value: "add_doctor", address: "" },
+        ]);
       }
     };
 

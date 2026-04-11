@@ -1,77 +1,79 @@
 import { Box, Typography, Paper } from "@mui/material";
 import { useEffect, useState } from "react";
+
 import TotalSalesReport from "@/assets/TotalSalesReport.svg";
 import TotalPurchaseReport from "@/assets/TotalPurchaseReport.svg";
 import ProfitReport from "@/assets/ProfitReport.svg";
 
-type CustomerItem = {
-  qty: number;
-  price: number;
-};
+import {
+  getAllRetailInvoices,
+  getRetailInvoiceItemsByInvoiceId,
+} from "@/service/retailInvoiceService";
 
-type CustomerStorage = {
-  itemsList?: CustomerItem[];
+import {
+  getDistributors,
+  DistributorResponse,
+} from "@/service/distributorService";
+
+type RetailInvoice = {
+  retailInvoiceId: number;
+  customerId: number;
+  invoiceDate: string;
 };
 
 type RetailInvoiceItem = {
-  total?: number;
+  medicineId: number;
+  quantity: number;
+  price: number;
+};
+
+type DistributorWithPurchase = DistributorResponse & {
+  totalPurchase?: number;
 };
 
 function ReportCards() {
   const [totalSales, setTotalSales] = useState<number>(0);
   const [totalPurchase, setTotalPurchase] = useState<number>(0);
-  //handle through setting
-  const settings = JSON.parse(localStorage.getItem("report_settings") || "{}");
 
-  const visibleCards: string[] = settings?.card_visibility_control || [];
+  const calculateSales = async () => {
+    try {
+      const invoices: RetailInvoice[] = await getAllRetailInvoices();
 
-  const calculateTotals = () => {
-    
-    //  SALES (From medical_customers)
-   
-    const customerData: CustomerStorage[] = JSON.parse(
-      localStorage.getItem("medical_customers") || "[]"
-    );
+      let sales = 0;
 
-    const sales = customerData.reduce((sum, customer) => {
-      const customerTotal =
-        customer.itemsList?.reduce(
-          (itemSum, item) =>
-            itemSum +
-            (Number(item.qty) || 0) *
-            (Number(item.price) || 0),
-          0
-        ) || 0;
+      for (const inv of invoices) {
+        const items: RetailInvoiceItem[] =
+          await getRetailInvoiceItemsByInvoiceId(inv.retailInvoiceId);
 
-      return sum + customerTotal;
-    }, 0);
+        for (const item of items) {
+          sales += (item.price || 0) * (item.quantity || 0);
+        }
+      }
 
-    setTotalSales(sales);
+      setTotalSales(sales);
+    } catch (error) {
+      console.error("Error calculating sales:", error);
+      setTotalSales(0);
+    }
+  };
 
-   
-    //  PURCHASE (From retailInvoices)
-   
-    const retailInvoices: RetailInvoiceItem[] = JSON.parse(
-      localStorage.getItem("retailInvoices") || "[]"
-    );
+  const calculatePurchase = async () => {
+    try {
+      const distributors: DistributorWithPurchase[] = await getDistributors();
 
-    const purchase = retailInvoices.reduce(
-      (sum, invoice) => sum + (Number(invoice.total) || 0),
-      0
-    );
+      const purchaseValue =
+        distributors?.[0]?.totalPurchase ?? 0;
 
-    setTotalPurchase(purchase);
+      setTotalPurchase(purchaseValue);
+    } catch (error) {
+      console.error("Error fetching purchase:", error);
+      setTotalPurchase(0);
+    }
   };
 
   useEffect(() => {
-    calculateTotals();
-
-    // Auto refresh when data updates
-    window.addEventListener("reportUpdated", calculateTotals);
-
-    return () => {
-      window.removeEventListener("reportUpdated", calculateTotals);
-    };
+    calculateSales();
+    calculatePurchase();
   }, []);
 
   const profit = totalSales - totalPurchase;
@@ -101,9 +103,7 @@ function ReportCards() {
       gap={3}
       mb={4}
     >
-      {cards 
-      .filter((card) => visibleCards.includes(card.label))
-      .map((card) => (
+      {cards.map((card) => (
         <Paper
           key={card.label}
           sx={{
@@ -119,9 +119,7 @@ function ReportCards() {
             <Typography variant="h6" fontWeight="bold">
               {card.value}
             </Typography>
-            <Typography variant="body2">
-              {card.label}
-            </Typography>
+            <Typography variant="body2">{card.label}</Typography>
           </Box>
 
           <Box component="img" src={card.img} width={55} />

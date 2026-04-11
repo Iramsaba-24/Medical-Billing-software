@@ -14,6 +14,6 @@ export const API_ENDPOINTS = {
   CUSTOMER: `${API_BASE_URL}/Customer`,
   RETAIL_INVOICE: `${API_BASE_URL}/RetailInvoice`,
   RETAIL_INVOICE_ITEMS: `${API_BASE_URL}/RetailInvoiceItems`,
-  
+  GET_TOTAL_PURCHASE: `${API_BASE_URL}/purchase/total`,
 };
  
