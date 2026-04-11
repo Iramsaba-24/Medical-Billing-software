@@ -74,7 +74,7 @@ export const addDoctor = async (
     ...data,
     userId: getUserId(),
     clinicName: "Default Clinic",
-    IsActive: data.isActive ?? data.IsActive ?? true,
+    IsActive: data.isActive ?? data.IsActive ?? true,//nullish coalescing 
   };
  
   const res = await axios.post(

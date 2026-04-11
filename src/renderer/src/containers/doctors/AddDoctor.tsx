@@ -33,24 +33,6 @@ const AddDoctor = () => {
 
   const navigate = useNavigate();
 
-  // submit
-  // const onSubmit = (data: AddDoctorFormValues) => {
-  //   const existingDoctors = JSON.parse(
-  //     localStorage.getItem("doctors") || "[]"
-  //   );
-
-  //   const newDoctor = {
-  //     doctorId: Date.now(),
-  //     ...data,
-  //   };
-    
-  //  localStorage.setItem(
-  //     "doctors",
-  //     JSON.stringify([...existingDoctors, newDoctor])
-  //   );
-
-  //   navigate(URL_PATH.Doctors);
-  // };
 const onSubmit = async (data: AddDoctorFormValues) => {
   try {
     await addDoctor({

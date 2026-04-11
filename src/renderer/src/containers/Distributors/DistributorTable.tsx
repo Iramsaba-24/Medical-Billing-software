@@ -36,7 +36,7 @@ const convertToDistributor = (response: DistributorResponse): Distributor => {
     email: response.email,
     createdDate: response.createdDate, 
     address: response.address,
-    status: "Active",
+   status: response.isActive ? "Active" : "Inactive",
     ownerName: response.ownerName,
     website: response.website,
     gstin: response.gstin,
@@ -79,31 +79,49 @@ const Distributors = () => {
     }
   };
 
-  const handleStatusChange = async (id: string, status: "Active" | "Inactive") => {
-    try {
-      const updated = distributors.map((d) =>
-        d.id === id ? { ...d, status } : d
-      );
-      setDistributors(updated);
-      showToast("success", "Status updated successfully!");
-    } catch (error) {
-      console.error("Error updating status:", error);
-      showToast("error", "Failed to update status.");
-    }
-  };
+const handleStatusChange = async (
+  id: string,
+  status: "Active" | "Inactive"
+) => {
+  try {
+    const distributor = distributors.find((d) => d.id === id);
+    if (!distributor) return;
 
-  // const handleSave = async (updatedDistributor: Distributor) => {
-  //   try {
-  //     const updated = distributors.map((d) =>
-  //       d.id === updatedDistributor.id ? updatedDistributor : d
-  //     );
-  //     setDistributors(updated);
-  //     showToast("success", "Distributor updated successfully!");
-  //   } catch (error) {
-  //     console.error("Error updating distributor:", error);
-  //     showToast("error", "Failed to update distributor.");
-  //   }
-  // };
+    // API call
+    await updateDistributor(parseInt(id), {
+      companyName: distributor.companyName,
+      ownerName: distributor.ownerName,
+      phone: distributor.phone,
+      email: distributor.email,
+      registrationNumber: distributor.registrationNumber,
+      website: distributor.website,
+      gstin: distributor.gstin,
+      address: distributor.address,
+
+      isActive: status === "Active",
+
+      bankName: distributor.bankDetails?.bankName || "",
+      accountNumber: distributor.bankDetails?.accountNumber || "",
+      accountHolderName:
+        distributor.bankDetails?.accountHolderName || "",
+      branch: distributor.bankDetails?.branch || "",
+      ifscCode: distributor.bankDetails?.ifscCode || "",
+      upiId: distributor.bankDetails?.upiId || "",
+    });
+
+    // frontend update
+    const updated = distributors.map((d) =>
+      d.id === id ? { ...d, status } : d
+    );
+
+    setDistributors(updated);
+    showToast("success", "Status updated successfully!");
+  } catch (error) {
+    console.error("Error updating status:", error);
+    showToast("error", "Failed to update status.");
+  }
+};
+
 
   const handleSave = async (updatedDistributor: Distributor) => {
   try {
