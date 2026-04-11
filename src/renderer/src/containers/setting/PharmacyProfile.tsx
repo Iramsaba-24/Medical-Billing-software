@@ -791,8 +791,8 @@ import { pharmacySettingsService } from "@/service/pharmacySettingsService";
 export type PharmacyFormValues = {
   pharmacyName: string | null
   address: string| null;
-  drugLicenseNumber: string;
-  fssaiNumber: string;
+ drugLicenseNumber: string;
+ fssaiNumber: string;
  contactNumber: string;
   email: string;
   bankName: string;
@@ -806,8 +806,8 @@ export type PharmacyFormValues = {
 const defaultValues: PharmacyFormValues = {
   pharmacyName: "ABC Medical Store",
   address: "Main Road, City",
-  drugLicenseNumber: "DL-KA-2023-001245",
-  fssaiNumber: "12345678901234",
+ drugLicenseNumber: "DL-KA-2023-001245",
+ fssaiNumber: "12345678901234",
   contactNumber: "9876543210",
   email: "pharmacy@gmail.com",
   bankName: "State Bank of India",

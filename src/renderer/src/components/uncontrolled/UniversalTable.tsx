@@ -494,4 +494,4 @@ export function UniversalTable<T extends Record<string, unknown>>({
     </Paper>
   );
 }
- 
+
