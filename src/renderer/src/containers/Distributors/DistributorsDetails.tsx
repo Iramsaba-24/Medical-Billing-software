@@ -31,14 +31,23 @@ const [showBankDetails, setShowBankDetails] = useState(false);
     { label: "Address", value: data.address },
   ];
 
+  // const bankFields = [
+  //   { label: "Bank Name", value: data.bankName },
+  //   { label: "A/C Number", value: data.accountNumber },
+  //   { label: "A/C Holder's Name", value: data.accountHolderName },
+  //   { label: "Branch", value: data.branchName },
+  //   { label: "IFSC", value: data.ifscCode },
+  //   { label: "UPI ID", value: data.upiId },
+  // ];
+
   const bankFields = [
-    { label: "Bank Name", value: data.bankName },
-    { label: "A/C Number", value: data.accountNumber },
-    { label: "A/C Holder's Name", value: data.accountHolderName },
-    { label: "Branch", value: data.branchName },
-    { label: "IFSC", value: data.ifscCode },
-    { label: "UPI ID", value: data.upiId },
-  ];
+  { label: "Bank Name", value: data.bankDetails?.bankName },
+  { label: "A/C Number", value: data.bankDetails?.accountNumber },
+  { label: "A/C Holder's Name", value: data.bankDetails?.accountHolderName },
+  { label: "Branch", value: data.bankDetails?.branch },
+  { label: "IFSC", value: data.bankDetails?.ifscCode },
+  { label: "UPI ID", value: data.bankDetails?.upiId },
+];
 
   return (
     <Box p={-2}>

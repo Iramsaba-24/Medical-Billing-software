@@ -361,4 +361,3 @@ const onSubmit = async (data: InvoiceFormData) => {
 };
 
 export default EditInvoice;
-

@@ -190,7 +190,8 @@ const DateTimeField: FC<DateFieldProps> = ({
 
           
            
-            minDate: getMinDate(),
+             minDate: getMinDate(),
+          
 
             slotProps: {
               textField: {
