@@ -1,5 +1,4 @@
 
-
 import { useState, useMemo, useEffect } from "react";
 import {
   Paper,
@@ -10,23 +9,20 @@ import {
 } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
 
-import { useForm, FormProvider } from "react-hook-form"; 
-import DropdownField from "@/components/controlled/DropdownField"; 
+import { useForm, FormProvider } from "react-hook-form";
+import DropdownField from "@/components/controlled/DropdownField";
 
-//  TYPES
-
+// TYPES
 export type InvoiceData = {
   invoice: string;
-  patient: string;
+  name: string;
   date: string;
   price: number;
-  gst: number;
-  total: number;
+  gst?: number;
+  total?: number;
   status: "Paid" | "Pending" | "Overdue";
-  [key: string]: string | number | undefined;
 };
 
-// ADDED (Form type)
 type FilterForm = {
   statusFilter: string;
   timeFilter: string;
@@ -35,9 +31,6 @@ type FilterForm = {
 const InvoiceTable = () => {
   const [invoices, setInvoices] = useState<InvoiceData[]>([]);
 
-  
-
-  //  added (react-hook-form)
   const methods = useForm<FilterForm>({
     defaultValues: {
       statusFilter: "All",
@@ -46,47 +39,64 @@ const InvoiceTable = () => {
   });
 
   const { watch } = methods;
-
-  // added (watch filter values)
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  // LOAD INVOICES
-
+  //  FIXED SYNC LOGIC
   useEffect(() => {
     const loadInvoices = () => {
-      const stored = localStorage.getItem("invoiceList");
+      const stored = localStorage.getItem("currentInvoice");
       const parsed: InvoiceData[] = stored ? JSON.parse(stored) : [];
       setInvoices(parsed);
     };
 
     loadInvoices();
 
-    window.addEventListener("invoiceUpdated", loadInvoices);
+    // cross-tab sync
+    const handleStorageChange = () => {
+      loadInvoices();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    // same-tab fallback sync
+    const interval = setInterval(() => {
+      loadInvoices();
+    }, 1000);
 
     return () => {
-      window.removeEventListener("invoiceUpdated", loadInvoices);
+      window.removeEventListener("storage", handleStorageChange);
+      clearInterval(interval);
     };
   }, []);
 
-  //  FILTER LOGIC 
-
+  // FILTER LOGIC
   const filteredData = useMemo(() => {
     return invoices.filter((inv) => {
       const matchesStatus =
         statusFilter === "All" || inv.status === statusFilter;
 
-      const invDate = new Date(inv.date);
+      const parts = inv.date.split("/");
+      const invDate = new Date(
+        Number(parts[2]),
+        Number(parts[1]) - 1,
+        Number(parts[0])
+      );
+
       const today = new Date();
+
       let matchesTime = true;
 
       if (timeFilter === "This Month") {
         matchesTime =
           invDate.getMonth() === today.getMonth() &&
           invDate.getFullYear() === today.getFullYear();
-      } else if (timeFilter === "Last 7 Days") {
+      }
+
+      if (timeFilter === "Last 7 Days") {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
+
         matchesTime = invDate >= sevenDaysAgo && invDate <= today;
       }
 
@@ -94,8 +104,20 @@ const InvoiceTable = () => {
     });
   }, [invoices, statusFilter, timeFilter]);
 
+  // DELETE FUNCTION
+  const handleDeleteSelected = (rowsToDelete: InvoiceData[]) => {
+    const updatedInvoices = invoices.filter(
+      (inv) =>
+        !rowsToDelete.some((row) => row.invoice === inv.invoice)
+    );
 
-  // ADDED (Dropdown Options)
+    setInvoices(updatedInvoices);
+
+    localStorage.setItem(
+      "currentInvoice",
+      JSON.stringify(updatedInvoices)
+    );
+  };
 
   const statusOptions = [
     { label: "All Status", value: "All" },
@@ -110,16 +132,14 @@ const InvoiceTable = () => {
     { label: "Last 7 Days", value: "Last 7 Days" },
   ];
 
-  // TABLE COLUMNS 
-
   const columns: Column<InvoiceData>[] = [
     { key: "invoice", label: "Invoice" },
-    { key: "patient", label: "Patient" },
+    { key: "name", label: "Patient Name" },
     { key: "date", label: "Date" },
     {
       key: "price",
       label: "Price",
-      render: (row) => `₹ ${row.price.toFixed(2)}`,
+      render: (row) => `₹ ${row.price?.toFixed(2)}`,
     },
     {
       key: "gst",
@@ -130,7 +150,7 @@ const InvoiceTable = () => {
       key: "total",
       label: "Total",
       render: (row) =>
-        `₹ ${row.total?.toFixed(2) ?? row.price.toFixed(2)}`,
+        `₹ ${row.total?.toFixed(2) ?? row.price?.toFixed(2)}`,
     },
     {
       key: "status",
@@ -151,7 +171,7 @@ const InvoiceTable = () => {
             sx={{
               backgroundColor: current.bg,
               color: current.color,
-              fontWeight: "600",
+              fontWeight: 600,
               borderRadius: "4px",
             }}
           />
@@ -161,7 +181,6 @@ const InvoiceTable = () => {
   ];
 
   return (
-    //  added (Required wrapper for dropdown)
     <FormProvider {...methods}>
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
@@ -170,46 +189,34 @@ const InvoiceTable = () => {
 
         <Divider sx={{ mb: 3 }} />
 
-     
         <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-
-          {/* Status Filter */}
           <DropdownField
             name="statusFilter"
             label="Status"
             options={statusOptions}
-           // isStatic
-            freeSolo={false}
-            //floatLabel
-            
           />
 
-          {/* Time Filter */}
           <DropdownField
             name="timeFilter"
             label="Time Filter"
             options={timeOptions}
-           // isStatic
-            freeSolo={false}
-           // floatLabel
-            
           />
-
         </Stack>
 
-        <UniversalTable<InvoiceData>
-          data={filteredData}
-          columns={columns}
-          showSearch
-          showExport
-          enableCheckbox
-          getRowId={(row) => row.invoice}
-        />
+        <div style={{ width: "100%", overflowX: "auto" }}>
+          <UniversalTable<InvoiceData>
+            data={filteredData}
+            columns={columns}
+            showSearch
+            showExport
+            enableCheckbox
+            getRowId={(row) => row.invoice}
+            onDeleteSelected={handleDeleteSelected}
+          />
+        </div>
       </Paper>
     </FormProvider>
   );
 };
 
 export default InvoiceTable;
-
-

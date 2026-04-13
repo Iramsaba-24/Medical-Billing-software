@@ -1,6 +1,15 @@
-import {Dialog, DialogTitle, DialogContent,DialogActions,Button,TextField,Select, MenuItem,
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import TextInputField from "@/components/controlled/TextInputField";
+import DropdownField from "@/components/controlled/DropdownField";
+import DateTimeField from "@/components/controlled/DateTimeField";
 
 export type Distributor = {
   id: string;
@@ -19,19 +28,34 @@ type Props = {
   onSave: (data: Distributor) => void;
 };
 
-const EditDistributorForm = ({
-  editingRow,
-  onClose,
-  onSave,
-}: Props) => {
-  const [formData, setFormData] =
-    useState<Distributor | null>(null);
+const EditDistributorForm = ({ editingRow, onClose, onSave }: Props) => {
+  const methods = useForm<Distributor>({
+    defaultValues: {
+      id: "",
+      companyName: "",
+      mobile: "",
+      email: "",
+      date: "",
+      registrationNumber: "",
+      address: "",
+      status: "Active",
+    },
+  });
+
+  const { reset, handleSubmit } = methods;
 
   useEffect(() => {
-    setFormData(editingRow);
-  }, [editingRow]);
+    if (editingRow) {
+      reset(editingRow);
+    }
+  }, [editingRow, reset]);
 
-  if (!formData) return null;
+  if (!editingRow) return null;
+
+  const statusOptions = [
+    { label: "Active", value: "Active" },
+    { label: "Inactive", value: "Inactive" },
+  ];
 
   return (
     <Dialog
@@ -42,134 +66,91 @@ const EditDistributorForm = ({
     >
       <DialogTitle>Edit Distributor</DialogTitle>
 
-      <DialogContent
-        sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-      >
-        <TextField
-          label="Company Name"
-          value={formData.companyName}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              companyName: e.target.value,
-            })
-          }
-        />
-
-        <TextField
-          label="Registration No"
-          value={formData.registrationNumber}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              registrationNumber: e.target.value,
-            })
-          }
-        />
-
-        <TextField
-          label="Mobile"
-          value={formData.mobile}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              mobile: e.target.value,
-            })
-          }
-        />
-
-        <TextField
-          label="Email"
-          value={formData.email}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              email: e.target.value,
-            })
-          }
-        />
-
-        <TextField
-          label="Date"
-          value={formData.date}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              date: e.target.value,
-            })
-          }
-        />
-
-        <TextField
-          label="Address"
-          value={formData.address}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              address: e.target.value,
-            })
-          }
-        />
-
-        <Select
-          value={formData.status}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              status: e.target.value as
-                | "Active"
-                | "Inactive",
-            })
-          }
+      <FormProvider {...methods}>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
-          <MenuItem value="Active">
-            Active
-          </MenuItem>
-          <MenuItem value="Inactive">
-            Inactive
-          </MenuItem>
-        </Select>
-      </DialogContent>
+          <TextInputField
+            name="companyName"
+            label="Company Name"
+            required
+            maxLength={30}
+          />
 
-      <DialogActions sx={{ gap: 2, px: 3, pb: 2 }}>
-        <Button
-          onClick={onClose}
-          sx={{
-            px: 4,
-            width: "20%",
-            textTransform: "none",
-            border: "2px solid #1b7f6b",
-            color: "#1b7f6b",
-            "&:hover": {
-              backgroundColor: "#1b7f6b",
-              color: "#fff",
-            },
-          }}
-        >
-          Cancel
-        </Button>
+          <TextInputField
+            name="registrationNumber"
+            label="Registration No"
+            type="number"
+            maxLength={15}
+          />
 
-        <Button
-          variant="contained"
-          onClick={() => {
-            onSave(formData);
-            onClose();
-          }}
-          sx={{
-            px: 4,
-            width: "20%",
-            textTransform: "none",
-            backgroundColor: "#1b7f6b",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#1b7f6b",
+          <TextInputField name="mobile" label="Mobile Number" maxLength={10} />
+
+          <TextInputField name="email" label="Email" />
+
+          <DateTimeField
+            useCurrentDate={true}
+            disabled
+            name="date"
+            label="Date"
+          />
+
+          <TextInputField
+            name="address"
+            label="Address"
+            inputType="textarea"
+            rows={2}
+          />
+
+          {/* Status Dropdown */}
+          <DropdownField
+            name="status"
+            label="Status"
+            options={statusOptions}
+            required
+          />
+        </DialogContent>
+
+        <DialogActions sx={{ gap: 2, px: 3, pb: 2 }}>
+          <Button
+            onClick={onClose}
+            sx={{
+              px: 4,
+              width: "20%",
+              textTransform: "none",
               border: "2px solid #1b7f6b",
-            },
-          }}
-        >
-          Save
-        </Button>
-      </DialogActions>
+              color: "#1b7f6b",
+              "&:hover": {
+                backgroundColor: "#1b7f6b",
+                color: "#fff",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={handleSubmit((data) => {
+              onSave(data);
+              onClose();
+            })}
+            sx={{
+              px: 4,
+              width: "20%",
+              textTransform: "none",
+              backgroundColor: "#1b7f6b",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#1b7f6b",
+                border: "2px solid #1b7f6b",
+              },
+            }}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </FormProvider>
     </Dialog>
   );
 };

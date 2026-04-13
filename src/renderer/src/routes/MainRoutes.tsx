@@ -2,10 +2,8 @@ import { RouteObject } from "react-router-dom";
 import Layout from "@/containers/layout/Header";
 import { URL_PATH } from "@/constants/UrlPath";
 import Invoices from "@/view/Invoices";
-import CreateInvoice from "@/containers/Invoices/CreateInvoice";
-import InvoiceView from "@/containers/Invoices/InvoiceView";
+import InvoiceView from "@/containers/invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
-import InventoryList from "@/containers/inventory/InvetoryList";
 import MedicineGroup from "@/containers/inventory/MedicineGroup";
 import MedicineGroupView from "@/containers/inventory/MedicineGroupView";
 import AddMedicineGroup from "@/containers/inventory/AddMedicineGroup";
@@ -22,38 +20,44 @@ import DistributorDetails from "@/containers/distributors/DistributorsDetails";
 import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
-
-
 import Setting from "@/containers/layout/Setting";
-
 import DistributorsForm from "@/containers/distributors/DistributorsForm";
 import InventorySettings from "@/containers/setting/InventorySettings";
-
 import MediPoints from "@/containers/billing/MediPoints";
 import Billing from "@/view/Billing";
-
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
-import RetailInvoice from "@/containers/billing/RetailInvoice";
+import NewInvoice from "@/containers/billing/NewInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
-import PaymentDetails from "@/containers/billing/PaymentDetails";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
+import EditInvoice from "@/containers/invoices/EditInvoice"
+import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
+
+
+
 
 export const mainRoutes: RouteObject[] = [
   {
     element: <Layout />,
     children: [
-
       { path: URL_PATH.Landing, element: <Landing /> },
 
       { path: URL_PATH.Dashboard, element: <Dashboard /> },
 
       { path: URL_PATH.SalesView, element: <SalesView /> },
+      
+      {
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
+       },
 
 
+      
+      
       {
         path: URL_PATH.Invoices,
         element: <Invoices />,
@@ -66,29 +70,38 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.Doctors,
         element: <DoctorTable />,
       },
+       {
+        path: URL_PATH.NewInvoiceBill,
+        element: <NewInvoiceBill />,
+      },
       {
         path: URL_PATH.AddDoctor,
         element: <AddDoctor />,
       },
+      // {
+      //   path: URL_PATH.CreateInvoice,
+      //   element: <CreateInvoice />,
+      // },
       {
-        path: URL_PATH.CreateInvoice,
-        element: <CreateInvoice />,
-      },
+  path: "/edit-invoice/:invoiceNo",
+  element: <EditInvoice />,
+},
       {
         path: `${URL_PATH.InvoiceView}/:invoiceNo`,
         element: <InvoiceView />,
       },
+       {
+        path: URL_PATH.InvoiceView,
+        element: <InvoiceView />,
+      },
+
       {
         path: URL_PATH.Inventory,
         element: <Inventory />,
       },
       {
-        path: URL_PATH.RetailInvoice,
-        element: <RetailInvoice />,
-      },
-      {
-        path: URL_PATH.InventoryList,
-        element: <InventoryList />,
+        path: URL_PATH.NewInvoice,
+        element: <NewInvoice />,
       },
       {
         path: URL_PATH.Reorder,
@@ -123,43 +136,9 @@ export const mainRoutes: RouteObject[] = [
         element: <DistributorDetails />,
       },
       {
-        path: URL_PATH.DistributorDetails,
-        element: <DistributorDetails />,
-      },
-      {
         path: URL_PATH.ReportPage,
         element: <ReportPage />,
       },
-      {
-        path: URL_PATH.DistributorsSetting,
-        element: <DistributorsSetting />,
-      },
-      {
-        path: URL_PATH.ReportSettings,
-        element: <ReportSettings />,
-      },
-
-      {
-        path: URL_PATH.InvoiceSetting,
-        element: <InvoiceSettings />,
-      },
-      {
-        path: URL_PATH.GeneralSettings,
-        element: <GeneralSettings />,
-      },
-      {
-        path: URL_PATH.PharmacyProfile,
-        element: <PharmacyProfile />,
-      },
-      {
-        path: URL_PATH.DashboardSettings,
-        element: <DashboardSettings />,
-      },
-      {
-        path: URL_PATH.CustomerSettings,
-        element: <CustomerSettings />,
-      },
-
       {
         path: URL_PATH.MediPoints,
         element: <MediPoints />,
@@ -174,61 +153,65 @@ export const mainRoutes: RouteObject[] = [
         element: <Billing />,
       },
       {
-        path: URL_PATH.InventorySettings,
-        element: <InventorySettings />,
-      },
-       {
-        path: URL_PATH.PharmacyProfile,
-        element: <PharmacyProfile />,
-      },
-       {
-        path: URL_PATH.CustomerSettings,
-        element: <CustomerSettings />,
-      },
-      // {
-      //   path: URL_PATH.DoctorsSettings,
-      //   element: <DoctorsSettings />,
-      // },
-      {
-        path: URL_PATH.InvoiceSetting,
-        element: <InvoiceSettings />,
-      },
-      {
-        path: URL_PATH.Setting,
-        element: <Setting />,
-      },
-      {
-        path: URL_PATH.DashboardSettings,
-        element: <DashboardSettings />,
-      },
-      {
-        path: URL_PATH.DoctorSettings,
-        element: <DoctorSettings />,
-      },
-
-      {
-        path: URL_PATH.PharmacyProfile,
-        element: <PharmacyProfile />,
-      },
-      {
-        path: URL_PATH.CustomerSettings,
-        element: <CustomerSettings />,
-      },
-
-      {
-        path: URL_PATH.RetailInvoice,
-        element: <Billing />,
-      },
-      {
-        path: URL_PATH.PaymentDetails,
-        element: <PaymentDetails />,
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
       },
       {
         path: URL_PATH.PaymentMethod,
         element: <PaymentMethod />,
       },
-    
-      
+       {
+        path: URL_PATH.AddCustomerForm,
+        element: <AddCustomerForm />,
+      },
+      {
+        path: URL_PATH.NewInvoiceBill,
+        element: <NewInvoiceBill />,
+      },
+      {
+        path: URL_PATH.Setting,
+        element: <Setting />,
+        children: [
+          { index: true, element: <GeneralSettings /> },
+
+          {
+            path: URL_PATH.GeneralSettings.replace("/settings/", ""),
+            element: <GeneralSettings />,
+          },
+          {
+            path: URL_PATH.PharmacyProfile.replace("/settings/", ""),
+            element: <PharmacyProfile />,
+          },
+          {
+            path: URL_PATH.DashboardSettings.replace("/settings/", ""),
+            element: <DashboardSettings />,
+          },
+          {
+            path: URL_PATH.CustomerSettings.replace("/settings/", ""),
+            element: <CustomerSettings />,
+          },
+          {
+            path: URL_PATH.DoctorSettings.replace("/settings/", ""),
+            element: <DoctorSettings />,
+          },
+          {
+            path: URL_PATH.DistributorsSetting.replace("/settings/", ""),
+            element: <DistributorsSetting />,
+          },
+          {
+            path: URL_PATH.InventorySettings.replace("/settings/", ""),
+            element: <InventorySettings />,
+          },
+          {
+            path: URL_PATH.InvoiceSetting.replace("/settings/", ""),
+            element: <InvoiceSettings />,
+          },
+          {
+            path: URL_PATH.ReportSettings.replace("/settings/", ""),
+            element: <ReportSettings />,
+          },
+        ],
+      },
     ],
   },
 ];

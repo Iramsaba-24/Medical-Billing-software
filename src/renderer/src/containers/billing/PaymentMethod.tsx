@@ -1,420 +1,268 @@
-import { useForm, FormProvider, useWatch } from "react-hook-form";
-import { Paper, Box, Button } from "@mui/material";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
+import { Box } from "@mui/material";
+import { useEffect, useState } from "react";
+import CardPayment from "@/containers/billing/CardPayment";
+import UpiPayment from "@/containers/billing/UpiPayment";
+import CashPayment from "@/containers/billing/CashPayment";
+import InvoiceTabButtons from "./InvoiceTabButtons";
 import RadioField from "@/components/controlled/RadioField";
-import NumericField from "@/components/controlled/NumericField";
-import TextInputField from "@/components/controlled/TextInputField";
-import gpayIcon from "@/assets/icons/googlepay.svg";
-import paytmIcon from "@/assets/icons/paytm.svg";
-import upiIcon from "@/assets/icons/upi.svg";
-import phonepeIcon from "@/assets/icons/phonepe.svg";
-import CircularProgress from "@mui/material/CircularProgress";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useState } from "react";
-import { useNavigate, useLocation  } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 
-
-// form fields
 type PaymentMethods = {
-  paymentMethod: "credit-card" | "upi";
+  paymentMethod: "credit-card" | "upi" | "cash";
+
   CardNumber?: string;
+
   CardHolderName?: string;
+
   Cvv?: string;
+
   UpiId?: string;
 };
 
-// paper style of card and upi
-const PaperStyle ={
-  borderRadius: 2, 
-  p: { xs: 1, sm: 2 },
-  mb:{sx:1}
-}
-
-// radio btn style
 const radioStyle = {
-  "& .MuiRadio-root": {   
+  "& .MuiRadio-root": {
     color: "default.main",
-    "&.Mui-checked": {   
+
+    "&.Mui-checked": {
       color: "#238878",
     },
   },
 };
 
-//btn style
-const btnStyle = {
-   backgroundColor: "#238878",
-  height: 40,
-  minWidth: 80,
-  color: "#fff",
-  textTransform: "none",
-  "&:hover": {
-    backgroundColor: "#fff",
-    color: "#238878",
-    borderColor: "#238878",
-  },
-}
-
-// component
 const PaymentMethod = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const methods = useForm<PaymentMethods>({
-
+    
     defaultValues: {
-      paymentMethod: "credit-card",
+      paymentMethod: "credit-card",    
     },
+    mode: "onChange",
   });
 
-  // UPI value watch (instant update)
-  const upiId = useWatch({
-    control: methods.control,
-    name: "UpiId",
-  });
-
-  // function to get UPI app icons
-  const getUpiApp = (upiId?: string) => {
-  if (!upiId) return null;
-
-  const id = upiId.toLowerCase();
-
-  // Google Pay
-  if (
-    id.includes("@okaxis") ||
-    id.includes("@oksbi") ||
-    id.includes("@okhdfcbank") ||
-    id.includes("@okicici")
-  ) {
-    return "gpay";
-  }
-
-  // Paytm
-  if (id.includes("@paytm")) 
-  {
-    return "paytm";
-  }
-
-  // phonepe
-  if(id.includes("@ybl") ||
-  id.includes("@axl") ||
-  id.includes("@ibl"))
-  {
-    return "phonepe"
-  }
-  return null;
-  };
-
-  // detected icon
-  const detecteIcon = getUpiApp(upiId) || "upi";
-  //icon 
-  const upiIcons: Record<string, string> = { //utility object-keys type and values type
-    gpay: gpayIcon,
-    paytm: paytmIcon,
-    upi:upiIcon,
-    phonepe: phonepeIcon,
-  };
-
-  // payment method watch (instant update)
   const payment = useWatch({
     control: methods.control,
+
     name: "paymentMethod",
   });
 
-  const {handleSubmit} = methods
-  // handle to card payment 
-  const [CardPaymentStatus, setCardPaymentStatus] = useState<"default" | "loading" | "success"> ("default"); 
-  // handle to upi payment
-  const [UpiPaymentStatus, setUpiPaymentStatus] = useState<"default" | "loading" | "success"> ("default"); 
+  const [finalAmount, setFinalAmount] = useState(0);
 
-  const onCardPay = () => {
-    setCardPaymentStatus("loading");
-    setTimeout(() => {
-      setCardPaymentStatus("success");
-    }, 1500);
-  };
+  const { setValue } = methods;
 
-const onUpiPay =() =>
-{
-  setUpiPaymentStatus("loading");
-  setTimeout(()=>{
-    setUpiPaymentStatus("success")
-  },1500)
+  useEffect(() => {
+   
+    const stateAmount = (location.state as { totalFromInvoice?: number })?.totalFromInvoice;
+    if (stateAmount && stateAmount > 0) {
+      setFinalAmount(stateAmount);
+    } else {
+      const storedRetail = localStorage.getItem("currentRetailInvoice");
+      const storedInvoice = localStorage.getItem("currentNewInvoice");
+      if (storedRetail) {
+        const retail = JSON.parse(storedRetail);
+        setFinalAmount(retail.totalPrice || 0);
+      } else if (storedInvoice) {
+        const invoices = JSON.parse(storedInvoice);
+        const lastInvoice = invoices[invoices.length - 1];
+        setFinalAmount(lastInvoice?.totalPrice || 0);
+      }
+    }
+
+    
+    const flow = (location.state as { flow?: string })?.flow;
+
+    if (flow === "retail") {
+      const invoiceSettings = localStorage.getItem("invoiceSettings");
+      if (invoiceSettings) {
+        const settings = JSON.parse(invoiceSettings);
+        if (["cash", "upi", "credit-card"].includes(settings.payment_method)) {
+          setValue("paymentMethod", settings.payment_method);
+        }
+      }
+    } else if (flow === "new") {
+      const distributorSettings = localStorage.getItem("distributorSettings");
+      if (distributorSettings) {
+        const settings = JSON.parse(distributorSettings);
+        if (["cash", "upi", "credit-card"].includes(settings.payment_method)) {
+          setValue("paymentMethod", settings.payment_method);
+        }
+      }
+    }
+
+  }, [location.state, setValue]); 
+
+
+ const saveInvoice = () => {
+  const storedRetail = localStorage.getItem("currentRetailInvoice");
+  const storedNew = localStorage.getItem("currentNewInvoice");
+
+  function getTimeFormat(): string {
+  try {
+    const saved = localStorage.getItem("generalSettings");
+    if (saved) {
+      const settings = JSON.parse(saved);
+      const timeZone = settings.timeZone || "India (IST)";
+      const twelveHourZones = ["US (EST)", "US (PST)", "Australia (AEST)"];
+      if (twelveHourZones.includes(timeZone)) {
+        return "12";  // 12-hour
+      }
+      return "24";  // 24-hour
+    }
+  } catch {
+    // ignore
+  }
+  return "24";
 }
 
-
-// function to show the status of payment for upi and card
-const showPaymentStatus = (
-  status: "default" | "loading" | "success"
-) => {
-  if (status === "loading") {
-    return (
-      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-        <CircularProgress />
-        <Box textAlign="center">
-          Waiting for payment confirmation…
-          <br />
-          Please complete the payment.
-        </Box>
-      </Box>
-    );
-  }
-
-  if (status === "success") {
-    return (
-      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-        <CheckCircleIcon
-          sx={{ color: "success.main", fontSize: { xs: 44, sm: 60 } }}
-        />
-        <Box fontWeight={500}>Successful</Box>
-      </Box>
-    );
-  }
-
-  return null;
-};
-
-const [activeTab, setActiveTab] = useState<"new" | "retail">("new");   
-const navigate = useNavigate();
-  const location = useLocation();
-  return (
-
-   
-  <FormProvider {...methods}>
-  <form noValidate>
-    {/* new invoice and retail invoice btn */}
-    <Button
-          onClick={() => {setActiveTab("new");                                                        
-            if (location.pathname !== URL_PATH.Billing) { navigate(URL_PATH.Billing);}}}                  
-          sx={{
-            textTransform: "none",       
-            width: { xs: "50%", md: "10%" },
-            height: "38px",
-            fontWeight: 500,
-            borderRadius: "0px 18px 0px 0px",
-            backgroundColor: activeTab === "new" ? "#238878" : "#fff",       
-            color: activeTab === "new" ? "#fff" : "#000",                   
-            border: activeTab === "new" ? "none" : "1px solid #ccc",        
-            "&:hover": {
-              backgroundColor: activeTab === "new" ? "#238878" : "#f5f5f5",   
-            },
-          }}>
-          New Invoice
-        </Button>
- 
-        {/* Retail Invoice */}
-          <Button
-            onClick={() => {setActiveTab("retail");  
-             if (location.pathname !== URL_PATH.RetailInvoice) { navigate(URL_PATH.RetailInvoice); }}}
-            sx={{
-              textTransform: "none",
-              width: { xs: "50%", md: "10%" },
-              height: "38px",
-              fontWeight: 500,
-              borderRadius: "0px 18px 0px 0px",
-              backgroundColor: activeTab === "retail" ? "#238878" : "#fff",
-              color: activeTab === "retail" ? "#fff" : "#000",
-              border: activeTab === "retail" ? "none" : "1px solid #ccc",
-              "&:hover": {
-                backgroundColor: activeTab === "retail" ? "#238878" : "#f5f5f5",
-              },
-            }}>
-            Retail Invoice
-          </Button>
-          <Box
-          display="flex"
-          flexDirection="column"
-          sx={{
-            border: "1px solid #ccc",
-            gap: { xs: 2, sm: 3 }, 
-            backgroundColor: "#fff",
-            p: { xs: 2, sm: 3 },  
-            // mx:{xs:-2 , md:0.5},          
-          }}
-        >
+function getFormattedTime(): string {
+  const now = new Date();
+  const format = getTimeFormat();
   
-      {/* CARD PAYMENT */}
-      <Paper sx={PaperStyle}>
-        <RadioField
-          name="paymentMethod"
-          options={[
-            { label: "Debit / Credit Card", value: "credit-card"},]}
-          label=""
-          sx={radioStyle}
-        />
+  if (format === "12") {
+    // 12-hour format — hh:mm:ss AM/PM
+    return now.toLocaleTimeString("en-US", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit",
+      hour12: true 
+    });
+  } else {
+    // 24-hour format — HH:mm:ss
+    return now.toLocaleTimeString("en-GB", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit",
+      hour12: false 
+    });
+  }
+}
 
-        <Box display="flex"   flexDirection={{ xs: "row", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} gap={2}>
-          {/* Card Number */}
-          <Box flex={1} >
-            <TextInputField
-              label="Card Number"
-              name="CardNumber"
-              disabled={payment === "upi"}
-              inputType="numbers"
-              minLength={13}
-              maxLength={19}
-              rules={{                
-                required: payment === "credit-card" ? "Card Number is required" : false,
-              }
-            }
-            />
-          </Box>
+  // Retail Flow
+  if (storedRetail) {
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentInvoice") || "[]"
+    );
+    const retail = JSON.parse(storedRetail);
 
-          {/* Icon */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mb: 3
-            }}
-          >
-            <CreditCardIcon />
-          </Box>
-        </Box>
-        
-        {/* Card holder name */}
-        <Box display="flex" gap={2} alignItems="center">
-          <Box flex={1}>
-            <TextInputField
-              label="Card Holder's Name"
-              name="CardHolderName"
-              disabled={payment === "upi"}
-              inputType="alphabet"
-              minLength={3}
-              maxLength={50}
-              rules={{
-                required:
-                  payment === "credit-card"
-                    ? "Card Holder's Name is required"
-                    : false,
+    const newInvoice = {
+      invoice: retail.invoice,
+      name: retail.name,
+      doctor: retail.doctor,
+      address: retail.address,
+      doctorAddress: retail.doctorAddress,
+      date: new Date().toLocaleDateString("en-GB"),
+        time: getFormattedTime(),
+      price: retail.totalPrice,
+      status: "Paid",
+      medicines: retail.medicines,
+      gst: retail.gst,
+      type: "retail",
+      gstAmount: retail.gstAmount,
+      subTotal: retail.subTotal,
+      totalPrice: retail.totalPrice,
+    };
 
-              }}
-            />
-          </Box>
+    const updated = [newInvoice, ...existingInvoices];
+    localStorage.setItem("currentInvoice", JSON.stringify(updated));
+    localStorage.removeItem("currentRetailInvoice");
+    navigate(`${URL_PATH.InvoiceView}/${newInvoice.invoice}`, {
+      state: { invoice: newInvoice },
+    });
+    return;
+  }
 
-          {/* Empty box only for sm+ screens */}
-          <Box
-            sx={{
-              width: 24,
-              display: { xs: "none", sm: "block" },
-            }}
+  // New Invoice Flow
+  if (storedNew) {
+    const existingInvoices = JSON.parse(
+      localStorage.getItem("currentNewInvoiceList") || "[]"
+    );
+    const invoices = JSON.parse(storedNew);
+    const lastInvoice = invoices[invoices.length - 1];
+
+    const invoiceNumber = `INV-${lastInvoice.id || Date.now()}`;
+
+    const summaryInvoice = {
+      invoice: invoiceNumber,
+      name: lastInvoice.company,
+      date: new Date().toLocaleDateString(),
+        time: getFormattedTime(),
+      price: lastInvoice.totalPrice,
+      status: "Paid",
+      type: "distributor",
+      medicines: lastInvoice.medicines || [],
+      totalPrice: lastInvoice.totalPrice,
+    };
+
+    const billInvoice = {
+      ...lastInvoice,
+      invoice: invoiceNumber,
+      date: new Date().toLocaleDateString(),
+    };
+
+    const updated = [summaryInvoice, ...existingInvoices];
+    localStorage.setItem("currentNewInvoiceList", JSON.stringify(updated));
+    localStorage.removeItem("currentNewInvoice");
+
+    navigate(URL_PATH.NewInvoiceBill, {
+      state: { invoice: billInvoice },
+    });
+  }
+};
+   
+  
+
+  return (
+    <FormProvider {...methods}>
+      <InvoiceTabButtons />
+
+      <Box
+        display="flex"
+        flexDirection="column"
+        sx={{
+          border: "1px solid #ccc",
+
+          gap: { xs: 2, sm: 3 },
+
+          backgroundColor: "#fff",
+
+          p: { xs: 2, sm: 3 },
+        }}
+      >
+        <Box display="flex" gap={2} mb={1}>
+          <RadioField
+            name="paymentMethod"
+            options={[
+              { label: "Credit / Debit Card", value: "credit-card" },
+
+              { label: "UPI Payment", value: "upi" },
+
+              { label: "Cash", value: "cash" },
+            ]}
+            label=""
+            sx={radioStyle}
           />
         </Box>
 
-        {/* Cvv */}       
-        <Box
-        display="flex"
-        flexDirection={{ xs: "column", sm: "row" }}
-        alignItems="flex-start"
-        justifyContent={{ xs: "flex-start", sm: "space-between" }}
-        gap={2}
-        >
-          <Box width={{ xs: "100%", sm: "auto" }}>
-            <NumericField
-              label="CVV"
-              name="Cvv"
-              required={payment === "credit-card"}
-              disabled={payment === "upi"}
-              decimal={false}
-              maxlength={3}
-              max={999}
-            />
-          </Box>
+        {payment === "credit-card" && (
+          <CardPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
+        )}
 
-          {/* Pay Button */}
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={handleSubmit(onCardPay)}
-            disabled={payment === "upi"}
-            sx={{
-              ...btnStyle,
-              width: { xs: "100%", sm: "auto" },
-              mb:1
-            }}
-          >
-            Pay
-          </Button>
-        </Box>
-        
-        <Box textAlign="center" alignItems={"center"}>
-            {showPaymentStatus(CardPaymentStatus)}
-        </Box>
-      </Paper>
+        {payment === "upi" && (
+          <UpiPayment finalAmount={finalAmount} onSuccess={saveInvoice} />
+        )}
 
-      {/* UPI PAYMENT SECTION */}
-      <Paper sx={PaperStyle}>
-        <RadioField
-          name="paymentMethod"
-          options={[
-            { label: "UPI Payment", value: "upi" },
-          ]}
-          label=""
-          sx={radioStyle}
-        />
-
-        <Box display="flex" flexDirection="column" gap={1}>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Box flex={1}>
-              <TextInputField
-                label="Enter your UPI ID"
-                name="UpiId"
-                inputType="alphanumeric"
-                disabled={payment === "credit-card"}
-                rules={{
-                  required: payment === 'upi' ? 'UPI ID is required' : false,
-                  pattern: {
-                    value: /^[a-zA-Z0-9._-]+@(okaxis|oksbi|okhdfcbank|okicici|paytm|ybl|axl|ib|phonepe)$/,
-                    message: 'Enter valid UPI ID'
-                  }
-                }}           
-              />
-            </Box>
-
-            {detecteIcon && upiIcons[detecteIcon] && (   
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  backgroundColor: "#fff",
-                  boxShadow: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mb: 3,
-                }}
-              >
-                <img
-                  src={upiIcons[detecteIcon]}
-                  width={28}
-                  height={28}
-                />
-              </Box>
-            )}
-          </Box>
-
-          {/* UPi pay btn */}
-          <Box display="flex" justifyContent="flex-end" mt={0} >
-            <Button 
-                type="button" 
-                variant="contained" 
-                onClick={handleSubmit(onUpiPay)}
-                disabled={payment === "credit-card"}
-                sx={{...btnStyle,  width: { xs: "100%", sm: "auto" }}}>
-                Pay
-            </Button>
-
-          </Box>
-          {/* Payment status circular progress*/}
-          <Box  alignItems="center" textAlign={"center"}>
-            {showPaymentStatus(UpiPaymentStatus)}
-          </Box>
-        </Box>
-      </Paper>
-    </Box>
-  </form>
-</FormProvider>
-
-  )
+        {payment === "cash" && (
+          <CashPayment
+            payment={payment}
+            finalAmount={finalAmount}
+            onSuccess={saveInvoice}
+          />
+        )}
+      </Box>
+    </FormProvider>
+  );
 };
 
 export default PaymentMethod;

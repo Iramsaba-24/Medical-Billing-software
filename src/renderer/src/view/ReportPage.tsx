@@ -1,12 +1,22 @@
-import ReportCards from '@/containers/Report/ReportCards';
-import SalesGraph from '@/containers/Report/SalesGraph';
-import InvoiceTable from '@/containers/Report/InvoiceTable';
-import InventoryTable from '@/containers/Report/InventoryTable';
-import CustomerList from '@/containers/Report/CustomersList';
-import DistributorReportTable from '@/containers/Report/DistributorReportTable';
+
+import ReportCards from '@/containers/report/ReportCards';
+import SalesGraph from '@/containers/report/SalesGraph';
+import InvoiceTable from '@/containers/report/InvoiceTable';
+import InventoryTable from '@/containers/report/InventoryTable';
+import CustomerList from '@/containers/report/CustomersList';
+import DistributorReportTable from '@/containers/report/DistributorReportTable';
 import { Box, Typography } from "@mui/material";
 
 const ReportPage = () => {
+  //settings
+const DEFAULT_SETTINGS = {
+  card_visibility_control: ["Total Sales Report"],
+  other_visibility_control: ["Sales Report", "Invoice Report Table"],
+};
+
+const stored = localStorage.getItem("report_settings");
+const settings = stored ? JSON.parse(stored) : DEFAULT_SETTINGS;
+const visibleTables: string[] = settings.other_visibility_control;
   return (
    
     <Box className="container"  >
@@ -25,7 +35,7 @@ const ReportPage = () => {
           </Typography>
         </Box>
       <ReportCards />
-      <SalesGraph />
+      {visibleTables.includes("Sales Report") && <SalesGraph />}
       <Box sx={{ 
         display: 'flex', 
         flexDirection: 'column', 
@@ -33,10 +43,13 @@ const ReportPage = () => {
         marginTop: '30px'  
       }}>
         
-        <InvoiceTable />
-        <InventoryTable />
-        <DistributorReportTable />
-        <CustomerList />
+      {visibleTables.includes("Invoice Report Table") && <InvoiceTable />}
+
+      {visibleTables.includes("Inventory Stock Report") && <InventoryTable />}
+
+      {visibleTables.includes("Distributor List") && <DistributorReportTable />}
+
+      {visibleTables.includes("Customer List") && <CustomerList />}
         
       </Box>
     </Box>

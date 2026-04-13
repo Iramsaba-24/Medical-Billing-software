@@ -1,84 +1,354 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Select, MenuItem,  
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import { Invoice, InvoiceStatus } from "@/types/invoice";
+import {Paper,Button,Stack,Typography,Box,IconButton,} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
+import { FormProvider, useFieldArray, useForm, useWatch } from "react-hook-form";
+import DateTimeField from "@/components/controlled/DateTimeField";
+import { useNavigate, useParams } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
+import DropdownField from "@/components/controlled/DropdownField";
+import TextInputField from "@/components/controlled/TextInputField";
 
-type Props = {
-  editingRow: Invoice | null;
-  onClose: () => void;
-  onSave: (data: Invoice) => void;
+import dayjs, { Dayjs } from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat"; // ✅ ADD
+
+import { useEffect, useState } from "react";
+
+dayjs.extend(customParseFormat); // ✅ ADD
+
+type InvoiceItem = {
+  item: string;
+  qty: number;
+  price: number;
 };
 
-const EditInvoice = ({ editingRow, onClose, onSave }: Props) => {
-  const [formData, setFormData] = useState<Invoice | null>(null);
+type StoredMedicine = {
+  name: string;
+  qty: string;
+  amount: number;
+  price?: number;
+};
 
+type StoredInvoice = {
+  invoice: string;
+  name: string;
+  date: string;
+  price: number;
+  status: "Paid" | "Pending" | "Overdue";
+  medicines?: StoredMedicine[];
+  items?: InvoiceItem[];
+};
+
+type Customer = {
+  name: string;
+};
+
+type InventoryItem = {
+  itemName: string;
+  pricePerUnit: number;
+};
+
+type DropdownOption = {
+  label: string;
+  value: string;
+};
+
+type InventoryOption = DropdownOption & {
+  price: number;
+};
+
+type InvoiceFormData = {
+  name: string;
+  date: Dayjs;
+  status: "Paid" | "Pending" | "Overdue";
+  items: InvoiceItem[];
+};
+
+const EditInvoice = () => {
+  const navigate = useNavigate();
+  const { invoiceNo } = useParams<{ invoiceNo: string }>();
+
+  const methods = useForm<InvoiceFormData>({
+    defaultValues: {
+      name: "",
+      date: dayjs(),
+      status: "Pending",
+      items: [{ item: "", qty: 1, price: 0 }],
+    },
+  });
+
+  const { control, handleSubmit, reset, setValue } = methods;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  });
+
+  const watchedItems = useWatch({
+    control,
+    name: "items",
+  });
+
+  const [customerOptions, setCustomerOptions] = useState<DropdownOption[]>([]);
+  const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>([]);
+
+  const statusOptions: DropdownOption[] = [
+    { label: "Paid", value: "Paid" },
+    { label: "Pending", value: "Pending" },
+    { label: "Overdue", value: "Overdue" },
+  ];
+
+  // Load Customers
   useEffect(() => {
-    if (editingRow) {
-      setFormData(editingRow);
-    }
-  }, [editingRow]);
+    const stored = localStorage.getItem("medical_customers");
+    if (!stored) return;
 
-  if (!formData) return null;
+    const parsed: Customer[] = JSON.parse(stored);
 
-  const handleChange = (field: keyof Invoice, value: string | number) => {
-    setFormData({
-      ...formData,
-      [field]: value,
+    setCustomerOptions(
+      parsed.map((c) => ({
+        label: c.name,
+        value: c.name,
+      }))
+    );
+  }, []);
+
+  // Load Inventory
+  useEffect(() => {
+    watchedItems?.forEach((item, index) => {
+      const selectedItem = inventoryOptions.find(
+        (i) => i.value === item.item
+      );
+
+      if (!selectedItem) return;
+
+      const qty = Number(item.qty) || 0;
+      const total = qty * selectedItem.price;
+
+      if (item.price !== total) {
+        setValue(`items.${index}.price`, total);
+      }
     });
+  }, [watchedItems, inventoryOptions, setValue]);
+
+  // Load inventory
+  useEffect(() => {
+    const stored = localStorage.getItem("inventory") || "[]";
+    if (!stored) return;
+
+    const parsed: InventoryItem[] = JSON.parse(stored);
+
+    setInventoryOptions(
+      parsed.map((i) => ({
+        label: i.itemName,
+        value: i.itemName,
+        price: i.pricePerUnit,
+      }))
+    );
+  }, []);
+
+  // Load invoice
+useEffect(() => {
+  if (!invoiceNo) return;
+
+
+  const storedInvoices = localStorage.getItem("currentInvoice");
+  if (!storedInvoices) return;
+
+  const invoices: StoredInvoice[] = JSON.parse(storedInvoices);
+  const foundInvoice = invoices.find(
+    (inv) => String(inv.invoice) === String(invoiceNo)
+  );
+
+  if (!foundInvoice) return;
+
+  let items: InvoiceItem[] = [];
+
+  if (foundInvoice.medicines && foundInvoice.medicines.length > 0) {
+    items = foundInvoice.medicines.map((m) => ({
+      item: m.name,
+      qty: Number(m.qty),
+     price: Number(m.amount ?? m.price), 
+    }));
+  } else if (foundInvoice.items && foundInvoice.items.length > 0) {
+    items = foundInvoice.items.map((i) => ({
+      item: i.item,
+      qty: Number(i.qty),
+      price: Number(i.price),
+    }));
+  }
+
+  const finalItems = items.length > 0 ? items : [{ item: "", qty: 1, price: 0 }];
+
+  reset({
+    name: foundInvoice.name,
+    date: dayjs(foundInvoice.date, "DD/MM/YYYY"),
+    status: foundInvoice.status,
+    items: finalItems,
+  });
+}, [invoiceNo, reset]); 
+
+
+  const onSubmit = (data: InvoiceFormData) => {
+    const stored = localStorage.getItem("currentInvoice");
+    const invoices: StoredInvoice[] = stored ? JSON.parse(stored) : [];
+
+    const totalPrice = data.items.reduce((sum, i) => sum + Number(i.price), 0);
+
+    const updated = invoices.map((inv) =>
+      inv.invoice === invoiceNo
+        ? {
+          ...inv,
+          name: data.name,
+          date: dayjs(data.date).format("DD/MM/YYYY"),
+          price: totalPrice,
+          status: data.status,
+          medicines: data.items.map((i) => ({
+            name: i.item,
+            qty: `${i.qty}`,
+            amount: i.price,
+          })),
+        }
+        : inv
+    );
+
+    localStorage.setItem("currentInvoice", JSON.stringify(updated));
+
+    navigate(URL_PATH.Invoices);
   };
 
   return (
-    <Dialog open={Boolean(editingRow)} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Edit Invoice</DialogTitle>
+    <FormProvider {...methods}>
+      <Paper sx={{ p: 4, maxWidth: 900, mx: "auto" }}>
+        <Typography variant="h6" mb={3}>
+          Edit Invoice
+        </Typography>
 
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <TextField
-          label="Invoice No"
-          value={formData.invoice}
-          disabled
-        />
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+          <DropdownField
+            name="name"
+            label="Customer"
+            options={customerOptions}
+            fullWidth
+          />
 
-        <TextField
-          label="Patient"
-          value={formData.patient}
-          onChange={(e) => handleChange("patient", e.target.value)}
-        />
+          <DateTimeField
+  name="date"
+  label="Invoice Date"
+  viewMode="date"
+  useCurrentDate={true}
+  disabled
+/>
 
-        <TextField
-          label="Date"
-          value={formData.date}
-          onChange={(e) => handleChange("date", e.target.value)}
-        />
+          <DropdownField
+            name="status"
+            label="Status"
+            options={statusOptions}
+            fullWidth
+          />
+        </Stack>
 
-        <TextField
-          label="Price"
-          type="number"
-          value={formData.price}
-          onChange={(e) =>
-            handleChange("price", Number(e.target.value))
-          }
-        />
+        <Box mt={4}>
+          <Typography fontWeight={600} mb={2}>
+            Invoice Items
+          </Typography>
 
-        <Select
-          value={formData.status}
-          onChange={(e) =>
-            handleChange("status", e.target.value as InvoiceStatus)
-          }
-        >
-          <MenuItem value="Paid">Paid</MenuItem>
-          <MenuItem value="Pending">Pending</MenuItem>
-          <MenuItem value="Overdue">Overdue</MenuItem>
-        </Select>
-      </DialogContent>
+          {fields.map((field, index) => (
+            <Stack key={field.id} direction="row" spacing={2} mb={2}>
+              <DropdownField
+                name={`items.${index}.item`}
+                label="Item"
+                options={inventoryOptions}
+                sx={{ width: 500 }}
+                onChangeCallback={(val: string) => {
+                  const selectedItem = inventoryOptions.find(
+                    (i) => i.value === val
+                  );
 
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button variant="contained" onClick={() => onSave(formData)}>
-          Save
-        </Button>
-      </DialogActions>
-    </Dialog>
+                  if (!selectedItem) return;
+
+                  const qty =
+                    Number(methods.getValues(`items.${index}.qty`)) || 1;
+
+                  const total = qty * selectedItem.price;
+
+                  setValue(`items.${index}.price`, total);
+                }}
+              />
+
+              <TextInputField
+                name={`items.${index}.qty`}
+                label="Qty"
+                type="number"
+                sx={{ width: 100 }}
+              />
+
+              <TextInputField
+                name={`items.${index}.price`}
+                label="Price"
+                type="number"
+                inputProps={{ readOnly: true }}
+                sx={{ width: 140 }}
+              />
+
+              <IconButton
+                color="error"
+                disabled={fields.length === 1}
+                onClick={() => remove(index)}
+              >
+                <RemoveIcon />
+              </IconButton>
+
+              <IconButton
+                color="success"
+                onClick={() => append({ item: "", qty: 1, price: 0 })}
+              >
+                <AddIcon />
+              </IconButton>
+            </Stack>
+          ))}
+        </Box>
+
+        <Stack direction="row" justifyContent="space-between" mt={4}>
+          <Button
+            variant="outlined"
+            onClick={() => navigate(URL_PATH.Invoices)}
+            sx={{
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#238878",
+              color: "#fff",
+              border: "2px solid #238878",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
+            onClick={handleSubmit(onSubmit)}
+          >
+            Update Invoice
+          </Button>
+        </Stack>
+      </Paper>
+    </FormProvider>
   );
 };
 
 export default EditInvoice;
+

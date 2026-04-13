@@ -22,8 +22,51 @@ import dayjs, { type Dayjs } from "dayjs";
 import { useTranslation } from "react-i18next";
 import { getComponentTranslations } from "@/helpers/useTranslations";
 
-type ViewMode = "date" | "time" | "datetime" | "month" | "year" | "month-year";
+function getDateFormat(): string {
+  try {
+    const saved = localStorage.getItem("generalSettings");
+    if (saved) {
+      const settings = JSON.parse(saved);
+      return settings.dateFormat || "DD/MM/YYYY";
+    }
+  } catch {
+    // ignore
+  }
+  return "DD/MM/YYYY";
+}
 
+function getTimeFormat(): string {
+  try {
+    const saved = localStorage.getItem("generalSettings");
+    if (saved) {
+      const settings = JSON.parse(saved);
+      
+      
+      const timeZone = settings.timeZone || "India (IST)";
+      
+      const twelveHourZones = ["US (EST)", "US (PST)", "Australia (AEST)"];
+      
+      if (twelveHourZones.includes(timeZone)) {
+        return "hh:mm A";  // 12-hour
+      }
+      return "HH:mm";  // 24-hour
+    }
+  } catch {
+    // ignore
+  }
+  return "HH:mm"; // default
+}
+
+const allowPastCurrentFuture = (): Dayjs => {
+  return dayjs("1900-01-01");
+};
+
+
+const allowCurrentFutureOnly = (): Dayjs => {
+  return dayjs().startOf("day");
+};
+type ViewMode = "date" | "time" | "datetime" | "month" | "year" | "month-year";
+ 
 type DateFieldProps = {
   name: string;
   label: string;
@@ -31,17 +74,19 @@ type DateFieldProps = {
   sx?: SxProps<Theme>;
   viewMode?: ViewMode;
   useCurrentDate?: boolean;
+  dateRestriction?: "past-current-future" | "current-future-only"; 
 } & Partial<DatePickerProps> &
   Partial<TimePickerProps> &
   Partial<DateTimePickerProps>;
-
+ 
 const DateTimeField: FC<DateFieldProps> = ({
   name,
   label,
   required = false,
   sx,
   viewMode = "date",
-  useCurrentDate = true,
+  useCurrentDate = false,
+  dateRestriction = "current-future-only", // Default: block past
   ...pickerProps
 }) => {
   const { t } = useTranslation();
@@ -51,13 +96,15 @@ const DateTimeField: FC<DateFieldProps> = ({
     formState: { errors },
   } = useFormContext();
 
+  
+  // Parse field value into Dayjs
+  
   const parseValue = (value: unknown): Dayjs | null => {
     if (!value) return null;
     if (dayjs.isDayjs(value)) return value;
     if (value instanceof Date) return dayjs(value);
-
     if (typeof value !== "string") return null;
-
+ 
     switch (viewMode) {
       case "year":
         return dayjs(value, "YYYY", true);
@@ -75,6 +122,8 @@ const DateTimeField: FC<DateFieldProps> = ({
     }
   };
 
+  // Format value for storage
+  
   const toStoreValue = (date: Dayjs): string => {
     switch (viewMode) {
       case "year":
@@ -93,6 +142,17 @@ const DateTimeField: FC<DateFieldProps> = ({
     }
   };
 
+  
+
+  
+  const getMinDate = (): Dayjs => {
+    if (dateRestriction === "past-current-future") {
+      return allowPastCurrentFuture();
+    } else if (dateRestriction === "current-future-only") {
+      return allowCurrentFutureOnly();
+    }
+    return allowCurrentFutureOnly(); // default fallback
+  };
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Controller
@@ -104,13 +164,19 @@ const DateTimeField: FC<DateFieldProps> = ({
             : undefined,
         }}
         render={({ field }) => {
+          const savedFormat = getDateFormat();
+          
+  const muiFormat = savedFormat.replace(/\//g, "-");
+   const timeFormat = getTimeFormat();
+        
+         
           if (useCurrentDate && !field.value) {
             field.onChange(toStoreValue(dayjs()));
           }
-
+ 
           const parsedValue = parseValue(field.value);
           const hasError = !!errors[name];
-
+ 
           const commonProps = {
             label,
             value: parsedValue,
@@ -121,6 +187,10 @@ const DateTimeField: FC<DateFieldProps> = ({
                 field.onChange(null);
               }
             },
+
+          
+           
+            minDate: getMinDate(),
 
             slotProps: {
               textField: {
@@ -149,29 +219,31 @@ const DateTimeField: FC<DateFieldProps> = ({
                 },
               },
             },
-
+ 
             ...pickerProps,
           };
 
+          
+        
           switch (viewMode) {
             case "time":
-              return <TimePicker {...commonProps} />;
-
+              return <TimePicker {...commonProps} format={timeFormat}  />;
+ 
             case "datetime":
               return (
-                <DateTimePicker {...commonProps} format="DD-MM-YYYY HH:mm" />
+                <DateTimePicker {...commonProps} format={`${muiFormat} ${timeFormat}`}/>
               );
-
+ 
             case "month":
               return (
                 <DatePicker {...commonProps} views={["month"]} format="MMMM" />
               );
-
+ 
             case "year":
               return (
                 <DatePicker {...commonProps} views={["year"]} format="YYYY" />
               );
-
+ 
             case "month-year":
               return (
                 <DatePicker
@@ -181,14 +253,14 @@ const DateTimeField: FC<DateFieldProps> = ({
                   format="MMMM YYYY"
                 />
               );
-
+ 
             case "date":
             default:
               return (
                 <DatePicker
                   {...commonProps}
                   views={["year", "month", "day"]}
-                  format="DD-MM-YYYY"
+                    format={muiFormat}
                 />
               );
           }
@@ -197,5 +269,7 @@ const DateTimeField: FC<DateFieldProps> = ({
     </LocalizationProvider>
   );
 };
-
+ 
 export default DateTimeField;
+ 
+ 

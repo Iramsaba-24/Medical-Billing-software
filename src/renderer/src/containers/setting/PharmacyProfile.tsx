@@ -1,13 +1,22 @@
-
-import React, { useRef, useState } from "react";
-import {Box,Paper,Typography,Divider,Grid,Button,Stack,} from "@mui/material";
+import React, { useRef, useState, useEffect } from "react";
+import {
+  Box,
+  Paper,
+  Typography,
+  Divider,
+  Grid,
+  Button,
+  Stack,
+} from "@mui/material";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import EmailField from "@/components/controlled/EmailField";
- 
 
-type PharmacyFormValues = {
+import LogoImage from "@/assets/icons.svg"; //  default logo image
+import { showToast } from "@/components/uncontrolled/ToastMessage";
+
+export type PharmacyFormValues = {
   pharmacyName: string;
   address: string;
   drugLicense: string;
@@ -19,118 +28,173 @@ type PharmacyFormValues = {
   acNumber: string;
   acHolderName: string;
 };
- 
+
+/* DEFAULT VALUES */
+
+const defaultValues: PharmacyFormValues = {
+  pharmacyName: "ABC Medical Store",
+  address: "Main Road, City",
+  drugLicense: "DL-KA-2023-001245",
+  fssaiNo: "12345678901234",
+  contact: "9876543210",
+  email: "pharmacy@gmail.com",
+  bankName: "State Bank of India",
+  branchIfsc: "SBIN0001234",
+  acNumber: "123456789012",
+  acHolderName: "ABC Medical Store",
+};
+
 function PharmacyProfile() {
   const methods = useForm<PharmacyFormValues>({
     mode: "onChange",
-    defaultValues: {
-      pharmacyName: "",
-      address: "",
-      drugLicense: "",
-      fssaiNo: "",
-      contact: "",
-      email: "",
-      bankName: "",
-      branchIfsc: "",
-      acNumber: "",
-      acHolderName: "",
-    },
+    defaultValues: defaultValues,
   });
- 
+
   const { handleSubmit, reset } = methods;
- 
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
- 
-  // Image preview state
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
- 
+
+  // default preview logo
+  const [previewImage, setPreviewImage] = useState<string | null>(LogoImage);
+
+  /* LOAD SAVED DATA */
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("pharmacyProfile");
+    const savedLogo = localStorage.getItem("pharmacyLogo");
+
+    if (savedData) {
+      reset(JSON.parse(savedData));
+    }
+
+    if (savedLogo) {
+      setPreviewImage(savedLogo); //  show saved logo
+    } else {
+      setPreviewImage(LogoImage); // show default logo
+    }
+  }, [reset]);
+
+  /* SAVE */
+
   const onSubmit: SubmitHandler<PharmacyFormValues> = (data) => {
     console.log("Form submitted with:", data);
-    window.alert("Data saved successfully!");
-    handleReset();
+
+    localStorage.setItem("pharmacyProfile", JSON.stringify(data));
+    localStorage.setItem("pharmacyName", data.pharmacyName);
+
+    // ADD THIS   Drug License save
+    localStorage.setItem("drugLicense", data.drugLicense);
+
+    if (previewImage) {
+      localStorage.setItem("pharmacyLogo", previewImage);
+    }
+    showToast("success", "Settings updated successfully!");
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 900);
   };
- 
+
+  /* IMAGE CHANGE */
+
   const handleImageChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ): void => {
     const file = event.target.files?.[0];
+
     if (file) {
-      setPreviewImage(URL.createObjectURL(file));
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+
+      reader.readAsDataURL(file);
     }
   };
- 
-  /* Reset */
+
+  /* RESET → DEFAULT VALUES */
+
   const handleReset = (): void => {
-    reset();
-    setPreviewImage(null);
+    reset(defaultValues);
+
+    setPreviewImage(LogoImage); //  reset logo to default
+
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
- 
-  /* Styles */
- const cardStyle = {
-  p: { xs: 2, md: 4 },
-  borderRadius: "5px",
-  boxShadow: 3,
-  mb: 1,
-};
- 
+
+  const cardStyle = {
+    p: { xs: 2, md: 4 },
+    borderRadius: "5px",
+    boxShadow: 3,
+    mb: 1,
+  };
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Box mb={2}>
           <Typography
             sx={{
-              fontSize: { xs: 20, sm: 22, md: 24 },  
+              fontSize: { xs: 20, sm: 22, md: 24 },
               fontWeight: 700,
-              color: '#111827',
-              mt: {xs:1 , md:0.5},
+              color: "#111827",
+              mt: { xs: 1, md: 0.5 },
               mb: 0.5,
             }}
           >
             Pharmacy Profile
           </Typography>
         </Box>
-        <Box sx={{  width: "100%" }}>
- 
-          {/* CARD 1 : Pharmacy Profile */}
-          <Paper sx={cardStyle}>
 
+        <Box sx={{ width: "100%" }}>
+          {/* CARD 1 */}
+
+          <Paper sx={cardStyle}>
             <Grid container spacing={{ xs: 3, md: 12 }}>
-              {/* Left Column */}
               <Grid size={{ xs: 12, md: 6 }}>
                 <Stack spacing={{ xs: 2, md: 2 }}>
                   <TextInputField
                     name="pharmacyName"
                     label="Pharmacy Name"
                     placeholder="Pharmacy Name"
+                    minLength={3}
+                    maxLength={30}
+                    inputType="textarea"
+                    rows={1}
                     required
                   />
- 
+
                   <TextInputField
                     name="address"
                     label="Address"
                     placeholder="Address"
                     inputType="textarea"
+                    minLength={10}
+                    maxLength={50}
                     rows={4}
                     required
                   />
- 
+
                   <TextInputField
                     name="drugLicense"
                     label="Drug License No."
                     placeholder="DL-KA-2023-001245"
+                    inputType="all"
+                    rows={1}
+                    minLength={15}
+                    maxLength={20}
                     required
-                     
                   />
                 </Stack>
               </Grid>
- 
+
               {/* Right Column (Upload Logo + FSSAI) */}
-              <Grid size={{ xs: 12, md: 6}}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Stack
-                  spacing={{  md: 3}}
+                  spacing={{ md: 3 }}
                   alignItems={{ xs: "center", md: "flex-start" }}
                 >
                   {/* Upload Logo */}
@@ -140,19 +204,19 @@ function PharmacyProfile() {
                         mb: 1,
                         fontWeight: 600,
                         textAlign: { md: "left" },
-                       xs:{ml:5} ,
+                        xs: { ml: 5 },
                       }}
                     >
                       Upload Logo
                     </Typography>
- 
+
                     <Box
                       sx={{
                         display: "flex",
-                      flexDirection: "row",
+                        flexDirection: "row",
                         gap: { xs: 3, md: 6 },
                         flexWrap: "wrap",
-                 
+
                         alignItems: "center",
                         justifyContent: { xs: "center", md: "flex-start" },
                       }}
@@ -182,14 +246,14 @@ function PharmacyProfile() {
                         >
                           Upload
                         </Button>
- 
+
                         <Typography
                           variant="caption"
                           sx={{ color: "#666", mt: 0.5, textAlign: "center" }}
                         >
                           (.JPEG or .PNG only)
                         </Typography>
- 
+
                         <input
                           type="file"
                           ref={fileInputRef}
@@ -198,7 +262,7 @@ function PharmacyProfile() {
                           onChange={handleImageChange}
                         />
                       </Box>
- 
+
                       <Box
                         sx={{
                           width: 140,
@@ -227,131 +291,90 @@ function PharmacyProfile() {
                       </Box>
                     </Box>
                   </Box>
- 
-                  {/* FSSAI No */}
+
                   <Box sx={{ mt: { xs: 0, md: 12 }, width: "100%" }}>
                     <TextInputField
                       name="fssaiNo"
                       label="FSSAI No."
                       placeholder="12345678901234"
-                      sx={{ mt: 8 }}
+                      type="number"
+                      minLength={14}
+                      maxLength={14}
                       required
- 
- 
+                      sx={{ mt: 8 }}
                     />
                   </Box>
                 </Stack>
               </Grid>
             </Grid>
           </Paper>
- 
-          {/* CARD 2 : Contact Details */}
+
+          {/* CARD 2 */}
+
           <Paper sx={cardStyle}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>
               Contact Details
             </Typography>
+
             <Divider sx={{ my: 2 }} />
- 
+
             <Grid container spacing={{ xs: 2, md: 9 }}>
               <Grid size={{ xs: 12, md: 6 }}>
                 <MobileField
                   name="contact"
                   label="Contact Number"
                   placeholder="9876543210"
+                  countryCode
                   required
                 />
               </Grid>
- 
+
               <Grid size={{ xs: 12, md: 6 }}>
-                <EmailField name="email" label="Email Address" required />
+                <EmailField
+                  name="email"
+                  label="Email Address"
+                  required
+                  maxLength={50}
+                />
               </Grid>
             </Grid>
           </Paper>
- 
-          {/* CARD 3 : Bank Details */}
-          <Paper sx={cardStyle}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-              Bank Details
-            </Typography>
-            <Divider sx={{ my: 2 }} />
- 
-            <Grid container spacing={{ xs: 3, md: 9 }}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Stack spacing={2}>
-                  <TextInputField name="bankName" label="Bank Name" required />
- 
-                  <TextInputField
-                    name="acNumber"
-                    label="A/C Number"
-                    placeholder="12345678912"
-                    required
-                 
-                  />
-                </Stack>
-              </Grid>
- 
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Stack spacing={2}>
-                  <TextInputField
-                    name="branchIfsc"
-                    label="Branch / IFSC"
-                    placeholder="SBIN0000456"
-                    required
-                  />
- 
-                  <TextInputField
-                    name="acHolderName"
-                    label="A/C Holder Name"
-                    required
-                  />
-                </Stack>
-              </Grid>
-            </Grid>
-          </Paper>
- 
-          {/* Buttons */}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}>
-              <Button
-                  type="button"
-                  variant="outlined"
-                  onClick={() => reset()}
-                  sx={{
-                    color: "#238878",
-                    border: "2px solid #238878",
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "#238878",
-                      color: "#fff",
-                      border: "2px solid #238878",
-                    },
-                  }}
-                >
-                  Reset
-                </Button>
-      
-                <Button
-                  type="submit"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#238878",
-                    color: "#fff",
-                    border: "2px solid #238878",
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "#fff",
-                      color: "#238878",
-                      border: "2px solid #238878",
-                    },
-                  }}
-                >
-                 
-                  Save
-                </Button>
-            </Box>
+
+          {/* BUTTONS */}
+
+          <Box
+            sx={{ display: "flex", justifyContent: "center", mt: 4, gap: 4 }}
+          >
+            <Button
+              type="button"
+              variant="outlined"
+              onClick={handleReset}
+              sx={{
+                color: "#238878",
+                border: "2px solid #238878",
+                textTransform: "none",
+              }}
+            >
+              Reset
+            </Button>
+
+            <Button
+              type="submit"
+              variant="contained"
+              sx={{
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+                textTransform: "none",
+              }}
+            >
+              Save
+            </Button>
+          </Box>
         </Box>
       </form>
     </FormProvider>
   );
 }
- 
+
 export default PharmacyProfile;

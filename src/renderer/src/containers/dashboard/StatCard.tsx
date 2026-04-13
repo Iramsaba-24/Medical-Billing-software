@@ -1,3 +1,6 @@
+
+
+ 
 import React from 'react';
 import {
   Box,
@@ -9,86 +12,105 @@ import Revenue from '@/assets/revenue.svg';
 import Inventory from '@/assets/inventory.svg';
 import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
-
+import { InventoryItem } from '@/containers/inventory/InventoryList';
+type CustomerItem = {
+  qty: number;
+  price: number;
+};
+ 
+type CustomerStorage = {
+  itemsList?: CustomerItem[];
+};
+ 
 const Dashboard: React.FC = () => {
-  // Function to generate and download the report
-//   const handleDownloadReport = () => {
-//     // Demo data for the report
-//     const reportData = {
-//       reportTitle: 'Inventory Dashboard Report',
-//       generatedDate: new Date().toLocaleString(),
-//       statistics: [
-//         { title: 'Total Revenue', value: '₹ 2,30,847' },
-//         { title: 'Inventory Status', value: 'Good' },
-//         { title: 'Medicines Available', value: '298' },
-//         { title: 'Medicine Shortage', value: '01' },
-//       ],
-//       summary: {
-//         totalRevenue: '₹ 2,30,847',
-//         inventoryStatus: 'Good',
-//         availableMedicines: '298 types',
-//         criticalShortage: '1 medicine',
-//       },
-//     };
-
-//     // Create report content in text format
-//     let reportContent = `
-// ═══════════════════════════════════════════════════
-//           INVENTORY DASHBOARD REPORT
-// ═══════════════════════════════════════════════════
-
-// Generated On: ${reportData.generatedDate}
-
-// ───────────────────────────────────────────────────
-//                  QUICK STATISTICS
-// ───────────────────────────────────────────────────
-
-// - Total Revenue: ${reportData.statistics[0].value}
-// - Inventory Status: ${reportData.statistics[1].value}
-// - Medicines Available: ${reportData.statistics[2].value}
-// - Medicine Shortage: ${reportData.statistics[3].value}
-
-// ───────────────────────────────────────────────────
-//                  DETAILED SUMMARY
-// ───────────────────────────────────────────────────
-
-// Total Revenue: ${reportData.summary.totalRevenue}
-// Inventory Status: ${reportData.summary.inventoryStatus}
-// Available Medicines: ${reportData.summary.availableMedicines}
-// Critical Shortage: ${reportData.summary.criticalShortage}
-
-// ───────────────────────────────────────────────────
-//                   RECOMMENDATIONS
-// ───────────────────────────────────────────────────
-
-// 1. Restock medicines with shortage immediately
-// 2. Monitor inventory levels regularly
-// 3. Review revenue trends weekly
-// 4. Update medicine database monthly
-
-// ═══════════════════════════════════════════════════
-//               END OF REPORT
-// ═══════════════════════════════════════════════════
-//     `.trim();
-
-//     // Create a Blob from the report content
-//     const blob = new Blob([reportContent], { type: 'text/plain' });
-    
-//     // Create a download link
-//     const url = window.URL.createObjectURL(blob);
-//     const link = document.createElement('a');
-//     link.href = url;
-//     link.download = `Inventory_Report_${new Date().getTime()}.txt`;
-    
-//     // Trigger the download
-//     document.body.appendChild(link);
-//     link.click();
-    
-//     // Cleanup
-//     document.body.removeChild(link);
-//     window.URL.revokeObjectURL(url);
-//   };
-
+ 
+// to fetch available medicine from inventory
+const availableMedicines = () :string =>
+{
+  const data = localStorage.getItem("inventory")
+  if(!data){
+    return "0"
+  }
+  const parseData : InventoryItem[] = JSON.parse(data)
+  const count = parseData.filter((item)=> Number(item.stockQty) >0 ).length
+  return count.toString()
+}
+ 
+// to fetch medicine shortage
+const medicineShoratage = () : string =>
+{
+  const data =localStorage.getItem("inventory")
+  if(!data){
+    return "0"
+  }
+  const parseData : InventoryItem[] = JSON.parse(data)
+  const count = parseData.filter((item)=> Number(item.stockQty) <5 ).length
+  return count.toString()
+}
+ 
+//inventory status
+const inventoryStatus = (): string =>
+{
+  const data = Number(medicineShoratage())
+  if(data ===0)
+  {
+    return "Good"
+  }
+  if(data<=3)
+  {
+    return "Average"
+  }
+  return "Critical"
+}
+ 
+// fetch total revenue
+const totalRevenue = (): string => {
+  const customerData: CustomerStorage[] = JSON.parse(
+    localStorage.getItem("medical_customers") || "[]"
+  );
+ 
+  const sales = customerData.reduce((sum, customer) => {
+    const customerTotal =
+      customer.itemsList?.reduce(
+        (itemSum, item) =>
+          itemSum + (Number(item.qty) || 0) * (Number(item.price) || 0),
+        0
+      ) || 0;
+ 
+    return sum + customerTotal;
+  }, 0);
+ 
+  return `₹ ${sales.toLocaleString()}`;
+};
+ 
+ 
+const getVisibleKpis = (): string[] => {
+  const defaultKpis = [
+    "totalRevenue",
+    "inventoryStatus",
+    "medicinesAvailable",
+    "medicinesShortage",
+  ];
+ 
+  const data = localStorage.getItem("dashboardSettings");
+ 
+  if (!data) return defaultKpis;
+ 
+  try {
+    const parsed = JSON.parse(data);
+ 
+    //  handle BOTH formats
+    if (Array.isArray(parsed)) return parsed;
+ 
+    return parsed.visibleKpis || defaultKpis;
+ 
+  } catch {
+    return defaultKpis;
+  }
+};
+ 
+const visibleKpis = getVisibleKpis();
+ 
   return (
     <Box>
       <Box
@@ -112,10 +134,10 @@ const Dashboard: React.FC = () => {
         >
           Dashboard
         </Typography>
-
+ 
         <Typography
           sx={{
-            fontSize: { xs: 13, sm: 14, md: 15 }, 
+            fontSize: { xs: 13, sm: 14, md: 15 },
             mb: 1.5,
             color: "text.secondary",
           }}
@@ -123,72 +145,65 @@ const Dashboard: React.FC = () => {
           A quick data overview of the inventory.
         </Typography>
       </Box>
-
-        {/* <Button
-          variant="contained"
-          onClick={handleDownloadReport}
-         sx={{
-              px:4,
-              width:"14%",          
-              textTransform:"none",
-              backgroundColor:"#1b7f6b",
-              "&:hover": {
-                backgroundColor:"#fff",
-                color:"#1b7f6b",
-                border:"2px solid #1b7f6b",
-              },
-            }}
-        >
-          Download Report
-        </Button> */}
+ 
       </Box>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: '1fr',
-            sm: 'repeat(2, 1fr)',
-            md: 'repeat(4, 1fr)',
-          },
-          gap: 3,
-        }}
-      >
-        <StackCard
-          value="₹ 2,30,847"
-          title="Total Revenue"
-          icon={Revenue}
-        />
-
-        <StackCard
-          value="Good"
-          title="Inventory Status"
-          icon={Inventory}
-        />
-
-        <StackCard
-          value="298"
-          title="Medicines Available"
-          icon={Medicines}
-        />
-
-        <StackCard
-          value="01"
-          title="Medicine Shortage"
-          icon={Shortage}
-        />
-      </Box>
+     <Box
+  sx={{
+    display: "grid",
+    gridTemplateColumns: {
+      xs: "1fr",
+      sm: "repeat(2, 1fr)",
+      md: "repeat(4, 1fr)",
+    },
+    gap: 3,
+  }}
+>
+ 
+{visibleKpis.includes("totalRevenue") && (
+  <StackCard
+    value={totalRevenue()}
+    title="Total Revenue"
+    icon={Revenue}
+  />
+)}
+ 
+{visibleKpis.includes("inventoryStatus") && (
+  <StackCard
+    value={inventoryStatus()}
+    title="Inventory Status"
+    icon={Inventory}
+  />
+)}
+ 
+{visibleKpis.includes("medicinesAvailable") && (
+  <StackCard
+    value={availableMedicines()}
+    title="Medicines Available"
+    icon={Medicines}
+  />
+)}
+ 
+{visibleKpis.includes("medicinesShortage") && (
+  <StackCard
+    value={medicineShoratage()}
+    title="Medicine Shortage"
+    icon={Shortage}
+  />
+)}
+ 
+</Box>
     </Box>
   );
 };
-
+ 
 export default Dashboard;
-
+ 
 interface StackCardProps {
   value: string;
   title: string;
   icon: string;
 }
-
+ 
 const StackCard: React.FC<StackCardProps> = ({ value, title, icon }) => {
   return (
     <Card
@@ -200,7 +215,7 @@ const StackCard: React.FC<StackCardProps> = ({ value, title, icon }) => {
         alignItems: 'center',
         px: 2.5,
         background: '#FFFFFF',
-        
+       
       }}
     >
       <CardContent
@@ -237,7 +252,7 @@ const StackCard: React.FC<StackCardProps> = ({ value, title, icon }) => {
               {title}
             </Typography>
           </Box>
-
+ 
           <img
             src={icon}
             alt={title}
@@ -248,3 +263,5 @@ const StackCard: React.FC<StackCardProps> = ({ value, title, icon }) => {
     </Card>
   );
 };
+ 
+ 

@@ -1,6 +1,4 @@
-
-
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -9,15 +7,18 @@ import {
   TextField,
   InputAdornment,
   Chip,
-  Slide,
+  Slide
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useForm, FormProvider } from 'react-hook-form';
 import DropdownField from '@/components/controlled/DropdownField';
 import { UniversalTable, type Column, ACTION_KEY } from '@/components/uncontrolled/UniversalTable';
 import EditSalesForm from './EditSalesForm';
+import ViewSalesDialog from './ViewSalesTable';
 
-export interface SalesData {
+
+
+export interface SalesData extends Record<string, unknown> {
   id: number;
   name: string;
   medicine: string;
@@ -25,17 +26,18 @@ export interface SalesData {
   totalPrice: number;
   date: string;
   time: string;
-  [key: string]: string | number;
 }
 
-const initialSalesData: SalesData[] = [
-  { id: 1, name: 'Kishor Kedar', medicine: 'Medicine Two', quantity: 1, totalPrice: 152, date: 'Jan 05, 2026', time: '10:00AM' },
-  { id: 2, name: 'Rohit Raut', medicine: 'Paracetamol', quantity: 5, totalPrice: 57, date: 'Jan 05, 2026', time: '11:00AM' },
-  { id: 3, name: 'Smita Rao', medicine: 'Honitus', quantity: 1, totalPrice: 125, date: 'Jan 04, 2026', time: '04:00PM' },
-  { id: 4, name: 'Shilpa Rathod', medicine: 'Eladi', quantity: 1, totalPrice: 160, date: 'Jan 03, 2026', time: '12:00PM' },
-  { id: 5, name: 'Kanta Jain', medicine: 'Insulin', quantity: 10, totalPrice: 1799, date: 'Jan 01, 2026', time: '10:00AM' },
-  { id: 6, name: 'Amit Sharma', medicine: 'Aspirin', quantity: 3, totalPrice: 45, date: 'Dec 30, 2025', time: '02:00PM' },
-];
+type StoredSale = {
+  name: string;
+  totalPrice: number;
+  invoice: string;
+  date: string;
+   time?: string; 
+  medicines: { name: string; qty: number }[];
+};
+
+
 
 const filterOptions = [
   { value: 'Today', label: 'Today' },
@@ -44,55 +46,104 @@ const filterOptions = [
   { value: 'All', label: 'All' },
 ];
 
-const parseDate = (dateStr: string): Date => {
-  const months: Record<string, number> = {
-    Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
-    Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11,
-  };
-
-  const [month, day, year] = dateStr.replace(',', '').split(' ');
-  return new Date(Number(year), months[month], Number(day));
-};
-
-const getFilteredDataByDate = (data: SalesData[], filter: string) => {
-  const today = new Date(2026, 0, 6);
+const getFilteredDataByDate = (data: SalesData[], filter: string): SalesData[] => {
+  const today = new Date();
 
   switch (filter) {
     case 'Today':
-      return data.filter(
-        d =>
-          parseDate(d.date).toDateString() ===
-          new Date(2026, 0, 5).toDateString()
-      );
-    case '6 Days':
+      return data.filter(d => new Date(d.date).toDateString() === today.toDateString());
+
+    case '6 Days': {
+      const sixDaysAgo = new Date();
+      sixDaysAgo.setDate(today.getDate() - 6);
       return data.filter(d => {
-        const date = parseDate(d.date);
-        return date >= new Date(2026, 0, 1) && date <= today;
+        const date = new Date(d.date);
+        return date >= sixDaysAgo && date <= today;
       });
+    }
+
     case 'This Month':
-      return data.filter(d => parseDate(d.date).getMonth() === 0);
-    case 'All':
+      return data.filter(d => {
+        const date = new Date(d.date);
+        return date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+      });
+
     default:
       return data;
   }
 };
 
+
+
 const SalesTable: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('This Month');
-  const [salesData, setSalesData] = useState<SalesData[]>(initialSalesData);
-
-  //  Only one state needed for dialog
+  const [salesList, setSalesList] = useState<SalesData[]>([]);
   const [editingRow, setEditingRow] = useState<SalesData | null>(null);
+  const [viewRow, setViewRow] = useState<SalesData | null>(null);
 
-  const methods = useForm({
-    defaultValues: {
-      filter: 'This Month',
-    },
+  const methods = useForm({ defaultValues: { filter: 'This Month' } });
+
+
+  useEffect(() => {
+  const storedRetail = localStorage.getItem('currentInvoice');
+  const storedDistributor = localStorage.getItem('currentNewInvoiceList');
+
+  const retailParsed: StoredSale[] = storedRetail ? JSON.parse(storedRetail) : [];
+  const distributorParsed: StoredSale[] = storedDistributor ? JSON.parse(storedDistributor) : [];
+
+ 
+  const combined = [...retailParsed, ...distributorParsed];
+
+  if (combined.length === 0) return;
+
+  const formatted: SalesData[] = combined.map((item, index) => {
+    const medicineNames =
+      item.medicines && item.medicines.length > 0
+        ? item.medicines.map(m => m.name).join(', ')
+        : '-';
+
+    const totalQty =
+      item.medicines && item.medicines.length > 0
+        ? item.medicines.reduce((sum, m) => sum + (m.qty || 0), 0)
+        : 1;
+
+    return {
+      id: index + 1,
+      name: item.name || '-',
+      medicine: medicineNames,
+      quantity: totalQty,
+      totalPrice: item.totalPrice || 0,
+      date: item.date || new Date().toISOString().split('T')[0],
+  
+     time:item.time || '-',
+    };
   });
 
+  setSalesList(formatted);
+}, []);
+
+  const saveToLocalStorage = (data: SalesData[]) => {
+    const formatted: StoredSale[] = data.map(item => ({
+      invoice: String(item.id),
+      name: item.name as string,
+      totalPrice: item.totalPrice as number,
+      date: item.date as string,
+      medicines:
+        item.medicine !== '-'
+          ? (item.medicine as string).split(', ').map(name => ({
+              name,
+              qty: 1, 
+            }))
+          : [],
+    }));
+
+    localStorage.setItem('currentInvoice', JSON.stringify(formatted));
+    localStorage.setItem('currentNewInvoiceList', JSON.stringify([]));
+  };
+
   const filteredSalesData = useMemo(() => {
-    const dateFiltered = getFilteredDataByDate(salesData, selectedMonth);
+    const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
 
     if (!searchQuery.trim()) return dateFiltered;
 
@@ -101,7 +152,8 @@ const SalesTable: React.FC = () => {
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.medicine.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery, selectedMonth, salesData]);
+  }, [salesList, selectedMonth, searchQuery]);
+
 
   const columns: Column<SalesData>[] = [
     { key: 'name', label: 'Name' },
@@ -110,62 +162,52 @@ const SalesTable: React.FC = () => {
     {
       key: 'totalPrice',
       label: 'Price',
-      render: row => row.totalPrice.toFixed(2),
+      render: row => `₹ ${(row.totalPrice as number).toFixed(2)}`,
     },
     { key: 'date', label: 'Date' },
     { key: 'time', label: 'Time' },
     { key: ACTION_KEY, label: 'Actions' },
   ];
 
-  const handleEdit = (row: SalesData) => {
-    setEditingRow(row); // opens dialog
-  };
+  
 
-  const handleCloseEditDialog = () => {
-    setEditingRow(null); // closes dialog
-  };
+  const handleEdit = (row: SalesData) => setEditingRow(row);
+  const handleCloseEditDialog = () => setEditingRow(null);
 
   const handleSaveEdit = (data: SalesData) => {
-    setSalesData(prevData => {
-      const newData = prevData.map(item =>
+    setSalesList(prev => {
+      const updated = prev.map(item =>
         item.id === data.id ? { ...item, ...data } : item
       );
-
-      const updatedFiltered = getFilteredDataByDate(
-        newData,
-        selectedMonth
-      );
-
-      if (!updatedFiltered.some(item => item.id === data.id)) {
-        setSelectedMonth('All');
-      }
-
-      return newData;
+      saveToLocalStorage(updated);
+      return updated;
     });
-
     handleCloseEditDialog();
   };
 
   const handleDelete = (row: SalesData) => {
-    if (window.confirm(`Are you sure you want to delete ${row.name}'s record?`)) {
-      setSalesData(prevData =>
-        prevData.filter(item => item.id !== row.id)
-      );
-    }
+    if (!window.confirm(`Delete ${row.name}?`)) return;
+
+    setSalesList(prev => {
+      const updated = prev.filter(item => item.id !== row.id);
+      saveToLocalStorage(updated);
+      return updated;
+    });
   };
 
   const handleDeleteSelected = (rows: SalesData[]) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete ${rows.length} selected record(s)?`
-      )
-    ) {
-      const selectedIds = rows.map(row => row.id);
-      setSalesData(prevData =>
-        prevData.filter(item => !selectedIds.includes(item.id))
-      );
-    }
+    if (!window.confirm(`Delete ${rows.length} records?`)) return;
+
+    const ids = rows.map(r => r.id);
+
+    setSalesList(prev => {
+      const updated = prev.filter(item => !ids.includes(item.id));
+      saveToLocalStorage(updated);
+      return updated;
+    });
   };
+
+ 
 
   return (
     <>
@@ -181,20 +223,11 @@ const SalesTable: React.FC = () => {
                 gap={2}
                 mb={3}
               >
-                <Typography
-                  variant="h6"
-                  fontWeight={600}
-                  textAlign={{ xs: 'left', md: 'left' }}
-                >
+                <Typography variant="h6" fontWeight={600}>
                   Recent Sales List
                 </Typography>
 
-                <Box
-                  display="flex"
-                  flexDirection={{ xs: 'column', sm: 'row' }}
-                  gap={2}
-                  width={{ xs: '100%', md: 'auto' }}
-                >
+                <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={2}>
                   <TextField
                     size="small"
                     placeholder="Search"
@@ -207,12 +240,6 @@ const SalesTable: React.FC = () => {
                         </InputAdornment>
                       ),
                     }}
-                    sx={{
-                      width: { xs: '100%', sm: 250, md: 300 },
-                      '& .MuiOutlinedInput-root': {
-                        height: 50,
-                      },
-                    }}
                   />
 
                   <Box sx={{ width: { xs: '100%', sm: 180 } }}>
@@ -220,22 +247,13 @@ const SalesTable: React.FC = () => {
                       name="filter"
                       options={filterOptions}
                       onChangeCallback={value => setSelectedMonth(value)}
-                      sx={{
-                        '& .MuiFormHelperText-root': {
-                          display: 'none',
-                        },
-                      }}
                     />
                   </Box>
                 </Box>
               </Box>
             </FormProvider>
 
-            <Chip
-              label={`Filter: ${selectedMonth}`}
-              sx={{ mb: 2 }}
-              color="primary"
-            />
+            <Chip label={`Filter: ${selectedMonth}`} sx={{ mb: 2 }} />
 
             <UniversalTable
               data={filteredSalesData}
@@ -245,32 +263,24 @@ const SalesTable: React.FC = () => {
               getRowId={row => row.id}
               onDeleteSelected={handleDeleteSelected}
               actions={{
+                view: setViewRow,
                 edit: handleEdit,
                 delete: handleDelete,
               }}
-              paperSx={{
-                boxShadow: 'none',
-                borderRadius: 0,
-              }}
-              headerSx={{
-                fontWeight: 600,
-              }}
-              rowHoverSx={{
-                '&:hover': {
-                  bgcolor: 'rgba(0, 0, 0, 0.04)',
-                },
-              }}
-              caption={undefined}
             />
           </CardContent>
         </Card>
       </Slide>
 
-    
       <EditSalesForm
         editingRow={editingRow}
         onClose={handleCloseEditDialog}
         onSave={handleSaveEdit}
+      />
+
+      <ViewSalesDialog
+        viewRow={viewRow}
+        onClose={() => setViewRow(null)}
       />
     </>
   );

@@ -1,14 +1,11 @@
 import { Box, Divider, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import BillingTable from "@/containers/Invoices/BillingTable";
-import { URL_PATH } from "@/constants/UrlPath";
 import { Invoice } from "@/types/invoice";
-
+import axios from "axios";
 import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
-
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
 
 const cardHover = {
@@ -22,51 +19,70 @@ const cardHover = {
   },
 };
 
-const Billing = () => {
-  const navigate = useNavigate();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
-  // Load invoices from localStorage
+const Billing = () => {
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   useEffect(() => {
-    const stored = localStorage.getItem("invoiceList");
+    const stored = localStorage.getItem("currentInvoice");
     const parsed: Invoice[] = stored ? JSON.parse(stored) : [];
     setInvoices(parsed);
   }, []);
+useEffect(() => {
+  axios.get("http://localhost:5158/api/invoice/dashboard")
+    .then((res) => {
+      console.log("API DATA 👉", res.data);
+      setDashboard(res.data);
+    })
+    .catch((err) => {
+      console.log("ERROR 👉", err);
+    });
+}, []);
+  // Memoized Calculations
 
-  // Memoized Calculations 
-  const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
-    const revenue = invoices
-      .filter(inv => inv.status === "Paid")
-      .reduce((sum, inv) => sum + inv.price, 0);
+  // const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
+  //   const revenue = invoices
+  //     .filter(inv => inv.status === "Paid")
 
-    const pending = invoices
-      .filter(inv => inv.status === "Pending")
-      .reduce((sum, inv) => sum + inv.price, 0);
-
-    return {
-      totalRevenue: revenue,
-      pendingAmount: pending,
-      totalInvoices: invoices.length,
-    };
-  }, [invoices]);
-
+  //     .reduce((sum, inv) => sum + inv.price, 0);
+  //   const pending = invoices
+  //     .filter(inv => inv.status === "Pending")
+  //     .reduce((sum, inv) => sum + inv.price, 0);
+  //   return {
+  //     totalRevenue: revenue,
+  //     pendingAmount: pending,
+  //     totalInvoices: invoices.length,
+  //   };
+  // }, [invoices]);
+const [dashboard, setDashboard] = useState({
+  totalRevenue: 0,
+  pendingAmount: 0,
+  totalInvoices: 0
+});
   return (
     <Box>
-     <Typography variant="h5" mb={2}>
-      Invoices
-    </Typography>
-    <Divider sx={{ mb: 3 }} />
+      <Typography sx={{
+        fontSize: { xs: 20, sm: 24, md: 28 },
+        fontWeight: 700,
+        color: '#111827',
+        mt: { xs: 1, md: 0.5 },
+        mb: 0.5
+      }} >
+
+        Invoices
+      </Typography>
+      <Divider sx={{ mb: 3 }} />
       {/* Cards */}
       <Box
         display="flex"
-        flexDirection={{xs:"column", md:"row"}}
+        flexDirection={{ xs: "column", md: "row" }}
         mb={4}
         gap={2}
       >
+
         {/* Revenue Card */}
-        <Box 
+<Box
+
           p={{ xs: 2, md: 5 }}
-          
           bgcolor="#fff"
           borderRadius={2}
           boxShadow={1}
@@ -78,16 +94,17 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
+            height: { md: 105 }
           }}>
           <Box>
-             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              ₹ {totalRevenue.toLocaleString()}
+            <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
+              ₹ {dashboard.totalRevenue.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Total Revenue (Paid)
             </Typography>
           </Box>
-           <Box
+          <Box
             component="img"
             src={revenueImg}
             alt="Revenue"
@@ -96,11 +113,11 @@ const Billing = () => {
               height: { xs: 44, md: 80 },
               flexShrink: 0,
             }}
-          />        
-          </Box>
+          />
+        </Box>
 
         {/* Pending Card */}
-         <Box
+        <Box
           p={{ xs: 2, md: 5 }}
           bgcolor="#fff"
           borderRadius={2}
@@ -113,12 +130,11 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
-             height: {  md: 105}
-          }}
-        >
+            height: { md: 105 }
+          }}>
           <Box>
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              ₹ {pendingAmount.toLocaleString()}
+              ₹ {dashboard.pendingAmount.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Pending Amount
@@ -133,8 +149,8 @@ const Billing = () => {
               height: { xs: 44, md: 80 },
               flexShrink: 0,
             }}
-          />       
-          </Box>
+          />
+        </Box>
 
         {/* Total Invoices */}
         <Box
@@ -150,14 +166,15 @@ const Billing = () => {
             ...cardHover,
             flex: "1 1 0",
             minWidth: 0,
-             height: {  md: 105}
+            height: { md: 105 }
           }}
         >
           <Box>
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              {totalInvoices}
+              {dashboard.totalInvoices}
             </Typography>
             <Typography variant="body2" color="text.secondary">
+
               Total Invoices
             </Typography>
           </Box>
@@ -171,21 +188,19 @@ const Billing = () => {
               flexShrink: 0,
             }}
           />
-        </Box>        
+        </Box>
       </Box>
 
       <BillingTable
         invoices={invoices}
+
         setInvoices={setInvoices}
-        onCreate={() => navigate(URL_PATH.CreateInvoice)}
-        onView={(invoice: Invoice) =>
-          navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
-            state: invoice,
-          })
-        }
       />
-    </Box>
+</Box>
+
   );
+
 };
 
 export default Billing;
+

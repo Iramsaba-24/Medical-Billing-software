@@ -1,32 +1,32 @@
-import { Box, Paper, Typography, Button } from "@mui/material";
+import { Box, Paper, Typography, Button, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import TotalItems from "@/assets/TotalItems.svg";
 import LowStock from "@/assets/warningsign.svg";
 import TotalValue from "@/assets/TotalValue.svg";
 import type { InventoryItem } from "@/containers/inventory/AddInventoryItem";
-import InventoryList from "@/containers/inventory/InvetoryList";
+import InventoryList from "@/containers/inventory/InventoryList";
 import GroupSummary from "@/containers/inventory/GroupSummary";
-
+ 
 export default function InventoryPage() {
   const navigate = useNavigate();
-
+ 
    const inventory: InventoryItem[] = JSON.parse(
   localStorage.getItem("inventory") || "[]"
  );
-
+ 
   const totalItems = inventory.length;
-
+ 
   const lowStockItems = inventory.filter(
   (item) => item.stockQty > 0 && item.stockQty < 10
   ).length;
   length;
-
+ 
   const totalValue = inventory.reduce(
     (sum, item) => sum + item.stockQty * item.pricePerUnit,
     0
   );
-
+ 
 return (
     <Box>
       <Box>
@@ -41,8 +41,9 @@ return (
           >
             Inventory
           </Typography>
+          <Divider sx={{ mb: 3 }} />
       </Box>
-
+ 
       <Box
         display="grid"
         gridTemplateColumns={{ xs: "1fr", md: "repeat(3, 1fr)" }}
@@ -78,7 +79,7 @@ return (
                 {card.label}
               </Typography>
             </Box>
-
+ 
             <Box
               component="img"
               src={card.img}
@@ -96,13 +97,13 @@ return (
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" mb={2}>
             <Typography fontWeight={600}>
-              Medicine Groups 
+              Medicine Groups
             </Typography>
-
+ 
             <Button
               size="small"
               variant="contained"
-              sx={{   
+              sx={{  
                 px: 2.5,
                 py: 1,
                 minWidth: 100,
@@ -122,13 +123,13 @@ return (
               View Details
             </Button>
           </Box>
-
+ 
              <GroupSummary />
-
+ 
         </Paper>
-
+ 
         <Box display="flex" flexDirection="column" gap={2}>
-
+ 
           <Button
             fullWidth
             sx={{
@@ -150,7 +151,7 @@ return (
           >
             + Add New Group
           </Button>
-
+ 
           <Button
             fullWidth
             sx={{
@@ -172,29 +173,9 @@ return (
           >
             + Add New Medicine
           </Button>
-
-          <Button
-            fullWidth
-           sx={{
-            px: 2.5,
-            py: 1,
-            minWidth: 100,
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            fontSize: "0.95rem",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
-              border: "2px solid #238878",
-            }
-          }}
-            onClick={() => navigate(URL_PATH.InventoryList)}
-          >
-            View Inventory List
-          </Button>
-
+ 
+         
+ 
            <Button
             fullWidth
            sx={{
@@ -218,7 +199,7 @@ return (
           </Button>
         </Box>
       </Box>
-
+ 
       <InventoryList />
     </Box>
   );

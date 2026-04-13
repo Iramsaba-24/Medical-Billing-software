@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import { useForm, FormProvider, Controller, useFormContext } from "react-hook-form";
 import CheckboxGroup from "@/components/controlled/CheckboxGroup";
+import {showToast } from "@/components/uncontrolled/ToastMessage";
 
-/* Same Card Style as Pharmacy Profile */
 const cardStyle = {
   p: { xs: 2, md: 4 },
   borderRadius: "5px",
@@ -80,6 +80,7 @@ const DoctorsSettings: React.FC = () => {
 
   const onSubmit = (data: DoctorsSettingsForm) => {
     console.log("Saved Settings:", data);
+      showToast("success", "Settings updated successfully");
   };
 
   return (
