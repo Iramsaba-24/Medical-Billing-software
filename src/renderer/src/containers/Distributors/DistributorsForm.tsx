@@ -171,13 +171,6 @@ const DistributorsForm = () => {
               />
  
               <TextInputField
-                name="website"
-                label="Website (Optional)"
-                inputType="textarea"
-                rows={1}
-              />
- 
-              <TextInputField
                 name="gstin"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"

@@ -26,10 +26,10 @@ export interface DoctorResponse {
   SrNo: number;
   doctorId: number;
   doctorName: string;
-  degree: string;
+  degree: string; 
   phone: string;
   email: string;
-  registrationNumber: string;
+  registrationNumber: string; 
   hospitalAddress: string;
    isActive: boolean;
     IsActive?: boolean;

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
-
-
+ 
+ 
 // frontend form data
 export interface MedicineFormData {
    medicineId: number;
@@ -14,7 +14,7 @@ export interface MedicineFormData {
   supplier:string;
   hsnCode?: string;
 }
-
+ 
 // backend request
 interface MedicineRequest {
   medicineId: number;
@@ -30,8 +30,8 @@ interface MedicineRequest {
   gstPercentage: number;
   hsnCode?: string; 
 }
-
-
+ 
+ 
 // backend response
 export interface MedicineResponse {
   medicineId: number;
@@ -43,7 +43,7 @@ export interface MedicineResponse {
   groupId: number;
   hsnCode?: string; 
   distributorId: number;
-  
+ 
   gstPercentage: number;
   totalPrice: number;
   gst: number;
@@ -53,22 +53,22 @@ export interface MedicineResponse {
   distributorName?: string;
   groupName?: string;
   category?: string;
-  
+ 
 }
-
-
+ 
+ 
 // token
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
-
+ 
   return {
     headers: {
       Authorization: token ? `Bearer ${token}` : "",
     },
   };
 };
-
-
+ 
+ 
 export const getMedicines = async (search?: string) => {
   try {
     const res = await axios.get(API_ENDPOINTS.MEDICINE, {
@@ -83,11 +83,11 @@ export const getMedicines = async (search?: string) => {
     throw error;
   }
 };
-
+ 
 export const addMedicine = async (
   data: MedicineFormData
 ): Promise<MedicineResponse> => {
-
+ 
   const payload: MedicineRequest = {
      medicineId: data.medicineId,
     itemName: data.itemName,
@@ -97,23 +97,23 @@ export const addMedicine = async (
     expiryDate: new Date(data.expiryDate).toISOString(),
     hsnCode: data.hsnCode || "",
     groupId: Number(data.medicineGroup),  
-    distributorId: Number(data.supplier), 
+    distributorId: Number(data.supplier),
     batchNumber: "NA",
     company: "NA",
     gstPercentage: 0
   };
-
-  console.log("FINAL PAYLOAD:", payload); 
-
+ 
+  console.log("FINAL PAYLOAD:", payload);
+ 
   const res = await axios.post(
     API_ENDPOINTS.MEDICINE,
     payload,
     getAuthHeaders()
   );
-
+ 
   return res.data.data;
 };
-
+ 
 export const updateMedicine = async (
   id: number,
   data: MedicineFormData
@@ -132,7 +132,7 @@ export const updateMedicine = async (
     gstPercentage: 0,
     hsnCode: data.hsnCode || "",
   };
-
+ 
   const res = await axios.put(
     `${API_ENDPOINTS.MEDICINE}/${id}`,
     payload,
@@ -140,10 +140,11 @@ export const updateMedicine = async (
   );
   return res.data.data;
 };
-
+ 
 export const deleteMedicine = async (id: number): Promise<void> => {
   await axios.delete(
     `${API_ENDPOINTS.MEDICINE}/${id}`,
     getAuthHeaders()
   );
 };
+ 
