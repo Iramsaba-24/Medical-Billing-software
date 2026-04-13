@@ -1,3 +1,4 @@
+
 // import { useState } from "react";
 // import { useForm, FormProvider } from "react-hook-form";
 // import {
@@ -55,6 +56,8 @@
 //   const onSubmit = async (data: LoginFormInputs) => {
 //     console.log("Login attempt:", data);
 //     setIsLoading(true);
+
+    
     
 //     try {
 //       const loginData: LoginRequest = {
@@ -72,23 +75,49 @@
       
 //       console.log("Login response:", response);
       
-//       if (response.token) {
-//         localStorage.setItem('token', response.token);
-//         if (response.userId) {
-//           localStorage.setItem('userId', response.userId.toString());
-//         }
+//       // if (response.token) {
+//       //   localStorage.setItem('token', response.token);
+//       //   if (response.userId) {
+//       //     localStorage.setItem('userId', response.userId.toString());
+//       //   }
 
         
-//         if (response.username) {
-//           localStorage.setItem('username', response.username);
-//         }
-//         if (response.email) {
-//           localStorage.setItem('userEmail', response.email);
-//         }
+//       //   if (response.username) {
+//       //     localStorage.setItem('username', response.username);
+//       //   }
+//       //   if (response.email) {
+//       //     localStorage.setItem('userEmail', response.email);
+//       //   }
         
-//         showToast("success", "Login successful!");
+//       //   showToast("success", "Login successful!");
         
-//         navigate(URL_PATH.Landing);
+//       //   navigate(URL_PATH.Landing);
+
+//    if (response.token) {
+//   localStorage.setItem('token', response.token);
+  
+//   if (response.userId) {
+//     localStorage.setItem('userId', response.userId.toString());
+//   }
+
+//   // block 
+//   try {
+//     const payload = JSON.parse(atob(response.token.split('.')[1]));
+//     console.log("JWT payload:", payload);
+//     const jwtUsername = payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+//     if (jwtUsername) {
+//       localStorage.setItem('username', jwtUsername);  
+//     }
+//   } catch (e) {
+//     console.error("JWT decode failed", e);
+//   }
+
+//   if (data.licenseKey && data.licenseKey.trim() !== "") {
+//     localStorage.setItem('licenseKey', data.licenseKey.trim());
+//   }
+//   showToast("success", "Login successful!");
+//   navigate(URL_PATH.Landing);
+
 //       } else {
 //         showToast("error", response.message || "Login failed");
 //       }
@@ -318,7 +347,7 @@
 //                 }}
 //               />
 
-//               <TextInputField
+//               {/* <TextInputField
 //                 name="licenseKey"
 //                 label="License Key (Optional)"
 //                 sx={inputStyle("licenseKey")}
@@ -328,7 +357,7 @@
 //                     message: "Invalid License Key format",
 //                   },
 //                 }}
-//               />
+//               /> */}
 //             </Box>
             
 //             <Button
@@ -403,6 +432,10 @@
 // };
 
 // export default LoginPage;
+
+
+
+
 
 import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
@@ -504,6 +537,9 @@ const LoginPage = () => {
   if (response.userId) {
     localStorage.setItem('userId', response.userId.toString());
   }
+
+ const emailToSave = response.email || data.usernameOrEmail;
+  localStorage.setItem('userEmail', emailToSave);
 
   // block 
   try {
@@ -752,7 +788,7 @@ const LoginPage = () => {
                 }}
               />
 
-              <TextInputField
+              {/* <TextInputField
                 name="licenseKey"
                 label="License Key (Optional)"
                 sx={inputStyle("licenseKey")}
@@ -762,7 +798,7 @@ const LoginPage = () => {
                     message: "Invalid License Key format",
                   },
                 }}
-              />
+              /> */}
             </Box>
             
             <Button
@@ -837,6 +873,10 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
+
+
 
 
 

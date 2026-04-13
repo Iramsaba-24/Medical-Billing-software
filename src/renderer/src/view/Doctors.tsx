@@ -93,7 +93,6 @@ const Doctors = () => {
       });
 
       // UI update
-
       setDoctors((prev) =>
         prev.map((doc) => (doc.doctorId === id ? { ...doc, status } : doc)),
       );

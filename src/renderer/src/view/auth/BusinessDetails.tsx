@@ -342,7 +342,8 @@ const BusinessDetails = () => {
 
             <TextInputField
               name="licenseNumber"
-              label="License Number (Optional)"
+              label="License Number "
+              required
               placeholder="DL-KA-2023-001245"
               sx={{
                 "& .MuiOutlinedInput-root": {

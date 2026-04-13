@@ -27,6 +27,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  //profilePicture: string;
   ownerName: string;
   message: string;
   token: string;

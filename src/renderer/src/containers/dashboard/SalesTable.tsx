@@ -145,6 +145,7 @@ useEffect(() => {
 
     fetchMedicines();
   }, []);
+  
   //filtered sales data
   const filteredSalesData = useMemo(() => {
     const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
