@@ -8,18 +8,17 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useState } from "react";
 import AppToast from "@/containers/distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
-import BankDetailsForm from "@/containers/distributors/BankDetailForm";
 import { addDistributor } from "@/service/distributorService";
-import axios from "axios"; 
-
-
+import axios from "axios";
+ 
+ 
 type DistributorFormInput = {
   distributorId: number;
   companyName: string;
   ownerName?: string;
   phone: string;
   email: string;
-  createdAt: string; 
+  createdAt: string;
   registrationNumber: string;
   website: string;
   gstin: string;
@@ -31,7 +30,7 @@ type DistributorFormInput = {
   ifscCode: string;
   upiId: string;
 };
-
+ 
 const DistributorsForm = () => {
   const methods = useForm<DistributorFormInput>({
     defaultValues: {
@@ -39,7 +38,7 @@ const DistributorsForm = () => {
       ownerName: "",
       phone: "",
       email: "",
-      createdAt: "", 
+      createdAt: "",
       registrationNumber: "",
       website: "",
       gstin: "",
@@ -53,22 +52,22 @@ const DistributorsForm = () => {
     },
     mode: "onChange",
   });
-
+ 
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
-
+ 
   const onSubmit = async (data: DistributorFormInput) => {
     try {
       const cleanedData = {
         ...data,
         ownerName: data.ownerName || "",
-        website: data.website ? data.website : undefined, 
+        website: data.website ? data.website : undefined,
       };
-
+ 
       console.log("Submitting data:", cleanedData);
-
+ 
       await addDistributor(cleanedData);
-
+ 
       setToastOpen(true);
       setTimeout(() => {
         navigate(URL_PATH.DistributorsPage);
@@ -79,7 +78,7 @@ const DistributorsForm = () => {
           "Error saving distributor:",
           error.response?.data || error.message
         );
-        
+       
       } else if (error instanceof Error) {
         console.error("Error saving distributor:", error.message);
       } else {
@@ -87,12 +86,12 @@ const DistributorsForm = () => {
       }
     }
   };
-
+ 
   return (
     <Box p={2} sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
       <FormProvider {...methods}>
         <form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
-          
+         
           <Paper
             sx={{
               maxWidth: 800,
@@ -107,7 +106,7 @@ const DistributorsForm = () => {
             <Typography variant="h6" mb={3} fontWeight={600}>
               Add Distributor
             </Typography>
-
+ 
             <Box
               sx={{
                 display: "grid",
@@ -125,7 +124,7 @@ const DistributorsForm = () => {
                 rows={1}
                 required
               />
-
+ 
               <TextInputField
                 name="ownerName"
                 label="Owner Name"
@@ -134,7 +133,7 @@ const DistributorsForm = () => {
                 maxLength={30}
                 required
               />
-
+ 
               <MobileField
                 name="phone"
                 label="Phone"
@@ -143,7 +142,7 @@ const DistributorsForm = () => {
                 preventDuplicate
                 required
               />
-
+ 
               <EmailField
                 name="email"
                 label="Email"
@@ -151,7 +150,7 @@ const DistributorsForm = () => {
                 maxLength={50}
                 preventDuplicate
               />
-
+ 
               <DateTimeField
                 name="createdAt"
                 label="Date"
@@ -161,7 +160,7 @@ const DistributorsForm = () => {
                 dateRestriction="current-future-only"
                 required
               />
-
+ 
               <TextInputField
                 name="registrationNumber"
                 label="Registration Number"
@@ -170,14 +169,7 @@ const DistributorsForm = () => {
                 required
                 maxLength={14}
               />
-
-              <TextInputField
-                name="website"
-                label="Website (Optional)"
-                inputType="textarea"
-                rows={1}
-              />
-
+ 
               <TextInputField
                 name="gstin"
                 label="GSTIN"
@@ -194,7 +186,7 @@ const DistributorsForm = () => {
                 }}
               />
             </Box>
-
+ 
             <Box sx={{ mt: 2 }}>
               <TextInputField
                 name="address"
@@ -207,20 +199,6 @@ const DistributorsForm = () => {
               />
             </Box>
           </Paper>
-
-          <Paper
-            sx={{
-              maxWidth: 800,
-              mx: "auto",
-              p: 4,
-              backgroundColor: "#fff",
-              borderRadius: "10px",
-              boxShadow: 3,
-            }}
-          >
-            <BankDetailsForm />
-          </Paper>
-
           <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}>
             <Button
               variant="outlined"
@@ -237,7 +215,7 @@ const DistributorsForm = () => {
             >
               Cancel
             </Button>
-
+ 
             <Button
               type="submit"
               variant="contained"
@@ -257,7 +235,7 @@ const DistributorsForm = () => {
           </Box>
         </form>
       </FormProvider>
-
+ 
       <AppToast
         open={toastOpen}
         message="Data saved successfully"
@@ -267,7 +245,5 @@ const DistributorsForm = () => {
     </Box>
   );
 };
-
-export default DistributorsForm;
-
-
+ 
+export default DistributorsForm; 

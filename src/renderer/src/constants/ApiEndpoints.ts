@@ -17,5 +17,6 @@ export const API_ENDPOINTS = {
   REORDER: `${API_BASE_URL}/Reorder`,
 LOW_STOCK: `${API_BASE_URL}/Medicine/low-stock`,
 LAST_PURCHASE: `${API_BASE_URL}/ReorderLevels`, 
+  GET_TOTAL_PURCHASE: `${API_BASE_URL}/purchase/total`,
 };
  

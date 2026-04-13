@@ -1,197 +1,198 @@
 import { useState, useMemo, useEffect } from "react";
 import { Typography, Stack, Paper, Divider } from "@mui/material";
-import { UniversalTable } from "@/components/uncontrolled/UniversalTable";
+import {
+  UniversalTable,
+  Column,
+} from "@/components/uncontrolled/UniversalTable";
+import DropdownField from "@/components/controlled/DropdownField";
+import { useForm, FormProvider } from "react-hook-form";
+import { getAllCustomers } from "@/service/customerService";
+import { CustomerData } from "@/view/CustomerMaster";
 
-import { useForm, FormProvider } from "react-hook-form"; 
-import DropdownField from "@/components/controlled/DropdownField"; 
+import {
+  getAllRetailInvoices,
+  getRetailInvoiceItemsByInvoiceId,
+} from "@/service/retailInvoiceService";
 
-// TYPES 
-type DistributorRow = {
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
+
+type Customer = {
+  id: number;
   name: string;
-  email: string;
-  contact: string;
-  lastPurchaseDate: string;
-  status: "Active" | "Inactive";
-   purchaseAmount?: number; // optional for old data safety
-};
-
-type DistributorStorage = {
-  companyName: string;
-  email: string;
-  mobile: string;
+  medicines: string;
+  quantity: number;
+  totalPrice: number;
+  referenceFrom: string;
   date: string;
-  status?: "Active" | "Inactive";
-  purchaseAmount: number;
 };
 
 type FilterForm = {
-  statusFilter: string;
   timeFilter: string;
 };
 
+type Invoice = {
+  retailInvoiceId: number;
+  customerId: number;
+  invoiceDate: string;
+};
 
-const columns = [
-  { key: "name", label: "Company Name" },
-  { key: "email", label: "Email" },
-  { key: "contact", label: "Contact" },
-  { key: "lastPurchaseDate", label: "Last Purchase Date" },
-  {
-    key: "status",
-    label: "Status",
-    render: (row: DistributorRow) => (
-      <span
-        style={{
-          color: row.status === "Active" ? "green" : "red",
-          fontWeight: 500,
-        }}
-      >
-        {row.status}
-      </span>
-    ),
-  },
-];
+type InvoiceItem = {
+  medicineId: number;
+  quantity: number;
+  price: number;
+};
 
-function DistributorReportTable() {
-
-  const [distributorData, setDistributorData] = useState<DistributorRow[]>([]);
+function CustomerTable() {
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
   const methods = useForm<FilterForm>({
     defaultValues: {
-      statusFilter: "All",
       timeFilter: "All Time",
     },
   });
 
-  const { watch } = methods;
-  const statusFilter = watch("statusFilter");
-  const timeFilter = watch("timeFilter");
+  const timeFilter = methods.watch("timeFilter");
 
-  // LOAD FROM LOCALSTORAGE
   useEffect(() => {
-    const stored = localStorage.getItem("distributors");
+    const fetchData = async () => {
+      try {
+        const customerRes: CustomerData[] = await getAllCustomers();
+        const invoices: Invoice[] = await getAllRetailInvoices();
+        const medicines: MedicineResponse[] = await getMedicines();
 
-    const parsed: DistributorStorage[] = stored
-      ? JSON.parse(stored)
-      : [];
+        const medicineMap = new Map<number, string>();
+        medicines.forEach((m) => {
+          medicineMap.set(m.medicineId, m.itemName);
+        });
 
-    const formattedData: DistributorRow[] = parsed.map((item) => ({
-      name: item.companyName,
-      email: item.email,
-      contact: item.mobile,
-      lastPurchaseDate: item.date,
-      status: item.status ?? "Active",
-    }));
+        const formatted: Customer[] = [];
 
-    setDistributorData(formattedData);
+        for (const cust of customerRes) {
+          const custInvoices = invoices.filter(
+            (inv) => inv.customerId === cust.customerId
+          );
+
+          let totalQty = 0;
+          let totalPrice = 0;
+          const medNames: string[] = [];
+
+          for (const inv of custInvoices) {
+            const items: InvoiceItem[] =
+              await getRetailInvoiceItemsByInvoiceId(inv.retailInvoiceId);
+
+            items.forEach((item) => {
+              totalQty += item.quantity;
+              totalPrice += item.price * item.quantity;
+
+              const name = medicineMap.get(item.medicineId);
+              if (name) medNames.push(name);
+            });
+          }
+
+          formatted.push({
+            id: Number(cust.customerId),
+            name: cust.name || "",
+            medicines: medNames.join(", "),
+            quantity: totalQty,
+            totalPrice: totalPrice,
+            referenceFrom: cust.doctor || "",
+            date: cust.date || "",
+          });
+        }
+
+        setCustomers(formatted);
+      } catch (error) {
+        console.error("Failed to fetch customers", error);
+        setCustomers([]);
+      }
+    };
+
+    fetchData();
+
+    const handleFocus = () => {
+      fetchData();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
-  // FILTER LOGIC
   const filteredData = useMemo(() => {
-    return distributorData.filter((distributor) => {
+    return customers.filter((customer) => {
+      if (timeFilter === "All Time") return true;
 
-      const matchesStatus =
-        statusFilter === "All" || distributor.status === statusFilter;
-
-      const purchaseDate = new Date(distributor.lastPurchaseDate);
+      const itemDate = new Date(customer.date);
       const today = new Date();
-      let matchesTime = true;
 
       if (timeFilter === "This Month") {
-        matchesTime =
-          purchaseDate.getMonth() === today.getMonth() &&
-          purchaseDate.getFullYear() === today.getFullYear();
-      } else if (timeFilter === "Last 30 Days") {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-        matchesTime =
-          purchaseDate >= thirtyDaysAgo && purchaseDate <= today;
+        return (
+          itemDate.getMonth() === today.getMonth() &&
+          itemDate.getFullYear() === today.getFullYear()
+        );
       }
 
-      return matchesStatus && matchesTime;
+      if (timeFilter === "Last 7 Days") {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+
+        return itemDate >= sevenDaysAgo && itemDate <= today;
+      }
+
+      return true;
     });
-  }, [statusFilter, timeFilter, distributorData]);
+  }, [customers, timeFilter]);
 
-  //  DELETE SELECTED ROWS FUNCTION ADDED
-  const handleDeleteSelected = (rowsToDelete: DistributorRow[]) => {
-    const updatedData = distributorData.filter(
-      (dist) =>
-        !rowsToDelete.some(
-          (row) =>
-            row.name === dist.name &&
-            row.lastPurchaseDate === dist.lastPurchaseDate
-        )
-    );
-
-    setDistributorData(updatedData);
-
-    //  Update localStorage
-    const updatedStorage = updatedData.map((item) => ({
-      companyName: item.name,
-      email: item.email,
-      mobile: item.contact,
-      date: item.lastPurchaseDate,
-      status: item.status,
-    }));
-
-    localStorage.setItem("distributors", JSON.stringify(updatedStorage));
-    window.dispatchEvent(new Event("reportUpdated"));
-  };
-
-  const statusOptions = [
-    { label: "All Status", value: "All" },
-    { label: "Active", value: "Active" },
-    { label: "Inactive", value: "Inactive" },
+  const columns: Column<Customer>[] = [
+    { key: "name", label: "Name" },
+    { key: "medicines", label: "Medicines" },
+    { key: "quantity", label: "Quantity" },
+    {
+      key: "totalPrice",
+      label: "Total Price",
+      render: (row) => `₹${row.totalPrice.toFixed(2)}`,
+    },
+    { key: "referenceFrom", label: "Reference From" },
+    { key: "date", label: "Date" },
   ];
 
-  const timeOptions = [
+  const filterOptions = [
     { label: "All Time", value: "All Time" },
+    { label: "Last 7 Days", value: "Last 7 Days" },
     { label: "This Month", value: "This Month" },
-    { label: "Last 30 Days", value: "Last 30 Days" },
   ];
 
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-          Distributors List
+          Customers List
         </Typography>
 
         <Divider sx={{ mb: 3 }} />
 
-        <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ mb: 2 }}>
-
-          <DropdownField
-            name="statusFilter"
-            label="Status"
-            options={statusOptions}
-            freeSolo={false}
-          />
-
+        <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
           <DropdownField
             name="timeFilter"
-            label="Time Filter"
-            options={timeOptions}
-            freeSolo={false}
+            label="Filter"
+            options={filterOptions}
           />
         </Stack>
 
-        
         <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
-        <UniversalTable<DistributorRow>
-          data={filteredData}
-          showSearch={true}
-          showExport={true}
-          columns={columns}
-          enableCheckbox={true}
-          getRowId={(row) => `${row.name}-${row.lastPurchaseDate}`}
-          
-          //  DELETE 
-          onDeleteSelected={handleDeleteSelected}
-        />
+          <UniversalTable<Customer>
+            data={filteredData}
+            columns={columns}
+            showSearch
+            showExport
+            getRowId={(row) => row.id}
+          />
         </div>
       </Paper>
     </FormProvider>
   );
 }
 
-export default DistributorReportTable;
+export default CustomerTable;

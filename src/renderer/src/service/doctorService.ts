@@ -25,10 +25,10 @@ interface DoctorRequest extends DoctorFormData {
 export interface DoctorResponse {
   doctorId: number;
   doctorName: string;
-  degree: string;
+  degree: string; 
   phone: string;
   email: string;
-  registrationNumber: string;
+  registrationNumber: string; 
   hospitalAddress: string;
    isActive: boolean;
     IsActive?: boolean;
@@ -74,7 +74,7 @@ export const addDoctor = async (
     ...data,
     userId: getUserId(),
     clinicName: "Default Clinic",
-    IsActive: data.isActive ?? data.IsActive ?? true,
+    IsActive: data.isActive ?? data.IsActive ?? true,//nullish coalescing 
   };
  
   const res = await axios.post(

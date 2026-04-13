@@ -116,7 +116,7 @@ const [topMedicine, setTopMedicine] = useState<string>("Loading...");
 const totalMedicines = (): string => {
   return inventory.length.toString();
 };
- 
+
 const totalMedicineGroups = (): string => {
   return medicineGroups.length.toString();
 };
@@ -134,9 +134,10 @@ useEffect(() => {
       setInventory(medicines);
       setMedicineGroups(groups);
 
-      // top selling medicine filter
+      //  dropdown filter 
 const salesMap: Record<number, number> = {};
-const filteredInvoices = filterInvoicesByDate(invoices, filters[1]);
+const filteredInvoices = filterInvoicesByDate(invoices, filters[1]);//top selling medicine 
+
 
 for (const inv of filteredInvoices) {        
   const items = await getRetailInvoiceItemsByInvoiceId(inv.retailInvoiceId);
@@ -213,8 +214,9 @@ const topMed = medicines.find((m: MedicineResponse) => m.medicineId === topMedId
             }}
           >
             <Box display="flex" justifyContent="space-between" mb={2}>
-              <Typography fontWeight={600}>{card.title}</Typography>
- 
+              <Typography fontSize={{ xs: 16, md: 18 }}           mb={{ xs: 1, md: 5 }}
+fontWeight={600}>{card.title}</Typography>
+
               <FormProvider {...methods}>
                 <Box width={150}>
                   <DropdownField

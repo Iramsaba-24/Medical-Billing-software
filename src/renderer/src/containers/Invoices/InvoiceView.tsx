@@ -230,6 +230,20 @@ const pharmacyAddress = pharmacyData?.address || "-";
               <Typography fontSize={12} fontWeight={600}>Sub Total</Typography>
               <Typography fontSize={12}>₹ {subTotal.toFixed(2)}</Typography>
             </Box>
+
+
+
+
+            <Box display="flex" justifyContent="space-between" mt={0.5}>
+  <Typography fontSize={12} fontWeight={600}>Medipoint</Typography>
+  <Typography fontSize={12}>₹ 0.00</Typography>
+</Box>
+<Box display="flex" justifyContent="space-between" mt={0.5}>
+  <Typography fontSize={12} fontWeight={600}>GST (5%)</Typography>
+  <Typography fontSize={12}>₹ 0.00</Typography>
+</Box>
+
+            
            
             <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
               <Typography fontSize={13} fontWeight={700}>NET</Typography>
@@ -358,6 +372,20 @@ const pharmacyAddress = pharmacyData?.address || "-";
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
  
+
+<TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
+  <TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Medipoint</strong></TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ 0.00</TableCell>
+</TableRow>
+
+<TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
+  <TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>GST (5%)</strong></TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ 0.00</TableCell>
+</TableRow>
+
+
  
               <TableRow sx={{ borderTop: "2px solid #000" }}>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
