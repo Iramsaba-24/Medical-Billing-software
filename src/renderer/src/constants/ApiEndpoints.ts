@@ -15,5 +15,8 @@ export const API_ENDPOINTS = {
   RETAIL_INVOICE: `${API_BASE_URL}/RetailInvoice`,
   RETAIL_INVOICE_ITEMS: `${API_BASE_URL}/RetailInvoiceItems`,
   GET_TOTAL_PURCHASE: `${API_BASE_URL}/purchase/total`,
+  DASHBOARD_CARDS: `${API_BASE_URL}/dashboard/cards`,
+DASHBOARD_INVENTORY: `${API_BASE_URL}/dashboard/inventory`,
+DASHBOARD_TOP_SELLING: `${API_BASE_URL}/dashboard/top-selling`,
 };
  
