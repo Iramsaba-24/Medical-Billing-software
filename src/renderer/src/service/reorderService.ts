@@ -10,7 +10,6 @@ const getAuthHeaders = () => {
   };
 };
 
-// TYPES
 export type LowStockResponse = {
   medicineId: number;
   itemName: string;
@@ -47,7 +46,7 @@ export type ReorderApiResponse = {
   data: ReorderLevelsResponse[];
 };
 
-// CREATE REORDER
+// reorder
 export const createReorder = async (data: {
   distributorId: number;
   email: string;
@@ -61,7 +60,7 @@ export const createReorder = async (data: {
   return res.data;
 };
 
-// GET LOW STOCK
+// low stock
 export const getLowStock = async (): Promise<LowStockApiResponse> => {
   const res = await axios.get<LowStockApiResponse>(
     API_ENDPOINTS.LOW_STOCK,
@@ -70,7 +69,7 @@ export const getLowStock = async (): Promise<LowStockApiResponse> => {
   return res.data;
 };
 
-// GET LAST PURCHASE
+// last purchase
 export const getLastPurchases = async (): Promise<ReorderApiResponse> => {
   const res = await axios.get<ReorderApiResponse>(
     API_ENDPOINTS.LAST_PURCHASE,
