@@ -7,7 +7,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import RadioField from "@/components/controlled/RadioField";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-
+import { useEffect } from "react";
 type PaymentFormInputs = {
   paymentMethod: string;
   amount: string;
@@ -20,6 +20,7 @@ const radioStyle = {
     },
   },
 };
+// const selectedAmount = localStorage.getItem("selectedAmount") || "";
 
 const ProceedToPaymentPage = () => {
   const methods = useForm<PaymentFormInputs>({
@@ -29,6 +30,15 @@ const ProceedToPaymentPage = () => {
     },
     mode: "onChange",
   });
+
+  useEffect(() => {
+  const amount = localStorage.getItem("selectedAmount");
+  console.log("Fetched Amount:", amount); 
+
+  if (amount) {
+    methods.setValue("amount", amount);
+  }
+}, [methods]);
 
   const navigate = useNavigate();
   const { handleSubmit } = methods;
@@ -185,6 +195,7 @@ const ProceedToPaymentPage = () => {
               name="amount"
               label=""
               placeholder="Enter total amount"
+              disabled={true}
               rules={{
                 required: "Amount is required",
                 pattern: {

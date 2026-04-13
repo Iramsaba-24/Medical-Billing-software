@@ -11,7 +11,8 @@ export interface MedicineFormData {
   pricePerUnit: number;
   expiryDate: string;
   medicineGroup: string;
-  supplier:string ;
+  supplier:string;
+  hsnCode?: string;
 }
 
 // backend request
@@ -27,6 +28,7 @@ interface MedicineRequest {
   batchNumber: string;
   company: string;
   gstPercentage: number;
+  hsnCode?: string; 
 }
 
 
@@ -39,6 +41,7 @@ export interface MedicineResponse {
   expiryDate: string;
   unit: string;
   groupId: number;
+  hsnCode?: string; 
   distributorId: number;
   
   gstPercentage: number;
@@ -92,7 +95,7 @@ export const addMedicine = async (
     quantity: data.quantity,
     pricePerUnit: data.pricePerUnit,
     expiryDate: new Date(data.expiryDate).toISOString(),
-
+    hsnCode: data.hsnCode || "",
     groupId: Number(data.medicineGroup),  
     distributorId: Number(data.supplier), 
     batchNumber: "NA",
@@ -127,6 +130,7 @@ export const updateMedicine = async (
     batchNumber: "NA",
     company: "NA",
     gstPercentage: 0,
+    hsnCode: data.hsnCode || "",
   };
 
   const res = await axios.put(

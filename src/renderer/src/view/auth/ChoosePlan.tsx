@@ -10,6 +10,11 @@ import { showToast } from "@/components/uncontrolled/ToastMessage";
 type PlanForm = {
   plan: string;
 };
+const planAmountMapping: Record<string, number> = {
+  basic: 999,
+  standard: 1999,
+  premium: 2999,
+};
 
 const ChoosePlan = () => {
   const methods = useForm<PlanForm>({
@@ -17,22 +22,27 @@ const ChoosePlan = () => {
       plan: "",
     },
   });
-
+const radioStyle = {
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": { color: "#238878" },
+  },
+};
   const navigate = useNavigate();
 
-  const onSubmit = (data: PlanForm) => {
-    console.log("Plan selected:", data);
-    
-    localStorage.setItem('selectedPlan', data.plan);
-    
-    const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
-    const completeData = { ...existingData, plan: data.plan };
-    localStorage.setItem('registrationData', JSON.stringify(completeData));
-    
-    showToast("success", "Plan selected successfully!");
-    
-    navigate(URL_PATH.AccountSetup);
-  };
+const onSubmit = (data: PlanForm) => {
+  const amount = planAmountMapping[data.plan];
+
+  localStorage.setItem("selectedPlan", data.plan);
+  localStorage.setItem("selectedAmount", amount.toString());
+
+  const existingData = JSON.parse(localStorage.getItem("registrationData") || '{}');
+  const completeData = { ...existingData, plan: data.plan, amount };
+  localStorage.setItem('registrationData', JSON.stringify(completeData));
+
+  showToast("success", "Plan selected successfully!");
+  navigate(URL_PATH.AccountSetup);
+};
 
   return (
     <Box
@@ -105,6 +115,12 @@ const ChoosePlan = () => {
                   { label: "Standard Plan - ₹1999 / month", value: "standard" },
                   { label: "Premium Plan - ₹2999 / month", value: "premium" },
                 ]}
+                sx={{
+                  ...radioStyle,
+                  "& .MuiFormLabel-asterisk": {
+                    display: "none", 
+                  },
+                }}
               />
             </Box>
           </Box>
