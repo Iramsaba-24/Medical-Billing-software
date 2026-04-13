@@ -17,6 +17,7 @@ export type InventoryFormData = {
   medicineId: number;
   unit: string;
   quantity: number;
+  hsnCode?: string;
   medicineGroup: string;
   pricePerUnit: number;
   expiryDate: string;
@@ -31,6 +32,7 @@ export type InventoryItem = {
   pricePerUnit: number;
   expiryDate: string;
   supplier: number;
+  hsnCode?: string;
   status: "In Stock" | "Low Stock" | "Out of Stock";
 };
 
@@ -225,6 +227,16 @@ useEffect(() => {
               label="Price per Unit (₹)"
               required
             />
+            
+            <TextInputField
+              inputType="numbers"
+              rows={1}
+              name="hsnCode"
+              label="HSN Number"
+              minLength={4}
+              maxLength={10}
+              required
+            />
 
             <DateTimeField
               name="expiryDate"
@@ -244,6 +256,7 @@ useEffect(() => {
               freeSolo={false}
               editable={true}
             />
+
 
             <Box
               gridColumn="1 / -1"

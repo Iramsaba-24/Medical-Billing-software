@@ -18,5 +18,8 @@ export const API_ENDPOINTS = {
 LOW_STOCK: `${API_BASE_URL}/Medicine/low-stock`,
 LAST_PURCHASE: `${API_BASE_URL}/ReorderLevels`, 
   GET_TOTAL_PURCHASE: `${API_BASE_URL}/purchase/total`,
+  DASHBOARD_CARDS: `${API_BASE_URL}/dashboard/cards`,
+DASHBOARD_INVENTORY: `${API_BASE_URL}/dashboard/inventory`,
+DASHBOARD_TOP_SELLING: `${API_BASE_URL}/dashboard/top-selling`,
 };
  

@@ -1,57 +1,22 @@
-
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-} from '@mui/material';
+import {Box,Typography,Card,CardContent,} from '@mui/material';
 import Revenue from '@/assets/revenue.svg';
 import Inventory from '@/assets/inventory.svg';
 import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
-import { getMedicines, MedicineResponse } from "@/service/medicineService";
-import { getAllRetailInvoices, RetailInvoiceResponse } from "@/service/retailInvoiceService";
+
 import { useEffect, useState } from "react";
-
+import { DashboardCardsResponse, getDashboardCards } from "@/service/dashboardService";
 const Dashboard: React.FC = () => {
-const [inventory, setInventory] = useState<MedicineResponse[]>([]);// inventory data
-const [invoices, setInvoices] = useState<RetailInvoiceResponse[]>([]);// fetch invoices for revenue calculation
-// fetch inventory data
+const [data, setData] = useState<DashboardCardsResponse | null>(null);
 useEffect(() => {
-  const fetchInventory = async () => {
-    const data = await getMedicines(); 
-    setInventory(data);
+  const fetchData = async () => {
+    const res = await getDashboardCards();
+    setData(res);
   };
-  fetchInventory();
+  fetchData();
 }, []);
-// fetch invoices data
-useEffect(() => {
-  const fetchInvoices = async () => {
-    const data = await getAllRetailInvoices();
-    setInvoices(data);
-  };
 
-  fetchInvoices();
-}, []);
-// available medicines count
-const availableMedicines = inventory.filter(item => item.quantity > 0).length;
-// shortage count
-const medicineShortage = inventory.filter(item => item.quantity < 5).length;
-// inventory status
-const inventoryStatus = (): string => {
-  if (medicineShortage === 0) return "Good";
-  if (medicineShortage <= 3) return "Average";
-  return "Critical";
-};
-// fetch total revenue
-const totalRevenue = (): string => {
-  const total = invoices
-    .filter((inv) => inv.paymentStatus === "Paid")
-    .reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
-
-  return `₹ ${total.toLocaleString()}`;
-};
 // fetch visible kpis-settings
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
@@ -125,20 +90,20 @@ const visibleKpis = getVisibleKpis();
  
 {visibleKpis.includes("totalRevenue") && (
   <StackCard
-    value={totalRevenue()}
+    value={`₹ ${data?.totalRevenue ?? 0}`}
     title="Total Revenue"
     icon={Revenue}
   />
 )}
  
 {visibleKpis.includes("inventoryStatus") && (
-    <StackCard value={inventoryStatus()} title="Inventory Status" icon={Inventory} />
+    <StackCard value={data?.inventoryStatus ?? "—"} title="Inventory Status" icon={Inventory} />
   )}
   {visibleKpis.includes("medicinesAvailable") && (
-    <StackCard value={availableMedicines.toString()} title="Medicines Available" icon={Medicines} />
+    <StackCard value={(data?.medicineAvailableCount ?? 0).toString()} title="Medicines Available" icon={Medicines} />
   )}
   {visibleKpis.includes("medicinesShortage") && (
-    <StackCard value={medicineShortage.toString()} title="Medicine Shortage" icon={Shortage} />
+    <StackCard value={(data?.medicineShortageCount ?? 0).toString()} title="Medicine Shortage" icon={Shortage} />
   )}
  
 </Box>

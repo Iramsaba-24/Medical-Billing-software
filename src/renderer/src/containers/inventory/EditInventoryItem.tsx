@@ -27,6 +27,7 @@ export type InventoryItem = {
   distributorId: number;
   gst: string;
   unit: string;
+  hsnCode?: string;
 };
 
 type Props = {
@@ -176,6 +177,14 @@ const onSubmit = async (data: InventoryItem) => {
 
             <NumericField name="pricePerUnit" label="Price per Unit (₹)" required />
 
+            <TextInputField
+              inputType="numbers"
+              rows={1}
+              name="hsnCode"
+              label="HSN Number"
+              maxLength={10}
+              required
+            />
             <DateTimeField
               name="expiryDate"
               label="Expiry Date"

@@ -20,7 +20,7 @@ export type InventoryItem = {
 
   supplier: string;
   distributorId: number;
-
+  hsnCode: string;
   gst: string;
 };
 
@@ -34,7 +34,8 @@ type MedicineApi = {
   groupId: number;
   distributorId: number;
   gstPercentage: number;
-  unit: string;        
+  unit: string; 
+  hsnCode?: string;       
 }
 
 type GroupApi = {
@@ -103,6 +104,7 @@ const fetchInventory = async () => {
       supplier: distributorMap[item.distributorId] || "N/A",
       distributorId: item.distributorId,
       gst: `${item.gstPercentage}%`,
+       hsnCode: item.hsnCode || "-",
     }));
 
     setTableData(formatted);
@@ -156,6 +158,7 @@ const handleDelete = (item: InventoryItem) => {
       label: "Price",
       render: (row) => `₹ ${row.pricePerUnit}`,
     },
+     { key: "hsnCode", label: "HSN Number" },
     { key: "supplier", label: "Supplier" },
     { key: "expiryDate", label: "Expiry Date" },
     {
