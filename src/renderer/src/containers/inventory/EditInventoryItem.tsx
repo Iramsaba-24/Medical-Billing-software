@@ -1,3 +1,4 @@
+
 import { Box, Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";
@@ -17,6 +18,7 @@ export type OptionType = {
 
 export type InventoryItem = {
   itemName: string;
+  batchNumber: number;
   medicineId: number;
   quantity: number;
   medicineGroup: string;
@@ -42,7 +44,7 @@ export default function EditInventoryItem({ open, onClose, item }: Props) {
   const [groupOptions, setGroupOptions] = useState<OptionType[]>([]);
   const [supplierOptions, setSupplierOptions] = useState<OptionType[]>([]);
 
-  // useRef — re-render न होता maps store करायला
+  // useRef 
   const groupIdMapRef = useRef<Record<string, number>>({});
   const supplierIdMapRef = useRef<Record<string, number>>({});
   const groupNameMapRef = useRef<Record<number, string>>({});
@@ -105,14 +107,14 @@ export default function EditInventoryItem({ open, onClose, item }: Props) {
     fetchDistributors();
   }, []);
 
-  // Pre-fill — options load झाल्यावर
+  // Pre-fill  options load 
   useEffect(() => {
   if (item && groupOptions.length > 0 && supplierOptions.length > 0) {
     methods.reset({
       ...item,
       medicineGroup: groupNameMapRef.current[item.groupId] || item.medicineGroup,
       supplier: supplierNameMapRef.current[item.distributorId] || item.supplier,
-      unit: item.unit || "",  // ← हे add करा
+      unit: item.unit || "",  
     });
   }
 }, [item, groupOptions, supplierOptions, methods]);
@@ -126,6 +128,7 @@ const onSubmit = async (data: InventoryItem) => {
 
     await updateMedicine(item?.medicineId ?? 0, {
       medicineId: item?.medicineId ?? 0,
+       batchNumber: data.batchNumber,  
       itemName: data.itemName,
       unit: data.unit,
       quantity: data.quantity,
@@ -163,7 +166,9 @@ const onSubmit = async (data: InventoryItem) => {
             mt={1}
           >
             <TextInputField name="itemName" label="Item Name" required />
-            <NumericField name="medicineId" label="Item ID" required disabled/> 
+            {/* <NumericField name="medicineId" label="Item ID" required disabled/>  */}
+
+            <NumericField name="batchNumber" label="Batch Number" required />
             <NumericField name="quantity" label="Stock Quantity" required />
 
             <DropdownField

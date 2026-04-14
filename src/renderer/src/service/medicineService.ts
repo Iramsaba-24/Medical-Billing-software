@@ -1,11 +1,14 @@
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
+
+
  
  
 // frontend form data
 export interface MedicineFormData {
    medicineId: number;
-  itemName: string;
+   batchNumber: number;
+   itemName: string;
   unit: string;
   quantity: number;
   pricePerUnit: number;
@@ -18,6 +21,7 @@ export interface MedicineFormData {
 // backend request
 interface MedicineRequest {
   medicineId: number;
+  batchNumber: number; 
   itemName: string;
   unit: string;
   quantity: number;
@@ -25,7 +29,7 @@ interface MedicineRequest {
   expiryDate: string;
   groupId: number;
   distributorId: number;
-  batchNumber: string;
+  
   company: string;
   gstPercentage: number;
   hsnCode?: string; 
@@ -34,7 +38,9 @@ interface MedicineRequest {
  
 // backend response
 export interface MedicineResponse {
-  medicineId: number;
+medicineId: number;
+
+  batchNumber: number;
   itemName: string;
   quantity: number;
   pricePerUnit: number;
@@ -98,7 +104,7 @@ export const addMedicine = async (
     hsnCode: data.hsnCode || "",
     groupId: Number(data.medicineGroup),  
     distributorId: Number(data.supplier),
-    batchNumber: "NA",
+   batchNumber: data.batchNumber,
     company: "NA",
     gstPercentage: 0
   };
@@ -127,7 +133,7 @@ export const updateMedicine = async (
     expiryDate: new Date(data.expiryDate).toISOString(),
     groupId: Number(data.medicineGroup),
     distributorId: Number(data.supplier),
-    batchNumber: "NA",
+   batchNumber: data.batchNumber,
     company: "NA",
     gstPercentage: 0,
     hsnCode: data.hsnCode || "",
