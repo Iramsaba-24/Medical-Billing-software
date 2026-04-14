@@ -56,6 +56,7 @@ export interface DistributorResponse {
   gstin: string;
   address: string;
   createdDate: string;
+  purchaseAmount?: number;
  //reatedAt: string;
   bankDetails?: { 
     bankName: string;

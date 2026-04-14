@@ -11,6 +11,15 @@ type PlanForm = {
   plan: string;
 };
 
+const radioStyle = {
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": {
+      color: "#238878",
+    },
+  },
+};
+
 const ChoosePlan = () => {
   const methods = useForm<PlanForm>({
     defaultValues: {
@@ -22,15 +31,17 @@ const ChoosePlan = () => {
 
   const onSubmit = (data: PlanForm) => {
     console.log("Plan selected:", data);
-    
-    localStorage.setItem('selectedPlan', data.plan);
-    
-    const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
+
+    localStorage.setItem("selectedPlan", data.plan);
+
+    const existingData = JSON.parse(
+      localStorage.getItem("registrationData") || "{}"
+    );
     const completeData = { ...existingData, plan: data.plan };
-    localStorage.setItem('registrationData', JSON.stringify(completeData));
-    
+    localStorage.setItem("registrationData", JSON.stringify(completeData));
+
     showToast("success", "Plan selected successfully!");
-    
+
     navigate(URL_PATH.AccountSetup);
   };
 
@@ -93,7 +104,8 @@ const ChoosePlan = () => {
               sx={{
                 width: "100%",
                 maxWidth: 360,
-                ml: { xs: 2, sm: 6, md: 10 },
+                display: "flex",
+                justifyContent: "center",
               }}
             >
               <RadioField
@@ -105,6 +117,19 @@ const ChoosePlan = () => {
                   { label: "Standard Plan - ₹1999 / month", value: "standard" },
                   { label: "Premium Plan - ₹2999 / month", value: "premium" },
                 ]}
+                sx={{
+                  ...radioStyle,
+                  mb: 2,
+                  "& .MuiFormLabel-root": {
+                    color: "#000 !important",
+                  },
+                  "& .MuiFormLabel-root.Mui-focused": {
+                    color: "#000 !important",
+                  },
+                  "& .MuiFormLabel-asterisk": {
+                    display: "none",
+                  },
+                }}
               />
             </Box>
           </Box>
@@ -139,7 +164,6 @@ const ChoosePlan = () => {
 };
 
 export default ChoosePlan;
-
 
 
 

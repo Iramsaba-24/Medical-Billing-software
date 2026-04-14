@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -9,22 +9,20 @@ import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
- 
+
 type RegisterFormInputs = {
-   fullName: string;
-  
+  fullName: string;
   email: string;
   mobileNumber: string;
   companyName: string;
   city: string;
   state: string;
 };
- 
+
 const RegisterPage = () => {
   const methods = useForm<RegisterFormInputs>({
     defaultValues: {
       fullName: "",
-      
       email: "",
       mobileNumber: "",
       companyName: "",
@@ -33,9 +31,9 @@ const RegisterPage = () => {
     },
     mode: "onChange",
   });
- 
+
   const navigate = useNavigate();
- 
+
   const {
     formState: { errors },
     setValue,
@@ -43,10 +41,17 @@ const RegisterPage = () => {
     setError,
     clearErrors,
   } = methods;
- 
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
+
   const inputStyle = (fieldName: keyof RegisterFormInputs) => ({
     "& .MuiOutlinedInput-root": {
-      height: { xs: 42, sm: 46, md: 48 },
+      height: { xs: 38, sm: 42, md: 44 },
       borderRadius: "8px",
       backgroundColor: "#fff",
       "& fieldset": {
@@ -67,11 +72,11 @@ const RegisterPage = () => {
       },
     },
     "& .MuiOutlinedInput-input": {
-      fontSize: { xs: "13px", sm: "14px", md: "15px" },
-      padding: { xs: "10px 12px", sm: "12px 14px" },
+      fontSize: { xs: "12px", sm: "13px", md: "13.5px" },
+      padding: { xs: "7px 10px", sm: "9px 12px" },
     },
   });
- 
+
   const handleLettersOnlyChange =
     (field: "fullName" | "city" | "state") =>
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -80,23 +85,23 @@ const RegisterPage = () => {
       setValue(field, value, { shouldValidate: true });
       if (value) clearErrors(field);
     };
- 
+
   const validateRequiredFields = (data: RegisterFormInputs) => {
     let isValid = true;
- 
+
     (Object.keys(data) as (keyof RegisterFormInputs)[]).forEach((field) => {
       if (!data[field]?.trim()) {
         setError(field, { type: "manual", message: "This field is required" });
         isValid = false;
       }
     });
- 
+
     return isValid;
   };
- 
+
   const onSubmit = (data: RegisterFormInputs) => {
     if (!validateRequiredFields(data)) return;
- 
+
     const cleanedData = {
       ...data,
       fullName: data.fullName.trim(),
@@ -105,34 +110,36 @@ const RegisterPage = () => {
       city: data.city.trim(),
       state: data.state.trim(),
     };
- 
-     localStorage.setItem('registrationData', JSON.stringify({
-    fullName: cleanedData.fullName,
-    email: cleanedData.email,
-    mobileNumber: cleanedData.mobileNumber,
-    companyName: cleanedData.companyName,
-    city: cleanedData.city,
-    state: cleanedData.state,
-  }));
- 
+
+    localStorage.setItem(
+      "registrationData",
+      JSON.stringify({
+        fullName: cleanedData.fullName,
+        email: cleanedData.email,
+        mobileNumber: cleanedData.mobileNumber,
+        companyName: cleanedData.companyName,
+        city: cleanedData.city,
+        state: cleanedData.state,
+      })
+    );
+
     console.log(cleanedData);
- 
+
     navigate(URL_PATH.BusinessDetails);
     showToast("success", "Personal details saved!");
   };
- 
+
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100vh",
         display: "flex",
-        alignItems: { xs: "flex-start", sm: "center" },
+        alignItems: "center",
         justifyContent: "center",
         backgroundImage: `url(${BgImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         px: { xs: 2, sm: 3, md: 4 },
-        py: { xs: 4, sm: 5 },
       }}
     >
       <FormProvider {...methods}>
@@ -148,33 +155,33 @@ const RegisterPage = () => {
             alignItems: "center",
           }}
         >
-          <Box mb={{ xs: 1, sm: 1.5 }}>
+          <Box mb={{ xs: 0.3, sm: 0.5 }}>
             <img
               src={LogoImage}
               alt="Medi Logo"
-              style={{ width: "100%", maxWidth: "150px" }}
+              style={{ width: "100%", maxWidth: "125px" }}
             />
           </Box>
- 
+
           <Typography
-            mb={{ xs: 2.5, sm: 3 }}
+            mb={{ xs: 1, sm: 1.2 }}
             sx={{
               color: "#333",
               fontWeight: 600,
               fontFamily: '"Poppins", sans-serif',
-              fontSize: { xs: "1.4rem", sm: "1.7rem", md: "1.9rem" },
+              fontSize: { xs: "1.25rem", sm: "1.5rem", md: "1.7rem" },
               textAlign: "center",
             }}
           >
             Create Your Account
           </Typography>
- 
+
           <Box
             sx={{
               width: "100%",
               display: "flex",
               flexDirection: "column",
-              gap: { xs: 1.8, sm: 2 },
+              gap: { xs: 1, sm: 1.2 },
             }}
           >
             <TextInputField
@@ -187,7 +194,6 @@ const RegisterPage = () => {
               rows={1}
               sx={inputStyle("fullName")}
               required
-           
               onChange={handleLettersOnlyChange("fullName")}
               rules={{
                 pattern: {
@@ -196,14 +202,12 @@ const RegisterPage = () => {
                 },
               }}
             />
- 
             <EmailField
               name="email"
               label="Email Address"
               required
               sx={inputStyle("email")}
             />
- 
             <MobileField
               name="mobileNumber"
               label="Mobile Number"
@@ -211,7 +215,6 @@ const RegisterPage = () => {
               required
               sx={inputStyle("mobileNumber")}
             />
- 
             <TextInputField
               name="companyName"
               label="Company / Clinic Name"
@@ -221,7 +224,6 @@ const RegisterPage = () => {
               minLength={3}
               maxLength={30}
             />
- 
             <TextInputField
               name="city"
               label="City"
@@ -237,7 +239,6 @@ const RegisterPage = () => {
                 },
               }}
             />
- 
             <TextInputField
               name="state"
               label="State"
@@ -254,15 +255,15 @@ const RegisterPage = () => {
               }}
             />
           </Box>
- 
+
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{
-              mt: { xs: 2, sm: 5 },
+              mt: { xs: 0.8, sm: 1.5 },
               fontWeight: "1000",
-              fontSize: { xs: "1rem", sm: "1.05rem" },
+              fontSize: { xs: "0.9rem", sm: "0.95rem" },
               backgroundColor: "#1b7f6b",
               textTransform: "none",
               border: "2px solid #1b7f6b",
@@ -276,10 +277,10 @@ const RegisterPage = () => {
           >
             Next step
           </Button>
- 
+
           <Typography
-            mt={2}
-            sx={{ fontSize: "14px", color: "#555", textAlign: "center" }}
+            mt={1}
+            sx={{ fontSize: "12.5px", color: "#555", textAlign: "center" }}
           >
             Already have an account?{" "}
             <Box
@@ -306,5 +307,5 @@ const RegisterPage = () => {
     </Box>
   );
 };
- 
+
 export default RegisterPage;

@@ -7,7 +7,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import EmailField from "@/components/controlled/EmailField";
 import RadioField from "@/components/controlled/RadioField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-import MobileField from "@/components/controlled/MobileField";
+// import MobileField from "@/components/controlled/MobileField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { authService } from "@/service/authService";
@@ -249,7 +249,7 @@ const onSubmit = async (data: FormInputs) => {
           fontFamily: '"Poppins", sans-serif',
         }}
       >
-        Net Banking Payment
+        Net Banking Payment 
       </Typography>
 
       <FormProvider {...methods}>
@@ -294,7 +294,7 @@ const onSubmit = async (data: FormInputs) => {
             label=""
             options={[
               { value: "email", label: "Send E-Bill on your Email ID" },
-              { value: "whatsapp", label: "Send E-Bill on your WhatsApp" },
+              // { value: "whatsapp", label: "Send E-Bill on your WhatsApp" },
             ]}
             sx={{ mb: 2, ...radioStyle }}
           />
@@ -318,7 +318,7 @@ const onSubmit = async (data: FormInputs) => {
           )}
 
           {/* Conditional WhatsApp Field */}
-          {selectedBillType === "whatsapp" && (
+          {/* {selectedBillType === "whatsapp" && (
             <MobileField
               name="whatsapp"
               label="Whatsapp Number"
@@ -335,7 +335,7 @@ const onSubmit = async (data: FormInputs) => {
                 },
               }}
             />
-          )}
+          )} */}
 
           {/* Bottom Section */}
           <Box
@@ -358,7 +358,7 @@ const onSubmit = async (data: FormInputs) => {
                 fontSize: "0.9rem",
               }}
             >
-              ⚠ When payment is done, E-Bill will be sent to your selected Email / WhatsApp
+              ⚠ When payment is done, E-Bill will be sent to your selected Email 
             </Box>
 
             {/* Pay Button */}

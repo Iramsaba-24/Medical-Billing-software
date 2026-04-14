@@ -1,6 +1,5 @@
 import { InvoiceData } from "@/containers/Report/InvoiceTable";
 
-// 🔁 API response ka exact type define karo
 type ApiInvoice = {
   invoice: string;
   name: string;
