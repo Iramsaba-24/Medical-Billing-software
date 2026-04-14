@@ -10,6 +10,11 @@ import { showToast } from "@/components/uncontrolled/ToastMessage";
 type PlanForm = {
   plan: string;
 };
+const planAmountMapping: Record<string, number> = {
+  basic: 999,
+  standard: 1999,
+  premium: 2999,
+};
 
 const radioStyle = {
   "& .MuiRadio-root": {
@@ -26,9 +31,15 @@ const ChoosePlan = () => {
       plan: "",
     },
   });
-
+const radioStyle = {
+  "& .MuiRadio-root": {
+    color: "default.main",
+    "&.Mui-checked": { color: "#238878" },
+  },
+};
   const navigate = useNavigate();
 
+<<<<<<< HEAD
   const onSubmit = (data: PlanForm) => {
     console.log("Plan selected:", data);
 
@@ -44,6 +55,21 @@ const ChoosePlan = () => {
 
     navigate(URL_PATH.AccountSetup);
   };
+=======
+const onSubmit = (data: PlanForm) => {
+  const amount = planAmountMapping[data.plan];
+
+  localStorage.setItem("selectedPlan", data.plan);
+  localStorage.setItem("selectedAmount", amount.toString());
+
+  const existingData = JSON.parse(localStorage.getItem("registrationData") || '{}');
+  const completeData = { ...existingData, plan: data.plan, amount };
+  localStorage.setItem('registrationData', JSON.stringify(completeData));
+
+  showToast("success", "Plan selected successfully!");
+  navigate(URL_PATH.AccountSetup);
+};
+>>>>>>> bb6fb6a6eae991e9d6b094c581ef2d821f351aab
 
   return (
     <Box
@@ -119,6 +145,7 @@ const ChoosePlan = () => {
                 ]}
                 sx={{
                   ...radioStyle,
+<<<<<<< HEAD
                   mb: 2,
                   "& .MuiFormLabel-root": {
                     color: "#000 !important",
@@ -128,6 +155,10 @@ const ChoosePlan = () => {
                   },
                   "& .MuiFormLabel-asterisk": {
                     display: "none",
+=======
+                  "& .MuiFormLabel-asterisk": {
+                    display: "none", 
+>>>>>>> bb6fb6a6eae991e9d6b094c581ef2d821f351aab
                   },
                 }}
               />

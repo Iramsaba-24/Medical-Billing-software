@@ -1,4 +1,4 @@
-import { InvoiceData } from "@/containers/Report/InvoiceTable";
+import { InvoiceData } from "@/containers/report/InvoiceTable";
 
 type ApiInvoice = {
   invoice: string;

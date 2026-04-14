@@ -10,13 +10,6 @@ type GroupSummaryProps = {
 };
 const GroupSummary = () => {
     const [groups, setGroups] = useState<GroupSummaryProps[]>([]);
-
-    // useEffect(() => {
-    //     const storedGroups = JSON.parse(localStorage.getItem("medicineGroups") || "[]");
-    //     setGroups(storedGroups.slice(-3));
-    // }, []);
-
-    // fetch group summary
     useEffect(() => {
     const fetchGroups = async () => {
     try {

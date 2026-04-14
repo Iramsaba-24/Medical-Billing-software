@@ -145,6 +145,7 @@ useEffect(() => {
 
     fetchMedicines();
   }, []);
+  
   //filtered sales data
   const filteredSalesData = useMemo(() => {
     const dateFiltered = getFilteredDataByDate(salesList, selectedMonth);
@@ -173,18 +174,18 @@ useEffect(() => {
     { key: ACTION_KEY, label: "Actions" },
   ];
   //handle edit
-const handleEdit = async (row: SalesData) => {
-  try {
-    const items = await getRetailInvoiceItemsByInvoiceId(row.id);
+// const handleEdit = async (row: SalesData) => {
+//   try {
+//     const items = await getRetailInvoiceItemsByInvoiceId(row.id);
 
-    setEditingRow({
-      ...row,
-      items,
-    });
-  } catch (error) {
-    console.error(error);
-  }
-};
+//     setEditingRow({
+//       ...row,
+//       items,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
 
 const handleCloseEditDialog = () => setEditingRow(null);
   //handle save edit
@@ -227,25 +228,25 @@ const handleSaveEdit = async (data: SalesData) => {
   }
 };
   //handle delete
-const handleDelete = async (row: SalesData) => {
-  const ok = await showConfirmation(
-    `Delete ${row.name}?`,
-    "Confirm Delete"
-  );
+// const handleDelete = async (row: SalesData) => {
+//   const ok = await showConfirmation(
+//     `Delete ${row.name}?`,
+//     "Confirm Delete"
+//   );
 
-  if (!ok) return;
+//   if (!ok) return;
 
-  try {
-    await deleteRetailInvoice(row.id);   
+//   try {
+//     await deleteRetailInvoice(row.id);   
 
-    setSalesList((prev) => prev.filter((item) => item.id !== row.id));
+//     setSalesList((prev) => prev.filter((item) => item.id !== row.id));
 
-    showSnackbar("success", "Deleted successfully");
-  } catch (error) {
-    console.error(error);
-    showSnackbar("error", "Delete failed");
-  }
-};
+//     showSnackbar("success", "Deleted successfully");
+//   } catch (error) {
+//     console.error(error);
+//     showSnackbar("error", "Delete failed");
+//   }
+// };
   //handle delete selected
 const handleDeleteSelected = async (rows: SalesData[]) => {
   const ok = await showConfirmation(
@@ -313,8 +314,8 @@ const handleDeleteSelected = async (rows: SalesData[]) => {
               onDeleteSelected={handleDeleteSelected}
               actions={{
                 view: setViewRow,
-                edit: handleEdit,
-                delete: handleDelete,
+                // edit: handleEdit,
+                // delete: handleDelete,
               }}
             />
           </CardContent>

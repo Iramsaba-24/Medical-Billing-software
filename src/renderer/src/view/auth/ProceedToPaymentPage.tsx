@@ -1,17 +1,26 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import LogoImage from "@/assets/logoimg.svg";
 import BgImage from "@/assets/bgloginpage.svg";
 import TextInputField from "@/components/controlled/TextInputField";
 import RadioField from "@/components/controlled/RadioField";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-
+import { useEffect } from "react";
 type PaymentFormInputs = {
   paymentMethod: string;
   amount: string;
 };
+
+// Define plan prices
+const PLAN_PRICES: Record<string, number> = {
+  'basic': 999,
+  'standard': 1999,
+  'premium': 2999
+};
+
 const radioStyle = {
   "& .MuiRadio-root": {
     color: "default.main",
@@ -20,6 +29,7 @@ const radioStyle = {
     },
   },
 };
+// const selectedAmount = localStorage.getItem("selectedAmount") || "";
 
 const ProceedToPaymentPage = () => {
   const methods = useForm<PaymentFormInputs>({
@@ -30,8 +40,31 @@ const ProceedToPaymentPage = () => {
     mode: "onChange",
   });
 
+  useEffect(() => {
+  const amount = localStorage.getItem("selectedAmount");
+  console.log("Fetched Amount:", amount); 
+
+  if (amount) {
+    methods.setValue("amount", amount);
+  }
+}, [methods]);
+
   const navigate = useNavigate();
-  const { handleSubmit } = methods;
+  const { handleSubmit, setValue } = methods;
+
+  // Get selected plan from localStorage and set the amount
+  useEffect(() => {
+    const selectedPlan = localStorage.getItem('selectedPlan');
+    
+    if (selectedPlan && PLAN_PRICES[selectedPlan]) {
+      const amount = PLAN_PRICES[selectedPlan].toString();
+      setValue('amount', amount);
+    } else {
+      // Handle case when no plan is selected
+      showToast("error", "No plan selected. Please select a plan first.");
+      navigate(URL_PATH.ChoosePlan);
+    }
+  }, [setValue, navigate]);
 
   const handleAmountInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
@@ -64,8 +97,6 @@ const ProceedToPaymentPage = () => {
       navigate(URL_PATH.ChoosePlan);
       return;
     }
-
-    // Map plan to planId (you can also fetch from API)
     const planMapping: Record<string, number> = {
       'basic': 1,
       'standard': 2,
@@ -144,6 +175,23 @@ const ProceedToPaymentPage = () => {
             Payment Details
           </Typography>
 
+          {/* Display selected plan info */}
+          <Box sx={{ width: "100%", mb: 2 }}>
+            <Typography
+              sx={{
+                fontWeight: 500,
+                fontSize: "0.9rem",
+                color: "#666",
+                textAlign: "center",
+                mb: 1,
+              }}
+            >
+              Selected Plan: <strong style={{ color: "#1b7f6b", textTransform: "capitalize" }}>
+                {localStorage.getItem('selectedPlan') || 'None'}
+              </strong>
+            </Typography>
+          </Box>
+
           <Box sx={{ width: "100%", mb: 3 }}>
             <RadioField
               name="paymentMethod"
@@ -185,6 +233,7 @@ const ProceedToPaymentPage = () => {
               name="amount"
               label=""
               placeholder="Enter total amount"
+              disabled={true}
               rules={{
                 required: "Amount is required",
                 pattern: {
@@ -196,6 +245,7 @@ const ProceedToPaymentPage = () => {
                 inputMode: "numeric",
                 onInput: handleAmountInput,
                 maxLength: 4,
+                readOnly: true, 
               }}
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -210,6 +260,10 @@ const ProceedToPaymentPage = () => {
                   },
                   "&.Mui-focused fieldset": {
                     borderColor: "#2a9d8f",
+                  },
+                  "& input.Mui-readOnly": {
+                    backgroundColor: "#e8e8e8",
+                    cursor: "not-allowed",
                   },
                 },
               }}

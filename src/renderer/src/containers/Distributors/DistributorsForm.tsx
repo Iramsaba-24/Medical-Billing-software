@@ -8,7 +8,6 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useState } from "react";
 import AppToast from "@/containers/distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
-import BankDetailsForm from "@/containers/distributors/BankDetailForm";
 import { addDistributor } from "@/service/distributorService";
 import axios from "axios";
  
@@ -172,13 +171,6 @@ const DistributorsForm = () => {
               />
  
               <TextInputField
-                name="website"
-                label="Website (Optional)"
-                inputType="textarea"
-                rows={1}
-              />
- 
-              <TextInputField
                 name="gstin"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"
@@ -207,20 +199,6 @@ const DistributorsForm = () => {
               />
             </Box>
           </Paper>
- 
-          <Paper
-            sx={{
-              maxWidth: 800,
-              mx: "auto",
-              p: 4,
-              backgroundColor: "#fff",
-              borderRadius: "10px",
-              boxShadow: 3,
-            }}
-          >
-            <BankDetailsForm />
-          </Paper>
- 
           <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}>
             <Button
               variant="outlined"

@@ -12,6 +12,7 @@ import { getDoctors } from "@/service/doctorService";
 import { deleteDoctor } from "@/service/doctorService";
 import { updateDoctor } from "@/service/doctorService";
 type Doctor = {
+  SrNo?: number;
   doctorId: number;
 
   doctorName: string;
@@ -54,6 +55,7 @@ const Doctors = () => {
         const activeFlag = doc.isActive ?? doc.IsActive;
         return {
           ...doc,
+          // SrNo: doc.SrNorNo ?? index + 1,
           status: activeFlag === true ? "Active" : "Inactive",
         };
       });
@@ -93,7 +95,6 @@ const Doctors = () => {
       });
 
       // UI update
-
       setDoctors((prev) =>
         prev.map((doc) => (doc.doctorId === id ? { ...doc, status } : doc)),
       );
@@ -107,6 +108,7 @@ const Doctors = () => {
   };
 
   const columns: Column<Doctor>[] = [
+    { key: "SrNo", label: "Sr.No." },
     { key: "doctorName", label: "Name" },
 
     { key: "degree", label: "Degree" },
@@ -350,6 +352,18 @@ const Doctors = () => {
               showSnackbar("error", "Update failed");
             }
           }}
+//           onSave={(updatedDoctor: Doctor) => {
+//   updateDoctor(updatedDoctor.doctorId, updatedDoctor)
+//     .then(() => {
+//       showSnackbar("success", "Doctor updated successfully");
+//       setEditDoctor(null);
+//       fetchDoctors();
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//       showSnackbar("error", "Update failed");
+//     });
+// }}
         />
       </Box>
     </>

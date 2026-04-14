@@ -1,65 +1,23 @@
-
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-} from '@mui/material';
+import {Box,Typography,Card,CardContent,} from '@mui/material';
 import Revenue from '@/assets/revenue.svg';
 import Inventory from '@/assets/inventory.svg';
 import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
-import { getMedicines, MedicineResponse } from "@/service/medicineService";
-import { useEffect, useState } from "react";type CustomerItem = {
-  qty: number;
-  price: number;
-};
- 
-type CustomerStorage = {
-  itemsList?: CustomerItem[];
-};
- 
-const Dashboard: React.FC = () => {
-const [inventory, setInventory] = useState<MedicineResponse[]>([]);
-useEffect(() => {
-  const fetchInventory = async () => {
-    const data = await getMedicines(); // inventory fetch
-    setInventory(data);
-  };
-  fetchInventory();
-}, []);
-// available medicines count
-const availableMedicines = inventory.filter(item => item.quantity > 0).length;
-// shortage count
-const medicineShortage = inventory.filter(item => item.quantity < 5).length;
-// inventory status
-const inventoryStatus = (): string => {
-  if (medicineShortage === 0) return "Good";
-  if (medicineShortage <= 3) return "Average";
-  return "Critical";
-};
 
-// fetch total revenue
-const totalRevenue = (): string => {
-  const customerData: CustomerStorage[] = JSON.parse(
-    localStorage.getItem("medical_customers") || "[]"
-  );
- 
-  const sales = customerData.reduce((sum, customer) => {
-    const customerTotal =
-      customer.itemsList?.reduce(
-        (itemSum, item) =>
-          itemSum + (Number(item.qty) || 0) * (Number(item.price) || 0),
-        0
-      ) || 0;
- 
-    return sum + customerTotal;
-  }, 0);
- 
-  return `₹ ${sales.toLocaleString()}`;
-};
- 
+import { useEffect, useState } from "react";
+import { DashboardCardsResponse, getDashboardCards } from "@/service/dashboardService";
+const Dashboard: React.FC = () => {
+const [data, setData] = useState<DashboardCardsResponse | null>(null);
+useEffect(() => {
+  const fetchData = async () => {
+    const res = await getDashboardCards();
+    setData(res);
+  };
+  fetchData();
+}, []);
+
+// fetch visible kpis-settings
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
     "totalRevenue",
@@ -132,20 +90,20 @@ const visibleKpis = getVisibleKpis();
  
 {visibleKpis.includes("totalRevenue") && (
   <StackCard
-    value={totalRevenue()}
+    value={`₹ ${data?.totalRevenue ?? 0}`}
     title="Total Revenue"
     icon={Revenue}
   />
 )}
  
 {visibleKpis.includes("inventoryStatus") && (
-    <StackCard value={inventoryStatus()} title="Inventory Status" icon={Inventory} />
+    <StackCard value={data?.inventoryStatus ?? "—"} title="Inventory Status" icon={Inventory} />
   )}
   {visibleKpis.includes("medicinesAvailable") && (
-    <StackCard value={availableMedicines.toString()} title="Medicines Available" icon={Medicines} />
+    <StackCard value={(data?.medicineAvailableCount ?? 0).toString()} title="Medicines Available" icon={Medicines} />
   )}
   {visibleKpis.includes("medicinesShortage") && (
-    <StackCard value={medicineShortage.toString()} title="Medicine Shortage" icon={Shortage} />
+    <StackCard value={(data?.medicineShortageCount ?? 0).toString()} title="Medicine Shortage" icon={Shortage} />
   )}
  
 </Box>

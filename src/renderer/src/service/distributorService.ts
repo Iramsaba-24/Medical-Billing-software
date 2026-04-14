@@ -13,6 +13,8 @@ export interface DistributorFormData {
   website?: string;
   gstin: string;
   address: string;
+      isActive?: boolean;
+    IsActive?: boolean;
 
   // bank
   bankName: string;
@@ -33,6 +35,7 @@ interface DistributorRequest {
   website?: string | null;
   gstin: string;
   address: string;
+    IsActive: boolean;
 
   bankDetails: { 
     bankName: string;
@@ -56,7 +59,12 @@ export interface DistributorResponse {
   gstin: string;
   address: string;
   createdDate: string;
+<<<<<<< HEAD
   purchaseAmount?: number;
+=======
+     isActive: boolean;
+    IsActive?: boolean;
+>>>>>>> bb6fb6a6eae991e9d6b094c581ef2d821f351aab
  //reatedAt: string;
   bankDetails?: { 
     bankName: string;
@@ -116,7 +124,7 @@ export const addDistributor = async (
     website: data.website ? data.website : null, // fix URL issue
     gstin: data.gstin,
     address: data.address,
-
+IsActive: data.isActive ?? data.IsActive ?? true,
     bankDetails: { //  MUST be nested
       bankName: data.bankName,
       accountNumber: data.accountNumber,
@@ -151,6 +159,7 @@ export const updateDistributor = async (
     website: data.website ? data.website : null,
     gstin: data.gstin,
     address: data.address,
+    IsActive: data.isActive ?? data.IsActive ?? true,
 
     bankDetails: {
       bankName: data.bankName,
