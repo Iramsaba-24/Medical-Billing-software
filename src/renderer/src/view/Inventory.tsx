@@ -11,6 +11,7 @@ import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import { useState, useEffect } from "react";
 import type { MedicineResponse } from "@/service/medicineService";
 
+
  
 export default function InventoryPage() {
   const navigate = useNavigate();

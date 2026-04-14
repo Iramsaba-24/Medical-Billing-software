@@ -63,63 +63,81 @@ useEffect(() => {
     if (!invoiceNo) return;
 
     try {
-     const data = await getRetailInvoiceById(Number(invoiceNo));
-const items = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
-const medicines = await getMedicines();
+      const data = await getRetailInvoiceById(Number(invoiceNo));
+      const items = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
+      const medicines = (await getMedicines()) || [];
 
-let doctorName = "";
-if (data?.customerId) {
-  try {
-    const customer = await getCustomerById(data.customerId);
-    doctorName = customer?.doctor || "";
-  } catch {
-    doctorName = "";
-  }
-}
+      let doctorName = "";
+      if (data?.customerId) {
+        try {
+          const customer = await getCustomerById(data.customerId);
+          doctorName = customer?.doctor || "";
+        } catch {
+          doctorName = "";
+        }
+      }
 
-if (data) {
-  setInvoice({
-    invoice: String(data.retailInvoiceId),
-    name: data.customerName || "",
-    doctor: doctorName || "",
-    address: "",
-    date: new Date(data.invoiceDate).toLocaleDateString("en-GB"),
-    medicines: (items || []).map((item: {
-      medicineId: number;
-      quantity: number;
-      price: number;
-      amount: number;
-    }) => {
-      const medicine = medicines?.find(
-        (m: { medicineId: number; itemName: string; expiryDate?: string }) =>
-          Number(m.medicineId) === Number(item.medicineId)
-      );
-       console.log("item.medicineId:", item.medicineId, "found:", medicine?.itemName);
-      return {
-        name: medicine?.itemName || String(item.medicineId),
-        qty: item.quantity,
-        amount: item.amount,
-        batch: "",
-        expiry: medicine?.expiryDate
-          ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
-          : "",
-      };
-    }),
-    totalAmount: data.totalAmount,
-  });
-} else {
-  navigate(-1);
-}
+      if (data) {
+        setInvoice({
+          invoice: String(data.retailInvoiceId),
+          name: data.customerName || "",
+          doctor: doctorName || "",
+          address: "",
+          date: new Date(data.invoiceDate).toLocaleDateString("en-GB"),
+
+          medicines: (items || []).map((item: {
+            medicineId: number;
+            quantity: number;
+            price: number;
+            amount: number;
+          }) => {
+            const medicine = medicines.find(
+              (m: {
+                medicineId: number;
+                itemName: string;
+                expiryDate?: string;
+                hsnCode?: string;
+              }) => Number(m.medicineId) === Number(item.medicineId)
+            );
+
+            console.log(
+              "item.medicineId:",
+              item.medicineId,
+              "found:",
+              medicine?.itemName,
+              "HSN:",
+              medicine?.hsnCode
+            );
+
+            return {
+              name: medicine?.itemName || String(item.medicineId),
+              qty: item.quantity,
+              amount: item.amount,
+
+              batch: medicine?.hsnCode || "", 
+
+              expiry: medicine?.expiryDate
+                ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
+                : "",
+            };
+          }),
+
+          totalAmount: data.totalAmount,
+        });
+      } else {
+        navigate(-1);
+      }
     } catch (error) {
-       navigate(-1)
+      navigate(-1);
     }
 
     const invoiceSettings = localStorage.getItem("invoiceSettings");
     if (invoiceSettings) {
       const parsed = JSON.parse(invoiceSettings);
       const printOptions: string[] = parsed.product_linking || [];
+
       setShowLogo(printOptions.includes("show_logo"));
-      setShowHsn(printOptions.includes("show_hsn_code"));
+      setShowHsn(printOptions.includes("show_hsn_code")); // ✅ HSN toggle
     }
   };
 
@@ -230,6 +248,21 @@ const pharmacyAddress = pharmacyData?.address || "-";
               <Typography fontSize={12} fontWeight={600}>Sub Total</Typography>
               <Typography fontSize={12}>₹ {subTotal.toFixed(2)}</Typography>
             </Box>
+
+
+
+
+            <Box display="flex" justifyContent="space-between" mt={0.5}>
+  <Typography fontSize={12} fontWeight={600}>Medipoint</Typography>
+  <Typography fontSize={12}>₹ 0.00</Typography>
+</Box>
+<Box display="flex" justifyContent="space-between" mt={0.5}>
+  <Typography fontSize={12} fontWeight={600}>GST (5%)</Typography>
+  <Typography fontSize={12}>₹ 0.00</Typography>
+</Box>
+
+
+            
            
             <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
               <Typography fontSize={13} fontWeight={700}>NET</Typography>
@@ -358,6 +391,20 @@ const pharmacyAddress = pharmacyData?.address || "-";
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
  
+
+<TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
+  <TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Medipoint</strong></TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ 0.00</TableCell>
+</TableRow>
+
+<TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
+  <TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>GST (5%)</strong></TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ 0.00</TableCell>
+</TableRow>
+
+
  
               <TableRow sx={{ borderTop: "2px solid #000" }}>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
