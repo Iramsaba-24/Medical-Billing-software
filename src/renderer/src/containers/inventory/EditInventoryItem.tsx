@@ -18,7 +18,7 @@ export type OptionType = {
 
 export type InventoryItem = {
   itemName: string;
-  batchNumber: number;
+  // batchNumber: number;
   medicineId: number;
   quantity: number;
   medicineGroup: string;
@@ -128,7 +128,7 @@ const onSubmit = async (data: InventoryItem) => {
 
     await updateMedicine(item?.medicineId ?? 0, {
       medicineId: item?.medicineId ?? 0,
-       batchNumber: data.batchNumber,  
+      //  batchNumber: data.batchNumber,  
       itemName: data.itemName,
       unit: data.unit,
       quantity: data.quantity,
@@ -168,7 +168,7 @@ const onSubmit = async (data: InventoryItem) => {
             <TextInputField name="itemName" label="Item Name" required />
             {/* <NumericField name="medicineId" label="Item ID" required disabled/>  */}
 
-            <NumericField name="batchNumber" label="Batch Number" required />
+            {/* <NumericField name="batchNumber" label="Batch Number" required /> */}
             <NumericField name="quantity" label="Stock Quantity" required />
 
             <DropdownField

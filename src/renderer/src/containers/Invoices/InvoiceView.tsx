@@ -424,7 +424,7 @@ const pharmacyAddress = pharmacyData?.address || "-";
     sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
     align="center"
   >
-    <strong>SGST (2.5%)</strong>
+    <strong>SGST (5%)</strong>
   </TableCell>
   <TableCell
     sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
