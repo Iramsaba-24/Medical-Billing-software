@@ -28,7 +28,7 @@ import { deleteMedicine } from "@/service/medicineService";
 export type InventoryItem = {
   itemName: string;
   medicineId: number;
-  batchNumber: number; 
+  // batchNumber: number; 
   medicineGroup: string;
   groupId: number;
   unit: string;
@@ -43,15 +43,16 @@ export type InventoryItem = {
 
 type MedicineApi = {
   medicineId: number;
-  batchNumber: number; 
-  itemName: string;
-  quantity: number;
-  pricePerUnit: number;
+  medicineName: string;
+  totalStockTablets: number;
+  mrpPerStrip: number;
+  gstPercent: number;
   expiryDate: string;
+
   groupId: number;
   distributorId: number;
-  gstPercentage: number;
-  unit: string;
+
+  type: string;
   hsnCode?: string;
 };
 
@@ -119,21 +120,28 @@ const InventoryList = () => {
         distributorMap[Number(d.distributorId)] = d.companyName;
       });
 
-      const formatted: InventoryItem[] = medicines.map((item) => ({
-        itemName: item.itemName,
-        medicineId: item.medicineId,
-        batchNumber: item.batchNumber, 
-        medicineGroup: groupMap[item.groupId] || "N/A",
-        groupId: item.groupId,
-        unit: item.unit || "N/A",
-        quantity: item.quantity,
-        pricePerUnit: item.pricePerUnit,
-        expiryDate: item.expiryDate.split("T")[0],
-        supplier: distributorMap[item.distributorId] || "N/A",
-        distributorId: item.distributorId,
-        gst: `${item.gstPercentage}%`,
-        hsnCode: item.hsnCode || "-",
-      }));
+     const formatted: InventoryItem[] = medicines.map((item) => ({
+  itemName: item.medicineName,
+  medicineId: item.medicineId,
+
+  medicineGroup: groupMap[item.groupId] || "N/A",
+  groupId: item.groupId,
+
+  unit: item.type || "N/A", 
+
+  quantity: item.totalStockTablets, 
+
+  pricePerUnit: item.mrpPerStrip, 
+
+  expiryDate: item.expiryDate.split("T")[0],
+
+  supplier: distributorMap[item.distributorId] || "N/A",
+  distributorId: item.distributorId,
+
+  gst: `${item.gstPercent}%`, 
+
+  hsnCode: item.hsnCode || "-",
+}));
 
       setTableData(formatted);
     } catch (error) {
@@ -188,7 +196,7 @@ const InventoryList = () => {
     { key: "expiryDate", label: "Expiry Date" },
 
     //  NEW COLUMN
-    { key: "batchNumber", label: "Batch Number" },
+    // { key: "batchNumber", label: "Batch Number" },
 
     {
       key: "status",
@@ -228,7 +236,7 @@ const InventoryList = () => {
           {viewItem && (
             <Box display="flex" flexDirection="column" gap={2}>
               <Typography>Item: {viewItem.itemName}</Typography>
-              <Typography>Batch: {viewItem.batchNumber}</Typography>
+              {/* <Typography>Batch: {viewItem.batchNumber}</Typography> */}
               <Typography>Qty: {viewItem.quantity}</Typography>
             </Box>
           )}

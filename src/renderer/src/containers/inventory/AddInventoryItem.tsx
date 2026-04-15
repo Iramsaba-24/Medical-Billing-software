@@ -1,5 +1,3 @@
-
-
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -9,13 +7,13 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
-import { addMedicine, getMedicines } from "@/service/medicineService";
+import { addMedicine } from "@/service/medicineService";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 export type InventoryFormData = {
   itemName: string;
-  batchNumber: number;
+  // batchNumber: number;
   medicineId: number;
   unit: string;
   quantity: number;
@@ -28,7 +26,7 @@ export type InventoryFormData = {
 
 export type InventoryItem = {
   itemName: string;
-  batchNumber: number;
+  // batchNumber: number;
   medicineId: number;
   quantity: number;
   medicineGroup: string;
@@ -56,28 +54,7 @@ export default function AddInventoryItem() {
   const [supplierIdMap, setSupplierIdMap] = useState<Record<string, number>>(
     {},
   );
-  const [, setNextMedicineId] = useState<number>(1);
-
-  useEffect(() => {
-    const fetchNextId = async () => {
-      try {
-        const medicines = await getMedicines();
-        const existingIds = medicines
-          .map((m: { medicineId: number }) => m.medicineId)
-          .sort((a: number, b: number) => a - b);
-
-        const nextId =
-          existingIds.length > 0 ? existingIds[existingIds.length - 1] + 1 : 1;
-
-        setNextMedicineId(nextId);
-        methods.setValue("medicineId", nextId);
-      } catch (error) {
-        console.error("Error fetching next medicine ID:", error);
-      }
-    };
-
-    fetchNextId();
-  }, [methods, setNextMedicineId]);
+  
 
   // Load Medicine Groups
   useEffect(() => {
@@ -197,7 +174,7 @@ export default function AddInventoryItem() {
               disabled
             /> */}
 
-            <NumericField name="batchNumber" label="Batch Number" required />
+            {/* <NumericField name="batchNumber" label="Batch Number" required /> */}
 
             <DropdownField
               name="unit"

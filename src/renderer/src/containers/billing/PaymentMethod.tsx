@@ -34,6 +34,7 @@ type PaymentState = {
   totalFromInvoice: number;
   customerName?: string;
   doctorName?: string;
+    usedPoints?: number;  
 };
 const radioStyle = {
   "& .MuiRadio-root": {
@@ -139,6 +140,7 @@ const PaymentMethod = () => {
                   : "",
               })),
               totalAmount: state.totalFromInvoice,
+                 usedPoints: state.usedPoints || 0,
             },
           },
         });
