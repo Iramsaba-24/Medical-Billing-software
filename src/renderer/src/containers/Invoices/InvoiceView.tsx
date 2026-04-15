@@ -3,7 +3,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer,
    useTheme } from "@mui/material"
 import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
-import {  useNavigate, useParams } from "react-router-dom";
+import {  useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoImage from "@/assets/logoimg.svg";
 import { PharmacyFormValues } from "../setting/PharmacyProfile";
@@ -29,6 +29,7 @@ export interface Invoice {
   subTotal?: number;
  
   totalAmount?: number;
+  usedPoints?: number;
   total?: number;
 }
 interface Medicine {
@@ -38,6 +39,12 @@ interface Medicine {
   batch?: string;
   expiry?: string;
 }
+
+type InvoiceNavigationState = {
+  invoice?: {
+    usedPoints?: number;
+  };
+};
  
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
@@ -45,6 +52,7 @@ const InvoiceView = () => {
  const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
+  const location = useLocation() as { state: InvoiceNavigationState };
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -123,6 +131,7 @@ useEffect(() => {
           }),
 
           totalAmount: data.totalAmount,
+          
         });
       } else {
         navigate(-1);
@@ -148,6 +157,7 @@ useEffect(() => {
 const subTotal = invoice?.medicines?.reduce(
   (sum, med) => sum + Number(med.amount), 0) || 0;
 
+  const usedPoints = location.state?.invoice?.usedPoints || 0;
 const discountedTotal = invoice?.totalAmount ?? subTotal;
 const netTotal = discountedTotal;
  
@@ -257,11 +267,14 @@ const pharmacyAddress = pharmacyData?.address || "-";
   <Typography fontSize={12}>₹ 0.00</Typography>
 </Box>
 <Box display="flex" justifyContent="space-between" mt={0.5}>
-  <Typography fontSize={12} fontWeight={600}>GST (5%)</Typography>
+  <Typography fontSize={12} fontWeight={600}>CGST (5%)</Typography>
   <Typography fontSize={12}>₹ 0.00</Typography>
 </Box>
 
-
+<Box display="flex" justifyContent="space-between" mt={0.5}>
+  <Typography fontSize={12} fontWeight={600}>SGST (5%)</Typography>
+  <Typography fontSize={12}>₹ 0.00</Typography>
+</Box>
             
            
             <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
@@ -395,17 +408,31 @@ const pharmacyAddress = pharmacyData?.address || "-";
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
   <TableCell /><TableCell /><TableCell /><TableCell />
   <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Medipoint</strong></TableCell>
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ 0.00</TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {usedPoints.toFixed(2)}</TableCell>
 </TableRow>
 
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
   <TableCell /><TableCell /><TableCell /><TableCell />
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>GST (5%)</strong></TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>CGST (5%)</strong></TableCell>
   <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ 0.00</TableCell>
 </TableRow>
 
 
- 
+ <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
+  <TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell
+    sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
+    align="center"
+  >
+    <strong>SGST (2.5%)</strong>
+  </TableCell>
+  <TableCell
+    sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
+    align="center"
+  >
+    ₹ 0.00
+  </TableCell>
+</TableRow>
               <TableRow sx={{ borderTop: "2px solid #000" }}>
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   Get Well Soon..

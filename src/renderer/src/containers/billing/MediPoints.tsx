@@ -6,11 +6,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import TextInputField from "@/components/controlled/TextInputField";
 import InvoiceTabButtons from "./InvoiceTabButtons";
+import DropdownField from "@/components/controlled/DropdownField";
 
 type MediPointsForm = {
   totalAmount: string;
   mediPoints: string;
   discountedAmount: string;
+  gst: string; 
 };
 
 type InfoRowProps = {
@@ -25,7 +27,7 @@ const PayNPrint = {
   border: "2px solid #238878",
   textTransform: "none",
   minWidth: "250px",
-  height: "36px",
+  height: "38px",
   "&:hover": {
     backgroundColor: "#fff",
     color: "#238878",
@@ -50,6 +52,7 @@ const earned = Math.floor(totalFromInvoice / 200) * 5;
       totalAmount: totalFromInvoice.toString(),
       mediPoints: "", 
       discountedAmount: totalFromInvoice.toString(),
+       gst: "12",
     },
   });
 
@@ -60,6 +63,12 @@ const earned = Math.floor(totalFromInvoice / 200) * 5;
 
   const usedNow = Number(mediPointsValue ?? 0);
   const total = Number(totalValue ?? 0);
+
+const gstOptions = [
+  { label: "5%", value: "5" },
+  { label: "12%", value: "12" },
+  { label: "18%", value: "18" },
+];
 
   useEffect(() => {
     if (usedNow > earned) {
@@ -106,6 +115,7 @@ const earned = Math.floor(totalFromInvoice / 200) * 5;
     state: {
       flow: location.state?.flow || "retail",
       totalFromInvoice: Number(data.discountedAmount),
+      usedPoints: usedNow,
       invoiceId: location.state?.invoiceId,
       rows: location.state?.rows,
       customerName: location.state?.customerName,
@@ -217,23 +227,41 @@ const earned = Math.floor(totalFromInvoice / 200) * 5;
           </Box>
 
           <Box
-            sx={{
-              display: "flex",
-              justifyContent: { xs: "center", md: "flex-end" },
-              gap: 2,
-              mt: 3,
-              flexWrap: "wrap",
-            }} 
-          >
-            <Button
-              variant="contained"
-              type="submit"
-              disabled={isInvalid}
-              sx={{ ...PayNPrint, minWidth: "140px" }}
-            >
-              Save & Continue
-            </Button>
-          </Box>
+
+   sx={{
+    display: "flex",
+    justifyContent: { xs: "center", md: "flex-end" }, 
+    alignItems: "center",
+    gap: 1,
+   
+    flexWrap: "wrap",
+  }}
+
+>
+ 
+  <Box sx={{ minWidth: "150px" }}>
+    <Typography fontWeight={500} mb={0.5}>
+      GST
+    </Typography>
+
+    <DropdownField
+      name="gst"
+      label=""
+      options={gstOptions}
+    size="small"
+    />
+  </Box>
+
+ 
+  <Button
+    variant="contained"
+    type="submit"
+    disabled={isInvalid}
+    sx={{ ...PayNPrint, minWidth: "140px" }}
+  >
+    Save & Continue
+  </Button>
+</Box>
         </Paper>
       </form>
     </FormProvider>
