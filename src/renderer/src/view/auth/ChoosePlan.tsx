@@ -33,8 +33,8 @@ const radioStyle = {
 const onSubmit = (data: PlanForm) => {
   const amount = planAmountMapping[data.plan];
 
-  localStorage.setItem("selectedPlan", data.plan);
-  localStorage.setItem("selectedAmount", amount.toString());
+  // localStorage.setItem("selectedPlan", data.plan);
+  // localStorage.setItem("selectedAmount", amount.toString());
 
   const existingData = JSON.parse(localStorage.getItem("registrationData") || '{}');
   const completeData = { ...existingData, plan: data.plan, amount };
