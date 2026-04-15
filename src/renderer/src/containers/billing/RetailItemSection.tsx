@@ -75,7 +75,7 @@ const addRow = () =>
     {
       retailItemId: Date.now(),
       medicineId: "",
-      quantity: "",
+      quantity: 1,
       price: "",
       amount: 0,
     },

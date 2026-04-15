@@ -8,7 +8,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import RadioField from "@/components/controlled/RadioField";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-import { useEffect } from "react";
+
 type PaymentFormInputs = {
   paymentMethod: string;
   amount: string;

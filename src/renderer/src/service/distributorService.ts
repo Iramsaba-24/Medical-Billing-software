@@ -59,12 +59,8 @@ export interface DistributorResponse {
   gstin: string;
   address: string;
   createdDate: string;
-<<<<<<< HEAD
-  purchaseAmount?: number;
-=======
      isActive: boolean;
     IsActive?: boolean;
->>>>>>> bb6fb6a6eae991e9d6b094c581ef2d821f351aab
  //reatedAt: string;
   bankDetails?: { 
     bankName: string;
