@@ -1,4 +1,5 @@
 
+
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -8,12 +9,13 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
-import { addMedicine, getMedicines  } from "@/service/medicineService";
+import { addMedicine, getMedicines } from "@/service/medicineService";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 export type InventoryFormData = {
   itemName: string;
+  batchNumber: number;
   medicineId: number;
   unit: string;
   quantity: number;
@@ -26,6 +28,7 @@ export type InventoryFormData = {
 
 export type InventoryItem = {
   itemName: string;
+  batchNumber: number;
   medicineId: number;
   quantity: number;
   medicineGroup: string;
@@ -43,40 +46,42 @@ export default function AddInventoryItem() {
 
   const navigate = useNavigate();
 
-  const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
-  const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
+  const [groupOptions, setGroupOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [supplierOptions, setSupplierOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [groupIdMap, setGroupIdMap] = useState<Record<string, number>>({});
-  const [supplierIdMap, setSupplierIdMap] = useState<Record<string, number>>({});
+  const [supplierIdMap, setSupplierIdMap] = useState<Record<string, number>>(
+    {},
+  );
   const [, setNextMedicineId] = useState<number>(1);
 
+  useEffect(() => {
+    const fetchNextId = async () => {
+      try {
+        const medicines = await getMedicines();
+        const existingIds = medicines
+          .map((m: { medicineId: number }) => m.medicineId)
+          .sort((a: number, b: number) => a - b);
 
-useEffect(() => {
-  const fetchNextId = async () => {
-    try {
-      const medicines = await getMedicines();
-      const existingIds = medicines
-        .map((m: { medicineId: number }) => m.medicineId)
-        .sort((a: number, b: number) => a - b);
+        const nextId =
+          existingIds.length > 0 ? existingIds[existingIds.length - 1] + 1 : 1;
 
-      const nextId = existingIds.length > 0
-        ? existingIds[existingIds.length - 1] + 1
-        : 1;
+        setNextMedicineId(nextId);
+        methods.setValue("medicineId", nextId);
+      } catch (error) {
+        console.error("Error fetching next medicine ID:", error);
+      }
+    };
 
-      setNextMedicineId(nextId);
-      methods.setValue("medicineId", nextId);
-    } catch (error) {
-      console.error("Error fetching next medicine ID:", error);
-    }
-  };
-
-  fetchNextId();
-}, [methods, setNextMedicineId]);
+    fetchNextId();
+  }, [methods, setNextMedicineId]);
 
   // Load Medicine Groups
   useEffect(() => {
     const fetchGroups = async () => {
-
-      
       try {
         const token = localStorage.getItem("token");
 
@@ -88,13 +93,15 @@ useEffect(() => {
 
         const idMap: Record<string, number> = {};
 
-        const options = res.data.data.map((g: { groupId: number; groupName: string }) => {
-          idMap[g.groupName] = g.groupId; // name → id map
-          return { label: g.groupName, value: g.groupName };
-        });
+        const options = res.data.data.map(
+          (g: { groupId: number; groupName: string }) => {
+            idMap[g.groupName] = g.groupId; // name  id map
+            return { label: g.groupName, value: g.groupName };
+          },
+        );
 
         setGroupOptions(options);
-        setGroupIdMap(idMap); // ← save करा
+        setGroupIdMap(idMap); //  save
       } catch (error) {
         console.error("Error fetching groups:", error);
       }
@@ -117,13 +124,15 @@ useEffect(() => {
 
         const sMap: Record<string, number> = {};
 
-        const options = res.data.map((d: { distributorId: number; companyName: string }) => {
-          sMap[d.companyName] = d.distributorId; // name → id map
-          return { label: d.companyName, value: d.companyName };
-        });
+        const options = res.data.map(
+          (d: { distributorId: number; companyName: string }) => {
+            sMap[d.companyName] = d.distributorId; // name  id map
+            return { label: d.companyName, value: d.companyName };
+          },
+        );
 
         setSupplierOptions(options);
-        setSupplierIdMap(sMap); // ← save करा
+        setSupplierIdMap(sMap); //  save
       } catch (error) {
         console.error("Error fetching distributors:", error);
       }
@@ -134,7 +143,7 @@ useEffect(() => {
 
   const onSubmit = async (data: InventoryFormData) => {
     try {
-      // name → id convert करा
+      // name id convert
       const finalData = {
         ...data,
         medicineGroup: groupIdMap[data.medicineGroup]?.toString() ?? "",
@@ -176,17 +185,19 @@ useEffect(() => {
               inputType="all"
               rows={1}
               name="itemName"
-              label="Item Name"
+              label="Medicine Name"
               maxLength={30}
               required
             />
 
-            <NumericField
+            {/* <NumericField
               name="medicineId"
               label="Item ID"
               required
               disabled
-            />
+            /> */}
+
+            <NumericField name="batchNumber" label="Batch Number" required />
 
             <DropdownField
               name="unit"
@@ -206,11 +217,7 @@ useEffect(() => {
               editable={true}
             />
 
-            <NumericField
-              name="quantity"
-              label="Stock Quantity"
-              required
-            />
+            <NumericField name="quantity" label="Stock Quantity" required />
 
             <DropdownField
               name="medicineGroup"
@@ -227,7 +234,7 @@ useEffect(() => {
               label="Price per Unit (₹)"
               required
             />
-            
+
             <TextInputField
               inputType="numbers"
               rows={1}
@@ -256,7 +263,6 @@ useEffect(() => {
               freeSolo={false}
               editable={true}
             />
-
 
             <Box
               gridColumn="1 / -1"
