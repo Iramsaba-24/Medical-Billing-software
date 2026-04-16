@@ -6,13 +6,13 @@ import {
   showConfirmation,
   showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
-import DoctorEdit from "@/containers/doctors/DoctorEdit";
+// import DoctorEdit from "@/containers/doctors/DoctorEdit";
 import { URL_PATH } from "@/constants/UrlPath";
 import { getDoctors } from "@/service/doctorService";
 import { deleteDoctor } from "@/service/doctorService";
 import { updateDoctor } from "@/service/doctorService";
 type Doctor = {
-  SrNo?: number;
+  SrNo: number;
   doctorId: number;
 
   doctorName: string;
@@ -35,7 +35,7 @@ const Doctors = () => {
 
   const [viewItem, setViewItem] = useState<Doctor | null>(null);
 
-  const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
+  // const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
 
   const navigate = useNavigate();
 
@@ -51,11 +51,11 @@ const Doctors = () => {
 
       console.log("Backend response:", JSON.stringify(data[0]));
 
-      const mappedDoctors: Doctor[] = data.map((doc) => {
+      const mappedDoctors: Doctor[] = data.map((doc,index) => {
         const activeFlag = doc.isActive ?? doc.IsActive;
         return {
           ...doc,
-          // SrNo: doc.SrNorNo ?? index + 1,
+          SrNo: doc.SrNo ?? index + 1,
           status: activeFlag === true ? "Active" : "Inactive",
         };
       });
@@ -223,7 +223,9 @@ const Doctors = () => {
             actions={{
               view: setViewItem,
 
-              edit: setEditDoctor,
+              edit: (doctor) => {
+    navigate(URL_PATH.AddDoctor, { state: doctor });
+  },
 
               delete: async (doctor) => {
                 const ok = await showConfirmation("Delete doctor?", "Confirm");
@@ -334,37 +336,7 @@ const Doctors = () => {
         </Dialog>
 
         {/* edit doctor  */}
-        <DoctorEdit
-          doctor={editDoctor}
-          onClose={() => setEditDoctor(null)}
-          onSave={async (updatedDoctor: Doctor) => {
-            try {
-              await updateDoctor(updatedDoctor.doctorId, updatedDoctor);
-
-              showSnackbar("success", "Doctor updated successfully");
-
-              setEditDoctor(null);
-
-              fetchDoctors();
-            } catch (error) {
-              console.error(error);
-
-              showSnackbar("error", "Update failed");
-            }
-          }}
-//           onSave={(updatedDoctor: Doctor) => {
-//   updateDoctor(updatedDoctor.doctorId, updatedDoctor)
-//     .then(() => {
-//       showSnackbar("success", "Doctor updated successfully");
-//       setEditDoctor(null);
-//       fetchDoctors();
-//     })
-//     .catch((error) => {
-//       console.error(error);
-//       showSnackbar("error", "Update failed");
-//     });
-// }}
-        />
+        
       </Box>
     </>
   );
