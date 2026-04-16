@@ -112,9 +112,11 @@ const DropdownField: FC<DropdownFieldProps> = ({
               freeSolo={freeSolo && editable}
               options={options}
               value={selectedOption || null}
-              inputValue={
-                typeof value === "string" ? value : value?.toString() || ""
-              }
+  inputValue={
+    freeSolo
+      ? value || ""
+      : selectedOption?.label || ""
+  }
               isOptionEqualToValue={(option, val) => {
                 if (!val) return false;
                 if (typeof val === "string") {
