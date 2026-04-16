@@ -17,6 +17,8 @@ export interface ItemRow {
   retailInvoiceId?: number;
   medicineId: string;
   medicineName?: string;
+  strength?: string;      
+  companyName?: string;
   expiryDate?: string;
   quantity: number | "";
   price: number | "";
@@ -69,6 +71,31 @@ const [inventory, setInventory] = useState<MedicineResponse[]>([]);
     value: item.itemName,
   }));
 
+//   const strengthOptions = inventory.map((item) => ({
+//   label: item.strength,
+//   value: item.strength,
+// }));
+
+// const companyOptions = inventory.map((item) => ({
+//   label: item.companyName,
+//   value: item.companyName,
+// }));
+
+
+const strengthOptions = [
+  { label: "250 mg", value: "250 mg" },
+  { label: "500 mg", value: "500 mg" },
+  { label: "650 mg", value: "650 mg" },
+  { label: "1 g", value: "1 g" },
+];
+
+const companyOptions = [
+  { label: "Cipla", value: "Cipla" },
+  { label: "Sun Pharma", value: "Sun Pharma" },
+  { label: "Dr Reddy", value: "Dr Reddy" },
+  { label: "Lupin", value: "Lupin" },
+];
+
 const addRow = () =>
   setRows([
     ...rows,
@@ -120,6 +147,8 @@ const handleNameChange = (id: number, selectedName: string) => {
   ...r,
   medicineId: item ? String(item.medicineId) : "",
   medicineName: item ? item.itemName : "",
+  // strength: item?.strength || "",       
+  // companyName: item?.companyName || "", 
   expiryDate: item ? item.expiryDate : "",
   price: item ? Number(item.pricePerUnit) : "",
 };
@@ -181,9 +210,9 @@ const handleNameChange = (id: number, selectedName: string) => {
             sx={{
               display: "grid",
               gridTemplateColumns: {
-                md: "4fr 1fr 1.5fr 1.5fr 50px",
-                xs: "1fr",
-              },
+  md: "3fr 2fr 2fr 1fr 1.5fr 1.5fr 50px",
+  xs: "1fr",
+},
               gap: 2,
               mb: { xs: 4, md: 2 },
               alignItems: "start",
@@ -204,6 +233,22 @@ const handleNameChange = (id: number, selectedName: string) => {
                 handleNameChange(row.retailItemId, value);
               }}
             />
+
+            <DropdownField
+  name={`strength_${row.retailItemId}`}
+  label="Strength"
+  options={strengthOptions}
+  value={row.strength || ""}
+  editable={false}
+/>
+
+<DropdownField
+  name={`company_${row.retailItemId}`}
+  label="Company"
+options={companyOptions}
+  value={row.companyName || ""}
+  editable={false}
+/>
 
             <TextField
               fullWidth
