@@ -9,14 +9,21 @@ import { useEffect, useState } from "react";
 import { DashboardCardsResponse, getDashboardCards } from "@/service/dashboardService";
 const Dashboard: React.FC = () => {
 const [data, setData] = useState<DashboardCardsResponse | null>(null);
+// useEffect(() => {
+//   const fetchData = async () => {
+//     const res = await getDashboardCards();
+//     setData(res);
+//   };
+//   fetchData();
+// }, []);
 useEffect(() => {
   const fetchData = async () => {
     const res = await getDashboardCards();
+    console.log("DASHBOARD API RESPONSE:", res);
     setData(res);
   };
   fetchData();
 }, []);
-
 // fetch visible kpis-settings
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
@@ -90,8 +97,10 @@ const visibleKpis = getVisibleKpis();
  
 {visibleKpis.includes("totalRevenue") && (
   <StackCard
-    value={`₹ ${data?.totalRevenue ?? 0}`}
-    title="Total Revenue"
+value={`₹ ${Number(data?.totalRevenue ?? 0).toLocaleString("en-IN", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
+})}`}    title="Total Revenue"
     icon={Revenue}
   />
 )}
