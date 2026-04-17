@@ -7,7 +7,7 @@ export interface MedicineFormData {
   medicineName: string;
   batchNumber?: string; 
   hsnCode?: string;
-
+  //  mrpPerTablet: number;
   numberOfStrips: number;
   tabletsPerStrip: number;
   looseTablets: number;
@@ -20,12 +20,9 @@ export interface MedicineFormData {
   companyName?: string;
   strength: string;
   type: string;
-
   distributorId: number;
   groupId: number;
-
   manufacturingDate?: string;
-
   minimumQuantity: number;
   maximumQuantity: number;
 }
@@ -38,7 +35,7 @@ export interface MedicineResponse {
   medicineName: string;
   batchNumber?: string;
   hsnCode?: string;
-
+   mrpPerTablet: number;
   totalStockTablets: number;
 
   purchasePricePerStrip: number;
@@ -58,9 +55,9 @@ export interface MedicineResponse {
   groupName?: string;
   category?: string;
 
-  totalPrice: number;
-  finalPrice: number;
-
+  // totalPrice: number;
+  // finalPrice: number;
+    stockValue: number;
   status: string;
   isLowStock: boolean;
 
@@ -161,4 +158,3 @@ export const deleteMedicine = async (id: number): Promise<void> => {
     getAuthHeaders()
   );
 };
- 

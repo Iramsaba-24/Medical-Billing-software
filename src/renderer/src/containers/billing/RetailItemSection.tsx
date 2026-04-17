@@ -23,6 +23,7 @@ export interface ItemRow {
   quantity: number | "";
   price: number | "";
   amount?: number;
+  
 }
 
 export type InventoryItem = {
@@ -66,35 +67,37 @@ const [inventory, setInventory] = useState<MedicineResponse[]>([]);
   fetchMedicines();
 }, []);
 
-  const itemOptions = inventory.map((item) => ({
-    label: item.itemName,
-    value: item.itemName,
+ const itemOptions = Array.from(
+  new Map(
+    inventory.map((item) => [
+      item.medicineName,
+      {
+        label: item.medicineName,
+        value: item.medicineName,
+      },
+    ])
+  ).values()
+);
+
+  const getStrengthOptions = (medicineName?: string) => {
+  if (!medicineName) return [];
+
+const strengths = inventory
+  .filter(
+    (item) =>
+      item.medicineName === medicineName && item.strength
+  )
+  .map((item) => item.strength as string);
+
+
+  const uniqueStrengths = Array.from(new Set(strengths));
+
+  return uniqueStrengths.map((s) => ({
+    label: s,
+    value: s,
   }));
+};
 
-//   const strengthOptions = inventory.map((item) => ({
-//   label: item.strength,
-//   value: item.strength,
-// }));
-
-// const companyOptions = inventory.map((item) => ({
-//   label: item.companyName,
-//   value: item.companyName,
-// }));
-
-
-const strengthOptions = [
-  { label: "250 mg", value: "250 mg" },
-  { label: "500 mg", value: "500 mg" },
-  { label: "650 mg", value: "650 mg" },
-  { label: "1 g", value: "1 g" },
-];
-
-const companyOptions = [
-  { label: "Cipla", value: "Cipla" },
-  { label: "Sun Pharma", value: "Sun Pharma" },
-  { label: "Dr Reddy", value: "Dr Reddy" },
-  { label: "Lupin", value: "Lupin" },
-];
 
 const addRow = () =>
   setRows([
@@ -135,23 +138,18 @@ const addRow = () =>
 
 
 const handleNameChange = (id: number, selectedName: string) => {
-  const item = inventory.find(
-    (i) =>
-      i.itemName.trim().toLowerCase() === selectedName.trim().toLowerCase()
-  );
-
   setRows(
     rows.map((r) => {
       if (r.retailItemId === id) {
-     return {
-  ...r,
-  medicineId: item ? String(item.medicineId) : "",
-  medicineName: item ? item.itemName : "",
-  // strength: item?.strength || "",       
-  // companyName: item?.companyName || "", 
-  expiryDate: item ? item.expiryDate : "",
-  price: item ? Number(item.pricePerUnit) : "",
-};
+        return {
+          ...r,
+          medicineId: "",
+          medicineName: selectedName,
+          strength: "",
+          companyName: "",
+          expiryDate: "",
+          price: "",
+        };
       }
       return r;
     })
@@ -222,10 +220,10 @@ const handleNameChange = (id: number, selectedName: string) => {
               name={`item_${row.retailItemId}`}
               label="Item Name"
               options={itemOptions}
-              value={row.medicineId}
+value={row.medicineName || ""}
               editable
               freeSolo={false}
-              alphanumeric
+              
               required
               error={nameError}
               helperText={nameError ? "Please select item" : ""}
@@ -234,20 +232,47 @@ const handleNameChange = (id: number, selectedName: string) => {
               }}
             />
 
-            <DropdownField
-  name={`strength_${row.retailItemId}`}
-  label="Strength"
-  options={strengthOptions}
-  value={row.strength || ""}
-  editable={false}
-/>
 
 <DropdownField
-  name={`company_${row.retailItemId}`}
+  name={`strength_${row.retailItemId}`}
+  label="Strength"
+  options={getStrengthOptions(row.medicineName)}
+  value={row.strength || ""}
+  editable
+  onChangeCallback={(value) => {
+    const selected = inventory.find(
+  (i) =>
+    i.medicineName === row.medicineName &&
+    i.strength === value &&
+    i.medicineId
+);
+
+if (selected) {
+  setRows(
+    rows.map((r) =>
+      r.retailItemId === row.retailItemId
+        ? {
+            ...r,
+            strength: selected.strength,
+            medicineId: String(selected.medicineId),
+          price: Number(selected.mrpPerTablet),
+            companyName: selected.companyName,
+            expiryDate: selected.expiryDate,
+          }
+        : r
+    )
+  );
+}
+  }}
+/>
+
+<TextField
+  fullWidth
   label="Company"
-options={companyOptions}
   value={row.companyName || ""}
-  editable={false}
+  onChange={(e) =>
+    updateRow(row.retailItemId, "companyName", e.target.value)
+  }
 />
 
             <TextField
