@@ -1,4 +1,3 @@
-
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -56,7 +55,7 @@ export type InventoryItem = {
 
 
 export default function AddInventoryItem() {
-  //edit
+
 const location = useLocation();
 
 const editData = location.state as InventoryFormData | undefined;
@@ -66,19 +65,19 @@ const methods = useForm<InventoryFormData>({
     medicineName: "",
     batchNumber: "",
     hsnCode: "",
-    numberOfStrips: 0,
-    tabletsPerStrip: 0,
-    looseTablets: 0,
-    purchasePricePerStrip: 0,
-    mrpPerStrip: 0,
-    gstPercent: 0,
+    // numberOfStrips: 0,
+    // tabletsPerStrip: 0,
+    // looseTablets: 0,
+    // purchasePricePerStrip: 0,
+    // mrpPerStrip: 0,
+    // gstPercent: 0,
     expiryDate: "",
     strength: "",
     type: "",
-    distributorId: 0,
+    // distributorId: 0,
     groupId: "",
-    minimumQuantity: 0,
-    maximumQuantity: 0,
+  //   minimumQuantity: 0,
+  //   maximumQuantity: 0,
   },
 });
 //edit
@@ -171,8 +170,8 @@ useEffect(() => {
       setDistributorData(data);
 
       const options = data.map((d) => ({
-        label: d.ownerName, //  owner name in dropdown
-        value: d.distributorId.toString() , // string required
+        label: d.ownerName, 
+        value: d.distributorId.toString() ,
       }));
 
       setSupplierOptions(options);
@@ -183,7 +182,7 @@ useEffect(() => {
 
   fetchDistributors();
 }, []);
-//compny name
+
 const selectedDistributorId = methods.watch("distributorId");
 
 useEffect(() => {
@@ -227,6 +226,13 @@ const purchasePricePerStrip = Number(methods.watch("purchasePricePerStrip")) || 
 const purchasePricePerTablet =
   tabletsPerStrip > 0
     ? purchasePricePerStrip / tabletsPerStrip
+    : 0;
+//cal mrp per tablet
+const mrpPerStrip = Number(methods.watch("mrpPerStrip")) || 0;
+
+const mrpPerTablet =
+  tabletsPerStrip > 0
+    ? mrpPerStrip / tabletsPerStrip
     : 0;
 
 const gstPercent = Number(methods.watch("gstPercent")) || 0;
@@ -411,6 +417,14 @@ gridTemplateColumns={{
     },
   }}
             />
+            <TextInputField
+  inputType="numbers"
+  name="mrpPerTablet"
+  label="MRP per Tablet"
+  value={mrpPerTablet}
+  disabled
+/>
+
                         <TextInputField
             inputType="numbers"
               name="gstPercent"

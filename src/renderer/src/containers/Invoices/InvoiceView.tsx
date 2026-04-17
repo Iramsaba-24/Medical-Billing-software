@@ -31,7 +31,11 @@ export interface Invoice {
   totalAmount?: number;
   usedPoints?: number;
   total?: number;
+    totalDiscount?: number;   
+  totalGST?: number; 
 }
+
+
 interface Medicine {
   name: string;
   qty: number | string;
@@ -41,9 +45,8 @@ interface Medicine {
 }
 
 type InvoiceNavigationState = {
-  invoice?: {
-    usedPoints?: number;
-  };
+  usedPoints?: number;
+  gstPercent?: number;
 };
  
 const InvoiceView = () => {
@@ -52,10 +55,12 @@ const InvoiceView = () => {
  const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
-  const location = useLocation() as { state: InvoiceNavigationState };
+ const location = useLocation() as { state: InvoiceNavigationState };
+const gstPercent = location.state?.gstPercent || 0;
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  
  
   const columns = [
     { label: "Sr No.", width: "7%" },
@@ -118,9 +123,9 @@ useEffect(() => {
             );
 
             return {
-              name: medicine?.itemName || String(item.medicineId),
+             name: medicine?.medicineName || "Medicine",
               qty: item.quantity,
-              amount: item.amount,
+          amount: Number(item.price) * Number(item.quantity),
 
               batch: medicine?.hsnCode || "", 
 
@@ -146,7 +151,7 @@ useEffect(() => {
       const printOptions: string[] = parsed.product_linking || [];
 
       setShowLogo(printOptions.includes("show_logo"));
-      setShowHsn(printOptions.includes("show_hsn_code")); // ✅ HSN toggle
+      setShowHsn(printOptions.includes("show_hsn_code")); 
     }
   };
 
@@ -157,10 +162,17 @@ useEffect(() => {
 const subTotal = invoice?.medicines?.reduce(
   (sum, med) => sum + Number(med.amount), 0) || 0;
 
-  const usedPoints = location.state?.invoice?.usedPoints || 0;
-const discountedTotal = invoice?.totalAmount ?? subTotal;
-const netTotal = discountedTotal;
- 
+const usedPoints = invoice?.totalDiscount || 0;
+
+const amountAfterDiscount = subTotal - usedPoints;
+
+const gstAmount =
+  invoice?.totalGST || (amountAfterDiscount * gstPercent) / 100;
+
+const cgst = gstAmount / 2;
+const sgst = gstAmount / 2;
+
+const netTotal = amountAfterDiscount + gstAmount;
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
  
 
@@ -264,17 +276,21 @@ const pharmacyAddress = pharmacyData?.address || "-";
 
             <Box display="flex" justifyContent="space-between" mt={0.5}>
   <Typography fontSize={12} fontWeight={600}>Medipoint</Typography>
-  <Typography fontSize={12}>₹ 0.00</Typography>
+<Typography fontSize={12}>- ₹ {usedPoints.toFixed(2)}</Typography>
 </Box>
-<Box display="flex" justifyContent="space-between" mt={0.5}>
-  <Typography fontSize={12} fontWeight={600}>CGST (5%)</Typography>
-  <Typography fontSize={12}>₹ 0.00</Typography>
-</Box>
+<Typography fontSize={12} fontWeight={600}>
+  CGST ({gstPercent / 2}%)
+</Typography>
+<Typography fontSize={12}>
+  ₹ {cgst.toFixed(2)}
+</Typography>
 
-<Box display="flex" justifyContent="space-between" mt={0.5}>
-  <Typography fontSize={12} fontWeight={600}>SGST (5%)</Typography>
-  <Typography fontSize={12}>₹ 0.00</Typography>
-</Box>
+<Typography fontSize={12} fontWeight={600}>
+  SGST ({gstPercent / 2}%)
+</Typography>
+<Typography fontSize={12}>
+  ₹ {sgst.toFixed(2)}
+</Typography>
             
            
             <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
@@ -407,14 +423,14 @@ const pharmacyAddress = pharmacyData?.address || "-";
 
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
   <TableCell /><TableCell /><TableCell /><TableCell />
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Medipoint</strong></TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>MediPoint</strong></TableCell>
   <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {usedPoints.toFixed(2)}</TableCell>
 </TableRow>
 
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
   <TableCell /><TableCell /><TableCell /><TableCell />
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>CGST (5%)</strong></TableCell>
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ 0.00</TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>CGST </strong></TableCell>
+  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {cgst.toFixed(2)}</TableCell>
 </TableRow>
 
 
@@ -424,13 +440,13 @@ const pharmacyAddress = pharmacyData?.address || "-";
     sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
     align="center"
   >
-    <strong>SGST (5%)</strong>
+    <strong>SGST</strong>
   </TableCell>
   <TableCell
     sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
     align="center"
   >
-    ₹ 0.00
+   ₹ {sgst.toFixed(2)}
   </TableCell>
 </TableRow>
               <TableRow sx={{ borderTop: "2px solid #000" }}>

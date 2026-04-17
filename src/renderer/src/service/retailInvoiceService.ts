@@ -37,6 +37,8 @@ export const createSingleRetailInvoiceItem = async (item: {
   price: number;
   gstPercent: number;
   discount: number;
+  strength?: string;       
+  companyName?: string;    
 }) => {
   const res = await axios.post(
     API_ENDPOINTS.RETAIL_INVOICE_ITEMS,

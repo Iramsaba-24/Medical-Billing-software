@@ -182,6 +182,8 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
               navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
                 state: { invoice },
               }),
+
+            
             edit: (invoice) =>
               navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
                 state: { invoice },
