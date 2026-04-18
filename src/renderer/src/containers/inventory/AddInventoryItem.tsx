@@ -1,16 +1,14 @@
 
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import TextInputField from "@/components/controlled/TextInputField";
-import DropdownField from "@/components/controlled/DropdownField";
-import DateTimeField from "@/components/controlled/DateTimeField";
+
 import { useNavigate,useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
 import { addMedicine, getMedicines, MedicineResponse,updateMedicine  } from "@/service/medicineService";
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
 import { getMedicineGroups } from "@/service/medicineGroupService";
-
+import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
 export type InventoryFormData = {
   medicineId?: number;
   medicineName: string;
@@ -59,19 +57,20 @@ export default function AddInventoryItem() {
   //edit
 const location = useLocation();
 
-const editData = location.state as InventoryFormData | undefined;
+// const editData = location.state as InventoryFormData | undefined;
+const editData = location.state as MedicineResponse | undefined;
 const methods = useForm<InventoryFormData>({
   mode: "onChange",
-  defaultValues: editData || {
+  defaultValues: {
     medicineName: "",
     batchNumber: "",
     hsnCode: "",
-    numberOfStrips: 0,
-    tabletsPerStrip: 0,
+    numberOfStrips: 1,
+    tabletsPerStrip: 1,
     looseTablets: 0,
     purchasePricePerStrip: 0,
     mrpPerStrip: 0,
-    gstPercent: 0,
+    gstPercent: 5,
     expiryDate: "",
     strength: "",
     type: "",
@@ -87,11 +86,43 @@ const methods = useForm<InventoryFormData>({
   const navigate = useNavigate();
 useEffect(() => {
   if (editData) {
-methods.reset({
-  ...editData,
-  groupId: String(editData.groupId),
-  distributorId: Number(editData.distributorId),
-});
+    methods.reset({
+      medicineId: editData.medicineId,
+      medicineName: editData.medicineName || "",
+      batchNumber: editData.batchNumber || "",
+      hsnCode: editData.hsnCode || "",
+
+      strength: editData.strength || "",
+      type: editData.type || "",
+
+      groupId: String(editData.groupId),
+      distributorId: editData.distributorId,
+
+      
+      numberOfStrips: editData.numberOfStrips ?? 0,
+      tabletsPerStrip: editData.tabletsPerStrip ?? 1,
+      looseTablets: editData.looseTablets ?? 0,
+
+      purchasePricePerStrip: editData.purchasePricePerStrip || 0,
+      mrpPerStrip: editData.mrpPerStrip || 0,
+      gstPercent: editData.gstPercent || 0,
+
+      expiryDate: editData.expiryDate
+        ? new Date(editData.expiryDate).toISOString().split("T")[0]
+        : "",
+      manufacturingDate: editData.manufacturingDate
+        ? new Date(editData.manufacturingDate).toISOString().split("T")[0]
+        : "",
+      purchaseDate: editData.purchaseDate
+        ? new Date(editData.purchaseDate).toISOString().split("T")[0]
+        : "",
+
+      companyName: editData.companyName || "",
+      invoiceNumber: editData.invoiceNumber || "",
+
+      minimumQuantity: editData.minimumQuantity || 0,
+      maximumQuantity: editData.maximumQuantity || 0,
+    });
   }
 }, [editData, methods]);
 
@@ -172,7 +203,7 @@ useEffect(() => {
 
       const options = data.map((d) => ({
         label: d.ownerName, //  owner name in dropdown
-        value: d.distributorId.toString() , // string required
+        value: d.distributorId.toString() , 
       }));
 
       setSupplierOptions(options);
@@ -228,6 +259,13 @@ const purchasePricePerTablet =
   tabletsPerStrip > 0
     ? purchasePricePerStrip / tabletsPerStrip
     : 0;
+//cal mrp per tablet
+const mrpPerStrip = Number(methods.watch("mrpPerStrip")) || 0;
+
+const mrpPerTablet =
+  tabletsPerStrip > 0
+    ? mrpPerStrip / tabletsPerStrip
+    : 0;
 
 const gstPercent = Number(methods.watch("gstPercent")) || 0;
 
@@ -240,268 +278,72 @@ const gstAmount = totalPrice * (gstPercent / 100);
 // Final Amount (with GST)
 const finalPrice = totalPrice + gstAmount;    
   return (
-    <FormProvider {...methods}>
-      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
-        <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
-<Typography fontSize={20} fontWeight={600} mb={4}>
-  {isEdit ? "Edit Medicine" : "Add New Medicine"}
-</Typography>
+<FormProvider {...methods}>
+  <Box width="100%" px={{ xs: 1, md: 2 }} mt={4} mb={8}>
+    <Paper sx={{ p: { xs: 1, md: 2 }, borderRadius: 2 }}>
+      <Typography fontSize={20} fontWeight={600} mb={4}>
+        {isEdit ? "Edit Medicine" : "Add New Medicine"}
+      </Typography>
 
-          <Box
-            component="form"
-            noValidate
-            onSubmit={methods.handleSubmit(onSubmit)}
-            display="grid"
-gridTemplateColumns={{
-  xs: "1fr",
-  sm: "repeat(2, 1fr)",
-  md: "repeat(3, 1fr)",
-  lg: "repeat(4, 1fr)",   
-}}            gap={2.5}
-            sx={{ px: { xs: 0, md: 4 } }}
+      <Box
+        component="form"
+        noValidate
+        onSubmit={methods.handleSubmit(onSubmit)}
+        display="grid"
+        gridTemplateColumns={{
+          xs: "1fr",
+          sm: "repeat(2, 1fr)",
+          md: "repeat(3, 1fr)",
+          lg: "repeat(4, 1fr)",
+        }}
+        gap={1.5}
+        sx={{ px: { xs: 0, md: 4 } }}
+      >
+        <InventoryFormFields
+          groupOptions={groupOptions}
+          supplierOptions={supplierOptions}
+          totalStock={totalStock}
+          purchasePricePerTablet={purchasePricePerTablet}
+          mrpPerTablet={mrpPerTablet}
+          finalPrice={finalPrice}
+        />
+
+        {/* Buttons SAME */}
+        <Box
+          gridColumn="1 / -1"
+          display="flex"
+          justifyContent="flex-end"
+          gap={2}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => navigate(-1)}
+            sx={{
+              px: 4,
+              textTransform: "none",
+              border: "2px solid #1b7f6b",
+              color: "#1b7f6b",
+            }}
           >
-            <TextInputField
-              inputType="all"
-              rows={1}
-              name="medicineName"
-              label="Medicine Name"
-              maxLength={30}
-              required
-            />
-            <TextInputField
-            name="strength"
-            label="Strength(e.g.500mg)"
-            required
-            />
-            <DropdownField
-              name="groupId"
-              label="Medicine Group"
-              placeholder="Medicine Group"
-              required
-              options={groupOptions}
-              freeSolo={false}
-              editable={true}
-            />
-            <TextInputField
-            inputType="numbers"
-              name="batchNumber"
-              label="Batch Number"
-              required
-            />
-                        <TextInputField
-              inputType="numbers"
-              rows={1}
-              name="hsnCode"
-              label="HSN Number"
-              minLength={4}
-              maxLength={10}
-              required
-            />
+            Cancel
+          </Button>
 
-            <DropdownField
-              name="type"
-              label="Type"
-              placeholder="Type"
-              required
-              options={[
-                { label: "Tablets", value: "tablets" },
-                { label: "Bottle", value: "bottle" },
-                { label: "Strip", value: "strip" },
-                { label: "Capsules", value: "capsules" },
-                { label: "Rolls", value: "rolls" },
-                { label: "Boxes", value: "boxes" },
-                { label: "Pairs", value: "pairs" },
-              ]}
-              freeSolo={false}
-              editable={true}
-            />
-
-          
-            
-            <TextInputField
-            inputType="numbers"
-            name="minimumQuantity"
-            label="Minimum Quantity"
-            required
-            />
-            <TextInputField
-            inputType="numbers"
-            name="maximumQuantity"
-            label="Maximum Quantity"
-            required    
-              rules={{
-    validate: (value: number) => {
-      const totalStock =
-        Number(methods.getValues("numberOfStrips")) *
-          Number(methods.getValues("tabletsPerStrip")) +
-        Number(methods.getValues("looseTablets"));
-
-      if (totalStock > Number(value)) {
-        return "Stock cannot be greater than Maximum Quantity";
-      }
-
-      return true;
-    },
-  }}       
-            />
-
-            {/* stock details */}
-            <TextInputField
-            inputType="numbers"
-            name="numberOfStrips"
-            label="Number of Strips"
-            required
-            />
-            <TextInputField
-            inputType="numbers"
-            name="tabletsPerStrip"
-            label="Tablets per Strip"
-            required
-            />
-            <TextInputField
-            inputType="numbers"
-            name="looseTablets"
-            label="Loose Tablets"
-            />
-
-  <TextInputField
-            inputType="numbers"
-              name="totalStockTablets"
-              label="Current Stock Quantity"
-              value={totalStock}
-              disabled={true}
-
-/>
-
-            {/* pricing */}
-            <TextInputField
-            inputType="numbers"
-              name="purchasePricePerStrip"
-              label="Purchase Price per Strip"
-              required
-
-            />
-
-
-            <TextInputField
-            inputType="numbers"
-            name="purchasePricePerTablet"
-            label="Purchase Price per Tablet"
-            value={purchasePricePerTablet}
-            disabled
-            />
-
-                        <TextInputField
-            inputType="numbers"
-              name="mrpPerStrip"
-              label="MRP per Strip"
-              required
-                rules={{
-    required: "MRP is required",
-    validate: (value: number) => {
-      const purchasePrice = Number(
-        methods.getValues("purchasePricePerStrip")
-      );
-
-      if (value <= purchasePrice) {
-        return "MRP must be greater than Purchase Price";
-      }
-
-      return true;
-    },
-  }}
-            />
-                        <TextInputField
-            inputType="numbers"
-              name="gstPercent"
-              label="GST Percentage"
-            />
-
-            <TextInputField
-              name="finalPrice"
-              label="Final Amount (With GST)"
-              value={finalPrice}
-              disabled
-            />
-          
-            {/* distributor/ company name */}
-            <DropdownField
-              name="distributorId"
-              label="distributor"
-              placeholder="distributor"
-              required
-              options={supplierOptions}
-              freeSolo={false}
-              editable={true}
-            />
-
-            <TextInputField
-              name="companyName"
-              label="Company Name"
-              disabled
-            />
-
-            {/* dates */}
-            <DateTimeField
-              name="expiryDate"
-              label="Expiry Date"
-              viewMode="date"
-              required
-              useCurrentDate={false}
-              dateRestriction="current-future-only"
-            />
-            <DateTimeField
-            name="purchaseDate"
-            label="Purchase Date"
-            />
-            <DateTimeField
-            name="manufacturingDate"
-            label="Manufacturing Date"
-            dateRestriction="past-current-future"
-            />
-            {/* invoice number */}
-            <TextInputField
-            inputType="numbers"
-            name="invoiceNumber"
-            label="Invoice Number"
-
-            />
-
-
-            <Box
-              gridColumn="1 / -1"
-              display="flex"
-              justifyContent="flex-end"
-              gap={2}
-            >
-              <Button
-                variant="outlined"
-                onClick={() => navigate(-1)}
-                sx={{
-                  px: 4,
-                  textTransform: "none",
-                  border: "2px solid #1b7f6b",
-                  color: "#1b7f6b",
-                }}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  px: 4,
-                  textTransform: "none",
-                  backgroundColor: "#1b7f6b",
-                }}
-              >
-                Save
-              </Button>
-            </Box>
-          </Box>
-        </Paper>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              px: 4,
+              textTransform: "none",
+              backgroundColor: "#1b7f6b",
+            }}
+          >
+            Save
+          </Button>
+        </Box>
       </Box>
-    </FormProvider>
+    </Paper>
+  </Box>
+</FormProvider>
+
   );
 }
