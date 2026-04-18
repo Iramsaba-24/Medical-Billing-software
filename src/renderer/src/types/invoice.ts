@@ -23,4 +23,6 @@ export type Invoice = {
   gstIn?: string;        
   distributorId?: string;
     totalAmount?: number;
+    usedPoints?: number;
+gstPercent?: number;
 };

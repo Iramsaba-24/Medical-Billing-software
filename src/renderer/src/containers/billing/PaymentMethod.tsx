@@ -27,6 +27,8 @@ type PaymentState = {
   rows: {
     medicineId: string;
     medicineName?: string;
+     strength?: string;        
+  companyName?: string;
     expiryDate?: string;
     quantity: number | "";
     price: number | "";
@@ -95,17 +97,34 @@ const PaymentMethod = () => {
           return;
         }
 
+const totalItems = state.rows.length || 1;
+
+const discountPerItem = Number(
+  ((state.usedPoints || 0) / totalItems).toFixed(2)
+);
+
+
         // Retail Items Save
         for (const r of state.rows) {
-          await createSingleRetailInvoiceItem({
-            retailInvoiceId: state.invoiceId,
-            medicineId: Number(r.medicineId),
-            quantity: Number(r.quantity),
-            price: Number(r.price),
-            gstPercent: 0,
-            discount: 0,
-          });
+         await createSingleRetailInvoiceItem({
+  retailInvoiceId: state.invoiceId,
+  medicineId: Number(r.medicineId),
+  quantity: Number(r.quantity),
+  price: Number(r.price),
+ gstPercent: Number(location.state?.gstPercent || 0),
+discount: discountPerItem, 
+  strength: r.strength,             
+  companyName: r.companyName,      
+});
         }
+
+const gstPercent = Number(location.state?.gstPercent || 0);
+const usedPoints = Number(location.state?.usedPoints || 0);
+
+const amountAfterDiscount = state.totalFromInvoice - usedPoints;
+
+const gstAmount = (amountAfterDiscount * gstPercent) / 100;
+
 
         const invoiceData = await getRetailInvoiceById(state.invoiceId);
         await updateRetailInvoice(state.invoiceId, {
@@ -114,8 +133,8 @@ const PaymentMethod = () => {
           invoiceType: invoiceData.invoiceType,
           invoiceDate: invoiceData.invoiceDate,
           totalAmount: state.totalFromInvoice,
-          totalGST: invoiceData.totalGST,
-          totalDiscount: invoiceData.totalDiscount,
+           totalGST: gstAmount,
+         totalDiscount: usedPoints, 
           medipointsEarned: invoiceData.medipointsEarned,
           paymentStatus: "Paid",
         });
@@ -123,26 +142,26 @@ const PaymentMethod = () => {
         navigate(`${URL_PATH.InvoiceView}/${state.invoiceId}`, {
 
           state: {
-            invoice: {
-
-              invoice: String(state.invoiceId),
-              name: state.customerName || "",
-              doctor: state.doctorName || "",
-              address: "",
-              date: new Date().toLocaleDateString("en-GB"),
-              medicines: state.rows.map((r) => ({
-                name: r.medicineName || String(r.medicineId),
-                qty: Number(r.quantity),
-                amount: Number(r.quantity) * Number(r.price),
-                batch: "",
-                expiry: r.expiryDate
-                  ? new Date(r.expiryDate).toLocaleDateString("en-GB")
-                  : "",
-              })),
-              totalAmount: state.totalFromInvoice,
-                 usedPoints: state.usedPoints || 0,
-            },
-          },
+  usedPoints: location.state?.usedPoints,
+    gstPercent: location.state?.gstPercent,  
+  invoice: {
+    invoice: String(state.invoiceId),
+    name: state.customerName || "",
+    doctor: state.doctorName || "",
+    address: "",
+    date: new Date().toLocaleDateString("en-GB"),
+    medicines: state.rows.map((r) => ({
+      name: r.medicineName || String(r.medicineId),
+      qty: Number(r.quantity),
+      amount: Number(r.quantity) * Number(r.price),
+      batch: "",
+      expiry: r.expiryDate
+        ? new Date(r.expiryDate).toLocaleDateString("en-GB")
+        : "",
+    })),
+    totalAmount: state.totalFromInvoice,
+  },
+}
         });
 
       } else if (state.flow === "new") {
