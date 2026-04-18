@@ -1,11 +1,10 @@
-
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 
 import { useNavigate,useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import { useEffect, useState } from "react";
-import { addMedicine, getMedicines, MedicineResponse,updateMedicine  } from "@/service/medicineService";
+import { useEffect, useState, useRef } from "react";
+import { addMedicine,  MedicineResponse,updateMedicine  } from "@/service/medicineService";
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
 import { getMedicineGroups } from "@/service/medicineGroupService";
 import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
@@ -31,7 +30,7 @@ export type InventoryFormData = {
   strength: string;
   type: string;
 
-  distributorId: number;
+  distributorId: number|string;
   groupId: string;
 
   manufacturingDate?: string;
@@ -54,7 +53,7 @@ export type InventoryItem = {
 
 
 export default function AddInventoryItem() {
-  //edit
+
 const location = useLocation();
 
 // const editData = location.state as InventoryFormData | undefined;
@@ -74,39 +73,37 @@ const methods = useForm<InventoryFormData>({
     expiryDate: "",
     strength: "",
     type: "",
-    distributorId: 0,
+    // distributorId: 0,
     groupId: "",
-    minimumQuantity: 0,
-    maximumQuantity: 0,
+  //   minimumQuantity: 0,
+  //   maximumQuantity: 0,
   },
 });
 //edit
 
   const isEdit = !!editData?.medicineId;
   const navigate = useNavigate();
+    const [distributorData, setDistributorData] = useState<DistributorResponse[]>([]);
+const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
+const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
+
+// edit mode
 useEffect(() => {
-  if (editData) {
+  if (editData && distributorData.length > 0 && groupOptions.length > 0) {
     methods.reset({
       medicineId: editData.medicineId,
       medicineName: editData.medicineName || "",
       batchNumber: editData.batchNumber || "",
       hsnCode: editData.hsnCode || "",
-
       strength: editData.strength || "",
       type: editData.type || "",
-
       groupId: String(editData.groupId),
-      distributorId: editData.distributorId,
-
-      
-      numberOfStrips: editData.numberOfStrips ?? 0,
+distributorId: String(editData.distributorId) as unknown as number,      numberOfStrips: editData.numberOfStrips ?? 0,
       tabletsPerStrip: editData.tabletsPerStrip ?? 1,
       looseTablets: editData.looseTablets ?? 0,
-
       purchasePricePerStrip: editData.purchasePricePerStrip || 0,
       mrpPerStrip: editData.mrpPerStrip || 0,
       gstPercent: editData.gstPercent || 0,
-
       expiryDate: editData.expiryDate
         ? new Date(editData.expiryDate).toISOString().split("T")[0]
         : "",
@@ -116,62 +113,15 @@ useEffect(() => {
       purchaseDate: editData.purchaseDate
         ? new Date(editData.purchaseDate).toISOString().split("T")[0]
         : "",
-
       companyName: editData.companyName || "",
       invoiceNumber: editData.invoiceNumber || "",
-
       minimumQuantity: editData.minimumQuantity || 0,
       maximumQuantity: editData.maximumQuantity || 0,
     });
   }
-}, [editData, methods]);
+  console.log("edit data", editData)
+}, [editData, distributorData, groupOptions]); // reset after medicine grp and  distributor data load
 
-const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
-const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
-
-  const [, setNextMedicineId] = useState<number>(1);
-  const [distributorData, setDistributorData] = useState<DistributorResponse[]>([]);
-const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-
-useEffect(() => {
-  const fetchNextId = async () => {
-    try {
-      const medicines = await getMedicines();
-
-      const mappedData = medicines.map((m: MedicineResponse) => ({
-        itemName: m.medicineName,
-        medicineId: m.medicineId,
-        quantity: m.totalStockTablets,
-        medicineGroup: m.groupName || "",
-        pricePerUnit: m.purchasePricePerTablet || 0,
-        expiryDate: m.expiryDate,
-        supplier: m.distributorId,
-        hsnCode: m.hsnCode,
-        status: m.status,
-      }));
-
-      setInventoryItems(mappedData);
-      console.log(mappedData); 
-      console.log(inventoryItems);
-      const existingIds = medicines
-        .map((m: { medicineId: number }) => m.medicineId)
-        .sort((a: number, b: number) => a - b);
-
-      const nextId =
-        existingIds.length > 0
-          ? existingIds[existingIds.length - 1] + 1
-          : 1;
-
-      setNextMedicineId(nextId);
-
-    } catch (error) {
-      console.error("Error fetching next medicine ID:", error);
-    }
-  };
-  
-
-  fetchNextId();
-}, []);
 
   // Load Medicine Groups
 useEffect(() => {
@@ -214,18 +164,23 @@ useEffect(() => {
 
   fetchDistributors();
 }, []);
-//compny name
+
 const selectedDistributorId = methods.watch("distributorId");
 
+const isInitialLoad = useRef(true);
+
 useEffect(() => {
+  if (isInitialLoad.current) {
+    isInitialLoad.current = false;
+    return;
+  }
   const selected = distributorData.find(
     (d) => d.distributorId === Number(selectedDistributorId)
   );
-
   if (selected) {
-    methods.setValue("companyName", selected.companyName); 
+    methods.setValue("companyName", selected.companyName);
   }
-}, [selectedDistributorId, distributorData, methods]);
+}, [selectedDistributorId, distributorData,supplierOptions]);
 const onSubmit = async (data: InventoryFormData) => {
   try {
     const finalData = {

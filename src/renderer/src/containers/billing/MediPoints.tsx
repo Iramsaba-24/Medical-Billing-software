@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
-import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -60,7 +59,7 @@ const earned = Math.floor(totalFromInvoice / 200) * 5;
 
   const mediPointsValue = watch("mediPoints");
   const totalValue = watch("totalAmount");
-
+const gstValue = watch("gst");
   const usedNow = Number(mediPointsValue ?? 0);
   const total = Number(totalValue ?? 0);
 
@@ -70,25 +69,32 @@ const gstOptions = [
   { label: "18%", value: "18" },
 ];
 
-  useEffect(() => {
-    if (usedNow > earned) {
-      setIsInvalid(true);
-      setUsed(0);
-      setRemains(earned);
+useEffect(() => {
+  if (usedNow > earned) {
+    setIsInvalid(true);
+    setUsed(0);
+    setRemains(earned);
 
-      setValue("discountedAmount", total.toFixed());
-      return;
-    }
+    setValue("discountedAmount", total.toFixed());
+    return;
+  }
 
-    setIsInvalid(false);
+  setIsInvalid(false);
 
-    setUsed(usedNow);
-    setRemains(earned - usedNow);
+  setUsed(usedNow);
+  setRemains(earned - usedNow);
 
-    const finalAmount = total - usedNow;
+  const gstPercent = Number(gstValue || 0);
 
-    setValue("discountedAmount", finalAmount.toFixed());
-  }, [usedNow, total, earned, setValue]);
+  const amountAfterDiscount = total - usedNow;
+
+  const gstAmount = (amountAfterDiscount * gstPercent) / 100;
+
+  const finalAmount = amountAfterDiscount + gstAmount;
+
+  setValue("discountedAmount", finalAmount.toFixed(2));
+
+}, [usedNow, total, earned, gstValue, setValue]);
 
   const InfoRow: React.FC<InfoRowProps> = ({ label, value, color }) => (
     <Box
@@ -111,17 +117,18 @@ const gstOptions = [
  const onSubmit = (data: MediPointsForm) => {
   if (isInvalid) return;
 
-  navigate(URL_PATH.PaymentMethod, {
-    state: {
-      flow: location.state?.flow || "retail",
-      totalFromInvoice: Number(data.discountedAmount),
-      usedPoints: usedNow,
-      invoiceId: location.state?.invoiceId,
-      rows: location.state?.rows,
-      customerName: location.state?.customerName,
-      doctorName: location.state?.doctorName,
-    }
-  });
+navigate(URL_PATH.PaymentMethod, {
+  state: {
+    flow: location.state?.flow || "retail",
+    totalFromInvoice: Number(data.discountedAmount),
+    usedPoints: usedNow,
+    gstPercent: Number(data.gst),
+    invoiceId: location.state?.invoiceId,
+    rows: location.state?.rows,
+    customerName: location.state?.customerName,
+    doctorName: location.state?.doctorName,
+  }
+});
 };
 
   return (
@@ -187,7 +194,7 @@ const gstOptions = [
             <Box sx={{ flex: 1 }}>
               <Box mb={2}>
                 <Typography fontWeight={500} mb={0.5}>
-                  Total (GST included)
+                  Total 
                 </Typography>
 
                 <TextInputField
@@ -203,7 +210,7 @@ const gstOptions = [
                   Add Medi Points
                 </Typography>
 
-                <NumericField name="mediPoints" label="" />
+                <TextInputField inputType="numbers" name="mediPoints" label="" />
 
                 {isInvalid && (
                   <Typography color="error" fontSize={13} mt={0.5}>

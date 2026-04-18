@@ -20,12 +20,9 @@ export interface MedicineFormData {
   companyName?: string;
   strength: string;
   type: string;
-
   distributorId: number;
   groupId: number;
-
   manufacturingDate?: string;
-
   minimumQuantity: number;
   maximumQuantity: number;
 }
@@ -166,4 +163,3 @@ export const deleteMedicine = async (id: number): Promise<void> => {
     getAuthHeaders()
   );
 };
- 

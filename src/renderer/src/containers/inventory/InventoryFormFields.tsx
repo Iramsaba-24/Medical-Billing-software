@@ -104,7 +104,6 @@ export default function InventoryFormFields({
         name="totalStockTablets"
         label="Current Stock Quantity"
         value={totalStock}
-        disabled
       />
 
       {/* Pricing */}
@@ -172,12 +171,13 @@ export default function InventoryFormFields({
         dateRestriction="current-future-only"
       />
 
-      <DateTimeField name="purchaseDate" label="Purchase Date" />
+      <DateTimeField name="purchaseDate" label="Purchase Date" required/>
 
       <DateTimeField
         name="manufacturingDate"
         label="Manufacturing Date"
         dateRestriction="past-current-future"
+        required
       />
 
       <TextInputField inputType="numbers" name="invoiceNumber" label="Invoice Number" />
