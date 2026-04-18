@@ -126,7 +126,8 @@ useEffect(() => {
             return {
              name: medicine?.medicineName || "Medicine",
               qty: item.quantity,
-          amount: Number(item.amount),
+        amount: Number(item.price) * Number(item. quantity),
+ 
  
               batch: medicine?.hsnCode || "",
  
@@ -138,8 +139,8 @@ useEffect(() => {
  
           totalAmount: data.totalAmount,
 gstPercent: data.gstPercent || 0,
-usedPoints: data.medipointsEarned || 0,
-         
+// usedPoints: data.medipointsEarned || 0,
+         usedPoints: data.totalDiscount
         });
       } else {
         navigate(-1);
@@ -162,6 +163,19 @@ usedPoints: data.medipointsEarned || 0,
 }, [invoiceNo, navigate]);
  
  
+// const subTotal = invoice?.medicines?.reduce(
+//   (sum, med) => sum + Number(med.amount), 0
+// ) || 0;
+ 
+// const usedPoints = invoice?.usedPoints || 0;
+// const gstPercent = invoice?.gstPercent || 0;
+ 
+// const gstAmountInSubTotal = (subTotal * gstPercent) / (100 + gstPercent);
+// const cgst = gstAmountInSubTotal / 2;
+// const sgst = gstAmountInSubTotal / 2;
+// const netTotal = subTotal;
+
+
 const subTotal = invoice?.medicines?.reduce(
   (sum, med) => sum + Number(med.amount), 0
 ) || 0;
@@ -169,10 +183,15 @@ const subTotal = invoice?.medicines?.reduce(
 const usedPoints = invoice?.usedPoints || 0;
 const gstPercent = invoice?.gstPercent || 0;
  
-const gstAmountInSubTotal = (subTotal * gstPercent) / (100 + gstPercent);
-const cgst = gstAmountInSubTotal / 2;
-const sgst = gstAmountInSubTotal / 2;
-const netTotal = subTotal;
+const amountAfterDiscount = subTotal - usedPoints;
+const gstAmount = (amountAfterDiscount * gstPercent) / 100;
+const finalAmount = amountAfterDiscount + gstAmount;
+ 
+const cgst = gstAmount / 2;
+const sgst = gstAmount / 2;
+const netTotal = finalAmount;
+ 
+
  
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
  
