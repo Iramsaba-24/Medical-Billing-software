@@ -160,48 +160,6 @@ const handleStatusChange = async (
     showToast("error", "Failed to update distributor.");
   }
 };
-
-  // const columns: Column<Distributor>[] = [
-  //   { key: "companyName", label: "Company Name" },
-  //   { key: "registrationNumber", label: "Reg. No." },
-  //   { key: "phone", label: "Mobile" },
-  //   { key: "email", label: "Email" },
-  //   { key: "createdAt", label: "Date" },
-  //   { key: "address", label: "Address" },
-  //   {
-  //     key: "status",
-  //     label: "Status",
-  //     render: (row) => (
-  //       <Select
-  //         size="small"
-  //         value={row.status}
-  //         onChange={(e) =>
-  //           handleStatusChange(
-  //             row.id,
-  //             e.target.value as "Active" | "Inactive"
-  //           )
-  //         }
-  //         sx={{
-  //           minWidth: 100,
-  //           fontSize: 13,
-  //           fontWeight: 600,
-  //           "& .MuiSelect-select": {
-  //             color:
-  //               row.status === "Active"
-  //                 ? "success.main"
-  //                 : "error.main",
-  //           },
-  //         }}
-  //       >
-  //         <MenuItem value="Active">Active</MenuItem>
-  //         <MenuItem value="Inactive">Inactive</MenuItem>
-  //       </Select>
-  //     ),
-  //   },
-  //   { key: ACTION_KEY, label: "Action" },
-  // ];
-
-
   const columns: Column<Distributor>[] = [
     { key: "companyName", label: "Company Name" },
     { key: "registrationNumber", label: "Reg. No." },

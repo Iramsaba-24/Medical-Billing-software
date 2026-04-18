@@ -338,3 +338,4 @@ const NetBanking_PurchaseDetails = () => {
 };
 
 export default NetBanking_PurchaseDetails;
+
