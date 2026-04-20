@@ -264,6 +264,7 @@ import axios from "axios";
  import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { updateDistributor } from "@/service/distributorService";
+import { showToast } from "@/components/uncontrolled/ToastMessage";
  
 type DistributorFormInput = {
   distributorId: number;
@@ -358,6 +359,8 @@ useEffect(() => {
     }
  
       console.log("Submitting data:", cleanedData);
+ showToast("success", "Business details saved!");
+      
  
       await addDistributor(cleanedData);
  
