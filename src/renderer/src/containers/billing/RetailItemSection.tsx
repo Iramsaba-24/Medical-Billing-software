@@ -17,10 +17,13 @@ export interface ItemRow {
   retailInvoiceId?: number;
   medicineId: string;
   medicineName?: string;
+  strength?: string;      
+  companyName?: string;
   expiryDate?: string;
   quantity: number | "";
   price: number | "";
   amount?: number;
+  
 }
 
 export type InventoryItem = {
@@ -64,10 +67,37 @@ const [inventory, setInventory] = useState<MedicineResponse[]>([]);
   fetchMedicines();
 }, []);
 
-  const itemOptions = inventory.map((item) => ({
-    label: item.itemName,
-    value: item.itemName,
+ const itemOptions = Array.from(
+  new Map(
+    inventory.map((item) => [
+      item.medicineName,
+      {
+        label: item.medicineName,
+        value: item.medicineName,
+      },
+    ])
+  ).values()
+);
+
+  const getStrengthOptions = (medicineName?: string) => {
+  if (!medicineName) return [];
+
+const strengths = inventory
+  .filter(
+    (item) =>
+      item.medicineName === medicineName && item.strength
+  )
+  .map((item) => item.strength as string);
+
+
+  const uniqueStrengths = Array.from(new Set(strengths));
+
+  return uniqueStrengths.map((s) => ({
+    label: s,
+    value: s,
   }));
+};
+
 
 const addRow = () =>
   setRows([
@@ -108,21 +138,18 @@ const addRow = () =>
 
 
 const handleNameChange = (id: number, selectedName: string) => {
-  const item = inventory.find(
-    (i) =>
-      i.itemName.trim().toLowerCase() === selectedName.trim().toLowerCase()
-  );
-
   setRows(
     rows.map((r) => {
       if (r.retailItemId === id) {
-     return {
-  ...r,
-  medicineId: item ? String(item.medicineId) : "",
-  medicineName: item ? item.itemName : "",
-  expiryDate: item ? item.expiryDate : "",
-  price: item ? Number(item.pricePerUnit) : "",
-};
+        return {
+          ...r,
+          medicineId: "",
+          medicineName: selectedName,
+          strength: "",
+          companyName: "",
+          expiryDate: "",
+          price: "",
+        };
       }
       return r;
     })
@@ -181,9 +208,9 @@ const handleNameChange = (id: number, selectedName: string) => {
             sx={{
               display: "grid",
               gridTemplateColumns: {
-                md: "4fr 1fr 1.5fr 1.5fr 50px",
-                xs: "1fr",
-              },
+  md: "3fr 2fr 2fr 1fr 1.5fr 1.5fr 50px",
+  xs: "1fr",
+},
               gap: 2,
               mb: { xs: 4, md: 2 },
               alignItems: "start",
@@ -193,10 +220,10 @@ const handleNameChange = (id: number, selectedName: string) => {
               name={`item_${row.retailItemId}`}
               label="Item Name"
               options={itemOptions}
-              value={row.medicineId}
+value={row.medicineName || ""}
               editable
               freeSolo={false}
-              alphanumeric
+              
               required
               error={nameError}
               helperText={nameError ? "Please select item" : ""}
@@ -204,6 +231,49 @@ const handleNameChange = (id: number, selectedName: string) => {
                 handleNameChange(row.retailItemId, value);
               }}
             />
+
+
+<DropdownField
+  name={`strength_${row.retailItemId}`}
+  label="Strength"
+  options={getStrengthOptions(row.medicineName)}
+  value={row.strength || ""}
+  editable
+  onChangeCallback={(value) => {
+    const selected = inventory.find(
+  (i) =>
+    i.medicineName === row.medicineName &&
+    i.strength === value &&
+    i.medicineId
+);
+
+if (selected) {
+  setRows(
+    rows.map((r) =>
+      r.retailItemId === row.retailItemId
+        ? {
+            ...r,
+            strength: selected.strength,
+            medicineId: String(selected.medicineId),
+          price: Number(selected.mrpPerTablet),
+            companyName: selected.companyName,
+            expiryDate: selected.expiryDate,
+          }
+        : r
+    )
+  );
+}
+  }}
+/>
+
+<TextField
+  fullWidth
+  label="Company"
+  value={row.companyName || ""}
+  onChange={(e) =>
+    updateRow(row.retailItemId, "companyName", e.target.value)
+  }
+/>
 
             <TextField
               fullWidth

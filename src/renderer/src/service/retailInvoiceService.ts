@@ -18,7 +18,7 @@ export interface RetailInvoiceResponse {
   totalAmount: number;
   paymentStatus: string;
   customerName: string;
-  invoiceDate: string; 
+  invoiceDate: string;
 }
  
 export interface RetailInvoiceItemPayload {
@@ -37,16 +37,17 @@ export const createSingleRetailInvoiceItem = async (item: {
   price: number;
   gstPercent: number;
   discount: number;
+  strength?: string;
+  companyName?: string;
 }) => {
   const res = await axios.post(
     API_ENDPOINTS.RETAIL_INVOICE_ITEMS,
     item,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
  
   return res.data;
 };
- 
  
 // token
 const getAuthHeaders = () => {
@@ -68,26 +69,29 @@ export const createRetailInvoice = async (data: {
   totalGST: number;
   totalDiscount: number;
   medipointsEarned: number;
+  gstPercent: number;
   paymentStatus: string;
 }) => {
   const res = await axios.post(
     API_ENDPOINTS.RETAIL_INVOICE,
     data,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
  
   return res.data;
 };
  
 // item
-export const createRetailInvoiceItems = async (items: {
-  retailInvoiceId: number;
-  medicineId: number;
-  quantity: number;
-  price: number;
-  gstPercent: number;
-  discount: number;
-}[]) => {
+export const createRetailInvoiceItems = async (
+  items: {
+    retailInvoiceId: number;
+    medicineId: number;
+    quantity: number;
+    price: number;
+    gstPercent: number;
+    discount: number;
+  }[],
+) => {
   const itemsWithSrNo = items.map((item, index) => ({
     ...item,
     SrNo: index + 1,
@@ -96,7 +100,7 @@ export const createRetailInvoiceItems = async (items: {
   const res = await axios.post(
     `${API_ENDPOINTS.RETAIL_INVOICE_ITEMS}/bulk`,
     itemsWithSrNo,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
  
   return res.data;
@@ -105,7 +109,7 @@ export const createRetailInvoiceItems = async (items: {
 // payment status
 export const updatePaymentStatus = async (
   invoiceId: number,
-  paymentStatus: string
+  paymentStatus: string,
 ) => {
   const res = await axios.patch(
     `${API_ENDPOINTS.RETAIL_INVOICE}/${invoiceId}/payment-status`,
@@ -116,7 +120,7 @@ export const updatePaymentStatus = async (
         ...getAuthHeaders().headers,
         "Content-Type": "application/json",
       },
-    }
+    },
   );
  
   return res.data;
@@ -124,10 +128,7 @@ export const updatePaymentStatus = async (
  
 // all invoice
 export const getAllRetailInvoices = async () => {
-  const res = await axios.get(
-    API_ENDPOINTS.RETAIL_INVOICE,
-    getAuthHeaders()
-  );
+  const res = await axios.get(API_ENDPOINTS.RETAIL_INVOICE, getAuthHeaders());
  
   return res.data;
 };
@@ -136,7 +137,7 @@ export const getAllRetailInvoices = async () => {
 export const getRetailInvoiceById = async (id: number) => {
   const res = await axios.get(
     `${API_ENDPOINTS.RETAIL_INVOICE}/${id}`,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
  
   return res.data;
@@ -146,7 +147,7 @@ export const getRetailInvoiceById = async (id: number) => {
 export const deleteRetailInvoice = async (id: number) => {
   const res = await axios.delete(
     `${API_ENDPOINTS.RETAIL_INVOICE}/${id}`,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
  
   return res.data;
@@ -154,12 +155,11 @@ export const deleteRetailInvoice = async (id: number) => {
 export const getRetailInvoiceItemsByInvoiceId = async (invoiceId: number) => {
   const res = await axios.get(
     `${API_ENDPOINTS.RETAIL_INVOICE_ITEMS}/by-invoice/${invoiceId}`,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
   return res.data;
-}; 
-
-
+};
+ 
 export const updateRetailInvoice = async (
   id: number,
   data: {
@@ -171,21 +171,26 @@ export const updateRetailInvoice = async (
     totalGST: number;
     totalDiscount: number;
     medipointsEarned: number;
+    gstPercent: number;
     paymentStatus: string;
-  }
+  },
 ) => {
   const res = await axios.put(
     `${API_ENDPOINTS.RETAIL_INVOICE}/${id}`,
     data,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
   return res.data;
 };
-
-export const deleteRetailInvoiceItemsByInvoiceId = async (invoiceId: number) => {
+ 
+export const deleteRetailInvoiceItemsByInvoiceId = async (
+  invoiceId: number,
+) => {
   const res = await axios.delete(
     `${API_ENDPOINTS.RETAIL_INVOICE_ITEMS}/by-invoice/${invoiceId}`,
-    getAuthHeaders()
+    getAuthHeaders(),
   );
   return res.data;
 };
+ 
+ 

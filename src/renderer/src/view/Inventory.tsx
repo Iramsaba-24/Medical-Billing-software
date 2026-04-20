@@ -32,14 +32,14 @@ useEffect(() => {
 
     
       console.log("isLowStock check:", medicines.map(m => ({
-        name: m.itemName,
+        name: m.medicineName,
         isLowStock: m.isLowStock,
-        finalPrice: m.finalPrice
+        stockValue: m.stockValue
       })));
 
       const totalItems = medicines.length;
-      const lowStockItems = medicines.filter(m => m.quantity > 0 && m.quantity <= 10).length;
-      const totalValue = medicines.reduce((sum, m) => sum + m.finalPrice, 0);
+      const lowStockItems = medicines.filter(m => m.isLowStock).length;
+      const totalValue = medicines.reduce((sum, m) => sum + m.stockValue, 0);
 
       setStats({ totalItems, lowStockItems, totalValue });
     } catch (error) {
