@@ -3,7 +3,7 @@ import { Paper, Table, TableBody, TableCell, TableContainer,
    useTheme } from "@mui/material"
 import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
-import {  useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoImage from "@/assets/logoimg.svg";
 import { PharmacyFormValues } from "../setting/PharmacyProfile";
@@ -31,11 +31,12 @@ export interface Invoice {
   totalAmount?: number;
   usedPoints?: number;
   total?: number;
-    totalDiscount?: number;   
-  totalGST?: number; 
+  gstPercent?: number;
+    // totalDiscount?: number;  
+  // totalGST?: number;
 }
-
-
+ 
+ 
 interface Medicine {
   name: string;
   qty: number | string;
@@ -44,10 +45,10 @@ interface Medicine {
   expiry?: string;
 }
  
-type InvoiceNavigationState = {
-  usedPoints?: number;
-  gstPercent?: number;
-};
+// type InvoiceNavigationState = {
+//   usedPoints?: number;
+//   gstPercent?: number;
+// };
  
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
@@ -55,12 +56,12 @@ const InvoiceView = () => {
  const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
- const location = useLocation() as { state: InvoiceNavigationState };
-const gstPercent = location.state?.gstPercent || 0;
+//  const location = useLocation() as { state: InvoiceNavigationState };
+// const gstPercent = location.state?.gstPercent || 0;
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  
+ 
  
   const columns = [
     { label: "Sr No.", width: "7%" },
@@ -125,10 +126,10 @@ useEffect(() => {
             return {
              name: medicine?.medicineName || "Medicine",
               qty: item.quantity,
-          amount: Number(item.price) * Number(item.quantity),
-
-              batch: medicine?.hsnCode || "", 
-
+          amount: Number(item.amount),
+ 
+              batch: medicine?.hsnCode || "",
+ 
               expiry: medicine?.expiryDate
                 ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
                 : "",
@@ -136,6 +137,8 @@ useEffect(() => {
           }),
  
           totalAmount: data.totalAmount,
+gstPercent: data.gstPercent || 0,
+usedPoints: data.medipointsEarned || 0,
          
         });
       } else {
@@ -151,7 +154,7 @@ useEffect(() => {
       const printOptions: string[] = parsed.product_linking || [];
  
       setShowLogo(printOptions.includes("show_logo"));
-      setShowHsn(printOptions.includes("show_hsn_code")); 
+      setShowHsn(printOptions.includes("show_hsn_code"));
     }
   };
  
@@ -160,19 +163,17 @@ useEffect(() => {
  
  
 const subTotal = invoice?.medicines?.reduce(
-  (sum, med) => sum + Number(med.amount), 0) || 0;
-
-const usedPoints = invoice?.totalDiscount || 0;
-
-const amountAfterDiscount = subTotal - usedPoints;
-
-const gstAmount =
-  invoice?.totalGST || (amountAfterDiscount * gstPercent) / 100;
-
-const cgst = gstAmount / 2;
-const sgst = gstAmount / 2;
-
-const netTotal = amountAfterDiscount + gstAmount;
+  (sum, med) => sum + Number(med.amount), 0
+) || 0;
+ 
+const usedPoints = invoice?.usedPoints || 0;
+const gstPercent = invoice?.gstPercent || 0;
+ 
+const gstAmountInSubTotal = (subTotal * gstPercent) / (100 + gstPercent);
+const cgst = gstAmountInSubTotal / 2;
+const sgst = gstAmountInSubTotal / 2;
+const netTotal = subTotal;
+ 
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
  
  
@@ -284,14 +285,14 @@ const pharmacyAddress = pharmacyData?.address || "-";
 <Typography fontSize={12}>
   ₹ {cgst.toFixed(2)}
 </Typography>
-
+ 
 <Typography fontSize={12} fontWeight={600}>
   SGST ({gstPercent / 2}%)
 </Typography>
 <Typography fontSize={12}>
   ₹ {sgst.toFixed(2)}
 </Typography>
-            
+           
            
             <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
               <Typography fontSize={13} fontWeight={700}>NET</Typography>
