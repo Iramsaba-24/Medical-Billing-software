@@ -107,14 +107,35 @@ export const authService = {
       `${API_BASE_URL}/Auth/register`,
       userData,
     );
+     if (response.data.token) {
+
+     try {
+        const loginResponse = await axios.post(`${API_BASE_URL}/Auth/login`, {
+         usernameOrEmail: userData.email,
+          password: userData.password
+          
+        });
+        console.log("Auto-login response:", loginResponse.data);
+        if (loginResponse.data.token) {
+          localStorage.setItem("token", loginResponse.data.token);
+          localStorage.setItem("userId", loginResponse.data.userId.toString());
+          console.log("Token saved:", loginResponse.data.token);
+        }
+      } catch (err) {
+        console.error("Auto-login error:", err);
+      }
+    }
+    
     return response.data;
   },
 
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
+     console.log("Login request:", JSON.stringify(credentials));
     const response = await axios.post(
       `${API_BASE_URL}/Auth/login`,
       credentials,
     );
+    console.log("LOGIN RESPONSE:", response.data);
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
       if (response.data.userId) {

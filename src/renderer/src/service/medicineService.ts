@@ -65,6 +65,11 @@ export interface MedicineResponse {
 
   minimumQuantity: number;
   maximumQuantity: number;
+  numberOfStrips: number;
+  tabletsPerStrip: number;
+  looseTablets: number;
+  purchaseDate?: string;
+  invoiceNumber?: string;
 }
  
  
@@ -151,7 +156,13 @@ export const updateMedicine = async (
 
   return res.data.data;
 };
- 
+ export const getMedicineById = async (id: number) => {
+  const res = await axios.get(
+    `${API_ENDPOINTS.MEDICINE}/${id}`,
+    getAuthHeaders()
+  );
+  return res.data.data;
+};
 export const deleteMedicine = async (id: number): Promise<void> => {
   await axios.delete(
     `${API_ENDPOINTS.MEDICINE}/${id}`,

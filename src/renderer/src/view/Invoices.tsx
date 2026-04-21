@@ -1,7 +1,8 @@
 import { Box, Divider, Typography } from "@mui/material";
-import { useEffect, useState, useMemo } from "react";
-import BillingTable from "@/containers/invoices/BillingTable.tsx";
+import { useEffect, useState } from "react";
+import BillingTable from "@/containers/Invoices/BillingTable";
 import { Invoice } from "@/types/invoice";
+import axios from "axios";
 import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
@@ -61,21 +62,25 @@ useEffect(() => {
 
   
 
-  const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
-    const revenue = invoices
-      .filter(inv => inv.status === "Paid")
+  // const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
+  //   const revenue = invoices
+  //     .filter(inv => inv.status === "Paid")
 
-      .reduce((sum, inv) => sum + inv.price, 0);
-    const pending = invoices
-      .filter(inv => inv.status === "Pending")
-      .reduce((sum, inv) => sum + inv.price, 0);
-    return {
-      totalRevenue: revenue,
-      pendingAmount: pending,
-      totalInvoices: invoices.length,
-    };
-  }, [invoices]);
-
+  //     .reduce((sum, inv) => sum + inv.price, 0);
+  //   const pending = invoices
+  //     .filter(inv => inv.status === "Pending")
+  //     .reduce((sum, inv) => sum + inv.price, 0);
+  //   return {
+  //     totalRevenue: revenue,
+  //     pendingAmount: pending,
+  //     totalInvoices: invoices.length,
+  //   };
+  // }, [invoices]);
+const [dashboard] = useState({
+  totalRevenue: 0,
+  pendingAmount: 0,
+  totalInvoices: 0
+});
   return (
     <Box>
       <Typography sx={{
@@ -116,7 +121,7 @@ useEffect(() => {
           }}>
           <Box>
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              ₹ {totalRevenue.toLocaleString()}
+              ₹ {dashboard.totalRevenue.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Total Revenue (Paid)
@@ -152,7 +157,7 @@ useEffect(() => {
           }}>
           <Box>
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              ₹ {pendingAmount.toLocaleString()}
+              ₹ {dashboard.pendingAmount.toLocaleString()}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Pending Amount
@@ -189,7 +194,7 @@ useEffect(() => {
         >
           <Box>
             <Typography fontWeight={600} fontSize={{ xs: 15, md: 18 }}>
-              {totalInvoices}
+              {dashboard.totalInvoices}
             </Typography>
             <Typography variant="body2" color="text.secondary">
 

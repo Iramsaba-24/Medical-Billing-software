@@ -1,0 +1,187 @@
+import TextInputField from "@/components/controlled/TextInputField";
+import DropdownField from "@/components/controlled/DropdownField";
+import DateTimeField from "@/components/controlled/DateTimeField";
+import { InventoryFormData } from "./AddInventoryItem";
+import { useFormContext } from "react-hook-form";
+
+type Props = {
+  groupOptions: { label: string; value: string }[];
+  supplierOptions: { label: string; value: string }[];
+  totalStock: number;
+  purchasePricePerTablet: number;
+  mrpPerTablet: number;
+  finalPrice: number;
+};
+
+export default function InventoryFormFields({
+  groupOptions,
+  supplierOptions,
+  totalStock,
+  purchasePricePerTablet,
+  mrpPerTablet,
+  finalPrice,
+}: Props) {
+  const methods = useFormContext<InventoryFormData>();
+
+  return (
+    <>
+            <TextInputField
+              inputType="all"
+              rows={1}
+              name="medicineName"
+              label="Medicine Name"
+              maxLength={30}
+              required
+            />
+
+      <TextInputField name="strength" label="Strength(e.g.500mg)" required />
+      <TextInputField name="companyName" label="Medicine Company Name" required />
+
+      <DropdownField
+        name="groupId"
+        label="Medicine Group"
+        options={groupOptions}
+        required
+        freeSolo={false}
+        editable
+      />
+
+      <TextInputField inputType="all" rows={1} name="batchNumber" label="Batch Number" required />
+
+      <TextInputField
+        inputType="numbers"
+        name="hsnCode"
+        label="HSN Number"
+        minLength={4}
+        maxLength={10}
+        required
+      />
+
+      <DropdownField
+        name="type"
+        label="Type"
+        required
+        options={[
+          { label: "Tablets", value: "tablets" },
+          { label: "Bottle", value: "bottle" },
+          { label: "Strip", value: "strip" },
+          { label: "Capsules", value: "capsules" },
+          { label: "Boxes", value: "boxes" },
+        ]}
+      />
+
+      {/* Quantity */}
+      <TextInputField inputType="numbers" name="minimumQuantity" label="Minimum Stock Level" required />
+
+      <TextInputField
+        inputType="numbers"
+        name="maximumQuantity"
+        label="Maximum Stock Limit"
+        required
+ rules={{
+    validate: (value: number) => {
+      const min = Number(methods.getValues("minimumQuantity"));
+      return value >= min || "Maximum quantity must be greater than or equal to minimum quantity";
+    },
+  }}
+      />
+
+      {/* Stock */}
+      <TextInputField inputType="numbers" name="numberOfStrips" label="Number of Medicine Pack" required   
+      rules={{
+        min: { value: 0, message: "Number of strips must be greater than 0" },
+      }}/>
+      <TextInputField inputType="numbers" name="tabletsPerStrip" label="Tablets In One Pack" required 
+      rules={{
+        min: { value: 1, message: "Tablets per strip must be greater than 0" },
+      }}/>
+      <TextInputField inputType="numbers" name="looseTablets" label="Extra Medicine (Loose)" 
+      rules={{
+        min: { value: 0, message: "Loose tablets cannot be negative" },
+      }}/>
+
+      <TextInputField
+        inputType="numbers"
+        name="totalStockTablets"
+        label="Current Stock Quantity"
+        value={totalStock}
+      />
+
+      {/* Pricing */}
+      <TextInputField
+        inputType="numbers"
+        name="purchasePricePerStrip"
+        label="Purchase Price Per Strip"
+        required
+      />
+
+      <TextInputField
+        inputType="numbers"
+        name="purchasePricePerTablet"
+        label="Purchase Price Per Tablet"
+        value={purchasePricePerTablet}
+        disabled
+      />
+
+      <TextInputField
+        inputType="numbers"
+        name="mrpPerStrip"
+        label="MRP Per Strip"
+        required
+        rules={{
+          validate: (value: number) => {
+            const purchase = Number(methods.getValues("purchasePricePerStrip"));
+            return value > purchase || "MRP must be greater than Purchase Price";
+          },
+        }}
+      />
+
+      <TextInputField
+        inputType="numbers"
+        name="mrpPerTablet"
+        label="MRP Per Tablet"
+        value={mrpPerTablet}
+        disabled
+      />
+
+      <TextInputField inputType="numbers" name="gstPercent" label="GST Percentage" />
+
+      <TextInputField
+        name="finalPrice"
+        label="Final Amount (With GST)"
+        value={finalPrice}
+        disabled
+      />
+
+      {/* Distributor */}
+      <DropdownField
+        name="distributorId"
+        label="Distributor"
+        options={supplierOptions}
+        required
+      />
+
+      
+
+      {/* Dates */}
+      <DateTimeField
+        name="expiryDate"
+        label="Expiry Date"
+        viewMode="date"
+        required
+        dateRestriction="current-future-only"
+      />
+
+      <DateTimeField name="purchaseDate" label="Purchase Date" required/>
+
+      <DateTimeField
+        name="manufacturingDate"
+        label="Manufacturing Date"
+        dateRestriction="past-current-future"
+        required
+      />
+
+      <TextInputField inputType="numbers" name="invoiceNumber" label="Invoice Number" />
+    </>
+  );
+}
