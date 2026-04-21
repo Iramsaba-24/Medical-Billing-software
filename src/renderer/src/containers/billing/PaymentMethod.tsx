@@ -236,4 +236,3 @@ const gstAmount = (amountAfterDiscount * gstPercent) / 100;
 export default PaymentMethod;
  
  
- 

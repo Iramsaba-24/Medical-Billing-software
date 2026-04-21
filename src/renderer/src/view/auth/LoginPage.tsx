@@ -389,6 +389,30 @@ const LoginPage = () => {
             >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
+            <Typography
+              mt={2}
+              sx={{ fontSize: "14px", color: "#555", textAlign: "center" }}
+            >
+              Don’t have an account?{" "}
+              <Box
+                component="span"
+                onClick={() => navigate(URL_PATH.REGISTER)}
+                sx={{
+                  color: "black",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-block",
+                  borderBottom: "2px solid transparent",
+                  "&:hover": {
+                    color: "#145c4d",
+                    borderBottom: "2px solid #145c4d",
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                Register
+              </Box>
+            </Typography>
           </Box>
         </FormProvider>
       </Box>

@@ -278,4 +278,3 @@ navigate(URL_PATH.PaymentMethod, {
 export default MediPoints;
  
  
- 

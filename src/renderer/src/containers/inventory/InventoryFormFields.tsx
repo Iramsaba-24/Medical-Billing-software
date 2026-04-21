@@ -35,6 +35,7 @@ export default function InventoryFormFields({
             />
 
       <TextInputField name="strength" label="Strength(e.g.500mg)" required />
+      <TextInputField name="companyName" label="Medicine Company Name" required />
 
       <DropdownField
         name="groupId"
@@ -160,7 +161,7 @@ export default function InventoryFormFields({
         required
       />
 
-      <TextInputField name="companyName" label="Company Name" disabled />
+      
 
       {/* Dates */}
       <DateTimeField

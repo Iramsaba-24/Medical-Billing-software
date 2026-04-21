@@ -519,4 +519,3 @@ const pharmacyAddress = pharmacyData?.address || "-";
 export default InvoiceView
  
  
- 

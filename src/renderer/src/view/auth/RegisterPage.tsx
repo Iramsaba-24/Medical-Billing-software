@@ -284,7 +284,7 @@ const RegisterPage = () => {
             Already have an account?{" "}
             <Box
               component="span"
-              onClick={() => navigate(URL_PATH.LOGIN)}
+              onClick={() => navigate("/")}
               sx={{
                 color: "black",
                 fontWeight: 600,

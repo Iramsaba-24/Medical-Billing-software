@@ -1,10 +1,9 @@
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-
 import { useNavigate,useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import { useEffect, useState, useRef } from "react";
-import { addMedicine,  MedicineResponse,updateMedicine  } from "@/service/medicineService";
+import { useEffect, useState} from "react";
+import { addMedicine,  getMedicineById,  MedicineResponse,updateMedicine  } from "@/service/medicineService";
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
 import { getMedicineGroups } from "@/service/medicineGroupService";
 import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
@@ -72,56 +71,16 @@ const methods = useForm<InventoryFormData>({
     expiryDate: "",
     strength: "",
     type: "",
-    // distributorId: 0,
     groupId: "",
-  //   minimumQuantity: 0,
-  //   maximumQuantity: 0,
   },
 });
 //edit
 
   const isEdit = !!editData?.medicineId;
   const navigate = useNavigate();
-    const [distributorData, setDistributorData] = useState<DistributorResponse[]>([]);
+    const [, setDistributorData] = useState<DistributorResponse[]>([]);
 const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
 const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
-
-// edit mode
-useEffect(() => {
-  if (editData && distributorData.length > 0 && groupOptions.length > 0) {
-    methods.reset({
-      medicineId: editData.medicineId,
-      medicineName: editData.medicineName || "",
-      batchNumber: editData.batchNumber || "",
-      hsnCode: editData.hsnCode || "",
-      strength: editData.strength || "",
-      type: editData.type || "",
-      groupId: String(editData.groupId),
-distributorId: String(editData.distributorId) as unknown as number,      numberOfStrips: editData.numberOfStrips ?? 0,
-      tabletsPerStrip: editData.tabletsPerStrip ?? 1,
-      looseTablets: editData.looseTablets ?? 0,
-      purchasePricePerStrip: editData.purchasePricePerStrip || 0,
-      mrpPerStrip: editData.mrpPerStrip || 0,
-      gstPercent: editData.gstPercent || 0,
-      expiryDate: editData.expiryDate
-        ? new Date(editData.expiryDate).toISOString().split("T")[0]
-        : "",
-      manufacturingDate: editData.manufacturingDate
-        ? new Date(editData.manufacturingDate).toISOString().split("T")[0]
-        : "",
-      purchaseDate: editData.purchaseDate
-        ? new Date(editData.purchaseDate).toISOString().split("T")[0]
-        : "",
-      companyName: editData.companyName || "",
-      invoiceNumber: editData.invoiceNumber || "",
-      minimumQuantity: editData.minimumQuantity || 0,
-      maximumQuantity: editData.maximumQuantity || 0,
-    });
-  }
-  console.log("edit data", editData)
-}, [editData, distributorData, groupOptions]); // reset after medicine grp and  distributor data load
-
-
   // Load Medicine Groups
 useEffect(() => {
   const fetchGroups = async () => {
@@ -164,22 +123,6 @@ useEffect(() => {
   fetchDistributors();
 }, []);
 
-const selectedDistributorId = methods.watch("distributorId");
-
-const isInitialLoad = useRef(true);
-
-useEffect(() => {
-  if (isInitialLoad.current) {
-    isInitialLoad.current = false;
-    return;
-  }
-  const selected = distributorData.find(
-    (d) => d.distributorId === Number(selectedDistributorId)
-  );
-  if (selected) {
-    methods.setValue("companyName", selected.companyName);
-  }
-}, [selectedDistributorId, distributorData,supplierOptions]);
 const onSubmit = async (data: InventoryFormData) => {
   try {
     const finalData = {
@@ -200,6 +143,54 @@ const onSubmit = async (data: InventoryFormData) => {
     console.error(error);
   }
 };
+
+//fetch medicine for edit
+useEffect(() => {
+  const fetchMedicine = async () => {
+    if (editData?.medicineId) {
+      const fullData = await getMedicineById(editData.medicineId);
+
+      methods.reset({
+        medicineId: fullData.medicineId,
+        medicineName: fullData.medicineName || "",
+        batchNumber: fullData.batchNumber || "",
+        hsnCode: fullData.hsnCode || "",
+        strength: fullData.strength || "",
+        type: fullData.type || "",
+        groupId: String(fullData.groupId),
+        distributorId: String(fullData.distributorId) as unknown as number,
+
+        numberOfStrips: fullData.numberOfStrips ?? 0,
+        tabletsPerStrip: fullData.tabletsPerStrip ?? 1,
+        looseTablets: fullData.looseTablets ?? 0,
+
+        purchasePricePerStrip: fullData.purchasePricePerStrip || 0,
+        mrpPerStrip: fullData.mrpPerStrip || 0,
+        gstPercent: fullData.gstPercent || 0,
+
+        expiryDate: fullData.expiryDate
+          ? new Date(fullData.expiryDate).toISOString().split("T")[0]
+          : "",
+
+        manufacturingDate: fullData.manufacturingDate
+          ? new Date(fullData.manufacturingDate).toISOString().split("T")[0]
+          : "",
+
+        purchaseDate: fullData.purchaseDate
+          ? new Date(fullData.purchaseDate).toISOString().split("T")[0]
+          : "",
+
+        companyName: fullData.companyName || "",
+        invoiceNumber: fullData.invoiceNumber || "",
+        minimumQuantity: fullData.minimumQuantity || 0,
+        maximumQuantity: fullData.maximumQuantity || 0,
+      });
+    }
+  };
+
+  fetchMedicine();
+}, [editData?.medicineId]);
+
   // calc total stock tablets
 const numberOfStrips = Number(methods.watch("numberOfStrips")) || 0;
 const tabletsPerStrip = Number(methods.watch("tabletsPerStrip")) || 0;
@@ -298,6 +289,5 @@ const finalPrice = totalPrice + gstAmount;
     </Paper>
   </Box>
 </FormProvider>
-
   );
 }
