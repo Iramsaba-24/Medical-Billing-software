@@ -136,6 +136,7 @@ const gstAmount = (amountAfterDiscount * gstPercent) / 100;
          totalDiscount: usedPoints,
          gstPercent: location.state?.gstPercent || 0,
           medipointsEarned: invoiceData.medipointsEarned,
+           
           paymentStatus: "Paid",
         });
  
