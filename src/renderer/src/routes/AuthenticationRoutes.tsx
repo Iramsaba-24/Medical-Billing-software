@@ -17,7 +17,7 @@ import ReceiverDetails from "@/view/auth/ReceiverDetails";
 export const authRoutes: RouteObject[] = [
   {
     index: true,
-    element: <RegisterPage />,
+    element: <LOGIN />,
   },
 
   {
@@ -34,8 +34,8 @@ export const authRoutes: RouteObject[] = [
   },
 
   {
-    path: URL_PATH.LOGIN,
-    element: <LOGIN />,
+    path: URL_PATH.REGISTER,
+    element: <RegisterPage />,
   },
   {
     path: URL_PATH.ChoosePlan,
