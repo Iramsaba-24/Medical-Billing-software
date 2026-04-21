@@ -257,7 +257,7 @@ import EmailField from "@/components/controlled/EmailField";
 import MobileField from "@/components/controlled/MobileField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useState } from "react";
-import AppToast from "@/containers/distributors/AppToast";
+import AppToast from "@/containers/Distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
 import { addDistributor } from "@/service/distributorService";
 import axios from "axios";

@@ -216,8 +216,8 @@ const LoginPage = () => {
           : "#1b7f6b !important",
       },
       "&.Mui-focused fieldset": {
-        borderColor: errors[fieldName]
-          ? "#d32f2f !important"
+        borderColor: errors[fieldName]  // If there's an error for this field, use red; otherwise, use green
+          ? "#d32f2f !important"      //type of error color
           : "#1b7f6b !important",
       },
     },
