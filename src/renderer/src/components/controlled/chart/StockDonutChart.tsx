@@ -7,7 +7,7 @@ import React, { useState, useEffect } from "react";
 
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
 import { RetailInvoiceResponse, getAllRetailInvoices } from "@/service/retailInvoiceService";
- 
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
 function CenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
  
@@ -54,7 +54,8 @@ const StockDonutChart = ({
   };
 const [suppliers, setSuppliers] = useState<DistributorResponse[]>([]);
 const [invoices, setInvoices] = useState<RetailInvoiceResponse[]>([]);
-
+const [medicines, setMedicines] = useState<MedicineResponse[]>([]);
+const totalPurchases = medicines.length;
 // function for date filter dropdown
 const isDateInFilter = (dateString: string, filter: FilterType): boolean => {
   const today = new Date();
@@ -92,19 +93,19 @@ const filteredSales = invoices.filter((inv) =>
 // chartDataMap
 const chartDataMap = {
   Today: [
-    { label: "Purchases", value: 20, color: "#6EE700" },
+    { label: "Purchases", value: totalPurchases, color: "#6EE700" },
     { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
     { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
     { label: "No Sales", value: 25, color: "#FFD200" },
   ],
   "6 Days": [
-    { label: "Purchases", value: 35, color: "#6EE700" },
+    { label: "Purchases", value: totalPurchases, color: "#6EE700" },
     { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
     { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
     { label: "No Sales", value: 10, color: "#FFD200" },
   ],
   "This Month": [
-    { label: "Purchases", value: 42, color: "#6EE700" },
+    { label: "Purchases", value: totalPurchases, color: "#6EE700" },
     { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
     { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
     { label: "No Sales", value: 12, color: "#FFD200" },
@@ -116,9 +117,10 @@ const chartDataMap = {
     try {
       const suppliersData = await getDistributors();
       const invoicesData = await getAllRetailInvoices();
-
+      const medicinesData = await getMedicines();
       setSuppliers(suppliersData);
       setInvoices(invoicesData);
+      setMedicines(medicinesData);
     } catch (error) {
       console.error("API Error:", error);
     }
@@ -126,6 +128,7 @@ const chartDataMap = {
 
   fetchData();
 }, []);
+
   const total =
   chartDataMap[filter]?.reduce((sum, d) => sum + d.value, 0) || 0;
   const theme = useTheme();

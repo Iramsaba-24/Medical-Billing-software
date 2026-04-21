@@ -95,10 +95,10 @@ const defaultValues: DashboardSettingsForm = {
   ],
   lowStockAlert: false,
   quantityThreshold: null,
-  expiryAlerts: ["30"],
+ expiryAlerts: ["30", "60", "90", "showExpiryOnDashboard"],
   showExpiryOnDashboard: false,
   topSellingMedicine: "",
-  chartPreferences: ["bar"],
+   chartPreferences: ["bar", "line", "donut"],
   autoRefresh: false,
   autoRefreshInterval: "",
 };

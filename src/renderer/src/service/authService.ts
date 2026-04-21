@@ -27,6 +27,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  //profilePicture: string;
   ownerName: string;
   message: string;
   token: string;
@@ -107,9 +108,21 @@ export const authService = {
       userData,
     );
      if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
-      if (response.data.userId) {
-        localStorage.setItem("userId", response.data.userId.toString());
+
+     try {
+        const loginResponse = await axios.post(`${API_BASE_URL}/Auth/login`, {
+         usernameOrEmail: userData.email,
+          password: userData.password
+          
+        });
+        console.log("Auto-login response:", loginResponse.data);
+        if (loginResponse.data.token) {
+          localStorage.setItem("token", loginResponse.data.token);
+          localStorage.setItem("userId", loginResponse.data.userId.toString());
+          console.log("Token saved:", loginResponse.data.token);
+        }
+      } catch (err) {
+        console.error("Auto-login error:", err);
       }
     }
     
@@ -117,6 +130,7 @@ export const authService = {
   },
 
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
+     console.log("Login request:", JSON.stringify(credentials));
     const response = await axios.post(
       `${API_BASE_URL}/Auth/login`,
       credentials,
@@ -210,3 +224,6 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   },
 );
+
+
+

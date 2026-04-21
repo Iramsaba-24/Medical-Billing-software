@@ -2,39 +2,43 @@ import {Box,Button,Typography,Dialog,DialogTitle,DialogContent,DialogActions} fr
 import {ACTION_KEY,Column,UniversalTable,} from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
 import {showConfirmation,showSnackbar,} from "@/components/uncontrolled/ToastMessage";
-import EditInventoryItem from "@/containers/inventory/EditInventoryItem";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import axios from "axios";
 import { deleteMedicine } from "@/service/medicineService";
-
+import { useNavigate } from "react-router-dom";
+import { URL_PATH } from "@/constants/UrlPath";
 export type InventoryItem = {
-  itemName: string;
+  srNo: number
+  medicineName: string;
   medicineId: number;
   medicineGroup: string;
   groupId: number;
-  unit: string;        
-  quantity: number;
+  type: string;        
+  totalStockTablets: number;
   pricePerUnit: number;
 
   expiryDate: string;
 
-  supplier: string;
+  companyName: string;
   distributorId: number;
-
-  gst: string;
+  hsnCode: string;
+  gstPercent: string;
 };
 
 
 type MedicineApi = {
+  srNo: number;
   medicineId: number;
-  itemName: string;
-  quantity: number;
-  pricePerUnit: number;
+  medicineName: string;       
+  totalStockTablets: number;
+  mrpPerStrip: number;
   expiryDate: string;
+  
   groupId: number;
   distributorId: number;
-  gstPercentage: number;
-  unit: string;        
+  gstPercent: number;
+  type: string; 
+  hsnCode?: string;       
 }
 
 type GroupApi = {
@@ -51,8 +55,8 @@ type DistributorApi = {
 const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]);
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
-  const [editItem, setEditItem] = useState<InventoryItem | null>(null);
-
+  // const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+  const navigate = useNavigate();
 
 const fetchInventory = async () => {
   try {
@@ -92,17 +96,19 @@ const fetchInventory = async () => {
     });
 
     const formatted: InventoryItem[] = medicines.map((item) => ({
-      itemName: item.itemName,
+      srNo: item.srNo,
+      medicineName: item.medicineName,
       medicineId: item.medicineId,
       medicineGroup: groupMap[item.groupId] || "N/A",
       groupId: item.groupId,
-      unit: item.unit || "N/A",
-      quantity: item.quantity,
-      pricePerUnit: item.pricePerUnit,
+      type: item.type || "N/A",
+      totalStockTablets: item.totalStockTablets,
+      pricePerUnit: item.mrpPerStrip,
       expiryDate: item.expiryDate.split("T")[0],
-      supplier: distributorMap[item.distributorId] || "N/A",
+      companyName: distributorMap[item.distributorId] || "N/A",
       distributorId: item.distributorId,
-      gst: `${item.gstPercentage}%`,
+      gstPercent: `${item.gstPercent}%`,
+       hsnCode: item.hsnCode || "-",
     }));
 
     setTableData(formatted);
@@ -147,28 +153,30 @@ const handleDelete = (item: InventoryItem) => {
     return "success.main";
   };
 
-  const columns: Column<InventoryItem>[] = [
-    { key: "itemName", label: "Item" },
-    { key: "medicineGroup", label: "Group" },
-    { key: "quantity", label: "Stock" },
-    {
-      key: "pricePerUnit",
-      label: "Price",
-      render: (row) => `₹ ${row.pricePerUnit}`,
-    },
-    { key: "supplier", label: "Supplier" },
-    { key: "expiryDate", label: "Expiry Date" },
-    {
-      key: "status",
-      label: "Status",
-      render: (row) => (
-        <Typography fontWeight={500} color={getStatusColor(row.quantity)}>
-          {getStatus(row.quantity)}
-        </Typography>
-      ),
-    },
-    { key: ACTION_KEY, label: "Action" },
-  ];
+const columns: Column<InventoryItem>[] = [
+  {key:"srNo", label:"Sr.No" },
+  { key: "medicineName", label: "Item" },
+  { key: "medicineGroup", label: "Group" },
+  { key: "totalStockTablets", label: "Stock" },
+  {
+    key: "pricePerUnit",
+    label: "Price",
+    render: (row) => `₹ ${row.pricePerUnit}`,
+  },
+  { key: "hsnCode", label: "HSN Number" },
+  { key: "companyName", label: "Supplier" },
+  { key: "expiryDate", label: "Expiry Date" },
+  {
+    key: "status",
+    label: "Status",
+    render: (row) => (
+      <Typography color={getStatusColor(row.totalStockTablets)}>
+        {getStatus(row.totalStockTablets)}
+      </Typography>
+    ),
+  },
+  { key: ACTION_KEY, label: "Action" },
+];
 
   return (
     <>
@@ -180,11 +188,14 @@ const handleDelete = (item: InventoryItem) => {
           data={tableData}
           columns={columns}
           rowsPerPage={5}
-          actions={{
-            view: setViewItem,
-            edit: setEditItem,
-            delete: handleDelete,
-          }}
+actions={{
+  view: setViewItem,
+edit: (item) =>
+  navigate(URL_PATH.AddInventoryItem, {
+    state: item,
+  }),
+  delete: handleDelete,
+}}
         />
       </Box>
       {/* VIEW DIALOG */}
@@ -208,7 +219,7 @@ const handleDelete = (item: InventoryItem) => {
               >
                 <Box width={160}>
                   <Typography fontWeight={600}>Item Name</Typography>
-                  <Typography>{viewItem.itemName}</Typography>
+                  <Typography>{viewItem.medicineName}</Typography>
                 </Box>
                 <Box width={130}>
                   <Typography fontWeight={600}>Item ID</Typography>
@@ -229,7 +240,7 @@ const handleDelete = (item: InventoryItem) => {
               >
                 <Box width={160}>
                   <Typography fontWeight={600}>Quantity</Typography>
-                  <Typography>{viewItem.quantity}</Typography>
+                  <Typography>{viewItem.totalStockTablets}</Typography>
                 </Box>
                 <Box width={130}>
                   <Typography fontWeight={600}>GST</Typography>
@@ -237,15 +248,15 @@ const handleDelete = (item: InventoryItem) => {
                 </Box>
                 <Box>
                   <Typography fontWeight={600}>Supplier</Typography>
-                  <Typography>{viewItem.supplier}</Typography>
+                  <Typography>{viewItem.companyName}</Typography>
                 </Box>
               </Box>
 
               {/* Status */}
               <Box>
                 <Typography fontWeight={600}>Status</Typography>
-                <Typography sx={{ color: getStatusColor(viewItem.quantity) }}>
-                  {getStatus(viewItem.quantity)}
+                <Typography sx={{ color: getStatusColor(viewItem.totalStockTablets) }}>
+                  {getStatus(viewItem.totalStockTablets)}
                 </Typography>
               </Box>
             </Box>
@@ -266,16 +277,6 @@ const handleDelete = (item: InventoryItem) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <EditInventoryItem
-        open={!!editItem}
-        onClose={() => {
-    setEditItem(null);
-    fetchInventory();
-  }}
-        item={editItem}
-        // tableData={tableData}
-        // setTableData={setTableData}
-      />
     </>
   );
 };

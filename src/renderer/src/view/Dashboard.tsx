@@ -11,7 +11,7 @@ import LineGraph from "@/containers/dashboard/LineGraph";
 const Dashboard: React.FC = () => {
   const getChartPreferences = (): string[] => {
     const data = localStorage.getItem("chartPreferences");
-    if (!data) return ["bar"];
+    if (!data) return ["bar", "line", "donut"];
 
     try {
       return JSON.parse(data);

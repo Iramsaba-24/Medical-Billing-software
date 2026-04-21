@@ -14,7 +14,7 @@ const Setting = () => {
       sx={{
         display: "flex",
         gap: 3,
-        width: "100%",
+        width: "100%",                                                                                                
         flexDirection: { xs: "column", md: "row" },
         ml: { xs: 0, md: -3 },
       }}

@@ -30,18 +30,17 @@ const BusinessDetails = () => {
     setIsLoading(true);
     
     try {
-      // Get registration data from localStorage
       const existingData = JSON.parse(localStorage.getItem('registrationData') || '{}');
       
-      // Combine with business details
       const completeData = { 
         ...existingData, 
-        businessDetails: {
+        businessDetail: {   
           businessType: data.businessType,
           gstin: data.gstin,
           licenseNumber: data.licenseNumber
         }
       };
+
       
       localStorage.setItem('registrationData', JSON.stringify(completeData));
       
@@ -147,7 +146,8 @@ const BusinessDetails = () => {
 
             <TextInputField
               name="licenseNumber"
-              label="License Number (Optional)"
+              label="License Number "
+              required
               placeholder="DL-KA-2023-001245"
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -190,4 +190,5 @@ const BusinessDetails = () => {
 };
 
 export default BusinessDetails;
+
 
