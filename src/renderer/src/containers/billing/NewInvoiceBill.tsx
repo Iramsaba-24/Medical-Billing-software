@@ -1,3 +1,4 @@
+
 import {
   Paper,
   Table,
@@ -17,19 +18,24 @@ import Sign from "@/assets/Sign.svg";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { PharmacyFormValues } from "@/containers/setting/PharmacyProfile";
+import { getInvoiceById } from "@/service/distributorInvoiceService";
+import { getItemsByInvoiceId ,} from "@/service/distributorInvoiceItemService";
+import { getMedicines } from "@/service/medicineService";
+import { DistributorInvoiceItemResponse } from "@/service/distributorInvoiceItemService";
 export interface Invoice {
   name: string;
   company: string;
-  doctor: string;
+  doctor: string; 
   address: string;
   invoice: string;
   date: string;
   gst?: number;
-  totalPrice?: number;
+  totalAmount?: number;
   gstIn?: string;
   medicines: {
     name: string;
-    qty: string;
+      quantity: string | number;  
+        mrp?: number; 
     amount: number;
     hsn: string;
     expiry: string;
@@ -49,10 +55,11 @@ const columns = [
 
 interface Medicine {
   name: string;
-  qty: number | string;
+ quantity: number | string;
   amount: number;
   hsn?: string;
   expiry?: string;
+   mrp?: number;
 }
 
 const NewInvoiceBill = () => {
@@ -67,21 +74,60 @@ const NewInvoiceBill = () => {
     (location.state as { invoice: Invoice })?.invoice || null
   );
 
-  useEffect(() => {
-    if (!invoice && invoiceNo) {
-      const savedInvoices = JSON.parse(localStorage.getItem("invoices") || "[]");
-      const found = savedInvoices.find((inv: Invoice) => inv.invoice === invoiceNo);
-      if (found) setInvoice(found);
-      else navigate(-1);
+useEffect(() => {
+  const fetchInvoice = async () => {
+    try {
+      if (!invoiceNo) return;
+
+      const invoiceData = await getInvoiceById(Number(invoiceNo));
+      const items = await getItemsByInvoiceId(Number(invoiceNo));
+      const medicines = await getMedicines(); 
+
+      const formattedMedicines = items.map((item: DistributorInvoiceItemResponse) => {
+        const med = medicines.find(
+          (m: { medicineId: number; itemName: string; expiryDate?: string }) =>
+            Number(m.medicineId) === Number(item.medicineId)
+        );
+
+        return {
+          name: med?.itemName || String(item.medicineId),
+          quantity: item.quantity,
+          amount: item.amount,
+          hsn: "-", 
+          expiry: med?.expiryDate
+            ? new Date(med.expiryDate).toLocaleDateString("en-GB")
+            : "-",
+          mrp: item.price,
+        };
+      });
+
+      setInvoice({
+        name: "",
+        company: "",
+        doctor: "",
+        address: "",
+        invoice: String(invoiceNo),
+        date: new Date().toLocaleDateString("en-GB"),
+        gst: invoiceData.totalGST,
+        totalAmount: invoiceData.totalAmount,
+        gstIn: "", 
+        medicines: formattedMedicines, 
+      });
+
+    } catch (error) {
+      console.error("Invoice fetch failed", error);
     }
-  }, [invoice, invoiceNo, navigate]);
+  };
+
+  fetchInvoice();
+}, [invoiceNo]);
 
   const subTotal =
     invoice?.medicines?.reduce((sum, med) => sum + Number(med.amount), 0) || 0;
 
   const invoiceGst = invoice?.gst ?? 0;
   const gstAmount = (subTotal * invoiceGst) / 100;
-  const grandTotal = invoice?.totalPrice ?? (subTotal + gstAmount);
+  const grandTotal = invoice?.totalAmount ?? (subTotal + gstAmount);
 
   const displayDate = invoice?.date || new Date().toLocaleDateString();
   const displayName = invoice?.company || invoice?.name || "-";
@@ -163,7 +209,8 @@ const pharmacyAddress = pharmacyData?.address || "-";
 
          
           {invoice?.medicines?.map((med: Medicine, index: number) => {
-            const rate = Number(med.qty) > 0 ? med.amount / Number(med.qty) : 0;
+             const rate = Number(med.quantity) > 0 ? med.amount / Number(med.quantity) : 0;
+          
             return (
               <Box
                 key={index}
@@ -184,7 +231,7 @@ const pharmacyAddress = pharmacyData?.address || "-";
                 </Typography>
                 <Typography fontSize={9.5} textAlign="center">{med.hsn || "-"}</Typography>
                 <Typography fontSize={9.5} textAlign="center">{med.expiry || "-"}</Typography>
-                <Typography fontSize={9.5} textAlign="center">{med.qty}</Typography>
+                <Typography fontSize={9.5} textAlign="center">{med.quantity}</Typography>
                 <Typography fontSize={9.5} textAlign="center">{rate.toFixed(2)}</Typography>
               </Box>
             );
@@ -333,14 +380,14 @@ const pharmacyAddress = pharmacyData?.address || "-";
 
               {/* Medicines */}
               {invoice?.medicines?.map((med: Medicine, index: number) => {
-                const rate = Number(med.qty) > 0 ? med.amount / Number(med.qty) : 0;
+                const rate = Number(med.quantity) > 0 ? med.amount / Number(med.quantity) : 0;
                 return (
                   <TableRow key={index} sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
                     <TableCell align="center">{index + 1}</TableCell>
                     <TableCell align="center">{med.name}</TableCell>
                     <TableCell align="center">{med.hsn || "-"}</TableCell>
                     <TableCell align="center">{med.expiry || "-"}</TableCell>
-                    <TableCell align="center">{med.qty}</TableCell>
+                    <TableCell align="center">{med.quantity}</TableCell>
                     <TableCell align="center">{rate.toFixed(2)}</TableCell>
                     <TableCell align="center">{invoiceGst}%</TableCell>
                     <TableCell align="center">-</TableCell>

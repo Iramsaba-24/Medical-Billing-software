@@ -5,25 +5,26 @@ import {
 } from "@/components/uncontrolled/UniversalTable";
 import ShareMenu from "@/containers/distributors/ShareMenu";
 import { useEffect, useState } from "react";
-
+import {  getAllInvoices, InvoiceListResponse  } from "@/service/distributorInvoiceService";
+import { getDistributors } from "@/service/distributorService";
 type InvoiceItem = {
   invoice: string;
   name: string;
-  date: string;
+  createdAt: string;
   price: number;
-  status: string;
+  paymentStatus: string;
 };
 
 const columns: Column<InvoiceItem>[] = [
   { key: "invoice", label: "Invoice No" },
   { key: "name", label: "Customer / Company" },
-  { key: "date", label: "Date" },
+  { key: "createdAt", label: "Date" },
   {
     key: "price",
     label: "Amount",
     render: (row) => `₹ ${row.price}`,
   },
-  { key: "status", label: "Status" },
+  { key: "paymentStatus", label: "Status" },
   {
     key: "invoice",
     label: "Actions",
@@ -33,13 +34,35 @@ const columns: Column<InvoiceItem>[] = [
 
 export default function NewInvoiceList() {
   const [tableData, setTableData] = useState<InvoiceItem[]>([]);
-  useEffect(() => {
-  const storedInvoices = localStorage.getItem("currentNewInvoiceList");
+useEffect(() => {
+  const fetchInvoices = async () => {
+    try {
+      const [invoiceData, distributorData] = await Promise.all([
+        getAllInvoices(),
+        getDistributors(),
+      ]);
 
-  if (storedInvoices) {
-    const parsed = JSON.parse(storedInvoices);
-    setTableData(parsed);
-  }
+const formatted = invoiceData.map((inv: InvoiceListResponse) => {
+  const distributor = distributorData.find(
+    (d) => d.distributorId === inv.distributorId
+  );
+
+  return {
+    invoice: String(inv.invoiceId),
+    name: distributor?.companyName || "Distributor",
+    createdAt: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+    price: inv.totalAmount,
+    paymentStatus: inv.paymentStatus,
+  };
+});
+
+      setTableData(formatted);
+    } catch (error) {
+      console.error("Fetch invoices failed", error);
+    }
+  };
+
+  fetchInvoices();
 }, []);
 
  

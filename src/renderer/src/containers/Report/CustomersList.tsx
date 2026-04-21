@@ -1,34 +1,20 @@
 import { useState, useMemo, useEffect } from "react";
-import {
-  Typography,
-  Stack,
-  Paper,
-  Divider,
-} from "@mui/material";
-
+import { Typography, Stack, Paper, Divider } from "@mui/material";
 import {
   UniversalTable,
   Column,
 } from "@/components/uncontrolled/UniversalTable";
-
 import DropdownField from "@/components/controlled/DropdownField";
 import { useForm, FormProvider } from "react-hook-form";
+import { getAllCustomers } from "@/service/customerService";
+import { CustomerData } from "@/view/CustomerMaster";
 
-// TYPES
+import {
+  getAllRetailInvoices,
+  getRetailInvoiceItemsByInvoiceId,
+} from "@/service/retailInvoiceService";
 
-type CustomerItem = {
-  name: string;
-  qty: number | string;
-  price: number | string;
-};
-
-type SavedCustomer = {
-  id: number;
-  name?: string;
-  doctor?: string;
-  date?: string;
-  itemsList?: CustomerItem[];
-};
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
 
 type Customer = {
   id: number;
@@ -44,6 +30,18 @@ type FilterForm = {
   timeFilter: string;
 };
 
+type Invoice = {
+  retailInvoiceId: number;
+  customerId: number;
+  invoiceDate: string;
+};
+
+type InvoiceItem = {
+  medicineId: number;
+  quantity: number;
+  price: number;
+};
+
 function CustomerTable() {
   const [customers, setCustomers] = useState<Customer[]>([]);
 
@@ -55,52 +53,73 @@ function CustomerTable() {
 
   const timeFilter = methods.watch("timeFilter");
 
-  
-  // LOAD DATA FROM LOCAL STORAGE
-  
   useEffect(() => {
-    const savedData = localStorage.getItem("medical_customers");
+    const fetchData = async () => {
+      try {
+        const customerRes: CustomerData[] = await getAllCustomers();
+        const invoices: Invoice[] = await getAllRetailInvoices();
+        const medicines: MedicineResponse[] = await getMedicines();
 
-    if (!savedData) {
-      setCustomers([]);
-      return;
-    }
+        const medicineMap = new Map<number, string>();
+        medicines.forEach((m) => {
+          medicineMap.set(m.medicineId, m.itemName);
+        });
 
-    const parsed: SavedCustomer[] = JSON.parse(savedData);
+        const formatted: Customer[] = [];
 
-    const formatted: Customer[] = parsed.map((item) => {
-      const items = item.itemsList || [];
+        for (const cust of customerRes) {
+          const custInvoices = invoices.filter(
+            (inv) => inv.customerId === cust.customerId
+          );
 
-      const medicines = items.map((i) => i.name).join(", ");
+          let totalQty = 0;
+          let totalPrice = 0;
+          const medNames: string[] = [];
 
-      const quantity = items.reduce(
-        (sum, i) => sum + (Number(i.qty) || 0),
-        0
-      );
+          for (const inv of custInvoices) {
+            const items: InvoiceItem[] =
+              await getRetailInvoiceItemsByInvoiceId(inv.retailInvoiceId);
 
-      const totalPrice = items.reduce(
-        (sum, i) =>
-          sum + (Number(i.qty) || 0) * (Number(i.price) || 0),
-        0
-      );
+            items.forEach((item) => {
+              totalQty += item.quantity;
+              totalPrice += item.price * item.quantity;
 
-      return {
-        id: item.id,
-        name: item.name || "",
-        medicines,
-        quantity,
-        totalPrice,
-        referenceFrom: item.doctor || "",
-        date: item.date || "",
-      };
-    });
+              const name = medicineMap.get(item.medicineId);
+              if (name) medNames.push(name);
+            });
+          }
 
-    setCustomers(formatted);
+          formatted.push({
+            id: Number(cust.customerId),
+            name: cust.name || "",
+            medicines: medNames.join(", "),
+            quantity: totalQty,
+            totalPrice: totalPrice,
+            referenceFrom: cust.doctor || "",
+            date: cust.date || "",
+          });
+        }
+
+        setCustomers(formatted);
+      } catch (error) {
+        console.error("Failed to fetch customers", error);
+        setCustomers([]);
+      }
+    };
+
+    fetchData();
+
+    const handleFocus = () => {
+      fetchData();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
-  
-  // FILTER LOGIC
-  
   const filteredData = useMemo(() => {
     return customers.filter((customer) => {
       if (timeFilter === "All Time") return true;
@@ -118,6 +137,7 @@ function CustomerTable() {
       if (timeFilter === "Last 7 Days") {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(today.getDate() - 7);
+
         return itemDate >= sevenDaysAgo && itemDate <= today;
       }
 
@@ -125,29 +145,6 @@ function CustomerTable() {
     });
   }, [customers, timeFilter]);
 
-  
-  // DELETE SELECTED ROWS FUNCTION
-  
-  const handleDeleteSelected = (rowsToDelete: Customer[]) => {
-    const updatedCustomers = customers.filter(
-      (customer) =>
-        !rowsToDelete.some((row) => row.id === customer.id)
-    );
-
-    setCustomers(updatedCustomers);
-
-    // Update localStorage
-    localStorage.setItem(
-      "medical_customers",
-      JSON.stringify(updatedCustomers)
-    );
-
-    window.dispatchEvent(new Event("reportUpdated")); //added for cards
-  };
-
-  
-  // TABLE COLUMNS
-  
   const columns: Column<Customer>[] = [
     { key: "name", label: "Name" },
     { key: "medicines", label: "Medicines" },
@@ -176,11 +173,7 @@ function CustomerTable() {
 
         <Divider sx={{ mb: 3 }} />
 
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          sx={{ mb: 2 }}
-        >
+        <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
           <DropdownField
             name="timeFilter"
             label="Filter"
@@ -189,19 +182,13 @@ function CustomerTable() {
         </Stack>
 
         <div style={{ width: "100%", maxWidth: "100%", overflowX: "auto" }}>
-        <UniversalTable<Customer>
-          data={filteredData}
-          columns={columns}
-          enableCheckbox
-          showSearch
-          showExport
-          getRowId={(row) => row.id}
-          
-          // DELETE FEATURE 
-          onDeleteSelected={handleDeleteSelected}
-          
-        />
-       
+          <UniversalTable<Customer>
+            data={filteredData}
+            columns={columns}
+            showSearch
+            showExport
+            getRowId={(row) => row.id}
+          />
         </div>
       </Paper>
     </FormProvider>
@@ -209,10 +196,3 @@ function CustomerTable() {
 }
 
 export default CustomerTable;
-
-
-
-
-
-
-

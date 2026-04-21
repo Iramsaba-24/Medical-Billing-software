@@ -1,264 +1,39 @@
-// import { Box, Paper, Typography } from "@mui/material";
-// import { useEffect, useState } from "react";
-// import WarningSign from "@/assets/warning-sign.svg";
-// import { InventoryItem } from "@/containers/inventory/InventoryList";
-
-// type InventoryWithDate = Omit<InventoryItem, "expiryDate"> & {
-//   expiryDate: Date;
-// };
-
-// const Alerts = () => {
-//   const [inventory, setInventory] = useState<InventoryWithDate[]>([]);
-
-//   const [expiryDays, setExpiryDays] = useState<number>(30);
-//   const [showAllExpiry, setShowAllExpiry] = useState(false);
-//   const [showLowStock, setShowLowStock] = useState(false);
-//   const [showReorder, setShowReorder] = useState(false);
-//   const [lowStockLimit, setLowStockLimit] = useState(30);
-
-//   useEffect(() => {
-//     const storedInventory = localStorage.getItem("inventory");
-//     if (!storedInventory) return;
-
-//     const parsed: InventoryWithDate[] = JSON.parse(storedInventory).map(
-//       (item: InventoryItem) => ({
-//         ...item,
-//         stockQty: Number(item.stockQty),
-//         expiryDate: new Date(item.expiryDate),
-//       })
-//     );
-
-//     setInventory(parsed);
-//   }, []);
-
-//   useEffect(() => {
-//     const settingsStr = localStorage.getItem("inventorySettings");
-//     if (!settingsStr) return;
-
-//     const settings = JSON.parse(settingsStr);
-
-//     // Low stock threshold
-//     setLowStockLimit(Number(settings.lowStockThreshold) || 30);
-
-//     // Alerts visibility checkboxes
-//     if (settings.alertsVisibility?.includes("alert1")) {
-//       setShowLowStock(true);
-//     } else {
-//       setShowLowStock(false);
-//     }
-
-//     if (settings.alertsVisibility?.includes("alert2")) {
-//       setShowReorder(true);
-//     } else {
-//       setShowReorder(false);
-//     }
-//   }, []);
-
-//   useEffect(() => {
-//     const settingsStr = localStorage.getItem("dashboardSettings");
-//     if (!settingsStr) return;
-
-//     const settings = JSON.parse(settingsStr);
-
-//     if (settings.expiryAlerts?.includes("Show Expiry Alert on Dashboard")) {
-//       setShowAllExpiry(true);
-//       return;
-//     }
-
-//     if (settings.expiryAlerts?.includes("90")) setExpiryDays(90);
-//     else if (settings.expiryAlerts?.includes("60")) setExpiryDays(60);
-//     else if (settings.expiryAlerts?.includes("30")) setExpiryDays(30);
-//   }, []);
-
-//   const lowStock = inventory.filter(
-//     (item) => item.stockQty <= lowStockLimit
-//   );
-
-//   const reorderStock = inventory.filter(
-//     (item) => item.stockQty <= 10
-//   );
-
-//   const today = new Date();
-
-//   const expiryAlerts = inventory.filter((item) => {
-//     const diffDays =
-//       (item.expiryDate.getTime() - today.getTime()) /
-//       (1000 * 3600 * 24);
-
-//     if (showAllExpiry) return true;
-
-//     return diffDays >= 0 && diffDays <= expiryDays;
-//   });
-
-//   return (
-//     <Paper sx={{ py: 2, px: 4, pb: 8, mb: 4, maxHeight: 400, overflowY: "auto" }}>
-//       <Typography
-//         fontSize={18}
-//         fontWeight={700}
-//         sx={{ mb: 2 }}
-//         display="flex"
-//         alignItems="center"
-//         justifyContent="space-between"
-//       >
-//         Alerts
-//         <Box component="img" src={WarningSign} width={24} />
-//       </Typography>
-
-//       <hr />
-
-//       {/* LOW STOCK */}
-//       {showLowStock && (
-//         <>
-//           <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-//             Low Stock Alerts ({lowStock.length})
-//           </Typography>
-
-//           {lowStock.length > 0 ? (
-//             lowStock.map((item) => (
-//               <Box key={item.itemId}>
-//                 <Typography>
-//                   {item.itemName} is running low — only {item.stockQty} left.
-//                 </Typography>
-//               </Box>
-//             ))
-//           ) : (
-//             <Typography color="text.secondary">
-//               No low stock items.
-//             </Typography>
-//           )}
-
-//           <hr />
-//         </>
-//       )}
-
-//       {/*  REORDER  */}
-//       {showReorder && (
-//         <>
-//           <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-//             Reorder Suggested ({reorderStock.length})
-//           </Typography>
-
-//           {reorderStock.length > 0 ? (
-//             reorderStock.map((item) => (
-//               <Box key={item.itemId}>
-//                 <Typography>
-//                   Based on current stock levels, {item.itemName} should be reordered.
-//                 </Typography>
-//               </Box>
-//             ))
-//           ) : (
-//             <Typography color="text.secondary">
-//               No reorder alerts.
-//             </Typography>
-//           )}
-
-//           <hr />
-//         </>
-//       )}
-
-//       {/* EXPIRY */}
-//       <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
-//         Expiry Alerts ({expiryAlerts.length})
-//       </Typography>
-
-//       {expiryAlerts.length > 0 ? (
-//         expiryAlerts.map((item) => (
-//           <Box key={item.itemId}>
-//             <Typography>
-//               {item.itemName} will expire on{" "}
-//               {item.expiryDate.toLocaleDateString()}.
-//             </Typography>
-//           </Box>
-//         ))
-//       ) : (
-//         <Typography color="text.secondary">
-//           No items expiring within {expiryDays} days.
-//         </Typography>
-//       )}
-//     </Paper>
-//   );
-// };
-
-// export default Alerts;
-
-
- 
 import { Box, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import WarningSign from "@/assets/warning-sign.svg";
-import { InventoryItem } from "@/containers/inventory/InventoryList";
+import {getMedicines, MedicineResponse } from "@/service/medicineService";
  
-type InventoryWithDate = Omit<InventoryItem, "expiryDate"> & {
- expiryDate: Date;
+type MedicineWithDate = Omit<MedicineResponse, "expiryDate"> & {
+  expiryDate: Date;
 };
  
 const Alerts = () => {
- const [inventory, setInventory] = useState<InventoryWithDate[]>([]);
- 
+const [inventory, setInventory] = useState<MedicineWithDate[]>([]); 
  const [expiryDays, setExpiryDays] = useState<number>(90);
  const [showAllExpiry, setShowAllExpiry] = useState(false);
  const [showLowStock, setShowLowStock] = useState(false);
  const [showReorder, setShowReorder] = useState(false);
  const [lowStockLimit, setLowStockLimit] = useState(30);
- 
- //  LOAD INVENTORY
- 
- // LOAD INVENTORY
- 
-// useEffect(() => {
- 
-//   const loadInventory = () => {
- 
-//     const storedInventory = localStorage.getItem("inventory");
- 
-//     if (!storedInventory) return;
- 
-//     const parsed: InventoryWithDate[] = JSON.parse(storedInventory).map(
- 
-//       (item: InventoryItem) => ({
- 
-//         ...item,
- 
-//         stockQty: Number(item.stockQty),
- 
-//         expiryDate: new Date(item.expiryDate),
- 
-//       })
- 
-//     );
- 
-//     setInventory(parsed);
- 
-//   };
- 
-//   loadInventory(); // ← पहिल्यांदा load
- 
-//   window.addEventListener("inventoryUpdated", loadInventory); // ← event listen
- 
-//   return () => {
- 
-//     window.removeEventListener("inventoryUpdated", loadInventory); // ← cleanup
- 
-//   };
- 
-// }, []);
- 
+//  fetch medicines from database
  useEffect(() => {
-   const storedInventory = localStorage.getItem("inventory");
-   if (!storedInventory) return;
- 
-   const parsed: InventoryWithDate[] = JSON.parse(storedInventory).map(
-     (item: InventoryItem) => ({
-       ...item,
-       stockQty: Number(item.stockQty),
-       expiryDate: new Date(item.expiryDate),
-     })
-   );
- 
-   setInventory(parsed);
- }, []);
- 
- //  INVENTORY SETTINGS (low stock / reorder)
+  const fetchMedicines = async () => {
+    try {
+      const data: MedicineResponse[] = await getMedicines();
+
+      const parsed: MedicineWithDate[] = data.map((item) => ({
+        ...item,
+        expiryDate: new Date(item.expiryDate),
+      }));
+
+      setInventory(parsed);
+    } catch (error) {
+      console.error("Error fetching medicines:", error);
+    }
+  };
+
+  fetchMedicines();
+}, []);
+ //  inventory settings (low stock / reorder)
  useEffect(() => {
    const settingsStr = localStorage.getItem("inventorySettings");
    if (!settingsStr) return;
@@ -271,7 +46,7 @@ const Alerts = () => {
    setShowReorder(settings.alertsVisibility?.includes("alert2"));
  }, []);
  
- //  DASHBOARD SETTINGS 
+ //  dashboard settings (expiry alerts)
  useEffect(() => {
    const settingsStr = localStorage.getItem("dashboardSettings");
    if (!settingsStr) return;
@@ -296,40 +71,27 @@ const Alerts = () => {
  
  // FILTERS
  const lowStock = inventory.filter(
-   (item) => item.stockQty <= lowStockLimit
+   (item) => item.quantity <= lowStockLimit
  );
  
  const reorderStock = inventory.filter(
-   (item) => item.stockQty <= 10
+   (item) => item.quantity <= 10
  );
  
  const today = new Date();
- 
- //  EXPIRY FILTER
- // const expiryAlerts = inventory.filter((item) => {
- //   const diffDays =
- //     (item.expiryDate.getTime() - today.getTime()) /
- //     (1000 * 3600 * 24);
- 
- //   if (showAllExpiry) return true;
- 
- //   return diffDays >= 0 && diffDays <= expiryDays;
- // });
- 
- 
+
  const expiryAlerts = inventory.filter((item) => {
  const diffDays =
    (item.expiryDate.getTime() - today.getTime()) /
    (1000 * 3600 * 24);
  
- // ✅ show all if no filter
+ // show all if no filter
  if (showAllExpiry || expiryDays === 0) return true;
  
  return diffDays >= 0 && diffDays <= expiryDays;
 });
  
- 
- //  EXPIRY COUNTDOWN FUNCTION
+ //  expiry countdown function
  const getExpiryText = (date: Date) => {
    const diffDays = Math.ceil(
      (date.getTime() - today.getTime()) / (1000 * 3600 * 24)
@@ -358,18 +120,17 @@ const Alerts = () => {
  
      <hr />
  
-     {/* LOW STOCK */}
+     {/* lowStock */}
      {showLowStock && (
        <>
          <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
            Low Stock Alerts ({lowStock.length})
          </Typography>
- 
          {lowStock.length > 0 ? (
            lowStock.map((item) => (
-             <Box key={item.itemId}>
+             <Box key={item.medicineId}>
                <Typography>
-                 {item.itemName} is running low — only {item.stockQty} left.
+                 {item.itemName} is running low — only {item.quantity} left.
                </Typography>
              </Box>
            ))
@@ -378,12 +139,11 @@ const Alerts = () => {
              No low stock items.
            </Typography>
          )}
- 
          <hr />
        </>
      )}
  
-     {/* REORDER */}
+     {/* reorder */}
      {showReorder && (
        <>
          <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
@@ -392,7 +152,7 @@ const Alerts = () => {
  
          {reorderStock.length > 0 ? (
            reorderStock.map((item) => (
-             <Box key={item.itemId}>
+             <Box key={item.medicineId}>
                <Typography>
                  {item.itemName} should be reordered.
                </Typography>
@@ -408,14 +168,14 @@ const Alerts = () => {
        </>
      )}
  
-     {/* EXPIRY */}
+     {/* expiry */}
      <Typography fontWeight={700} sx={{ mt: 2, mb: 1 }}>
        Expiry Alerts ({expiryAlerts.length})
      </Typography>
  
      {expiryAlerts.length > 0 ? (
        expiryAlerts.map((item) => (
-         <Box key={item.itemId}>
+         <Box key={item.medicineId}>
            <Typography>
              {item.itemName} will expire on{" "}
              {item.expiryDate.toLocaleDateString()} —{" "}

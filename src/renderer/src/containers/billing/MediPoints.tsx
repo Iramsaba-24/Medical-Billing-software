@@ -37,19 +37,18 @@ const MediPoints: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const totalFromInvoice = location.state?.totalFromInvoice || 0;
-
-  const earned = 10;
+const totalFromInvoice = location.state?.totalFromInvoice || 0;
+const earned = Math.floor(totalFromInvoice / 200) * 5;
 
   const [used, setUsed] = useState(0);
-  const [remains, setRemains] = useState(10);
+  const [remains, setRemains] = useState(earned);
 
   const [isInvalid, setIsInvalid] = useState(false);
 
   const methods = useForm<MediPointsForm>({
     defaultValues: {
       totalAmount: totalFromInvoice.toString(),
-      mediPoints: "",
+      mediPoints: "", 
       discountedAmount: totalFromInvoice.toString(),
     },
   });
@@ -100,27 +99,20 @@ const MediPoints: React.FC = () => {
     </Box>
   );
 
-  const onSubmit = (data: MediPointsForm) => {
-    if (isInvalid) return;
+ const onSubmit = (data: MediPointsForm) => {
+  if (isInvalid) return;
 
-    const storedInvoice = localStorage.getItem("currentRetailInvoice");
-
-    if (storedInvoice) {
-      const invoice = JSON.parse(storedInvoice);
-
-      invoice.totalPrice = Number(data.discountedAmount);
-
-      localStorage.setItem("currentRetailInvoice", JSON.stringify(invoice));
+  navigate(URL_PATH.PaymentMethod, {
+    state: {
+      flow: location.state?.flow || "retail",
+      totalFromInvoice: Number(data.discountedAmount),
+      invoiceId: location.state?.invoiceId,
+      rows: location.state?.rows,
+      customerName: location.state?.customerName,
+      doctorName: location.state?.doctorName,
     }
-
-
-navigate(URL_PATH.PaymentMethod, {
-  state: {
-    flow: location.state?.flow || "retail",
-    totalFromInvoice: Number(data.discountedAmount),
-  }
-});
-  };
+  });
+};
 
   return (
     <FormProvider {...methods}>

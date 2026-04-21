@@ -8,82 +8,90 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useState } from "react";
 import AppToast from "@/containers/Distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
-import BankDetailsForm from "@/containers/Distributors/BankDetailForm";
-
-// Define the structure of the data
+import { addDistributor } from "@/service/distributorService";
+import axios from "axios";
+ 
+ 
 type DistributorFormInput = {
+  distributorId: number;
   companyName: string;
   ownerName?: string;
-  mobile: string;
+  phone: string;
   email: string;
-  date: string;
+  createdAt: string;
   registrationNumber: string;
   website: string;
-  gstIn: string;
+  gstin: string;
   address: string;
   bankName: string;
   accountNumber: string;
   accountHolderName: string;
   branch: string;
-  ifsc: string;
+  ifscCode: string;
   upiId: string;
 };
-
+ 
 const DistributorsForm = () => {
-
   const methods = useForm<DistributorFormInput>({
     defaultValues: {
       companyName: "",
       ownerName: "",
-      mobile: "",
+      phone: "",
       email: "",
-   
-
+      createdAt: "",
       registrationNumber: "",
       website: "",
-      gstIn: "",
+      gstin: "",
       address: "",
       bankName: "",
       accountNumber: "",
       accountHolderName: "",
       branch: "",
-      ifsc: "",
+      ifscCode: "",
       upiId: "",
     },
     mode: "onChange",
   });
-
+ 
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
-
-  // Function  runs when the form  submitted successfully
-  const onSubmit = (data: DistributorFormInput) => {
-    const stored = localStorage.getItem("distributors");
-    const currentData = stored ? JSON.parse(stored) : [];
-
-    //  Prepare new entry with a unique ID and default status
-    const newEntry = {
-      ...data,
-      id: Date.now().toString(),
-      status: "Active",
-      
-    };
-
-    //  Add new entry to the list and save it back to storage
-    const updatedData = [...currentData, newEntry];
-    localStorage.setItem("distributors", JSON.stringify(updatedData));
-
-    setToastOpen(true);
-    setTimeout(() => {
-      navigate(URL_PATH.DistributorsPage);
-    }, 1500);
+ 
+  const onSubmit = async (data: DistributorFormInput) => {
+    try {
+      const cleanedData = {
+        ...data,
+        ownerName: data.ownerName || "",
+        website: data.website ? data.website : undefined,
+      };
+ 
+      console.log("Submitting data:", cleanedData);
+ 
+      await addDistributor(cleanedData);
+ 
+      setToastOpen(true);
+      setTimeout(() => {
+        navigate(URL_PATH.DistributorsPage);
+      }, 1500);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Error saving distributor:",
+          error.response?.data || error.message
+        );
+       
+      } else if (error instanceof Error) {
+        console.error("Error saving distributor:", error.message);
+      } else {
+        console.error("Error saving distributor:", error);
+      }
+    }
   };
-
+ 
   return (
     <Box p={2} sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
       <FormProvider {...methods}>
         <form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
-          {/* Distributor Details */}
+         
           <Paper
             sx={{
               maxWidth: 800,
@@ -98,7 +106,7 @@ const DistributorsForm = () => {
             <Typography variant="h6" mb={3} fontWeight={600}>
               Add Distributor
             </Typography>
-
+ 
             <Box
               sx={{
                 display: "grid",
@@ -116,7 +124,7 @@ const DistributorsForm = () => {
                 rows={1}
                 required
               />
-
+ 
               <TextInputField
                 name="ownerName"
                 label="Owner Name"
@@ -125,34 +133,34 @@ const DistributorsForm = () => {
                 maxLength={30}
                 required
               />
-
-              <MobileField 
-              name="mobile" 
-              label="Phone" 
-              placeholder="Mobile Number"
-              countryCode
-              preventDuplicate
-              required />
-
-              <EmailField 
-              name="email"
-               label="Email" 
-               required 
-               maxLength={50}
-            preventDuplicate 
+ 
+              <MobileField
+                name="phone"
+                label="Phone"
+                placeholder="Mobile Number"
+                countryCode
+                preventDuplicate
+                required
               />
-
-              <DateTimeField 
-              name="date" 
-              label="Date"
-              viewMode="date"
-              useCurrentDate={true}
-              disabled
-              dateRestriction="current-future-only"
-              required
-             //dateRestriction="past-current-future"
-               />
-
+ 
+              <EmailField
+                name="email"
+                label="Email"
+                required
+                maxLength={50}
+                preventDuplicate
+              />
+ 
+              <DateTimeField
+                name="createdAt"
+                label="Date"
+                viewMode="date"
+                useCurrentDate={true}
+                disabled
+                dateRestriction="current-future-only"
+                required
+              />
+ 
               <TextInputField
                 name="registrationNumber"
                 label="Registration Number"
@@ -161,21 +169,9 @@ const DistributorsForm = () => {
                 required
                 maxLength={14}
               />
+ 
               <TextInputField
-                name="website"
-                label="Website (Optional)"
-                inputType="textarea"
-                rows={1}
-                rules={{
-                  pattern: {
-                    value:
-                      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6})(\/[\w.-]*)*\/?$/i,
-                    message: "Invalid website URL (www.google.com)",
-                  },
-                }}
-              />
-              <TextInputField
-                name="gstIn"
+                name="gstin"
                 label="GSTIN"
                 placeholder=" e.g 27AAAAA0000A1ZS"
                 preventDuplicate
@@ -190,7 +186,7 @@ const DistributorsForm = () => {
                 }}
               />
             </Box>
-
+ 
             <Box sx={{ mt: 2 }}>
               <TextInputField
                 name="address"
@@ -203,24 +199,7 @@ const DistributorsForm = () => {
               />
             </Box>
           </Paper>
-
-          {/*  Bank Details */}
-          <Paper
-            sx={{
-              maxWidth: 800,
-              mx: "auto",
-              p: 4,
-              backgroundColor: "#fff",
-              borderRadius: "10px",
-              boxShadow: 3,
-            }}
-          >
-            <BankDetailsForm />
-          </Paper>
-          {/* button */}
-          <Box
-            sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}
-          >
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}>
             <Button
               variant="outlined"
               onClick={() => navigate(URL_PATH.DistributorsPage)}
@@ -231,12 +210,12 @@ const DistributorsForm = () => {
                 "&:hover": {
                   backgroundColor: "#238878",
                   color: "#fff",
-                  border: "2px solid #238878",
                 },
               }}
             >
               Cancel
             </Button>
+ 
             <Button
               type="submit"
               variant="contained"
@@ -248,7 +227,6 @@ const DistributorsForm = () => {
                 "&:hover": {
                   backgroundColor: "#fff",
                   color: "#238878",
-                  border: "2px solid #238878",
                 },
               }}
             >
@@ -257,7 +235,7 @@ const DistributorsForm = () => {
           </Box>
         </form>
       </FormProvider>
-
+ 
       <AppToast
         open={toastOpen}
         message="Data saved successfully"
@@ -267,5 +245,5 @@ const DistributorsForm = () => {
     </Box>
   );
 };
-
-export default DistributorsForm;
+ 
+export default DistributorsForm; 

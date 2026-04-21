@@ -101,7 +101,7 @@ const Dashboard: React.FC = () => {
             ? { xs: "1fr", md: "1fr 1fr" }
             : { xs: "1fr", md: "1fr" },
           gap: 2,
-          mb: 3,
+          mb: 3, 
         }}
       >
         <Cards />

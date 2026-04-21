@@ -1,3 +1,4 @@
+
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import TextInputField from "@/components/controlled/TextInputField";
@@ -7,13 +8,15 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
-
+import { addMedicine, getMedicines  } from "@/service/medicineService";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 export type InventoryFormData = {
   itemName: string;
-  itemId: string;
+  medicineId: number;
   unit: string;
-  stockQty: number;
+  quantity: number;
   medicineGroup: string;
   pricePerUnit: number;
   expiryDate: string;
@@ -22,12 +25,12 @@ export type InventoryFormData = {
 
 export type InventoryItem = {
   itemName: string;
-  itemId: string;
+  medicineId: number;
+  quantity: number;
   medicineGroup: string;
-  stockQty: number;
   pricePerUnit: number;
   expiryDate: string;
-  supplier: string;
+  supplier: number;
   status: "In Stock" | "Low Stock" | "Out of Stock";
 };
 
@@ -38,80 +41,121 @@ export default function AddInventoryItem() {
 
   const navigate = useNavigate();
 
-  const [groupOptions, setGroupOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
+  const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
+  const [groupIdMap, setGroupIdMap] = useState<Record<string, number>>({});
+  const [supplierIdMap, setSupplierIdMap] = useState<Record<string, number>>({});
+  const [, setNextMedicineId] = useState<number>(1);
 
-  const [supplierOptions, setSupplierOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
+
+useEffect(() => {
+  const fetchNextId = async () => {
+    try {
+      const medicines = await getMedicines();
+      const existingIds = medicines
+        .map((m: { medicineId: number }) => m.medicineId)
+        .sort((a: number, b: number) => a - b);
+
+      const nextId = existingIds.length > 0
+        ? existingIds[existingIds.length - 1] + 1
+        : 1;
+
+      setNextMedicineId(nextId);
+      methods.setValue("medicineId", nextId);
+    } catch (error) {
+      console.error("Error fetching next medicine ID:", error);
+    }
+  };
+
+  fetchNextId();
+}, [methods, setNextMedicineId]);
 
   // Load Medicine Groups
   useEffect(() => {
-    const storedGroups = JSON.parse(
-      localStorage.getItem("medicineGroups") || "[]"
-    );
+    const fetchGroups = async () => {
 
-    const options = storedGroups.map(
-      (group: { id: number; groupName: string }) => ({
-        label: group.groupName,
-        value: group.groupName,
-      })
-    );
+      
+      try {
+        const token = localStorage.getItem("token");
 
-    setGroupOptions(options);
-  }, []);
+        const res = await axios.get(API_ENDPOINTS.MEDICINE_GROUP, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
 
-  // Load Active Distributors as Suppliers
-  useEffect(() => {
-    const storedDistributors = JSON.parse(
-      localStorage.getItem("distributors") || "[]"
-    );
+        const idMap: Record<string, number> = {};
 
-    const options = storedDistributors
-      .filter((d: { status: string }) => d.status === "Active")
-      .map((distributor: { id: string; companyName: string }) => ({
-        label: distributor.companyName,
-        value: distributor.companyName,
-      }));
+        const options = res.data.data.map((g: { groupId: number; groupName: string }) => {
+          idMap[g.groupName] = g.groupId; // name → id map
+          return { label: g.groupName, value: g.groupName };
+        });
 
-    setSupplierOptions(options);
-  }, []);
-
-  const onSubmit = (data: InventoryFormData) => {
-    const existing: InventoryItem[] = JSON.parse(
-      localStorage.getItem("inventory") || "[]"
-    );
-
-    const status: InventoryItem["status"] =
-      data.stockQty === 0
-        ? "Out of Stock"
-        : data.stockQty < 20
-        ? "Low Stock"
-        : "In Stock";
-
-    const newItem: InventoryItem = {
-      itemName: data.itemName,
-      itemId: data.itemId,
-      medicineGroup: data.medicineGroup,
-      stockQty: data.stockQty,
-      pricePerUnit: data.pricePerUnit,
-      expiryDate: data.expiryDate,
-      supplier: data.supplier,
-      status,
+        setGroupOptions(options);
+        setGroupIdMap(idMap); // ← save करा
+      } catch (error) {
+        console.error("Error fetching groups:", error);
+      }
     };
 
-    localStorage.setItem(
-      "inventory",
-      JSON.stringify([...existing, newItem])
-    );
+    fetchGroups();
+  }, []);
 
-    navigate(URL_PATH.Inventory);
+  // Load Distributors
+  useEffect(() => {
+    const fetchDistributors = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await axios.get(`${API_ENDPOINTS.DISTRIBUTOR}`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        });
+
+        const sMap: Record<string, number> = {};
+
+        const options = res.data.map((d: { distributorId: number; companyName: string }) => {
+          sMap[d.companyName] = d.distributorId; // name → id map
+          return { label: d.companyName, value: d.companyName };
+        });
+
+        setSupplierOptions(options);
+        setSupplierIdMap(sMap); // ← save करा
+      } catch (error) {
+        console.error("Error fetching distributors:", error);
+      }
+    };
+
+    fetchDistributors();
+  }, []);
+
+  const onSubmit = async (data: InventoryFormData) => {
+    try {
+      // name → id convert करा
+      const finalData = {
+        ...data,
+        medicineGroup: groupIdMap[data.medicineGroup]?.toString() ?? "",
+        supplier: supplierIdMap[data.supplier]?.toString() ?? "",
+      };
+
+      await addMedicine(finalData);
+      navigate(URL_PATH.Inventory);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log("Error message:", error.message);
+      }
+
+      if (typeof error === "object" && error !== null && "response" in error) {
+        const err = error as { response?: { data?: unknown } };
+        console.log("BACKEND ERROR:", err.response?.data);
+      }
+    }
   };
 
   return (
     <FormProvider {...methods}>
-      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8} >
+      <Box width="100%" px={{ xs: 1, md: 3 }} mt={4} mb={8}>
         <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
           <Typography fontSize={20} fontWeight={600} mb={4}>
             Add New Item
@@ -119,13 +163,10 @@ export default function AddInventoryItem() {
 
           <Box
             component="form"
-             noValidate
-            onSubmit={methods.handleSubmit(onSubmit) }
+            noValidate
+            onSubmit={methods.handleSubmit(onSubmit)}
             display="grid"
-            gridTemplateColumns={{
-              xs: "1fr",
-              md: "repeat(3, 1fr)",
-            }}
+            gridTemplateColumns={{ xs: "1fr", md: "repeat(3, 1fr)" }}
             gap={2.5}
             sx={{ px: { xs: 0, md: 4 } }}
           >
@@ -139,9 +180,10 @@ export default function AddInventoryItem() {
             />
 
             <NumericField
-              name="itemId"
+              name="medicineId"
               label="Item ID"
               required
+              disabled
             />
 
             <DropdownField
@@ -163,7 +205,7 @@ export default function AddInventoryItem() {
             />
 
             <NumericField
-              name="stockQty"
+              name="quantity"
               label="Stock Quantity"
               required
             />
@@ -184,13 +226,11 @@ export default function AddInventoryItem() {
               required
             />
 
-            {/* Expiry Date (past date disabled) */}
             <DateTimeField
               name="expiryDate"
               label="Expiry Date"
               viewMode="date"
               required
-
               useCurrentDate={false}
               dateRestriction="current-future-only"
             />

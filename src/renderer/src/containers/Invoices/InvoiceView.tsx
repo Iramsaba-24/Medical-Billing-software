@@ -1,11 +1,15 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, Box, TableRow, Typography, Button, GlobalStyles, useMediaQuery, useTheme } from "@mui/material"
+import { Paper, Table, TableBody, TableCell, TableContainer,
+   Box, TableRow, Typography, Button, GlobalStyles, useMediaQuery, 
+   useTheme } from "@mui/material"
 import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoImage from "@/assets/logoimg.svg";
 import { PharmacyFormValues } from "../setting/PharmacyProfile";
- 
+import { getRetailInvoiceById, getRetailInvoiceItemsByInvoiceId } from "@/service/retailInvoiceService";
+ import { getMedicines } from "@/service/medicineService";
+ import { getCustomerById } from "@/service/customerService";
  
  
 export interface Invoice {
@@ -24,7 +28,7 @@ export interface Invoice {
   }[];
   subTotal?: number;
  
-  totalPrice?: number;
+  totalAmount?: number;
   total?: number;
 }
 interface Medicine {
@@ -37,10 +41,8 @@ interface Medicine {
  
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
-  const location = useLocation();
-  const [invoice, setInvoice] = useState<Invoice | null>(
-    (location.state as { invoice: Invoice })?.invoice || null
-  );
+
+ const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -56,14 +58,62 @@ const InvoiceView = () => {
     { label: "Amount", width: "15%" },
   ];
  
-  useEffect(() => {
-    if (!invoice && invoiceNo) {
-      const savedInvoices = JSON.parse(localStorage.getItem("currentInvoice") || "[]");
-      const found = savedInvoices.find((inv: Invoice) => inv.invoice === invoiceNo);
-      if (found) setInvoice(found);
-      else navigate(-1);
+useEffect(() => {
+  const fetchInvoice = async () => {
+    if (!invoiceNo) return;
+
+    try {
+     const data = await getRetailInvoiceById(Number(invoiceNo));
+const items = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
+const medicines = await getMedicines();
+
+let doctorName = "";
+if (data?.customerId) {
+  try {
+    const customer = await getCustomerById(data.customerId);
+    doctorName = customer?.doctor || "";
+  } catch {
+    doctorName = "";
+  }
+}
+
+if (data) {
+  setInvoice({
+    invoice: String(data.retailInvoiceId),
+    name: data.customerName || "",
+    doctor: doctorName || "",
+    address: "",
+    date: new Date(data.invoiceDate).toLocaleDateString("en-GB"),
+    medicines: (items || []).map((item: {
+      medicineId: number;
+      quantity: number;
+      price: number;
+      amount: number;
+    }) => {
+      const medicine = medicines?.find(
+        (m: { medicineId: number; itemName: string; expiryDate?: string }) =>
+          Number(m.medicineId) === Number(item.medicineId)
+      );
+       console.log("item.medicineId:", item.medicineId, "found:", medicine?.itemName);
+      return {
+        name: medicine?.itemName || String(item.medicineId),
+        qty: item.quantity,
+        amount: item.amount,
+        batch: "",
+        expiry: medicine?.expiryDate
+          ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
+          : "",
+      };
+    }),
+    totalAmount: data.totalAmount,
+  });
+} else {
+  navigate(-1);
+}
+    } catch (error) {
+       navigate(-1)
     }
- 
+
     const invoiceSettings = localStorage.getItem("invoiceSettings");
     if (invoiceSettings) {
       const parsed = JSON.parse(invoiceSettings);
@@ -71,19 +121,21 @@ const InvoiceView = () => {
       setShowLogo(printOptions.includes("show_logo"));
       setShowHsn(printOptions.includes("show_hsn_code"));
     }
-  }, [invoice, invoiceNo, navigate]);
+  };
+
+  fetchInvoice();
+}, [invoiceNo, navigate]);
  
  
-  const subTotal = invoice?.medicines?.reduce(
-    (sum, med) => sum + Number(med.amount), 0) || 0;
- 
-  // const gstAmount = invoice?.gst ? (subTotal * invoice.gst) / 100 : 0;
- 
-  const netTotal = subTotal ;
+const subTotal = invoice?.medicines?.reduce(
+  (sum, med) => sum + Number(med.amount), 0) || 0;
+
+const discountedTotal = invoice?.totalAmount ?? subTotal;
+const netTotal = discountedTotal;
  
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
  
-  //fetch name and address from pharmacy profile setting page
+
   const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
  
 useEffect(() => {
@@ -94,7 +146,7 @@ useEffect(() => {
 }, []);
 const pharmacyName = pharmacyData?.pharmacyName || "Your Pharmacy";
 const pharmacyAddress = pharmacyData?.address || "-";
-  // Mobile view card style
+ 
   if (isMobile) {
     return (
       <>

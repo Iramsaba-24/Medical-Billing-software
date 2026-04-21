@@ -1,6 +1,4 @@
 
-
- 
 import React from 'react';
 import {
   Box,
@@ -12,78 +10,49 @@ import Revenue from '@/assets/revenue.svg';
 import Inventory from '@/assets/inventory.svg';
 import Medicines from '@/assets/medicines.svg';
 import Shortage from '@/assets/shortage.svg';
-import { InventoryItem } from '@/containers/inventory/InventoryList';
-type CustomerItem = {
-  qty: number;
-  price: number;
-};
- 
-type CustomerStorage = {
-  itemsList?: CustomerItem[];
-};
- 
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
+import { getAllRetailInvoices, RetailInvoiceResponse } from "@/service/retailInvoiceService";
+import { useEffect, useState } from "react";
+
 const Dashboard: React.FC = () => {
- 
-// to fetch available medicine from inventory
-const availableMedicines = () :string =>
-{
-  const data = localStorage.getItem("inventory")
-  if(!data){
-    return "0"
-  }
-  const parseData : InventoryItem[] = JSON.parse(data)
-  const count = parseData.filter((item)=> Number(item.stockQty) >0 ).length
-  return count.toString()
-}
- 
-// to fetch medicine shortage
-const medicineShoratage = () : string =>
-{
-  const data =localStorage.getItem("inventory")
-  if(!data){
-    return "0"
-  }
-  const parseData : InventoryItem[] = JSON.parse(data)
-  const count = parseData.filter((item)=> Number(item.stockQty) <5 ).length
-  return count.toString()
-}
- 
-//inventory status
-const inventoryStatus = (): string =>
-{
-  const data = Number(medicineShoratage())
-  if(data ===0)
-  {
-    return "Good"
-  }
-  if(data<=3)
-  {
-    return "Average"
-  }
-  return "Critical"
-}
- 
+const [inventory, setInventory] = useState<MedicineResponse[]>([]);// inventory data
+const [invoices, setInvoices] = useState<RetailInvoiceResponse[]>([]);// fetch invoices for revenue calculation
+// fetch inventory data
+useEffect(() => {
+  const fetchInventory = async () => {
+    const data = await getMedicines(); 
+    setInventory(data);
+  };
+  fetchInventory();
+}, []);
+// fetch invoices data
+useEffect(() => {
+  const fetchInvoices = async () => {
+    const data = await getAllRetailInvoices();
+    setInvoices(data);
+  };
+
+  fetchInvoices();
+}, []);
+// available medicines count
+const availableMedicines = inventory.filter(item => item.quantity > 0).length;
+// shortage count
+const medicineShortage = inventory.filter(item => item.quantity < 5).length;
+// inventory status
+const inventoryStatus = (): string => {
+  if (medicineShortage === 0) return "Good";
+  if (medicineShortage <= 3) return "Average";
+  return "Critical";
+};
 // fetch total revenue
 const totalRevenue = (): string => {
-  const customerData: CustomerStorage[] = JSON.parse(
-    localStorage.getItem("medical_customers") || "[]"
-  );
- 
-  const sales = customerData.reduce((sum, customer) => {
-    const customerTotal =
-      customer.itemsList?.reduce(
-        (itemSum, item) =>
-          itemSum + (Number(item.qty) || 0) * (Number(item.price) || 0),
-        0
-      ) || 0;
- 
-    return sum + customerTotal;
-  }, 0);
- 
-  return `₹ ${sales.toLocaleString()}`;
+  const total = invoices
+    .filter((inv) => inv.paymentStatus === "Paid")
+    .reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+
+  return `₹ ${total.toLocaleString()}`;
 };
- 
- 
+// fetch visible kpis-settings
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
     "totalRevenue",
@@ -92,23 +61,18 @@ const getVisibleKpis = (): string[] => {
     "medicinesShortage",
   ];
  
-  const data = localStorage.getItem("dashboardSettings");
- 
+  const data = localStorage.getItem("dashboardSettings") 
   if (!data) return defaultKpis;
  
   try {
     const parsed = JSON.parse(data);
- 
-    //  handle BOTH formats
+    //  handle both formats
     if (Array.isArray(parsed)) return parsed;
- 
     return parsed.visibleKpis || defaultKpis;
- 
   } catch {
     return defaultKpis;
   }
 };
- 
 const visibleKpis = getVisibleKpis();
  
   return (
@@ -168,28 +132,14 @@ const visibleKpis = getVisibleKpis();
 )}
  
 {visibleKpis.includes("inventoryStatus") && (
-  <StackCard
-    value={inventoryStatus()}
-    title="Inventory Status"
-    icon={Inventory}
-  />
-)}
- 
-{visibleKpis.includes("medicinesAvailable") && (
-  <StackCard
-    value={availableMedicines()}
-    title="Medicines Available"
-    icon={Medicines}
-  />
-)}
- 
-{visibleKpis.includes("medicinesShortage") && (
-  <StackCard
-    value={medicineShoratage()}
-    title="Medicine Shortage"
-    icon={Shortage}
-  />
-)}
+    <StackCard value={inventoryStatus()} title="Inventory Status" icon={Inventory} />
+  )}
+  {visibleKpis.includes("medicinesAvailable") && (
+    <StackCard value={availableMedicines.toString()} title="Medicines Available" icon={Medicines} />
+  )}
+  {visibleKpis.includes("medicinesShortage") && (
+    <StackCard value={medicineShortage.toString()} title="Medicine Shortage" icon={Shortage} />
+  )}
  
 </Box>
     </Box>
@@ -263,5 +213,6 @@ const StackCard: React.FC<StackCardProps> = ({ value, title, icon }) => {
     </Card>
   );
 };
+ 
  
  

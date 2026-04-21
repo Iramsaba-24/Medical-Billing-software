@@ -3,43 +3,51 @@ import { Box, Typography, Paper,} from "@mui/material";
 import BankInfo from "@/containers/distributors/BankInfo";
 import NewInvoiceList from "@/containers/distributors/NewInvoiceList";
 import { useEffect, useState } from "react";
-
+ 
 const DistributorDetails = () => {
   const { state } = useLocation();
   const data = state?.distributor;
 const [showBankDetails, setShowBankDetails] = useState(false);
-
+ 
   useEffect(() => {
     const stored = localStorage.getItem("distributorSettings");
-
+ 
     if (stored) {
       const settings = JSON.parse(stored);
-
+ 
       setShowBankDetails(settings.bank_details?.includes("bank_details"));
     }
   }, []);
-
+ 
   if (!data) return <Typography p={3}>Distributor not found!</Typography>;
 // fields for BankInfo and DistributorDetails
   const distributorFields = [
     { label: "Company Name", value: data.companyName },
     { label: "Owner Name", value: data.ownerName },
     { label: "Registration Number", value: data.registrationNumber },
-    { label: "Mobile Number", value: data.mobile },
+    { label: "Mobile Number", value: data.phone },
     { label: "Email", value: data.email },
     { label: "Website", value: data.website },
     { label: "Address", value: data.address },
   ];
 
-  const bankFields = [
-    { label: "Bank Name", value: data.bankName },
-    { label: "A/C Number", value: data.accountNumber },
-    { label: "A/C Holder's Name", value: data.accountHolderName },
-    { label: "Branch", value: data.branch },
-    { label: "IFSC", value: data.ifsc },
-    { label: "UPI ID", value: data.upiId },
-  ];
+  // const bankFields = [
+  //   { label: "Bank Name", value: data.bankName },
+  //   { label: "A/C Number", value: data.accountNumber },
+  //   { label: "A/C Holder's Name", value: data.accountHolderName },
+  //   { label: "Branch", value: data.branchName },
+  //   { label: "IFSC", value: data.ifscCode },
+  //   { label: "UPI ID", value: data.upiId },
+  // ];
 
+  const bankFields = [
+  { label: "Bank Name", value: data.bankDetails?.bankName },
+  { label: "A/C Number", value: data.bankDetails?.accountNumber },
+  { label: "A/C Holder's Name", value: data.bankDetails?.accountHolderName },
+  { label: "Branch", value: data.bankDetails?.branch },
+  { label: "IFSC", value: data.bankDetails?.ifscCode },
+  { label: "UPI ID", value: data.bankDetails?.upiId },
+];
   return (
     <Box p={-2}>
      {/* DistributorsDetails */}
@@ -54,9 +62,10 @@ const [showBankDetails, setShowBankDetails] = useState(false);
       )}
       {/* InventoryList call */}
         <NewInvoiceList/>
-      
+     
     </Box>
   );
 };
-
+ 
 export default DistributorDetails;
+ 

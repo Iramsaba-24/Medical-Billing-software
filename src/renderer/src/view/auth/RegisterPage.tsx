@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent } from "react";
+import { ChangeEvent } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,8 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
  
 type RegisterFormInputs = {
-  fullName: string;
+   fullName: string;
+  
   email: string;
   mobileNumber: string;
   companyName: string;
@@ -23,6 +24,7 @@ const RegisterPage = () => {
   const methods = useForm<RegisterFormInputs>({
     defaultValues: {
       fullName: "",
+      
       email: "",
       mobileNumber: "",
       companyName: "",
@@ -79,11 +81,6 @@ const RegisterPage = () => {
       if (value) clearErrors(field);
     };
  
-  const handleLettersOnlyInput = (e: FormEvent<HTMLInputElement>) => {
-    const input = e.currentTarget;
-    input.value = input.value.replace(/[^A-Za-z ]/g, "").slice(0, 20);
-  };
- 
   const validateRequiredFields = (data: RegisterFormInputs) => {
     let isValid = true;
  
@@ -104,11 +101,11 @@ const RegisterPage = () => {
       ...data,
       fullName: data.fullName.trim(),
       email: data.email.trim(),
-      company: data.companyName.trim(),
+      companyName: data.companyName.trim(),
       city: data.city.trim(),
       state: data.state.trim(),
     };
-
+ 
      localStorage.setItem('registrationData', JSON.stringify({
     fullName: cleanedData.fullName,
     email: cleanedData.email,
@@ -119,7 +116,7 @@ const RegisterPage = () => {
   }));
  
     console.log(cleanedData);
-
+ 
     navigate(URL_PATH.BusinessDetails);
     showToast("success", "Personal details saved!");
   };
@@ -190,7 +187,7 @@ const RegisterPage = () => {
               rows={1}
               sx={inputStyle("fullName")}
               required
-            
+           
               onChange={handleLettersOnlyChange("fullName")}
               rules={{
                 pattern: {
@@ -221,32 +218,19 @@ const RegisterPage = () => {
               inputType="alphabet"
               required
               sx={inputStyle("companyName")}
-              slotProps={{
-                htmlInput: { maxLength: 30 },
-              }}
-              rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
-              }}
+              minLength={3}
+              maxLength={30}
             />
  
             <TextInputField
               name="city"
               label="City"
               required
+              minLength={3}
+              maxLength={30}
               sx={inputStyle("city")}
-              inputProps={{
-                maxLength: 20,
-                onInput: handleLettersOnlyInput,
-              }}
               onChange={handleLettersOnlyChange("city")}
               rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
                 pattern: {
                   value: /^[A-Za-z ]+$/,
                   message: "Only letters allowed",
@@ -259,16 +243,10 @@ const RegisterPage = () => {
               label="State"
               required
               sx={inputStyle("state")}
-              inputProps={{
-                maxLength: 20,
-                onInput: handleLettersOnlyInput,
-              }}
+              minLength={3}
+              maxLength={30}
               onChange={handleLettersOnlyChange("state")}
               rules={{
-                minLength: {
-                  value: 3,
-                  message: "Minimum 3 characters required",
-                },
                 pattern: {
                   value: /^[A-Za-z ]+$/,
                   message: "Only letters allowed",
@@ -330,5 +308,3 @@ const RegisterPage = () => {
 };
  
 export default RegisterPage;
- 
- 

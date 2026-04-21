@@ -16,7 +16,7 @@ const BankInfo = ({
 }: BankInfoProps) => (
   <Box sx={{ mb: 2 }}>
     <Typography variant="h6" fontWeight={600} mb={3}>
-      {title}
+      {title} 
     </Typography>
      {/* for displaying details in card */}
     <Box sx={{ display: "flex", flexWrap: "wrap", width: "100%",

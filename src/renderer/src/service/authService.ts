@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const API_BASE_URL = "http://localhost:5158/api";
 
@@ -27,6 +27,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  ownerName: string;
   message: string;
   token: string;
   userId?: number;
@@ -60,37 +61,67 @@ export interface PaymentRequest {
   subscriptionId: number;
   amount: number;
   paymentMethod: string;
-  couponCode?: string;
 }
 
 export interface PaymentResponse {
+  success: boolean;
   SrNo: number;
   userPaymentId: number;
   userId: number;
   subscriptionId: number;
   amount: number;
   paymentMethod: string;
-  couponCode: string;
   paymentStatus: string;
   paymentDate: string;
 }
 
+export interface SubscriptionResponse {
+  subscriptionId: number;
+  isActive?: boolean;
+  startDate?: string;
+  endDate?: string;
+  message?: string;
+  status?: string;
+
+   data?: {  
+    subscriptionId: number;
+    isActive?: boolean;
+    startDate?: string;
+    endDate?: string;
+  };
+}
+
+export interface UserSubscription {
+  subscriptionId: number;
+  userId: number;
+  planId: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+}
+
 export const authService = {
-  // Complete registration with all steps
   register: async (userData: RegisterRequest): Promise<RegisterResponse> => {
     const response = await axios.post(
       `${API_BASE_URL}/Auth/register`,
       userData,
     );
+     if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      if (response.data.userId) {
+        localStorage.setItem("userId", response.data.userId.toString());
+      }
+    }
+    
     return response.data;
   },
 
-  // Login
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const response = await axios.post(
       `${API_BASE_URL}/Auth/login`,
       credentials,
     );
+    console.log("LOGIN RESPONSE:", response.data);
     if (response.data.token) {
       localStorage.setItem("token", response.data.token);
       if (response.data.userId) {
@@ -100,32 +131,73 @@ export const authService = {
     return response.data;
   },
 
-  // Create subscription after payment
-  createSubscription: async (
-    subscriptionData: CreateSubscriptionRequest,
-  ): Promise<CreateSubscriptionResponse> => {
-    const response = await axios.post(
-      `${API_BASE_URL}/UserSubscription`,
-      subscriptionData,
-    );
-    return response.data;
+  getUserSubscriptions: async (userId: number): Promise<UserSubscription[]> => {
+    try {
+      const response = await axiosInstance.get(`/UserSubscription/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user subscriptions:", error);
+      return [];
+    }
   },
 
-  // Process payment
+  createSubscription: async (data: { userId: number; planId: number }): Promise<SubscriptionResponse> => {
+    try {
+      console.log("Sending subscription request:", data);
+      
+      const requestData = {
+        userId: Number(data.userId),
+        planId: Number(data.planId)
+      };
+      
+      const response = await axiosInstance.post(`/UserSubscription`, requestData);
+      console.log("Subscription response:", response.data);
+      return response.data;
+    } catch (error: unknown) {
+      console.error("Create subscription error:", error);
+      
+      if (error instanceof AxiosError && error.response?.status === 400) {
+        console.log("Attempting to fetch existing subscription...");
+        const subscriptions = await authService.getUserSubscriptions(data.userId);
+        
+        if (subscriptions && subscriptions.length > 0) {
+          const activeSub = subscriptions.find((s: UserSubscription) => s.isActive === true);
+          if (activeSub) {
+            console.log("Found existing active subscription:", activeSub);
+            return activeSub;
+          }
+        }
+      }
+      
+      throw error;
+    }
+  },
+
   processPayment: async (
     paymentData: PaymentRequest,
+    sendVia: "email" | "whatsapp",
+    email?: string,
   ): Promise<PaymentResponse> => {
-    const response = await axios.post(`${API_BASE_URL}/Payments`, paymentData);
+    const requestData = {
+      userId: paymentData.userId,
+      subscriptionId: paymentData.subscriptionId,
+      amount: paymentData.amount,
+      paymentMethod: paymentData.paymentMethod,
+      sendVia: sendVia,
+      email: email || "",
+    };
+    
+    console.log("Sending payment request:", requestData);
+    
+    const response = await axiosInstance.post("/Payments", requestData);
     return response.data;
-  },
+  }
 };
 
-// Optional: Create axios instance with interceptors
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Add token to requests if it exists
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

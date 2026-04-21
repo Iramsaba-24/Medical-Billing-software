@@ -1,32 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography } from '@mui/material';
- 
-const baseData = [
-  { day: 'Mon', value: 6000 },
-  { day: 'Tue', value: 10000 },
-  { day: 'Wed', value: 30000 },
-  { day: 'Thu', value: 10000 },
-  { day: 'Fri', value: 15000 },
-  { day: 'Sat', value: 16000 },
-];
- 
-const MAX_VALUE = 45000;
- 
+import { getAllRetailInvoices, RetailInvoiceResponse } from "@/service/retailInvoiceService";
+const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; 
+
 const BarChart: React.FC = () => {
-  const [data, setData] = useState(baseData);
  
+   const [invoices, setInvoices] = useState<RetailInvoiceResponse[]>([]);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      setData(prev =>
-        prev.map(item => ({
-          ...item,
-          value: Math.floor(Math.random() * 30000) + 5000,
-        }))
-      );
-    }, 3000);
- 
-    return () => clearInterval(interval);
-  }, []);
+  const fetchInvoices = async () => {
+    try {
+      const res = await getAllRetailInvoices();
+      setInvoices(res);
+    } catch (error) {
+      console.error("Failed to fetch invoices", error);
+    }
+  };
+
+  fetchInvoices();
+}, []);
+const chartData = days.map(day => {
+  const value = invoices
+    .filter(inv => {
+      const date = new Date(inv.invoiceDate);
+      const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
+      return dayName === day;
+    })
+    .reduce((sum, inv) => sum + inv.totalAmount, 0);
+
+  return {
+    day,
+    value,
+  };
+});
+
+ const data = chartData;
+const MAX_VALUE = 45000;
+
  
   return (
     <Card
@@ -72,51 +82,50 @@ const BarChart: React.FC = () => {
             alignItems="flex-end"
             minWidth={0}
           >
-            {data.map(item => {
-              const heightPercent = (item.value / MAX_VALUE) * 100;
- 
-              return (
-                <Box
-                  key={item.day}
-                  flex={1}
-                  display="flex"
-                  flexDirection="column"
-                  alignItems="center"
-                >
-                  <Box
-                    sx={{
-                      height: { xs: 150, sm: 260 },
-                      width: { xs: 10, sm: 22 },
-                      backgroundColor: '#E5E7EB',
-                      borderRadius: 2,
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: '100%',
-                        height: `${heightPercent}%`,
-                        background:
-                          'linear-gradient(180deg, #2EF2D0 0%, #00A991 100%)',
-                        borderRadius: 2,
-                        transition: 'height 0.8s ease',
-                      }}
-                    />
-                  </Box>
- 
-                  <Typography
-                    mt={1}
-                    fontSize={{ xs: 9, sm: 12 }}
-                    fontWeight={500}
-                    color="#374151"
-                  >
-                    {item.day}
-                  </Typography>
-                </Box>
-              );
-            })}
+{data.map(item => {
+const heightPercent = (item.value / MAX_VALUE) * 100;
+  return (
+    <Box
+      key={item.day}
+      flex={1}
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+    >
+      <Box
+        sx={{
+          height: { xs: 150, sm: 260 },
+          width: { xs: 10, sm: 22 },
+          backgroundColor: '#E5E7EB',
+          borderRadius: 2,
+          display: 'flex',
+          alignItems: 'flex-end',
+          overflow: 'hidden',
+        }}
+      >
+        <Box
+          sx={{
+            width: '100%',
+            height: `${heightPercent}%`,
+            background:
+              'linear-gradient(180deg, #2EF2D0 0%, #00A991 100%)',
+            borderRadius: 2,
+            transition: 'height 0.8s ease',
+          }}
+        />
+      </Box>
+
+      <Typography
+        mt={1}
+        fontSize={{ xs: 9, sm: 12 }}
+        fontWeight={500}
+        color="#374151"
+      >
+        {item.day}
+      </Typography>
+    </Box>
+  );
+})}
           </Box>
         </Box>
       </CardContent>
@@ -125,6 +134,7 @@ const BarChart: React.FC = () => {
 };
  
 export default BarChart;
+ 
  
  
  

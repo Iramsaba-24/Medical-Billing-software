@@ -1,67 +1,52 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Card, Divider } from "@mui/material";
- 
-interface SalesData {
-  totalPrice: number;
-  date: string;
-}
- 
+import { getAllRetailInvoices, RetailInvoiceResponse } from "@/service/retailInvoiceService";
+
 const LineGraph: React.FC = () => {
- 
-  const parseDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    if (!isNaN(d.getTime())) return d;
- 
-    // handle dd/mm/yyyy (your case)
-    const [day, month, year] = dateStr.split("/");
-    return new Date(`${year}-${month}-${day}`);
-  };
- 
-  const isToday = (dateStr: string) => {
+  const [totalSales, setTotalSales] = useState<number>(0);
+  const [totalPurchase] = useState<number>(0); 
+
+  // helper function to check if date is today
+  const isToday = (dateStr: string): boolean => {
     const today = new Date();
-    const d = parseDate(dateStr);
- 
+    const d = new Date(dateStr);
+
     return d.toDateString() === today.toDateString();
   };
- 
-  const getData = () => {
-    const storedRetail = localStorage.getItem("currentInvoice");
-    const storedDistributor = localStorage.getItem("currentNewInvoiceList");
- 
-    let retailSales: SalesData[] = [];
-    let distributorSales: SalesData[] = [];
- 
-    if (storedRetail) {
-      retailSales = JSON.parse(storedRetail);
-    }
- 
-    if (storedDistributor) {
-      distributorSales = JSON.parse(storedDistributor);
-    }
- 
-    // Combine + filter only TODAY
-    const allSales = [...retailSales, ...distributorSales].filter((sale) =>
-      isToday(sale.date)
-    );
- 
-    const totalSales = allSales.reduce(
-      (sum, s) => sum + (s.totalPrice || 0),
-      0
-    );
- 
-    return {
-      totalSales,
-      totalPurchase: 0,
+
+  useEffect(() => {
+    const fetchTodaySales = async () => {
+      try {
+        const data: RetailInvoiceResponse[] = await getAllRetailInvoices();
+
+        // filter today's invoices
+        const todaySales = data.filter(
+          (inv) =>
+            inv.invoiceDate &&
+            isToday(inv.invoiceDate) 
+            // && inv.paymentStatus === "Paid"   
+        );
+
+        // calculate total
+        const total = todaySales.reduce(
+          (sum, item) => sum + (item.totalAmount || 0),
+          0
+        );
+
+        setTotalSales(total);
+      } catch (error) {
+        console.error("Error fetching sales", error);
+      }
     };
-  };
- 
-  const { totalSales, totalPurchase } = getData();
- 
+
+    fetchTodaySales();
+  }, []);
+
   const max = Math.max(totalSales, totalPurchase, 1);
- 
+
   const salesPercent = (totalSales / max) * 100;
   const purchasePercent = (totalPurchase / max) * 100;
- 
+
   return (
     <Card
       sx={{
@@ -72,24 +57,23 @@ const LineGraph: React.FC = () => {
         backgroundColor: "#fff",
       }}
     >
-      <Typography  fontWeight={600} fontSize={{ xs: 14, sm: 18 }} mb={2}>
+      <Typography fontWeight={600} fontSize={{ xs: 14, sm: 18 }} mb={2}>
         Daily Report
       </Typography>
 
       <Divider sx={{ mb: 4, borderColor: "#9CA3AF" }} />
- 
+
       <Box display="flex" flexDirection="column" gap={6}>
- 
         {/* Sales */}
         <Box>
           <Typography fontWeight={700} fontSize={18}>
             ₹ {totalSales.toFixed(2)}
           </Typography>
- 
+
           <Typography fontSize={15} mt={1}>
             Today&apos;s Sale
           </Typography>
- 
+
           <Box
             sx={{
               mt: 3,
@@ -109,17 +93,17 @@ const LineGraph: React.FC = () => {
             />
           </Box>
         </Box>
- 
-        {/* Purchase UI */}
+
+        {/* Purchase */}
         <Box>
           <Typography fontWeight={700} fontSize={18}>
             ₹ {totalPurchase.toFixed(2)}
           </Typography>
- 
+
           <Typography fontSize={15} mt={1}>
             Today&apos;s Purchase
           </Typography>
- 
+
           <Box
             sx={{
               mt: 3,
@@ -139,10 +123,9 @@ const LineGraph: React.FC = () => {
             />
           </Box>
         </Box>
- 
       </Box>
     </Card>
   );
 };
- 
+
 export default LineGraph;

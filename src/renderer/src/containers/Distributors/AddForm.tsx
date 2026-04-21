@@ -8,13 +8,14 @@ import DateTimeField from '@/components/controlled/DateTimeField';
 import { useState } from "react";
 import AppToast from "@/containers/Distributors/AppToast";
 
+
 const AddForm = () => {
   const methods = useForm({
     defaultValues: {
-      companyName: '',
-      mobile: '',
+    companyName: '',
+      Phone: '',
       email: '',
-      date: '',
+      createdAt: '',
       address: '',
     },
   });
@@ -59,7 +60,7 @@ const AddForm = () => {
           }}
         >
           <Typography variant="h6" mb={3}>
-            Add Distributor
+            Add Distributor 
           </Typography>
           <Box
             sx={{
@@ -83,13 +84,13 @@ const AddForm = () => {
             display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', }, gap: 2, mt: 2,
           }}
           >
-            <MobileField name="mobile" label="Phone" required />
+            <MobileField name="phone" label="Phone" required />
             <EmailField name="email" label="Email" required />
           </Box>
 
           {/* Date */}
           <Box sx={{ mt: 2, width: '50%' }}>
-            <DateTimeField name="date" label="Date" viewMode="date" />
+            <DateTimeField name="createdAt" label="Date" viewMode="date" />
           </Box>
 
           {/* Address */}

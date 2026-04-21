@@ -1,57 +1,48 @@
-import {  useState } from "react";
-
+import { useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
-
-import {  useNavigate } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 import {
   UniversalTable,
   Column,
   DropdownOption,
 } from "@/components/uncontrolled/UniversalTable";
-// import {  InvoiceStatus } from "@/types/invoice";
 import { Invoice, InvoiceStatus } from "@/types/invoice";
-
 import { FormProvider, useForm } from "react-hook-form";
-
 import DropdownField from "@/components/controlled/DropdownField";
-
 import { URL_PATH } from "@/constants/UrlPath";
-
 import {
   showToast,
   showConfirmation,
 } from "@/components/uncontrolled/ToastMessage.tsx";
+import { deleteRetailInvoice } from "@/service/retailInvoiceService";
 
 type Props = {
   invoices: Invoice[];
   setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
+  refetchInvoices: () => Promise<void>;
 };
-
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ invoices, setInvoices }: Props) => {
- // const location = useLocation();
+const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
+  // const location = useLocation();
 
   const navigate = useNavigate();
-  
   const [filterType, setFilterType] = useState<FilterType>("all");
-
   const filterOptions = [
     { label: "All", value: "all" },
-
     { label: "Daily", value: "daily" },
-
     { label: "Monthly", value: "monthly" },
-
     { label: "Yearly", value: "yearly" },
   ];
 
   const filteredInvoices = invoices.filter((invoice) => {
     if (!filterType || filterType === "all") return true;
 
-    const parts = invoice.date.split("/");
+    const dateStr = invoice.invoiceDate ?? "";
+    if (!dateStr) return false;
+
+    const parts = dateStr.split("/");
     const invoiceDate = new Date(
       Number(parts[2]),
       Number(parts[1]) - 1,
@@ -86,13 +77,13 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
   const columns: Column<Invoice>[] = [
     { key: "invoice", label: "Invoice" },
     { key: "name", label: "Name" },
-    { key: "date", label: "Date" },
+    { key: "invoiceDate", label: "Date" },
     {
       key: "price",
       label: "Price",
       render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
     },
-    { key: "status", label: "Status" },
+    { key: "paymentStatus", label: "Status" },
     { key: "actionbutton", label: "Action" },
   ];
 
@@ -114,21 +105,19 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
   const handleDelete = async (invoiceNo: string) => {
     const confirmed = await showConfirmation(
       "Are you sure you want to delete this invoice?",
-
       "Confirm Delete"
     );
-
     if (!confirmed) return;
 
-    setInvoices((prev) => {
-      const updated = prev.filter((inv) => inv.invoice !== invoiceNo);
-
-      localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-      return updated;
-    });
-
-    showToast("success", "Invoice deleted successfully");
+    try {
+      await deleteRetailInvoice(Number(invoiceNo));
+      await refetchInvoices();
+      window.dispatchEvent(new Event("invoiceUpdated"));
+      showToast("success", "Invoice deleted successfully");
+    } catch (error) {
+      console.error("Error deleting invoice", error);
+      showToast("error", "Failed to delete invoice");
+    }
   };
 
   return (
@@ -166,30 +155,25 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
         </Box>
 
         <UniversalTable<Invoice>
-         data={filteredInvoices}
+          data={filteredInvoices}
           columns={columns}
           showSearch
           showExport
           enableCheckbox
           getRowId={(row) => row.invoice}
           dropdown={{
-            key: "status",
+            key: "paymentStatus",
 
             options: statusOptions,
 
             onChange: (row, value) => {
-              setInvoices((prev) => {
-                const updated = prev.map((inv) =>
+              setInvoices((prev) =>
+                prev.map((inv) =>
                   inv.invoice === row.invoice
-                    ? { ...inv, status: value as InvoiceStatus }
+                    ? { ...inv, paymentStatus: value as InvoiceStatus }
                     : inv
-                );
-
-                localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-                return updated;
-              });
-
+                )
+              );
               showToast("success", "Status updated successfully");
             },
           }}
@@ -207,23 +191,20 @@ const BillingTable = ({ invoices, setInvoices }: Props) => {
           onDeleteSelected={async (rows) => {
             const confirmed = await showConfirmation(
               "Delete selected invoices?",
-
               "Confirm Delete"
             );
-
             if (!confirmed) return;
 
-            setInvoices((prev) => {
-              const updated = prev.filter(
-                (inv) => !rows.some((r) => r.invoice === inv.invoice)
-              );
-
-              localStorage.setItem("currentInvoice", JSON.stringify(updated));
-
-              return updated;
-            });
-
-            showToast("success", "Selected invoices deleted");
+            try {
+              for (const row of rows) {
+                await deleteRetailInvoice(Number(row.invoice));
+              }
+              await refetchInvoices();
+              showToast("success", "Selected invoices deleted");
+            } catch (error) {
+              console.error("Error deleting selected invoices", error);
+              showToast("error", "Failed to delete selected invoices");
+            }
           }}
         />
       </Paper>

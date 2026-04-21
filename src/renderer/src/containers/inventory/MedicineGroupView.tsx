@@ -2,12 +2,16 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Paper, Typography } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
+import { getMedicines } from "@/service/medicineService";
+
+
 
 type InventoryItem = {
   itemName: string;
-  itemId: string;
+  medicineId: number;
   medicineGroup: string;
-  stockQty: number;
+  groupId: number;
+  quantity: number;
   pricePerUnit: number;
   expiryDate: string;
   supplier: string;
@@ -29,29 +33,33 @@ type InventoryItem = {
   };
 
 export default function MedicineGroupDetails() {
-  const { groupName } = useParams();
+const { groupName } = useParams<{ groupName: string }>();
   const [items, setItems] = useState<InventoryItem[]>([]);
 
-  useEffect(() => {
-    const inventory: InventoryItem[] =
-      JSON.parse(localStorage.getItem("inventory") || "[]");
 
-    const filtered = inventory.filter(
-      (item) => item.medicineGroup === groupName
-    );
-
-    setItems(filtered);
-  }, [groupName]);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      if (!groupName) return;
+      const all: InventoryItem[] = await getMedicines();
+      const filtered = all.filter((m: InventoryItem) => m.groupId === Number(groupName));
+      setItems(filtered);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  fetchData();
+}, [groupName]);
 
   const columns: Column<InventoryItem>[] = [
     { key: "itemName", label: "Item Name" },
-    { key: "itemId", label: "Item ID" },
-    { key: "stockQty", label: "Stock Qty" },
+    { key: "medicineId", label: "Item ID" },
+    { key: "quantity", label: "Stock Qty" },
     { key: "pricePerUnit", label: "Price" },
     { key: "status", label: "Status",
        render: (row) => (
-        <Typography fontWeight={500} color={getStatusColor(row.stockQty)}>
-          {getStatus(row.stockQty)}
+        <Typography fontWeight={500} color={getStatusColor(row.quantity)}>
+          {getStatus(row.quantity)}
         </Typography>
       ),
     },
@@ -60,7 +68,7 @@ export default function MedicineGroupDetails() {
   return (
     <Paper sx={{ p: 3, borderRadius: 2 }}>
     <Typography fontSize={20} fontWeight={600} mb={2}>
-      {groupName} {}
+      {groupName}
     </Typography>
 
 

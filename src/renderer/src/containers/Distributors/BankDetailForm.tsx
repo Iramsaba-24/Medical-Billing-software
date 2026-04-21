@@ -52,7 +52,7 @@ const BankDetailsForm = () => {
         />
 
         <TextInputField
-          name="ifsc"
+          name="ifscCode"
           label="IFSC Code"
           required
           maxLength={11}

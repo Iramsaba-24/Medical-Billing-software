@@ -1,17 +1,20 @@
-import React, { useState } from "react";
 import { Card, Typography, Box, useTheme, useMediaQuery } from "@mui/material";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { useDrawingArea } from "@mui/x-charts/hooks";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
+import React, { useState, useEffect } from "react";
 
+import { DistributorResponse, getDistributors } from "@/service/distributorService";
+import { RetailInvoiceResponse, getAllRetailInvoices } from "@/service/retailInvoiceService";
+ 
 function CenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
-
+ 
   return (
     <text
       x={left + width / 2}
-      y={top + height / 2}
+      y={top + height / 2} 
       textAnchor="middle"
       dominantBaseline="central"
       style={{
@@ -23,36 +26,15 @@ function CenterLabel({ children }: { children: React.ReactNode }) {
     </text>
   );
 }
-
+ 
 type FilterType = "Today" | "6 Days" | "This Month";
-
-const chartDataMap = {
-  Today: [
-    { label: "Purchases", value: 20, color: "#6EE700" },
-    { label: "Suppliers", value: 30, color: "#8B5CF6" },
-    { label: "Sales", value: 25, color: "#00F5C8" },
-    { label: "No Sales", value: 25, color: "#FFD200" },
-  ],
-  "6 Days": [
-    { label: "Purchases", value: 35, color: "#6EE700" },
-    { label: "Suppliers", value: 25, color: "#8B5CF6" },
-    { label: "Sales", value: 30, color: "#00F5C8" },
-    { label: "No Sales", value: 10, color: "#FFD200" },
-  ],
-  "This Month": [
-    { label: "Purchases", value: 42, color: "#6EE700" },
-    { label: "Suppliers", value: 28, color: "#8B5CF6" },
-    { label: "Sales", value: 18, color: "#00F5C8" },
-    { label: "No Sales", value: 12, color: "#FFD200" },
-  ],
-};
-
+ 
 const filterOptions = [
   { label: "Today", value: "Today" },
   { label: "6 Days", value: "6 Days" },
   { label: "This Month", value: "This Month" },
 ];
-
+ 
 const StockDonutChart = ({
   title,
   isOnlyDonutSelected = false,
@@ -61,19 +43,95 @@ const StockDonutChart = ({
   isOnlyDonutSelected?: boolean;
 }) => {
   const [filter, setFilter] = useState<FilterType>("This Month");
-
   const methods = useForm({
     defaultValues: {
       filterSelect: "This Month",
     },
   });
+  const handleFilterChange = (value: string) => {
+    if (!value || !(value in chartDataMap)) return;
+    setFilter(value as FilterType);
+  };
+const [suppliers, setSuppliers] = useState<DistributorResponse[]>([]);
+const [invoices, setInvoices] = useState<RetailInvoiceResponse[]>([]);
 
-  const total = chartDataMap[filter].reduce((sum, d) => sum + d.value, 0);
+// function for date filter dropdown
+const isDateInFilter = (dateString: string, filter: FilterType): boolean => {
+  const today = new Date();
+  const date = new Date(dateString);
 
+  if (filter === "Today") {
+    return date.toDateString() === today.toDateString();
+  }
+
+  if (filter === "6 Days") {
+    const past = new Date();
+    past.setDate(today.getDate() - 6);
+    return date >= past && date <= today;
+  }
+
+  if (filter === "This Month") {
+    return (
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  }
+
+  return true;
+};
+
+// filters
+const filteredSuppliers = suppliers.filter((s) =>
+  isDateInFilter(s.createdDate, filter)
+);
+
+const filteredSales = invoices.filter((inv) =>
+  isDateInFilter(inv.invoiceDate, filter)
+);
+
+// chartDataMap
+const chartDataMap = {
+  Today: [
+    { label: "Purchases", value: 20, color: "#6EE700" },
+    { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
+    { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
+    { label: "No Sales", value: 25, color: "#FFD200" },
+  ],
+  "6 Days": [
+    { label: "Purchases", value: 35, color: "#6EE700" },
+    { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
+    { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
+    { label: "No Sales", value: 10, color: "#FFD200" },
+  ],
+  "This Month": [
+    { label: "Purchases", value: 42, color: "#6EE700" },
+    { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
+    { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
+    { label: "No Sales", value: 12, color: "#FFD200" },
+  ],
+};
+// fetch data in donut chart
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const suppliersData = await getDistributors();
+      const invoicesData = await getAllRetailInvoices();
+
+      setSuppliers(suppliersData);
+      setInvoices(invoicesData);
+    } catch (error) {
+      console.error("API Error:", error);
+    }
+  };
+
+  fetchData();
+}, []);
+  const total =
+  chartDataMap[filter]?.reduce((sum, d) => sum + d.value, 0) || 0;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isSmallMobile = useMediaQuery("(max-width:360px)");
-
+ 
   const chartSize = isOnlyDonutSelected
     ? isSmallMobile
       ? 240
@@ -85,7 +143,7 @@ const StockDonutChart = ({
     : isMobile
     ? 180
     : 260;
-
+ 
   const innerRadius = isOnlyDonutSelected
     ? isSmallMobile
       ? 58
@@ -97,7 +155,7 @@ const StockDonutChart = ({
     : isMobile
     ? 45
     : 70;
-
+ 
   const outerRadius = isOnlyDonutSelected
     ? isSmallMobile
       ? 95
@@ -109,11 +167,8 @@ const StockDonutChart = ({
     : isMobile
     ? 75
     : 110;
-
-  const handleFilterChange = (value: string) => {
-    setFilter(value as FilterType);
-  };
-
+ 
+  
   return (
     <Card
       variant="outlined"
@@ -140,9 +195,9 @@ const StockDonutChart = ({
         >
           {title}
         </Typography>
-
+ 
         <FormProvider {...methods}>
-          <Box sx={{ width: { xs: "100%", sm: 200 }, mr: { sm: 1 } }}>
+          <Box sx={{ width: { xs: "110%", sm: 150 }, mr: { sm: 1 } }}>
             <DropdownField
               name="filterSelect"
               options={filterOptions}
@@ -151,7 +206,7 @@ const StockDonutChart = ({
           </Box>
         </FormProvider>
       </Box>
-
+ 
       {isOnlyDonutSelected ? (
         <Box
           sx={{
@@ -190,7 +245,7 @@ const StockDonutChart = ({
               <CenterLabel>{total}%</CenterLabel>
             </PieChart>
           </Box>
-
+ 
           <Box
             sx={{
               display: "grid",
@@ -256,5 +311,5 @@ const StockDonutChart = ({
     </Card>
   );
 };
-
+ 
 export default StockDonutChart;

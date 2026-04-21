@@ -1,10 +1,15 @@
- 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Card, Typography, Divider } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import DropdownField from "@/components/controlled/DropdownField";
-import { InventoryItem } from "@/containers/inventory/AddInventoryItem";
- 
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
+import { getMedicineGroups, MedicineGroupResponse } from "@/service/medicineGroupService";
+import { getAllRetailInvoices, getRetailInvoiceItemsByInvoiceId, RetailInvoiceResponse } from "@/service/retailInvoiceService";
+
+type InvoiceItem = {
+  medicineId: number;
+  quantity: number;
+};
 type FilterType = "Today" | "6 Days" | "This Month";
  
 interface CardInfo {
@@ -44,7 +49,37 @@ const filterOptions = [
   { label: "6 Days", value: "6 Days" },
   { label: "This Month", value: "This Month" },
 ];
- 
+//date filter function for top selling medicine 
+const filterInvoicesByDate = (
+  invoices: RetailInvoiceResponse[],
+  filter: FilterType
+) => {
+  const today = new Date();
+
+  return invoices.filter((inv) => {
+    const invDate = new Date(inv.invoiceDate);
+
+    if (filter === "Today") {
+      return invDate.toDateString() === today.toDateString();
+    }
+
+    if (filter === "6 Days") {
+      const past = new Date();
+      past.setDate(today.getDate() - 6);
+      return invDate >= past && invDate <= today;
+    }
+
+    if (filter === "This Month") {
+      return (
+        invDate.getMonth() === today.getMonth() &&
+        invDate.getFullYear() === today.getFullYear()
+      );
+    }
+
+    return true;
+  });
+};
+
 const getGridArea = (title: string) => {
   switch (title) {
     case "Inventory":
@@ -57,6 +92,10 @@ const getGridArea = (title: string) => {
 };
  
 const Cards: React.FC = () => {
+
+  const [inventory, setInventory] = useState<MedicineResponse[]>([]);
+const [medicineGroups, setMedicineGroups] = useState<MedicineGroupResponse[]>([]);
+const [topMedicine, setTopMedicine] = useState<string>("Loading...");
   const [filters, setFilters] = useState<Record<number, FilterType>>({
     0: "This Month",
     1: "This Month",
@@ -74,24 +113,64 @@ const Cards: React.FC = () => {
     }));
   };
  
-  const totalMedicines = (): string => {
-    const data = localStorage.getItem("inventory");
-    if (!data) return "0";
-    const parsedData: InventoryItem[] = JSON.parse(data);
-    return parsedData.length.toString();
+const totalMedicines = (): string => {
+  return inventory.length.toString();
+};
+
+const totalMedicineGroups = (): string => {
+  return medicineGroups.length.toString();
+};
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const [medicines, groups, invoices] = await Promise.all([
+        getMedicines(),
+        getMedicineGroups(),
+        getAllRetailInvoices(),
+      ]);
+
+      setInventory(medicines);
+      setMedicineGroups(groups);
+
+      //  dropdown filter 
+const salesMap: Record<number, number> = {};
+const filteredInvoices = filterInvoicesByDate(invoices, filters[1]);//top selling medicine 
+
+
+for (const inv of filteredInvoices) {        
+  const items = await getRetailInvoiceItemsByInvoiceId(inv.retailInvoiceId);
+
+        items.forEach((item: InvoiceItem) => {
+          const medId = item.medicineId;
+          const qty = item.quantity;
+
+          salesMap[medId] = (salesMap[medId] || 0) + qty;
+        });
+      }
+
+      // find max
+      let topMedId = 0;
+      let maxQty = 0;
+
+      for (const id in salesMap) {
+        if (salesMap[id] > maxQty) {
+          maxQty = salesMap[id];
+          topMedId = Number(id);
+        }
+      }
+
+      // find name
+const topMed = medicines.find((m: MedicineResponse) => m.medicineId === topMedId);      setTopMedicine(topMed ? topMed.itemName : "No Data");
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
- 
-  const totalMedicineGroups = (): string => {
-    const data = localStorage.getItem("medicineGroups");
-    if (!data) return "0";
-    const parsedData = JSON.parse(data);
-    return parsedData.length.toString();
-  };
- 
-  const getSelectedTopMedicine = (): string => {
-    const stored = localStorage.getItem("topSellingMedicine");
-    return stored || "No Medicine Selected";
-  };
+
+  fetchData();
+}, [filters]);
  
   return (
     <Box
@@ -135,8 +214,9 @@ const Cards: React.FC = () => {
             }}
           >
             <Box display="flex" justifyContent="space-between" mb={2}>
-              <Typography fontWeight={600}>{card.title}</Typography>
- 
+              <Typography fontSize={{ xs: 16, md: 18 }}           mb={{ xs: 1, md: 5 }}
+fontWeight={600}>{card.title}</Typography>
+
               <FormProvider {...methods}>
                 <Box width={150}>
                   <DropdownField
@@ -155,7 +235,7 @@ const Cards: React.FC = () => {
                 <Typography  fontWeight={700} fontSize={{ xs: 18, sm: 22, md:24}} mb={2}>
                   {card.title === "Inventory"
                     ? totalMedicines()
-                    : getSelectedTopMedicine()}
+                    : topMedicine}
                 </Typography>
                 <Typography fontSize={12} color="text.secondary">
                   {info?.leftLabel}
