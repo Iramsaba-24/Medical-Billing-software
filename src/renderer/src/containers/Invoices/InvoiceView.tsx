@@ -1,9 +1,9 @@
 import { Paper, Table, TableBody, TableCell, TableContainer,
-   Box, TableRow, Typography, Button, GlobalStyles, useMediaQuery, 
+   Box, TableRow, Typography, Button, GlobalStyles, useMediaQuery,
    useTheme } from "@mui/material"
 import PrintIcon from "@mui/icons-material/Print";
 import Sign from "@/assets/Sign.svg";
-import {  useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoImage from "@/assets/logoimg.svg";
 import { PharmacyFormValues } from "../setting/PharmacyProfile";
@@ -31,11 +31,12 @@ export interface Invoice {
   totalAmount?: number;
   usedPoints?: number;
   total?: number;
-    totalDiscount?: number;   
-  totalGST?: number; 
+  gstPercent?: number;
+    // totalDiscount?: number;  
+  // totalGST?: number;
 }
-
-
+ 
+ 
 interface Medicine {
   name: string;
   qty: number | string;
@@ -43,24 +44,24 @@ interface Medicine {
   batch?: string;
   expiry?: string;
 }
-
-type InvoiceNavigationState = {
-  usedPoints?: number;
-  gstPercent?: number;
-};
+ 
+// type InvoiceNavigationState = {
+//   usedPoints?: number;
+//   gstPercent?: number;
+// };
  
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
-
+ 
  const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
- const location = useLocation() as { state: InvoiceNavigationState };
-const gstPercent = location.state?.gstPercent || 0;
+//  const location = useLocation() as { state: InvoiceNavigationState };
+// const gstPercent = location.state?.gstPercent || 0;
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  
+ 
  
   const columns = [
     { label: "Sr No.", width: "7%" },
@@ -74,12 +75,12 @@ const gstPercent = location.state?.gstPercent || 0;
 useEffect(() => {
   const fetchInvoice = async () => {
     if (!invoiceNo) return;
-
+ 
     try {
       const data = await getRetailInvoiceById(Number(invoiceNo));
       const items = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
       const medicines = (await getMedicines()) || [];
-
+ 
       let doctorName = "";
       if (data?.customerId) {
         try {
@@ -89,7 +90,7 @@ useEffect(() => {
           doctorName = "";
         }
       }
-
+ 
       if (data) {
         setInvoice({
           invoice: String(data.retailInvoiceId),
@@ -97,7 +98,7 @@ useEffect(() => {
           doctor: doctorName || "",
           address: "",
           date: new Date(data.invoiceDate).toLocaleDateString("en-GB"),
-
+ 
           medicines: (items || []).map((item: {
             medicineId: number;
             quantity: number;
@@ -112,7 +113,7 @@ useEffect(() => {
                 hsnCode?: string;
               }) => Number(m.medicineId) === Number(item.medicineId)
             );
-
+ 
             console.log(
               "item.medicineId:",
               item.medicineId,
@@ -121,22 +122,24 @@ useEffect(() => {
               "HSN:",
               medicine?.hsnCode
             );
-
+ 
             return {
              name: medicine?.medicineName || "Medicine",
               qty: item.quantity,
-          amount: Number(item.price) * Number(item.quantity),
-
-              batch: medicine?.hsnCode || "", 
-
+          amount: Number(item.amount),
+ 
+              batch: medicine?.hsnCode || "",
+ 
               expiry: medicine?.expiryDate
                 ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
                 : "",
             };
           }),
-
+ 
           totalAmount: data.totalAmount,
-          
+gstPercent: data.gstPercent || 0,
+usedPoints: data.medipointsEarned || 0,
+         
         });
       } else {
         navigate(-1);
@@ -144,38 +147,36 @@ useEffect(() => {
     } catch (error) {
       navigate(-1);
     }
-
+ 
     const invoiceSettings = localStorage.getItem("invoiceSettings");
     if (invoiceSettings) {
       const parsed = JSON.parse(invoiceSettings);
       const printOptions: string[] = parsed.product_linking || [];
-
+ 
       setShowLogo(printOptions.includes("show_logo"));
-      setShowHsn(printOptions.includes("show_hsn_code")); 
+      setShowHsn(printOptions.includes("show_hsn_code"));
     }
   };
-
+ 
   fetchInvoice();
 }, [invoiceNo, navigate]);
  
  
 const subTotal = invoice?.medicines?.reduce(
-  (sum, med) => sum + Number(med.amount), 0) || 0;
-
-const usedPoints = invoice?.totalDiscount || 0;
-
-const amountAfterDiscount = subTotal - usedPoints;
-
-const gstAmount =
-  invoice?.totalGST || (amountAfterDiscount * gstPercent) / 100;
-
-const cgst = gstAmount / 2;
-const sgst = gstAmount / 2;
-
-const netTotal = amountAfterDiscount + gstAmount;
+  (sum, med) => sum + Number(med.amount), 0
+) || 0;
+ 
+const usedPoints = invoice?.usedPoints || 0;
+const gstPercent = invoice?.gstPercent || 0;
+ 
+const gstAmountInSubTotal = (subTotal * gstPercent) / (100 + gstPercent);
+const cgst = gstAmountInSubTotal / 2;
+const sgst = gstAmountInSubTotal / 2;
+const netTotal = subTotal;
+ 
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
  
-
+ 
   const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
  
 useEffect(() => {
@@ -270,10 +271,10 @@ const pharmacyAddress = pharmacyData?.address || "-";
               <Typography fontSize={12} fontWeight={600}>Sub Total</Typography>
               <Typography fontSize={12}>₹ {subTotal.toFixed(2)}</Typography>
             </Box>
-
-
-
-
+ 
+ 
+ 
+ 
             <Box display="flex" justifyContent="space-between" mt={0.5}>
   <Typography fontSize={12} fontWeight={600}>Medipoint</Typography>
 <Typography fontSize={12}>- ₹ {usedPoints.toFixed(2)}</Typography>
@@ -284,14 +285,14 @@ const pharmacyAddress = pharmacyData?.address || "-";
 <Typography fontSize={12}>
   ₹ {cgst.toFixed(2)}
 </Typography>
-
+ 
 <Typography fontSize={12} fontWeight={600}>
   SGST ({gstPercent / 2}%)
 </Typography>
 <Typography fontSize={12}>
   ₹ {sgst.toFixed(2)}
 </Typography>
-            
+           
            
             <Box display="flex" justifyContent="space-between" mt={0.5} pt={0.5} sx={{ borderTop: "1px solid #000" }}>
               <Typography fontSize={13} fontWeight={700}>NET</Typography>
@@ -420,20 +421,20 @@ const pharmacyAddress = pharmacyData?.address || "-";
                 <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
  
-
+ 
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
   <TableCell /><TableCell /><TableCell /><TableCell />
   <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>MediPoint</strong></TableCell>
   <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {usedPoints.toFixed(2)}</TableCell>
 </TableRow>
-
+ 
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
   <TableCell /><TableCell /><TableCell /><TableCell />
   <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>CGST </strong></TableCell>
   <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {cgst.toFixed(2)}</TableCell>
 </TableRow>
-
-
+ 
+ 
  <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
   <TableCell /><TableCell /><TableCell /><TableCell />
   <TableCell
@@ -516,4 +517,6 @@ const pharmacyAddress = pharmacyData?.address || "-";
 }
  
 export default InvoiceView
+ 
+ 
  

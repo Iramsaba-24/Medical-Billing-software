@@ -13,7 +13,6 @@ export type InventoryFormData = {
   medicineName: string;
   batchNumber?: string;
   hsnCode?: string;
-
   numberOfStrips: number;
   tabletsPerStrip: number;
   looseTablets: number;
