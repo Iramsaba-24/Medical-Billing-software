@@ -178,6 +178,23 @@ const columns: Column<InventoryItem>[] = [
   { key: ACTION_KEY, label: "Action" },
 ];
 
+//edit function
+// InventoryList.tsx मध्ये हे function add करा
+const handleEdit = async (item: InventoryItem) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(
+      `${API_ENDPOINTS.MEDICINE}/${item.medicineId}`,
+      { headers: { Authorization: token ? `Bearer ${token}` : "" } }
+    );
+    const fullMedicine = res.data.data; // full MedicineResponse
+    navigate(URL_PATH.AddInventoryItem, { state: fullMedicine });
+  } catch (error) {
+    console.error("Error fetching medicine details:", error);
+    showSnackbar("error", "Failed to load medicine details");
+  }
+};
+
   return (
     <>
       <Box sx={{ boxShadow: 3, p: 3, borderRadius: 2 }}>
@@ -190,10 +207,12 @@ const columns: Column<InventoryItem>[] = [
           rowsPerPage={5}
 actions={{
   view: setViewItem,
-edit: (item) =>
-  navigate(URL_PATH.AddInventoryItem, {
-    state: item,
-  }),
+// edit: (item) =>
+//   navigate(URL_PATH.AddInventoryItem, {
+//     state: item,
+//   }),
+edit: handleEdit,
+
   delete: handleDelete,
 }}
         />
