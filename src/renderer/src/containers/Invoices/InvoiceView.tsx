@@ -89,6 +89,12 @@ useEffect(() => {
       }
  
       if (data) {
+
+          console.log("data.totalDiscount:", data.totalDiscount);
+  console.log("data.totalAmount:", data.totalAmount);
+  console.log("data.medipointsEarned:", data.medipointsEarned);
+
+  
         setInvoice({
           invoice: String(data.retailInvoiceId),
           name: data.customerName || "",
@@ -101,11 +107,13 @@ useEffect(() => {
             quantity: number;
             price: number;
             amount: number;
+            strength?: string;      
+  companyName?: string;
           }) => {
             const medicine = medicines.find(
               (m: {
                 medicineId: number;
-                itemName: string;
+               medicineName: string; 
                 expiryDate?: string;
                 hsnCode?: string;
               }) => Number(m.medicineId) === Number(item.medicineId)
@@ -115,7 +123,7 @@ useEffect(() => {
               "item.medicineId:",
               item.medicineId,
               "found:",
-              medicine?.itemName,
+              medicine?.medicineName,
               "HSN:",
               medicine?.hsnCode
             );
@@ -123,8 +131,8 @@ useEffect(() => {
 // combine name, strength nd company name
             const nameParts = [
   medicine?.medicineName,
-  medicine?.strength,
-  medicine?.companyName,
+ item.strength || medicine?.strength,     
+    item.companyName || medicine?.companyName,
 ].filter(Boolean).join(" - ");
 
 
@@ -173,17 +181,17 @@ gstPercent: data.gstPercent || 0,
 const subTotal = invoice?.medicines?.reduce(
   (sum, med) => sum + Number(med.amount), 0
 ) || 0;
- 
+
 const usedPoints = invoice?.usedPoints || 0;
 const gstPercent = invoice?.gstPercent || 0;
- 
+const netTotal = invoice?.totalAmount || 0; 
+
 const amountAfterDiscount = subTotal - usedPoints;
 const gstAmount = (amountAfterDiscount * gstPercent) / 100;
-const finalAmount = amountAfterDiscount + gstAmount;
- 
+
 const cgst = gstAmount / 2;
 const sgst = gstAmount / 2;
-const netTotal = finalAmount;
+
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
   const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
  
