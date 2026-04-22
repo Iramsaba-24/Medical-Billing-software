@@ -74,7 +74,7 @@ type DateFieldProps = {
   sx?: SxProps<Theme>;
   viewMode?: ViewMode;
   useCurrentDate?: boolean;
-  dateRestriction?: "past-current-future" | "current-future-only"; 
+  dateRestriction?: "past-current-future" | "current-future-only"| "past-current-only"; 
 } & Partial<DatePickerProps> &
   Partial<TimePickerProps> &
   Partial<DateTimePickerProps>;
@@ -140,19 +140,25 @@ const DateTimeField: FC<DateFieldProps> = ({
       default:
         return date.toISOString();
     }
-  };
-
-  
-
-  
-  const getMinDate = (): Dayjs => {
-    if (dateRestriction === "past-current-future") {
-      return allowPastCurrentFuture();
-    } else if (dateRestriction === "current-future-only") {
-      return allowCurrentFutureOnly();
-    }
-    return allowCurrentFutureOnly(); // default fallback
-  };
+  };  
+const getMinDate = (): Dayjs | undefined => {
+  if (dateRestriction === "past-current-future") {
+    return allowPastCurrentFuture(); // all allowed
+  }
+  if (dateRestriction === "current-future-only") {
+    return allowCurrentFutureOnly(); // past blocked
+  }
+  if (dateRestriction === "past-current-only") {
+    return allowPastCurrentFuture(); // past allowed
+  }
+  return undefined;
+};
+  const getMaxDate = (): Dayjs | undefined => {
+  if (dateRestriction === "past-current-only") {
+    return dayjs().endOf("day"); // today allowed, future blocked
+  }
+  return undefined;
+};
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Controller
@@ -191,6 +197,7 @@ const DateTimeField: FC<DateFieldProps> = ({
           
            
              minDate: getMinDate(),
+             maxDate: getMaxDate(),
           
 
             slotProps: {
@@ -272,5 +279,3 @@ const DateTimeField: FC<DateFieldProps> = ({
 };
  
 export default DateTimeField;
- 
- 
