@@ -2,7 +2,7 @@ import { Box, Typography, Button } from "@mui/material";
 import BgImage from "@/assets/bgloginpage.svg";
 import LogoImage from "@/assets/logoimg.svg";
 import { useNavigate } from "react-router-dom";
-import { URL_PATH } from "@/constants/UrlPath";
+// import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState } from "react";
 
 interface SubscriptionDetails {
@@ -33,7 +33,7 @@ const PaymentSuccess: React.FC = () => {
   };
   
   const handleClick = () => { 
-    navigate(URL_PATH.LOGIN);
+    navigate("/");
   };
   
   return (

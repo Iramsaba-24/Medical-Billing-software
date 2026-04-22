@@ -15,9 +15,12 @@ export const API_ENDPOINTS = {
   RETAIL_INVOICE: `${API_BASE_URL}/RetailInvoice`,
   RETAIL_INVOICE_ITEMS: `${API_BASE_URL}/RetailInvoiceItems`,
   REORDER: `${API_BASE_URL}/Reorder`,
-LOW_STOCK: `${API_BASE_URL}/Medicine/low-stock`,
-LAST_PURCHASE: `${API_BASE_URL}/ReorderLevels`, 
+  LOW_STOCK: `${API_BASE_URL}/Medicine/low-stock`,
+  LAST_PURCHASE: `${API_BASE_URL}/ReorderLevels`, 
   GET_TOTAL_PURCHASE: `${API_BASE_URL}/purchase/total`,
-  UPI_PAYMENT: `${API_BASE_URL}/CustomerPayment/upi`
+  UPI_PAYMENT: `${API_BASE_URL}/CustomerPayment/upi`,
+  DASHBOARD_CARDS: `${API_BASE_URL}/dashboard/cards`,
+  DASHBOARD_INVENTORY: `${API_BASE_URL}/dashboard/inventory`,
+  DASHBOARD_TOP_SELLING: `${API_BASE_URL}/dashboard/top-selling`,
 };
  

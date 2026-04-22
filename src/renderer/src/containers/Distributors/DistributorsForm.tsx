@@ -257,7 +257,7 @@ import EmailField from "@/components/controlled/EmailField";
 import MobileField from "@/components/controlled/MobileField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { useState } from "react";
-import AppToast from "@/containers/Distributors/AppToast";
+import AppToast from "@/containers/distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
 import { addDistributor } from "@/service/distributorService";
 import axios from "axios";
@@ -341,49 +341,82 @@ useEffect(() => {
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
  
-  const onSubmit = async (data: DistributorFormInput) => {
-    try {
-      const cleanedData = {
-        ...data,
-        ownerName: data.ownerName || "",
-        website: data.website ? data.website : undefined,
-      };
+//   const onSubmit = async (data: DistributorFormInput) => {
+//     try {
+//       const cleanedData = {
+//         ...data,
+//         ownerName: data.ownerName || "",
+//         website: data.website ? data.website : undefined,
+//       };
 
 
-        if (editData) {
-      //  UPDATE
-      await updateDistributor(editData.id, cleanedData);
-    } else {
-      //   ADD
-      await addDistributor(cleanedData);
-    }
+//         if (editData) {
+//       //  UPDATE
+//       await updateDistributor(editData.id, cleanedData);
+//     } else {
+//       //   ADD
+//       await addDistributor(cleanedData);
+//     }
  
-      console.log("Submitting data:", cleanedData);
- showToast("success", "Business details saved!");
+//       console.log("Submitting data:", cleanedData);
+//  showToast("success", "Business details saved!");
       
  
-      await addDistributor(cleanedData);
+//       await addDistributor(cleanedData);
  
-      setToastOpen(true);
-      setTimeout(() => {
-        navigate(URL_PATH.DistributorsPage);
-      }, 1500);
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        console.error(
-          "Error saving distributor:",
-          error.response?.data || error.message
-        );
+//       setToastOpen(true);
+//       setTimeout(() => {
+//         navigate(URL_PATH.DistributorsPage);
+//       }, 1500);
+//     } catch (error: unknown) {
+//       if (axios.isAxiosError(error)) {
+//         console.error(
+//           "Error saving distributor:",
+//           error.response?.data || error.message
+//         );
        
-      } else if (error instanceof Error) {
-        console.error("Error saving distributor:", error.message);
-      } else {
-        console.error("Error saving distributor:", error);
-      }
-    }
-  };
+//       } else if (error instanceof Error) {
+//         console.error("Error saving distributor:", error.message);
+//       } else {
+//         console.error("Error saving distributor:", error);
+//       }
+//     }
+//   };
  
-  return (
+const onSubmit = async (data: DistributorFormInput) => {
+  try {
+    const cleanedData = {
+      ...data,
+      ownerName: data.ownerName || "",
+      website: data.website ? data.website : undefined,
+    };
+
+    if (editData) {
+      await updateDistributor(editData.id, cleanedData);
+    } else {
+      await addDistributor(cleanedData);
+    }
+
+    showToast("success", "Business details saved!");
+
+    setTimeout(() => {
+      navigate(URL_PATH.DistributorsPage);
+    }, 1000); // 1 sec enough
+
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error(
+        "Error saving distributor:",
+        error.response?.data || error.message
+      );
+    } else if (error instanceof Error) {
+      console.error("Error saving distributor:", error.message);
+    } else {
+      console.error("Error saving distributor:", error);
+    }
+  }
+}; 
+return (
     <Box p={2} sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
       <FormProvider {...methods}>
         <form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
