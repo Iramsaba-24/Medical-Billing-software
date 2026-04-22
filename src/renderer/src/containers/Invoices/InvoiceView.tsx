@@ -101,11 +101,13 @@ useEffect(() => {
             quantity: number;
             price: number;
             amount: number;
+            strength?: string;      
+  companyName?: string;
           }) => {
             const medicine = medicines.find(
               (m: {
                 medicineId: number;
-                itemName: string;
+               medicineName: string; 
                 expiryDate?: string;
                 hsnCode?: string;
               }) => Number(m.medicineId) === Number(item.medicineId)
@@ -115,7 +117,7 @@ useEffect(() => {
               "item.medicineId:",
               item.medicineId,
               "found:",
-              medicine?.itemName,
+              medicine?.medicineName,
               "HSN:",
               medicine?.hsnCode
             );
@@ -123,8 +125,8 @@ useEffect(() => {
 // combine name, strength nd company name
             const nameParts = [
   medicine?.medicineName,
-  medicine?.strength,
-  medicine?.companyName,
+ item.strength || medicine?.strength,     
+    item.companyName || medicine?.companyName,
 ].filter(Boolean).join(" - ");
 
 

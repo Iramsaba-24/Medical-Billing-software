@@ -37,6 +37,8 @@ type InventoryOption = DropdownOption & {
   id: number;
   price: number;
     gstPercent: number;
+      strength: string;   
+  companyName: string;
 };
  
 type InvoiceFormData = {
@@ -181,6 +183,9 @@ value: i.medicineName,
 id: i.medicineId,
  price: i.mrpPerTablet, 
   gstPercent: i.gstPercent,
+      strength: i.strength || "",   
+    companyName: i.companyName || "", 
+
   }))
 );
   };
@@ -236,79 +241,22 @@ setInvoiceOriginalTotal(originalSubtotal);
   fetchInvoice();
 }, [invoiceNo, reset, inventoryOptions]);
  
- 
-// const onSubmit = async (data: InvoiceFormData) => {
-//   try {
-//     const invoice = await getRetailInvoiceById(Number(invoiceNo));
- 
-//    const newTotal = data.items.reduce(
-//   (sum, item) => sum + Number(item.price),
-//   0
-// );
- 
-//     // invoice update
-//   await updateRetailInvoice(Number(invoiceNo), {
-//   userId: invoice.userId,
-//   customerId: invoice.customerId,
-//   invoiceType: invoice.invoiceType,
-//   invoiceDate: invoice.invoiceDate,
-//   totalAmount: newTotal,
-//   totalGST: invoice.totalGST,
-//   totalDiscount: invoice.totalDiscount,
-//   medipointsEarned: invoice.medipointsEarned,
-//   gstPercent: 0,          
-//   paymentStatus: data.status,
-// });
- 
-   
-//     await deleteRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
- 
- 
-//     for (const item of data.items) {
-//       const selectedItem = inventoryOptions.find(i => i.value === item.item);
-//       if (!selectedItem) continue;
- 
-//       // await createSingleRetailInvoiceItem({
-//       //   retailInvoiceId: Number(invoiceNo),
-//       //  medicineId: selectedItem?.id || 0,
-//       //   quantity: Number(item.qty),
-//       //    price: selectedItem?.price || 0,
-//       //   gstPercent: 0,
-//       //   discount: 0,
-//       // });
-//       await createSingleRetailInvoiceItem({
-//   retailInvoiceId: Number(invoiceNo),
-//   medicineId: selectedItem?.id || 0,
-//   quantity: Number(item.qty),
-//   price: selectedItem?.price || 0,
-//   gstPercent: item.gstPercent,  
-//   discount: item.discount,      
-// });
-//     }
- 
-//     navigate(URL_PATH.Invoices);
-//   } catch (error) {
-//     console.error("Error updating invoice", error);
-//   }
-// };
- 
-
 
 const onSubmit = async (data: InvoiceFormData) => {
   try {
     const invoice = await getRetailInvoiceById(Number(invoiceNo));
 
-    // Step 1: newTotal calculate kar (qty × unitPrice only)
+    
     const newTotal = data.items.reduce((sum: number, item: InvoiceItem) => {
       const selectedItem = inventoryOptions.find(i => i.value === item.item);
       if (!selectedItem) return sum;
       return sum + (Number(item.qty) * selectedItem.price);
     }, 0);
 
-    // Step 2: Original total
+  
     const originalTotal = invoice.totalAmount;
 
-    // Step 3: Medipoints ani GST calculate kar
+    
     let finalAmount = newTotal;
     let medipoints = 0;
     let totalGST = 0;
@@ -324,7 +272,7 @@ const onSubmit = async (data: InvoiceFormData) => {
       finalAmount = invoice.totalAmount;
     }
 
-    // Step 4: Old items delete, navi save kar
+
     await deleteRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
 
     for (const item of data.items) {
@@ -337,11 +285,13 @@ const onSubmit = async (data: InvoiceFormData) => {
         quantity: Number(item.qty),
         price: selectedItem?.price || 0,
         gstPercent: invoiceGstPercent,
-        discount: item.discount,
+       discount: Number(item.discount) || 0,
+           strength: selectedItem.strength,     
+    companyName: selectedItem.companyName,
       });
     }
 
-    // Step 5: Invoice update kar
+   
     await updateRetailInvoice(Number(invoiceNo), {
       userId: invoice.userId,
       customerId: invoice.customerId,
@@ -355,7 +305,8 @@ const onSubmit = async (data: InvoiceFormData) => {
       paymentStatus: data.status,
     });
 
-    navigate(URL_PATH.Invoices);
+   window.dispatchEvent(new Event("invoiceUpdated")); 
+navigate(URL_PATH.Invoices);
   } catch (error) {
     console.error("Error updating invoice", error);
   }
@@ -454,7 +405,7 @@ onChangeCallback={(val: string) => {
 
   setValue(`items.${index}.unitPrice`, selectedItem.price);
   setValue(`items.${index}.gstPercent`, invoiceGstPercent);
-  setValue(`items.${index}.discount`, 0);
+
   setValue(`items.${index}.price`, Number(displayPrice.toFixed(2)));
 }}
 />
