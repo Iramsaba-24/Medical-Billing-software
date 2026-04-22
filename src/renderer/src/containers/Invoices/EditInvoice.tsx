@@ -287,7 +287,7 @@ const onSubmit = async (data: InvoiceFormData) => {
   const amountAfterDiscount = newTotal - originalDiscount;
   totalGST = (amountAfterDiscount * invoiceGstPercent) / 100;
   finalAmount = amountAfterDiscount + totalGST;
-  medipoints = invoice.medipointsEarned;
+    medipoints = originalDiscount;
     }
 
 

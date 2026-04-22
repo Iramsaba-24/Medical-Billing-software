@@ -25,37 +25,17 @@ export default function InventoryFormFields({
 
   return (
     <>
-            <TextInputField
-              inputType="all"
-              rows={1}
-              name="medicineName"
-              label="Medicine Name"
-              maxLength={30}
-              required
-            />
+      <TextInputField inputType="all" rows={1} name="medicineName" label="Medicine Name" maxLength={30} required/>
 
-      <TextInputField name="strength" label="Strength(e.g.500mg)" required />
-      <TextInputField name="companyName" label="Medicine Company Name" required />
+      <TextInputField name="strength" label="Strength(e.g.500mg)" required maxLength={30} />
 
-      <DropdownField
-        name="groupId"
-        label="Medicine Group"
-        options={groupOptions}
-        required
-        freeSolo={false}
-        editable
-      />
+      <TextInputField name="companyName" label="Medicine Company Name" required minLength={3} maxLength={30} />
 
-      <TextInputField inputType="all" rows={1} name="batchNumber" label="Batch Number" required />
+      <DropdownField name="groupId" label="Medicine Group" options={groupOptions} required freeSolo={false} editable/>
 
-      <TextInputField
-        inputType="numbers"
-        name="hsnCode"
-        label="HSN Number"
-        minLength={4}
-        maxLength={10}
-        required
-      />
+      <TextInputField inputType="all" rows={1} name="batchNumber" label="Batch Number" required minLength={3} maxLength={30} />
+
+      <TextInputField inputType="numbers" name="hsnCode" label="HSN Number" minLength={4} maxLength={10} required/>
 
       <DropdownField
         name="type"
@@ -78,50 +58,35 @@ export default function InventoryFormFields({
         name="maximumQuantity"
         label="Maximum Stock Limit"
         required
- rules={{
-    validate: (value: number) => {
-      const min = Number(methods.getValues("minimumQuantity"));
-      return value >= min || "Maximum quantity must be greater than or equal to minimum quantity";
-    },
-  }}
-      />
+        rules={{
+            validate: (value: number) => {
+              const min = Number(methods.getValues("minimumQuantity"));
+              return value >= min || "Maximum quantity must be greater than or equal to minimum quantity";
+            },
+          }}/>  
 
       {/* Stock */}
       <TextInputField inputType="numbers" name="numberOfStrips" label="Number of Medicine Pack" required   
       rules={{
         min: { value: 0, message: "Number of strips must be greater than 0" },
       }}/>
+
       <TextInputField inputType="numbers" name="tabletsPerStrip" label="Tablets In One Pack" required 
       rules={{
         min: { value: 1, message: "Tablets per strip must be greater than 0" },
       }}/>
+
       <TextInputField inputType="numbers" name="looseTablets" label="Extra Medicine (Loose)" 
       rules={{
         min: { value: 0, message: "Loose tablets cannot be negative" },
       }}/>
 
-      <TextInputField
-        inputType="numbers"
-        name="totalStockTablets"
-        label="Current Stock Quantity"
-        value={totalStock}
-      />
+      <TextInputField inputType="numbers" name="totalStockTablets" label="Current Stock Quantity" value={totalStock} disabled />
 
       {/* Pricing */}
-      <TextInputField
-        inputType="numbers"
-        name="purchasePricePerStrip"
-        label="Purchase Price Per Strip"
-        required
-      />
+      <TextInputField inputType="numbers" name="purchasePricePerStrip" label="Purchase Price Per Strip" required/>
 
-      <TextInputField
-        inputType="numbers"
-        name="purchasePricePerTablet"
-        label="Purchase Price Per Tablet"
-        value={purchasePricePerTablet}
-        disabled
-      />
+      <TextInputField inputType="numbers" name="purchasePricePerTablet" label="Purchase Price Per Tablet" value={purchasePricePerTablet} disabled/>
 
       <TextInputField
         inputType="numbers"
@@ -136,32 +101,16 @@ export default function InventoryFormFields({
         }}
       />
 
-      <TextInputField
-        inputType="numbers"
-        name="mrpPerTablet"
-        label="MRP Per Tablet"
-        value={mrpPerTablet}
+      <TextInputField inputType="numbers" name="mrpPerTablet" label="MRP Per Tablet" value={mrpPerTablet}
         disabled
       />
 
       <TextInputField inputType="numbers" name="gstPercent" label="GST Percentage" />
 
-      <TextInputField
-        name="finalPrice"
-        label="Final Amount (With GST)"
-        value={finalPrice}
-        disabled
-      />
+      <TextInputField name="finalPrice" label="Final Amount (With GST)" value={finalPrice} disabled/>
 
       {/* Distributor */}
-      <DropdownField
-        name="distributorId"
-        label="Distributor"
-        options={supplierOptions}
-        required
-      />
-
-      
+      <DropdownField name="distributorId" label="Distributor" options={supplierOptions}required/>
 
       {/* Dates */}
       <DateTimeField
@@ -177,7 +126,7 @@ export default function InventoryFormFields({
       <DateTimeField
         name="manufacturingDate"
         label="Manufacturing Date"
-        dateRestriction="past-current-future"
+        dateRestriction="past-current-only"
         required
       />
 

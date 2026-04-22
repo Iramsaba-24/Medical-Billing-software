@@ -71,11 +71,11 @@ const [inventory, setInventory] = useState<MedicineWithDate[]>([]);
  
  // FILTERS
  const lowStock = inventory.filter(
-   (item) => item.quantity <= lowStockLimit
+   (item) => item.totalStockTablets <= lowStockLimit
  );
  
  const reorderStock = inventory.filter(
-   (item) => item.quantity <= 10
+   (item) => item.totalStockTablets <= 10
  );
  
  const today = new Date();
@@ -130,7 +130,7 @@ const [inventory, setInventory] = useState<MedicineWithDate[]>([]);
            lowStock.map((item) => (
              <Box key={item.medicineId}>
                <Typography>
-                 {item.itemName} is running low — only {item.quantity} left.
+                 {item.medicineName} is running low — only {item.totalStockTablets} left.
                </Typography>
              </Box>
            ))
@@ -154,7 +154,7 @@ const [inventory, setInventory] = useState<MedicineWithDate[]>([]);
            reorderStock.map((item) => (
              <Box key={item.medicineId}>
                <Typography>
-                 {item.itemName} should be reordered.
+                 {item.medicineName} should be reordered.
                </Typography>
              </Box>
            ))
@@ -177,7 +177,7 @@ const [inventory, setInventory] = useState<MedicineWithDate[]>([]);
        expiryAlerts.map((item) => (
          <Box key={item.medicineId}>
            <Typography>
-             {item.itemName} will expire on{" "}
+             {item.medicineName} will expire on{" "}
              {item.expiryDate.toLocaleDateString()} —{" "}
              <strong>{getExpiryText(item.expiryDate)}</strong>
            </Typography>
@@ -193,6 +193,3 @@ const [inventory, setInventory] = useState<MedicineWithDate[]>([]);
 };
  
 export default Alerts;
- 
- 
- 

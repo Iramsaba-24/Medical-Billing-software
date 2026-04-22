@@ -89,6 +89,12 @@ useEffect(() => {
       }
  
       if (data) {
+
+          console.log("data.totalDiscount:", data.totalDiscount);
+  console.log("data.totalAmount:", data.totalAmount);
+  console.log("data.medipointsEarned:", data.medipointsEarned);
+
+  
         setInvoice({
           invoice: String(data.retailInvoiceId),
           name: data.customerName || "",
@@ -175,17 +181,17 @@ gstPercent: data.gstPercent || 0,
 const subTotal = invoice?.medicines?.reduce(
   (sum, med) => sum + Number(med.amount), 0
 ) || 0;
- 
+
 const usedPoints = invoice?.usedPoints || 0;
 const gstPercent = invoice?.gstPercent || 0;
- 
+const netTotal = invoice?.totalAmount || 0; 
+
 const amountAfterDiscount = subTotal - usedPoints;
 const gstAmount = (amountAfterDiscount * gstPercent) / 100;
-const finalAmount = amountAfterDiscount + gstAmount;
- 
+
 const cgst = gstAmount / 2;
 const sgst = gstAmount / 2;
-const netTotal = finalAmount;
+
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
   const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
  

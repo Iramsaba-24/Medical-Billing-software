@@ -72,6 +72,7 @@ const methods = useForm<InventoryFormData>({
     strength: "",
     type: "",
     groupId: "",
+    purchaseDate: new Date().toISOString().split("T")[0],
   },
 });
 //edit
