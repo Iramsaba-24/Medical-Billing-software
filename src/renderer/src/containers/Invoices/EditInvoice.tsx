@@ -198,12 +198,17 @@ useEffect(() => {
   if (!invoiceNo) return;
   if (inventoryOptions.length === 0) return;
  
+    setInvoiceGstPercent(0);       
+  setInvoiceOriginalTotal(0); 
+
+
   const fetchInvoice = async () => {
     try {
       const invoice = await getRetailInvoiceById(Number(invoiceNo));
       const items: RetailInvoiceItemResponse[] = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
 
   console.log("DB items:", JSON.stringify(items));
+    
  
      const mappedItems = items.map((i: RetailInvoiceItemResponse) => {
   const med = inventoryOptions.find(m => m.id === i.medicineId);
@@ -222,7 +227,14 @@ useEffect(() => {
  const originalSubtotal = items.reduce(
   (sum: number, i: RetailInvoiceItemResponse) => sum + (i.price * i.quantity), 0
 );
+
+    console.log("originalSubtotal:", originalSubtotal);
+
 setInvoiceOriginalTotal(originalSubtotal);
+
+console.log("invoiceOriginalTotal set to:", originalSubtotal);
+
+
      reset({
   name: invoice.customerName,
   date: dayjs(invoice.invoiceDate),
@@ -253,6 +265,8 @@ const onSubmit = async (data: InvoiceFormData) => {
       return sum + (Number(item.qty) * selectedItem.price);
     }, 0);
 
+
+     
   
     const originalTotal = invoice.totalAmount;
 
@@ -267,9 +281,13 @@ const onSubmit = async (data: InvoiceFormData) => {
       totalGST = (amountAfterMedipoints * invoiceGstPercent) / 100;
       finalAmount = amountAfterMedipoints + totalGST;
     } else {
-      totalGST = invoice.totalGST;
-      medipoints = invoice.medipointsEarned;
-      finalAmount = invoice.totalAmount;
+      const originalDiscount = data.items.reduce(
+    (sum: number, item: InvoiceItem) => sum + (item.discount || 0), 0
+  );
+  const amountAfterDiscount = newTotal - originalDiscount;
+  totalGST = (amountAfterDiscount * invoiceGstPercent) / 100;
+  finalAmount = amountAfterDiscount + totalGST;
+  medipoints = invoice.medipointsEarned;
     }
 
 
