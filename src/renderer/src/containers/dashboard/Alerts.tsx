@@ -193,6 +193,3 @@ const [inventory, setInventory] = useState<MedicineWithDate[]>([]);
 };
  
 export default Alerts;
- 
- 
- 

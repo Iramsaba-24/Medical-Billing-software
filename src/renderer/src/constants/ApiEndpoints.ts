@@ -23,4 +23,3 @@ export const API_ENDPOINTS = {
   DASHBOARD_INVENTORY: `${API_BASE_URL}/dashboard/inventory`,
   DASHBOARD_TOP_SELLING: `${API_BASE_URL}/dashboard/top-selling`,
 };
- 

@@ -1,8 +1,7 @@
 import { Box, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import BillingTable from "@/containers/Invoices/BillingTable";
+import BillingTable from "@/containers/invoices/BillingTable";
 import { Invoice } from "@/types/invoice";
-import axios from "axios";
 import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
@@ -56,26 +55,64 @@ const fetchInvoices = async () => {
   }
 };
 
+// useEffect(() => {
+//   fetchInvoices();
+
+//   const handleInvoiceUpdated = () => {
+//     fetchInvoices(); 
+//   };
+
+//   window.addEventListener("invoiceUpdated", handleInvoiceUpdated); // ← ADD
+
+//   return () => {
+//     window.removeEventListener("invoiceUpdated", handleInvoiceUpdated); // ← cleanup
+//   };
+// }, []);
+
+
+
 useEffect(() => {
   fetchInvoices();
+
+  const handleInvoiceUpdated = async () => {
+    try {
+      const data = await getAllRetailInvoices();
+      const mapped: Invoice[] = data
+        .sort((a: { retailInvoiceId: number }, b: { retailInvoiceId: number }) =>
+          a.retailInvoiceId - b.retailInvoiceId
+        )
+        .map((inv: {
+          retailInvoiceId: number;
+          customerName?: string;
+          invoiceDate: string;
+          totalAmount: number;
+          paymentStatus: string;
+        }) => ({
+          invoice: String(inv.retailInvoiceId),
+          name: inv.customerName || "",
+          invoiceDate: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+          price: inv.totalAmount,
+          paymentStatus: inv.paymentStatus,
+          status: inv.paymentStatus,
+          medicines: [],
+          doctor: "",
+          address: "",
+          date: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
+        }));
+      setInvoices(mapped);
+    } catch (error) {
+      console.error("Error fetching invoices", error);
+    }
+  };
+
+  window.addEventListener("invoiceUpdated", handleInvoiceUpdated);
+
+  return () => {
+    window.removeEventListener("invoiceUpdated", handleInvoiceUpdated);
+  };
 }, []);
 
-  
 
-  // const { totalRevenue, pendingAmount, totalInvoices } = useMemo(() => {
-  //   const revenue = invoices
-  //     .filter(inv => inv.status === "Paid")
-
-  //     .reduce((sum, inv) => sum + inv.price, 0);
-  //   const pending = invoices
-  //     .filter(inv => inv.status === "Pending")
-  //     .reduce((sum, inv) => sum + inv.price, 0);
-  //   return {
-  //     totalRevenue: revenue,
-  //     pendingAmount: pending,
-  //     totalInvoices: invoices.length,
-  //   };
-  // }, [invoices]);
 const [dashboard] = useState({
   totalRevenue: 0,
   pendingAmount: 0,

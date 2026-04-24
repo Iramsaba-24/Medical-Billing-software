@@ -6,11 +6,11 @@ import Sign from "@/assets/Sign.svg";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LogoImage from "@/assets/logoimg.svg";
-import { PharmacyFormValues } from "../setting/PharmacyProfile";
+// import { PharmacyFormValues } from "../setting/PharmacyProfile";
 import { getRetailInvoiceById, getRetailInvoiceItemsByInvoiceId } from "@/service/retailInvoiceService";
  import { getMedicines } from "@/service/medicineService";
  import { getCustomerById } from "@/service/customerService";
- 
+ import { PharmacySettingsResponse, pharmacySettingsService } from "@/service/pharmacySettingsService";
  
 export interface Invoice {
   name: string;
@@ -42,13 +42,10 @@ interface Medicine {
   qty: number | string;
   amount: number;
   batch?: string;
+   manufacturing?: string;
   expiry?: string;
 }
- 
-// type InvoiceNavigationState = {
-//   usedPoints?: number;
-//   gstPercent?: number;
-// };
+
  
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
@@ -56,8 +53,6 @@ const InvoiceView = () => {
  const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
-//  const location = useLocation() as { state: InvoiceNavigationState };
-// const gstPercent = location.state?.gstPercent || 0;
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -67,12 +62,15 @@ const InvoiceView = () => {
     { label: "Sr No.", width: "7%" },
     { label: "Particulars", width: "33%" },
     ...(showHsn ? [{ label: "HSN Code", width: "13%" }] : []),
+    { label: "MFG", width: "12%" },
+
     { label: "Expiry", width: "12%" },
-    { label: "Quantity", width: "10%" },
+    { label: "MRP × Qty", width: "10%" },
     { label: "Amount", width: "15%" },
   ];
  
 useEffect(() => {
+  console.log(" pharmacy useEffect triggered");
   const fetchInvoice = async () => {
     if (!invoiceNo) return;
  
@@ -92,6 +90,12 @@ useEffect(() => {
       }
  
       if (data) {
+
+          console.log("data.totalDiscount:", data.totalDiscount);
+  console.log("data.totalAmount:", data.totalAmount);
+  console.log("data.medipointsEarned:", data.medipointsEarned);
+
+  
         setInvoice({
           invoice: String(data.retailInvoiceId),
           name: data.customerName || "",
@@ -104,42 +108,46 @@ useEffect(() => {
             quantity: number;
             price: number;
             amount: number;
+            strength?: string;      
+  companyName?: string;
           }) => {
             const medicine = medicines.find(
               (m: {
                 medicineId: number;
-                itemName: string;
+               medicineName: string; 
                 expiryDate?: string;
                 hsnCode?: string;
               }) => Number(m.medicineId) === Number(item.medicineId)
             );
  
-            console.log(
-              "item.medicineId:",
-              item.medicineId,
-              "found:",
-              medicine?.itemName,
-              "HSN:",
-              medicine?.hsnCode
-            );
- 
-            return {
-             name: medicine?.medicineName || "Medicine",
-              qty: item.quantity,
-          amount: Number(item.amount),
- 
-              batch: medicine?.hsnCode || "",
- 
-              expiry: medicine?.expiryDate
-                ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
-                : "",
-            };
+// combine name, strength nd company name
+            const nameParts = [
+  medicine?.medicineName,
+ item.strength || medicine?.strength,     
+    item.companyName || medicine?.companyName,
+].filter(Boolean).join(" - ");
+
+
+           return {
+  name: nameParts  || "Medicine",
+  qty: `${item.price} × ${item.quantity}`,
+  amount: Number(item.price) * Number(item.quantity),
+  batch: medicine?.hsnCode || "",
+
+  manufacturing: medicine?.manufacturingDate
+    ? new Date(medicine.manufacturingDate).toLocaleDateString("en-GB")
+    : "",
+
+  expiry: medicine?.expiryDate
+    ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
+    : "",
+};
           }),
  
           totalAmount: data.totalAmount,
 gstPercent: data.gstPercent || 0,
-usedPoints: data.medipointsEarned || 0,
-         
+
+         usedPoints: data.totalDiscount
         });
       } else {
         navigate(-1);
@@ -161,29 +169,38 @@ usedPoints: data.medipointsEarned || 0,
   fetchInvoice();
 }, [invoiceNo, navigate]);
  
- 
+
 const subTotal = invoice?.medicines?.reduce(
   (sum, med) => sum + Number(med.amount), 0
 ) || 0;
- 
+
 const usedPoints = invoice?.usedPoints || 0;
 const gstPercent = invoice?.gstPercent || 0;
- 
-const gstAmountInSubTotal = (subTotal * gstPercent) / (100 + gstPercent);
-const cgst = gstAmountInSubTotal / 2;
-const sgst = gstAmountInSubTotal / 2;
-const netTotal = subTotal;
- 
+const netTotal = invoice?.totalAmount || 0; 
+
+const amountAfterDiscount = subTotal - usedPoints;
+const gstAmount = (amountAfterDiscount * gstPercent) / 100;
+
+const cgst = gstAmount / 2;
+const sgst = gstAmount / 2;
+
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
- 
- 
-  const [pharmacyData, setPharmacyData] = useState<PharmacyFormValues | null>(null);
+const [pharmacyData, setPharmacyData] = useState<PharmacySettingsResponse | null>(null);
  
 useEffect(() => {
-  const stored = localStorage.getItem("pharmacyProfile");
-  if (stored) {
-    setPharmacyData(JSON.parse(stored) as PharmacyFormValues);
-  }
+  const fetchPharmacySettings = async () => {
+    try {
+      const settings = await pharmacySettingsService.getSettings(1);
+      // console.log("pharmacy settings:", settings);
+      setPharmacyData(settings);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(" Pharmacy fetch error message:", error.message);
+      }
+      // console.error(" Pharmacy fetch error full:", error);
+    }
+  };
+  fetchPharmacySettings();
 }, []);
 const pharmacyName = pharmacyData?.pharmacyName || "Your Pharmacy";
 const pharmacyAddress = pharmacyData?.address || "-";
@@ -210,10 +227,7 @@ const pharmacyAddress = pharmacyData?.address || "-";
               {showLogo && (
                 <Box
                   component="img"
-                  src={(() => {
-                    const savedLogo = localStorage.getItem("pharmacyLogo");
-                    return savedLogo || LogoImage;
-                  })()}
+src={pharmacyData?.logoUrl || LogoImage}
                   alt="logo"
                   sx={{ width: 36, height: 36, objectFit: "contain" }}
                 />
@@ -238,9 +252,10 @@ const pharmacyAddress = pharmacyData?.address || "-";
             </Box>
           </Box>
           {/* Column Headers */}
-          <Box sx={{ border: "1.5px solid #000", borderTop: "none", display: "grid", gridTemplateColumns: "30px 1fr 50px 55px 55px", p: "6px 8px", backgroundColor: "#f5f5f5" }}>
+          <Box sx={{ border: "1.5px solid #000", borderTop: "none", display: "grid", gridTemplateColumns: "30px 1fr 50px 50px 55px 55px", p: "6px 8px", backgroundColor: "#f5f5f5" }}>
             <Typography fontSize={10} fontWeight={700}>#</Typography>
             <Typography fontSize={10} fontWeight={700}>Particulars</Typography>
+            <Typography fontSize={10} fontWeight={700} textAlign="center">MFG</Typography>
             <Typography fontSize={10} fontWeight={700} textAlign="center">Expiry</Typography>
             <Typography fontSize={10} fontWeight={700} textAlign="center">Qty</Typography>
             <Typography fontSize={10} fontWeight={700} textAlign="center">Amt</Typography>
@@ -253,13 +268,14 @@ const pharmacyAddress = pharmacyData?.address || "-";
                 border: "1.5px solid #000",
                 borderTop: "none",
                 display: "grid",
-                gridTemplateColumns: "30px 1fr 50px 55px 55px",
+                gridTemplateColumns: "30px 1fr 50px 50px 55px 55px",
                 p: "5px 8px",
                 backgroundColor: index % 2 === 0 ? "#fff" : "#fafafa",
               }}
             >
               <Typography fontSize={11}>{index + 1}</Typography>
               <Typography fontSize={11}>{med.name}</Typography>
+              <Typography fontSize={11} textAlign="center">{med.manufacturing}</Typography>
               <Typography fontSize={11} textAlign="center">{med.expiry}</Typography>
               <Typography fontSize={11} textAlign="center">{med.qty}</Typography>
               <Typography fontSize={11} textAlign="center">₹{med.amount.toFixed(2)}</Typography>
@@ -276,7 +292,7 @@ const pharmacyAddress = pharmacyData?.address || "-";
  
  
             <Box display="flex" justifyContent="space-between" mt={0.5}>
-  <Typography fontSize={12} fontWeight={600}>Medipoint</Typography>
+  <Typography fontSize={12} fontWeight={600}>Discount</Typography>
 <Typography fontSize={12}>- ₹ {usedPoints.toFixed(2)}</Typography>
 </Box>
 <Typography fontSize={12} fontWeight={600}>
@@ -368,10 +384,7 @@ const pharmacyAddress = pharmacyData?.address || "-";
                     {showLogo && (
                       <Box
                         component="img"
-                        src={(() => {
-                          const savedLogo = localStorage.getItem("pharmacyLogo");
-                          return savedLogo || LogoImage;
-                        })()}
+src={pharmacyData?.logoUrl || LogoImage}
                         alt="logo"
                         sx={{ width: { xs: 36, md: 48 }, height: { xs: 36, md: 48 }, objectFit: "contain" }}
                       />
@@ -409,49 +422,47 @@ const pharmacyAddress = pharmacyData?.address || "-";
                   <TableCell align="center">{index + 1}</TableCell>
                   <TableCell>{med.name}</TableCell>
                   {showHsn && <TableCell align="center">{med.batch}</TableCell>}
+                  <TableCell align="center">{med.manufacturing}</TableCell>
                   <TableCell align="center">{med.expiry}</TableCell>
                   <TableCell align="center">{med.qty}</TableCell>
                   <TableCell align="center">₹ {med.amount.toFixed(2)}</TableCell>
                 </TableRow>
               ))}
- 
-              <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
-                <TableCell /><TableCell /><TableCell /><TableCell />
-                <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>Sub Total</strong></TableCell>
-                <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {subTotal.toFixed(2)}</TableCell>
-              </TableRow>
- 
- 
+
+
+{/* Sub Total */}
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
-  <TableCell /><TableCell /><TableCell /><TableCell />
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>MediPoint</strong></TableCell>
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {usedPoints.toFixed(2)}</TableCell>
+  <TableCell /><TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell align="center"><strong>Sub Total</strong></TableCell>
+  <TableCell align="center">₹ {subTotal.toFixed(2)}</TableCell>
 </TableRow>
- 
+
+{/* Discount */}
 <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
-  <TableCell /><TableCell /><TableCell /><TableCell />
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center"><strong>CGST </strong></TableCell>
-  <TableCell sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }} align="center">₹ {cgst.toFixed(2)}</TableCell>
+  <TableCell /><TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell align="center"><strong>Discount</strong></TableCell>
+  <TableCell align="center">₹ {usedPoints.toFixed(2)}</TableCell>
 </TableRow>
- 
- 
- <TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
-  <TableCell /><TableCell /><TableCell /><TableCell />
-  <TableCell
-    sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
-    align="center"
-  >
-    <strong>SGST</strong>
+
+{/* CGST */}
+<TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
+  <TableCell /><TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell align="center">
+    <strong>CGST ({gstPercent / 2}%)</strong>
   </TableCell>
-  <TableCell
-    sx={{ borderBottom: "2px solid #000", borderTop: "2px solid #000" }}
-    align="center"
-  >
-   ₹ {sgst.toFixed(2)}
+  <TableCell align="center">₹ {cgst.toFixed(2)}</TableCell>
+</TableRow>
+
+{/* SGST */}
+<TableRow sx={{ "& td": { borderLeft: "2px solid #000", borderRight: "2px solid #000" } }}>
+  <TableCell /><TableCell /><TableCell /><TableCell /><TableCell />
+  <TableCell align="center">
+    <strong>SGST ({gstPercent / 2}%)</strong>
   </TableCell>
+  <TableCell align="center">₹ {sgst.toFixed(2)}</TableCell>
 </TableRow>
               <TableRow sx={{ borderTop: "2px solid #000" }}>
-                <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
+                <TableCell colSpan={5} sx={{ border: "2px solid #000" }}>
                   Get Well Soon..
                 </TableCell>
                 <TableCell sx={{ border: "2px solid #000" }}>
@@ -463,7 +474,7 @@ const pharmacyAddress = pharmacyData?.address || "-";
               </TableRow>
  
               <TableRow>
-                <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
+                <TableCell colSpan={5} sx={{ border: "2px solid #000" }}>
                   Vat Tin No. :
                   <br />
                   Drug Lic No. : MH-PZ4-115478,115479,115480

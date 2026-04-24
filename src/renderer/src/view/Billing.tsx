@@ -142,6 +142,7 @@ const payload = {
   totalGST: 0,
   totalDiscount: 0,
  medipointsEarned: Math.floor(finalTotal / 200) * 5,
+   gstPercent: 0,  
   paymentStatus: "Pending",
 };
  
