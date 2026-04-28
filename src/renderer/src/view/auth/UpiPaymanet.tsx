@@ -16,6 +16,7 @@ import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { authService } from "@/service/authService";
 import { createUpiPayment } from "@/service/paymentService";
 
+
 type UpiFormFields = {
   paymentMethod: "upi";
   UpiId: string;
@@ -166,7 +167,7 @@ console.log("userId:", userId);
   showToast("success", "Payment Successful!");
         
        setTimeout(() => {
-    navigate(URL_PATH.PaymentSuccess);
+    navigate(URL_PATH.NetPurchaseDetails);
    }, 900);
 } else {
   throw new Error("Payment failed");

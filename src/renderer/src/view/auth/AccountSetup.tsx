@@ -580,7 +580,8 @@ const onSubmit = async (data: AccountForm): Promise<void> => {
     const registrationData = JSON.parse(localStorage.getItem('registrationData') || '{}');
     const selectedPlan = localStorage.getItem('selectedPlan');
 
-    if (!registrationData.email || !registrationData.fullName) {
+    if (!registrationData.email ||
+       !registrationData.fullName) {
       showToast("error", "Registration data missing. Please start over.");
       navigate(URL_PATH.REGISTER);
       return;
