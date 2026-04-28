@@ -8,6 +8,7 @@ import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 type InventoryItem = {
+  srNo: number; 
   itemName: string;
   itemId: string;
   medicineGroup: string;
@@ -24,6 +25,7 @@ type FilterForm = {
 };
 
 type MedicineApi = {
+  srNo: number; 
   medicineId: number;
   itemName: string;
   quantity: number;
@@ -107,6 +109,7 @@ function InventoryTable() {
       };
 
       const formatted: InventoryItem[] = medicines.map((item) => ({
+        srNo: item.srNo, 
         itemName: item.itemName,
         itemId: String(item.medicineId),
         medicineGroup: groupMap[item.groupId] || "N/A",
@@ -116,8 +119,6 @@ function InventoryTable() {
         supplier: distributorMap[item.distributorId] || "N/A",
         status: getStatus(item.quantity),
       }));
-
-      console.log("FINAL DATA:", formatted);
 
       setInventoryData(formatted);
     } catch (error) {
@@ -179,6 +180,8 @@ function InventoryTable() {
   ];
 
   const columns: Column<InventoryItem>[] = [
+    { key: "srNo", label: "Sr.No" }, 
+
     {
       key: "itemName",
       label: "Item",

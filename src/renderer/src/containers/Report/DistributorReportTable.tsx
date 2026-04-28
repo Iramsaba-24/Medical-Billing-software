@@ -9,6 +9,7 @@ import {
 } from "@/service/distributorService";
 
 type DistributorRow = {
+  id: string; 
   companyName: string;
   email: string;
   phone: string;
@@ -23,6 +24,11 @@ type FilterForm = {
 };
 
 const columns = [
+  {
+    key: "srNo",
+    label: "Sr No.",
+    render: (row: DistributorRow) => Number(row.id), 
+  },
   { key: "companyName", label: "Company Name" },
   { key: "email", label: "Email" },
   { key: "phone", label: "Contact" },
@@ -62,13 +68,14 @@ function DistributorReportTable() {
         const response: DistributorResponse[] = await getDistributors();
 
         const formattedData: DistributorRow[] = response.map((item) => ({
+          id: item.distributorId.toString(), 
           companyName: item.companyName || "",
           email: item.email || "",
           phone: item.phone || "",
           createdAt: item.createdDate
             ? new Date(item.createdDate).toISOString()
             : "",
-          status: "Active",
+          status: item.isActive ? "Active" : "Inactive", 
         }));
 
         setDistributorData(formattedData);
@@ -162,7 +169,7 @@ function DistributorReportTable() {
             showSearch={true}
             showExport={true}
             columns={columns}
-            getRowId={(row) => `${row.companyName}-${row.createdAt}`}
+            getRowId={(row) => row.id} 
           />
         </div>
       </Paper>
