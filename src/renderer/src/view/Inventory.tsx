@@ -30,16 +30,24 @@ useEffect(() => {
 
       const medicines: MedicineResponse[] = res.data.data;
 
-    
-      console.log("isLowStock check:", medicines.map(m => ({
-        name: m.medicineName,
-        isLowStock: m.isLowStock,
-        stockValue: m.stockValue
-      })));
+
+     console.log("medicine values:", JSON.stringify(medicines.map(m => ({
+  name: m.medicineName,
+  mrpPerTablet: m.mrpPerTablet,
+  totalStockTablets: m.totalStockTablets,
+  stockValue: m.stockValue,
+}))));
+
+console.log("isLowStock check:", JSON.stringify(medicines.map(m => ({
+  name: m.medicineName,
+  isLowStock: m.isLowStock,
+}))));
+
+
 
       const totalItems = medicines.length;
       const lowStockItems = medicines.filter(m => m.isLowStock).length;
-      const totalValue = medicines.reduce((sum, m) => sum + m.stockValue, 0);
+     const totalValue = medicines.reduce((sum, m) => sum + (m.mrpPerTablet * m.totalStockTablets), 0);
 
       setStats({ totalItems, lowStockItems, totalValue });
     } catch (error) {
@@ -74,7 +82,7 @@ return (
         {[
           { label: "Total Items", value: stats.totalItems, img: TotalItems },
 { label: "Low Stock Items", value: stats.lowStockItems, img: LowStock },
-{ label: "Total Value (GST incl.)", value: `₹ ${stats.totalValue.toFixed(2)}`, img: TotalValue },
+{ label: "Total Value ", value: `₹ ${stats.totalValue.toFixed(2)}`, img: TotalValue },
         ].map((card) => (
           <Paper
             key={card.label}
