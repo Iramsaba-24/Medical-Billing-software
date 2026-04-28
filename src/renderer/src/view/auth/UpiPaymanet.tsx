@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
 import { authService } from "@/service/authService";
+import { createUpiPayment } from "@/service/paymentService";
 
 type UpiFormFields = {
   paymentMethod: "upi";
@@ -109,32 +110,43 @@ const UpiPayment: React.FC = () => {
       }
 
       const paymentData = JSON.parse(paymentDataStr);
-      const upiIdValue = methods.getValues("UpiId");
+      // const upiIdValue = methods.getValues("UpiId");
 
       // Create subscription first
       const subscriptionResponse = await authService.createSubscription({
         userId: parseInt(userId),
         planId: paymentData.planId
       });
+      console.log("subscriptionId:", subscriptionResponse.subscriptionId);
+console.log("userId:", userId);
+
 
       if (!subscriptionResponse.subscriptionId) {
         throw new Error("Failed to create subscription");
       }
 
       // Process UPI payment - provide a valid sendVia value
-      const paymentRequest = {
-        userId: parseInt(userId),
-        subscriptionId: subscriptionResponse.subscriptionId,
-        amount: paymentData.amount,
-        paymentMethod: "UPI",
-        upiId: upiIdValue,
-        couponCode: paymentData.couponCode || ""
-      };
+      // const paymentRequest = {
+      //   userId: parseInt(userId),
+      //   subscriptionId: subscriptionResponse.subscriptionId,
+      //   amount: paymentData.amount,
+      //   paymentMethod: "UPI",
+      //   upiId: upiIdValue,
+      //   couponCode: paymentData.couponCode || ""
+      // };
 
       // Choose one of these options based on your preference:
       // Option 1: Send via email
-      const paymentResponse = await authService.processPayment(paymentRequest, "email");
-      
+      // const paymentResponse = await authService.processPayment(paymentRequest, "email");
+   const paymentResponse = await createUpiPayment({
+  invoiceId: paymentData.invoiceId || 1,
+   subscriptionId: subscriptionResponse.subscriptionId,
+  amountPaid: paymentData.amount,
+  customerId: parseInt(userId),
+  upiReference: "UPI" + Date.now(),
+  transactionReference: "TXN" + Date.now(),
+  
+});
       // OR Option 2: Send via whatsapp
       // const paymentResponse = await authService.processPayment(paymentRequest, "whatsapp");
       
@@ -142,22 +154,23 @@ const UpiPayment: React.FC = () => {
       // const sendVia = localStorage.getItem('preferredNotificationMethod') as "email" | "whatsapp" || "email";
       // const paymentResponse = await authService.processPayment(paymentRequest, sendVia);
 
-      if (paymentResponse.paymentStatus === "success") {
-        setUpiPaymentStatus("success");
-        
+      // if (paymentResponse.paymentStatus === "success") {
+      //   setUpiPaymentStatus("success");
+        if (paymentResponse) {
+  setUpiPaymentStatus("success");
         // Clear stored data
-        localStorage.removeItem('registrationData');
-        localStorage.removeItem('paymentData');
-        localStorage.removeItem('selectedPlanId');
+       localStorage.removeItem('registrationData');
+  localStorage.removeItem('paymentData');
+  localStorage.removeItem('selectedPlanId');
+
+  showToast("success", "Payment Successful!");
         
-        showToast("success", "Payment Successful!");
-        
-        setTimeout(() => {
-          navigate(URL_PATH.PaymentSuccess);
-        }, 900);
-      } else {
-        throw new Error("Payment failed");
-      }
+       setTimeout(() => {
+    navigate(URL_PATH.PaymentSuccess);
+   }, 900);
+} else {
+  throw new Error("Payment failed");
+}
     } catch (error: unknown) {
       console.error("Payment error:", error);
       setUpiPaymentStatus("default");

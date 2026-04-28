@@ -99,13 +99,34 @@ const RegisterPage = () => {
     return isValid;
   };
 
+  const isMobileNumberDuplicate = (mobileNumber: string): boolean => {
+    const storedData = localStorage.getItem("registrationData");
+
+    if (!storedData) return false;
+
+    const parsedData: RegisterFormInputs = JSON.parse(storedData);
+
+    return parsedData.mobileNumber === mobileNumber;
+  };
+
   const onSubmit = (data: RegisterFormInputs) => {
     if (!validateRequiredFields(data)) return;
+
+    if (isMobileNumberDuplicate(data.mobileNumber.trim())) {
+      setError("mobileNumber", {
+        type: "manual",
+        message: "Mobile number already exists",
+      });
+
+      showToast("error", "Mobile number already exists!");
+      return;
+    }
 
     const cleanedData = {
       ...data,
       fullName: data.fullName.trim(),
       email: data.email.trim(),
+      mobileNumber: data.mobileNumber.trim(),
       companyName: data.companyName.trim(),
       city: data.city.trim(),
       state: data.state.trim(),
@@ -202,12 +223,14 @@ const RegisterPage = () => {
                 },
               }}
             />
+
             <EmailField
               name="email"
               label="Email Address"
               required
               sx={inputStyle("email")}
             />
+
             <MobileField
               name="mobileNumber"
               label="Mobile Number"
@@ -215,6 +238,7 @@ const RegisterPage = () => {
               required
               sx={inputStyle("mobileNumber")}
             />
+
             <TextInputField
               name="companyName"
               label="Company / Clinic Name"
@@ -224,6 +248,7 @@ const RegisterPage = () => {
               minLength={3}
               maxLength={30}
             />
+
             <TextInputField
               name="city"
               label="City"
@@ -239,6 +264,7 @@ const RegisterPage = () => {
                 },
               }}
             />
+
             <TextInputField
               name="state"
               label="State"
@@ -285,7 +311,7 @@ const RegisterPage = () => {
             Already have an account?{" "}
             <Box
               component="span"
-              onClick={() => navigate(URL_PATH.LOGIN)}
+              onClick={() => navigate("/")}
               sx={{
                 color: "black",
                 fontWeight: 600,

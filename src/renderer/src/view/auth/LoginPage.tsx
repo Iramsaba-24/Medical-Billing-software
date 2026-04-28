@@ -216,8 +216,8 @@ const LoginPage = () => {
           : "#1b7f6b !important",
       },
       "&.Mui-focused fieldset": {
-        borderColor: errors[fieldName]
-          ? "#d32f2f !important"
+        borderColor: errors[fieldName]  // If there's an error for this field, use red; otherwise, use green
+          ? "#d32f2f !important"      //type of error color
           : "#1b7f6b !important",
       },
     },
@@ -389,6 +389,30 @@ const LoginPage = () => {
             >
               {isLoading ? "Logging in..." : "Login"}
             </Button>
+            <Typography
+              mt={2}
+              sx={{ fontSize: "14px", color: "#555", textAlign: "center" }}
+            >
+              Don’t have an account?{" "}
+              <Box
+                component="span"
+                onClick={() => navigate(URL_PATH.REGISTER)}
+                sx={{
+                  color: "black",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  display: "inline-block",
+                  borderBottom: "2px solid transparent",
+                  "&:hover": {
+                    color: "#145c4d",
+                    borderBottom: "2px solid #145c4d",
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                Register
+              </Box>
+            </Typography>
           </Box>
         </FormProvider>
       </Box>

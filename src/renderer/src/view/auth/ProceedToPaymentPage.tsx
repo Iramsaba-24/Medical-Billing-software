@@ -1,17 +1,25 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import LogoImage from "@/assets/logoimg.svg";
 import BgImage from "@/assets/bgloginpage.svg";
 import TextInputField from "@/components/controlled/TextInputField";
 import RadioField from "@/components/controlled/RadioField";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-// import { useEffect } from "react";
 type PaymentFormInputs = {
   paymentMethod: string;
   amount: string;
 };
+ 
+// Define plan prices
+const PLAN_PRICES: Record<string, number> = {
+  'basic': 999,
+  'standard': 1999,
+  'premium': 2999
+};
+ 
 const radioStyle = {
   "& .MuiRadio-root": {
     color: "default.main",
@@ -20,7 +28,6 @@ const radioStyle = {
     },
   },
 };
-
 const ProceedToPaymentPage = () => {
   const methods = useForm<PaymentFormInputs>({
     defaultValues: {
@@ -29,50 +36,61 @@ const ProceedToPaymentPage = () => {
     },
     mode: "onChange",
   });
-
-
+ 
+ 
   const navigate = useNavigate();
-  const { handleSubmit } = methods;
-
+  const { handleSubmit, setValue } = methods;
+ 
+  // Get selected plan from localStorage and set the amount
+  useEffect(() => {
+    const selectedPlan = localStorage.getItem('selectedPlan');
+   
+    if (selectedPlan && PLAN_PRICES[selectedPlan]) {
+      const amount = PLAN_PRICES[selectedPlan].toString();
+      setValue('amount', amount);
+    } else {
+      showToast("error", "No plan selected. Please select a plan first.");
+      navigate(URL_PATH.ChoosePlan);
+    }
+  }, [setValue, navigate]);
+ 
   const handleAmountInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-
+ 
     let value = input.value.replace(/[^0-9]/g, "");
-
+ 
     if (value.length > 4) {
       value = value.slice(0, 4);
     }
-
+ 
     input.value = value;
   };
-
+ 
   const onSubmit = (data: PaymentFormInputs) => {
     console.log("Payment Data:", data);
-
+ 
     // Store payment data in localStorage
     const userId = localStorage.getItem('userId');
     const selectedPlan = localStorage.getItem('selectedPlan');
-
+ 
     // Validate required data
     if (!userId) {
       showToast("error", "User not found. Please register again.");
       navigate(URL_PATH.REGISTER);
       return;
     }
-
+ 
     if (!selectedPlan) {
       showToast("error", "Plan not selected. Please start over.");
       navigate(URL_PATH.ChoosePlan);
       return;
     }
-
-    // Map plan to planId (you can also fetch from API)
     const planMapping: Record<string, number> = {
       'basic': 1,
       'standard': 2,
       'premium': 3
     };
-
+ 
     const paymentData = {
       userId: userId ? parseInt(userId) : 0,
       amount: parseFloat(data.amount),
@@ -80,9 +98,9 @@ const ProceedToPaymentPage = () => {
       planId: planMapping[selectedPlan] || 1,
       couponCode: ''
     };
-
+ 
     localStorage.setItem('paymentData', JSON.stringify(paymentData));
-
+ 
     if (data.paymentMethod === "upi") {
       navigate(URL_PATH.UpiPayment);
     } else if (data.paymentMethod === "card") {
@@ -93,7 +111,7 @@ const ProceedToPaymentPage = () => {
       showToast("error", "Please select payment method");
     }
   };
-
+ 
   return (
     <Box
       sx={{
@@ -131,7 +149,7 @@ const ProceedToPaymentPage = () => {
               }}
             />
           </Box>
-
+ 
           <Typography
             mb={{ xs: 2.5, sm: 3 }}
             sx={{
@@ -144,7 +162,24 @@ const ProceedToPaymentPage = () => {
           >
             Payment Details
           </Typography>
-
+ 
+          {/* Display selected plan info */}
+          <Box sx={{ width: "100%", mb: 2 }}>
+            <Typography
+              sx={{
+                fontWeight: 500,
+                fontSize: "0.9rem",
+                color: "#666",
+                textAlign: "center",
+                mb: 1,
+              }}
+            >
+              Selected Plan: <strong style={{ color: "#1b7f6b", textTransform: "capitalize" }}>
+                {localStorage.getItem('selectedPlan') || 'None'}
+              </strong>
+            </Typography>
+          </Box>
+ 
           <Box sx={{ width: "100%", mb: 3 }}>
             <RadioField
               name="paymentMethod"
@@ -169,7 +204,7 @@ const ProceedToPaymentPage = () => {
               }}
             />
           </Box>
-
+ 
           <Box sx={{ width: "100%", mb: 3 }}>
             <Typography
               sx={{
@@ -181,12 +216,11 @@ const ProceedToPaymentPage = () => {
             >
               Total Amount
             </Typography>
-
+ 
             <TextInputField
               name="amount"
               label=""
               placeholder="Enter total amount"
-              // disabled={true}
               rules={{
                 required: "Amount is required",
                 pattern: {
@@ -198,6 +232,7 @@ const ProceedToPaymentPage = () => {
                 inputMode: "numeric",
                 onInput: handleAmountInput,
                 maxLength: 4,
+                readOnly: true,
               }}
               sx={{
                 "& .MuiOutlinedInput-root": {
@@ -213,11 +248,15 @@ const ProceedToPaymentPage = () => {
                   "&.Mui-focused fieldset": {
                     borderColor: "#2a9d8f",
                   },
+                  "& input.Mui-readOnly": {
+                    backgroundColor: "#e8e8e8",
+                    cursor: "not-allowed",
+                  },
                 },
               }}
             />
           </Box>
-
+ 
           <Button
             type="submit"
             fullWidth
@@ -244,5 +283,7 @@ const ProceedToPaymentPage = () => {
     </Box>
   );
 };
-
+ 
 export default ProceedToPaymentPage;
+ 
+ 
