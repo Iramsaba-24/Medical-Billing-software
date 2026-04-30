@@ -113,11 +113,26 @@ useEffect(() => {
 }, []);
 
 
-const [dashboard] = useState({
-  totalRevenue: 0,
-  pendingAmount: 0,
-  totalInvoices: 0
-});
+// const [dashboard] = useState({
+//   totalRevenue: 0,
+//   pendingAmount: 0,
+//   totalInvoices: 0
+// });
+
+
+const dashboard = {
+  totalRevenue: invoices
+    .filter(inv => inv.paymentStatus === "Paid")
+    .reduce((sum, inv) => sum + (inv.price ?? 0), 0),
+
+  pendingAmount: invoices
+    .filter(inv => inv.paymentStatus === "Pending" || inv.paymentStatus === "Overdue")
+    .reduce((sum, inv) => sum + (inv.price ?? 0), 0),
+
+  totalInvoices: invoices.length,
+};
+
+
   return (
     <Box>
       <Typography sx={{

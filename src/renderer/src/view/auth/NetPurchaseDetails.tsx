@@ -7,7 +7,7 @@ import TextInputField from "@/components/controlled/TextInputField";
 import EmailField from "@/components/controlled/EmailField";
 import RadioField from "@/components/controlled/RadioField";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-import MobileField from "@/components/controlled/MobileField";
+// import MobileField from "@/components/controlled/MobileField";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { authService } from "@/service/authService";
@@ -208,7 +208,7 @@ const NetBanking_PurchaseDetails = () => {
           fontFamily: '"Poppins", sans-serif',
         }}
       >
-        Net Banking Payment
+        Net Banking Payment 
       </Typography>
 
       <FormProvider {...methods}>
@@ -250,7 +250,7 @@ const NetBanking_PurchaseDetails = () => {
             label=""
             options={[
               { value: "email", label: "Send E-Bill on your Email ID" },
-              { value: "whatsapp", label: "Send E-Bill on your WhatsApp" },
+              // { value: "whatsapp", label: "Send E-Bill on your WhatsApp" },
             ]}
             sx={{ mb: 2, ...radioStyle }}
           />
@@ -272,7 +272,8 @@ const NetBanking_PurchaseDetails = () => {
             />
           )}
 
-          {selectedBillType === "whatsapp" && (
+          {/* Conditional WhatsApp Field */}
+          {/* {selectedBillType === "whatsapp" && (
             <MobileField
               name="whatsapp"
               label="Whatsapp Number"
@@ -289,7 +290,7 @@ const NetBanking_PurchaseDetails = () => {
                 },
               }}
             />
-          )}
+          )} */}
 
           <Box
             sx={{
@@ -310,7 +311,7 @@ const NetBanking_PurchaseDetails = () => {
                 fontSize: "0.9rem",
               }}
             >
-              ⚠ When payment is done, E-Bill will be sent to your selected Email / WhatsApp
+              ⚠ When payment is done, E-Bill will be sent to your selected Email 
             </Box>
 
             <Button

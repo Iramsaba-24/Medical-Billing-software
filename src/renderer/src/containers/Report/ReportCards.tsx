@@ -10,10 +10,8 @@ import {
   getRetailInvoiceItemsByInvoiceId,
 } from "@/service/retailInvoiceService";
 
-import {
-  getDistributors,
-  DistributorResponse,
-} from "@/service/distributorService";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 type RetailInvoice = {
   retailInvoiceId: number;
@@ -27,8 +25,16 @@ type RetailInvoiceItem = {
   price: number;
 };
 
-type DistributorWithPurchase = DistributorResponse & {
-  totalPurchase?: number;
+type MedicineApi = {
+  medicineId: number;
+  itemName: string;
+  quantity: number;
+  pricePerUnit: number;
+  expiryDate: string;
+  groupId: number;
+  distributorId: number;
+  gstPercentage: number;
+  unit: string;
 };
 
 function ReportCards() {
@@ -59,14 +65,28 @@ function ReportCards() {
 
   const calculatePurchase = async () => {
     try {
-      const distributors: DistributorWithPurchase[] = await getDistributors();
+      const token = localStorage.getItem("token");
 
-      const purchaseValue =
-        distributors?.[0]?.totalPurchase ?? 0;
+      const res = await axios.get<{ data: MedicineApi[] }>(
+        API_ENDPOINTS.MEDICINE,
+        {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        }
+      );
 
-      setTotalPurchase(purchaseValue);
+      const medicines = res.data?.data || [];
+
+      let total = 0;
+
+      for (const item of medicines) {
+        total += (item.pricePerUnit || 0) * (item.quantity || 0);
+      }
+
+      setTotalPurchase(total);
     } catch (error) {
-      console.error("Error fetching purchase:", error);
+      console.error("Error calculating purchase:", error);
       setTotalPurchase(0);
     }
   };

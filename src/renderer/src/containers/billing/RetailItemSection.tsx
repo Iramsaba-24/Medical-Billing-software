@@ -23,7 +23,7 @@ export interface ItemRow {
   quantity: number | "";
   price: number | "";
   amount?: number;
-  
+   maxStock?: number;
 }
 
 export type InventoryItem = {
@@ -258,6 +258,7 @@ if (selected) {
           price: Number(selected.mrpPerTablet),
             companyName: selected.companyName,
             expiryDate: selected.expiryDate,
+               maxStock: selected.totalStockTablets,
           }
         : r
     )
@@ -275,23 +276,30 @@ if (selected) {
   }
 />
 
-            <TextField
-              fullWidth
-              label="Qty"
-              type="number"
-              value={row.quantity}
-              error={qtyError}
-              onKeyDown={(e) =>
-                ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()
-              }
-              onChange={(e) =>
-                updateRow(
-                  row.retailItemId,
-                  "quantity",
-                  e.target.value === "" ? "" : Number(e.target.value)
-                )
-              }
-            />
+           <TextField
+  fullWidth
+  label="Qty"
+  type="number"
+  value={row.quantity}
+  error={qtyError || (row.maxStock !== undefined && Number(row.quantity) > row.maxStock)}
+  helperText={
+    row.maxStock !== undefined && Number(row.quantity) > row.maxStock
+      ? `Only ${row.maxStock} in stock`
+      : qtyError
+      ? "Enter valid quantity"
+      : ""
+  }
+  onKeyDown={(e) =>
+    ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()
+  }
+  onChange={(e) =>
+    updateRow(
+      row.retailItemId,
+      "quantity",
+      e.target.value === "" ? "" : Number(e.target.value)
+    )
+  }
+/>
 
             <TextField
               fullWidth
@@ -374,3 +382,10 @@ if (selected) {
 };
 
 export default RetailItemSection;
+
+
+
+
+
+
+

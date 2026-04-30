@@ -372,24 +372,13 @@ navigate(URL_PATH.Invoices);
           </Typography>
  
           {fields.map((field, index) => (
-            <Stack key={field.id} direction="row" spacing={2} mb={2}>
+           <Stack key={field.id} direction={{ xs: "column", sm: "row" }} spacing={2} mb={2}>
               <DropdownField
                 name={`items.${index}.item`}
                 label="Item"
                 options={inventoryOptions}
-                sx={{ width: 500 }}
-//           onChangeCallback={(val: string) => {
-//   const selectedItem = inventoryOptions.find((i) => i.value === val);
-//   if (!selectedItem) return;
-//   const qty = Number(methods.getValues(`items.${index}.qty`)) || 1;
-//   const subtotal = qty * selectedItem.price;
-//   const gstAmount = (subtotal * invoiceGstPercent) / 100; // ← invoice chi gst
-//   const total = subtotal + gstAmount;
-//   setValue(`items.${index}.unitPrice`, selectedItem.price);
-//   setValue(`items.${index}.gstPercent`, invoiceGstPercent); // ← invoice chi gst
-//   setValue(`items.${index}.discount`, 0);
-//   setValue(`items.${index}.price`, Number(total.toFixed(2)));
-// }}
+               sx={{ width: { xs: "100%", sm: 500 } }}
+
 
 
 onChangeCallback={(val: string) => {
@@ -432,7 +421,7 @@ onChangeCallback={(val: string) => {
   name={`items.${index}.qty`}
   label="Qty"
   type="number"
-  sx={{ width: 100 }}
+ sx={{ width: { xs: "100%", sm: 100 } }}
 />
  
               <TextInputField
@@ -440,7 +429,7 @@ onChangeCallback={(val: string) => {
                 label="Price"
                 type="number"
                 inputProps={{ readOnly: true }}
-                sx={{ width: 140 }}
+                sx={{ width: { xs: "100%", sm: 140 } }}
               />
  
               <IconButton

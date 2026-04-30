@@ -17,6 +17,7 @@ import {
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
 
 type Customer = {
+  srNo: number; 
   id: number;
   name: string;
   medicines: string;
@@ -90,6 +91,7 @@ function CustomerTable() {
           }
 
           formatted.push({
+            srNo: cust.srNo, 
             id: Number(cust.customerId),
             name: cust.name || "",
             medicines: medNames.join(", "),
@@ -146,6 +148,7 @@ function CustomerTable() {
   }, [customers, timeFilter]);
 
   const columns: Column<Customer>[] = [
+    { key: "srNo", label: "Sr No" }, 
     { key: "name", label: "Name" },
     { key: "medicines", label: "Medicines" },
     { key: "quantity", label: "Quantity" },

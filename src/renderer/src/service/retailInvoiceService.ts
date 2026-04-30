@@ -132,6 +132,7 @@ export const getAllRetailInvoices = async () => {
  
   return res.data;
 };
+
  
 //invoice by id
 export const getRetailInvoiceById = async (id: number) => {

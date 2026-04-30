@@ -23,6 +23,8 @@ import {
   MedicineGroupResponse,
 } from "@/service/medicineGroupService";
 
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
+
 type SalesRecord = {
   name: string;
   sales: number;
@@ -31,6 +33,12 @@ type SalesRecord = {
 type FormValues = {
   dateRange: string;
   medicineGroup: string;
+};
+
+type RetailInvoiceItem = {
+  medicineId: number;
+  quantity: number;
+  price: number;
 };
 
 const getDateRanges = (selected?: string): string[] => {
@@ -112,7 +120,6 @@ const SalesGraph = () => {
 
   useEffect(() => {
     const newRanges = getDateRanges(selectedRange);
-
     setDateRanges(newRanges);
 
     if (!newRanges.includes(selectedRange)) {
@@ -135,7 +142,18 @@ const SalesGraph = () => {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const invoices: RetailInvoiceResponse[] = await getAllRetailInvoices();
+        const invoices: RetailInvoiceResponse[] =
+          await getAllRetailInvoices();
+
+        const medicines: MedicineResponse[] = await getMedicines();
+
+        const medicineGroupMap = new Map<number, string>();
+        medicines.forEach((m) => {
+          medicineGroupMap.set(
+            m.medicineId,
+            (m.groupName || "").trim().toLowerCase()
+          );
+        });
 
         const { start, end } = parseDateRange(selectedRange);
 
@@ -151,30 +169,55 @@ const SalesGraph = () => {
           "Week 4": 0,
         };
 
-        for (const invoice of filteredInvoices) {
-          const items = await getRetailInvoiceItemsByInvoiceId(
-            invoice.retailInvoiceId
-          );
+        const normalizedSelectedGroup = selectedGroup
+          ? selectedGroup.trim().toLowerCase()
+          : "";
 
-          for (const item of items) {
-            if (selectedGroup && item.groupName !== selectedGroup) continue;
-
-            const date = new Date(invoice.invoiceDate);
-            const day = date.getDate();
-
-            let week = "Week 1";
-            if (day > 7 && day <= 14) week = "Week 2";
-            else if (day > 14 && day <= 21) week = "Week 3";
-            else if (day > 21) week = "Week 4";
-
-            weeklyData[week] += item.quantity * item.price;
-          }
+        if (!normalizedSelectedGroup) {
+          setData([
+            { name: "Week 1", sales: 0 },
+            { name: "Week 2", sales: 0 },
+            { name: "Week 3", sales: 0 },
+            { name: "Week 4", sales: 0 },
+          ]);
+          return;
         }
 
-        const formatted: SalesRecord[] = Object.keys(weeklyData).map((key) => ({
-          name: key,
-          sales: weeklyData[key],
-        }));
+        for (const invoice of filteredInvoices) {
+          const invoiceDate = new Date(invoice.invoiceDate);
+          const day = invoiceDate.getDate();
+
+          let week: keyof typeof weeklyData = "Week 1";
+          if (day > 7 && day <= 14) week = "Week 2";
+          else if (day > 14 && day <= 21) week = "Week 3";
+          else if (day > 21) week = "Week 4";
+
+          const items: RetailInvoiceItem[] =
+            await getRetailInvoiceItemsByInvoiceId(
+              invoice.retailInvoiceId
+            );
+
+          const groupTotal = items.reduce(
+            (sum: number, item: RetailInvoiceItem) => {
+              const itemGroup =
+                medicineGroupMap.get(item.medicineId) || "";
+
+              if (itemGroup !== normalizedSelectedGroup) return sum;
+
+              return sum + item.quantity * item.price;
+            },
+            0
+          );
+
+          weeklyData[week] += groupTotal;
+        }
+
+        const formatted: SalesRecord[] = Object.keys(weeklyData).map(
+          (key) => ({
+            name: key,
+            sales: weeklyData[key],
+          })
+        );
 
         setData(formatted);
       } catch (err) {
