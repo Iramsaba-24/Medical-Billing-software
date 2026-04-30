@@ -32,6 +32,8 @@ const LandingPage = () => {
 const licenseNumber =
   registrationData?.businessDetail?.licenseNumber || "Not Available";
 
+
+
   return (
     <>
       <Box sx={{ minHeight: "100vh" }}>
@@ -147,8 +149,6 @@ const licenseNumber =
 };
 
 export default LandingPage;
-
-
 
 
 
