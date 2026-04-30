@@ -318,11 +318,6 @@ import { showToast } from "@/components/uncontrolled/ToastMessage";
 type PlanForm = {
   plan: string;
 };
-const planAmountMapping: Record<string, number> = {
-  basic: 999,
-  standard: 1999,
-  premium: 2999,
-};
 
 const ChoosePlan = () => {
   const methods = useForm<PlanForm>({
@@ -338,19 +333,22 @@ const radioStyle = {
 };
   const navigate = useNavigate();
 
-const onSubmit = (data: PlanForm) => {
-  const amount = planAmountMapping[data.plan];
+  const onSubmit = (data: PlanForm) => {
+    console.log("Plan selected:", data);
 
   // localStorage.setItem("selectedPlan", data.plan);
   // localStorage.setItem("selectedAmount", amount.toString());
 
-  const existingData = JSON.parse(localStorage.getItem("registrationData") || '{}');
-  const completeData = { ...existingData, plan: data.plan, amount };
-  localStorage.setItem('registrationData', JSON.stringify(completeData));
+    const existingData = JSON.parse(
+      localStorage.getItem("registrationData") || "{}"
+    );
+    const completeData = { ...existingData, plan: data.plan };
+    localStorage.setItem("registrationData", JSON.stringify(completeData));
 
-  showToast("success", "Plan selected successfully!");
-  navigate(URL_PATH.AccountSetup);
-};
+    showToast("success", "Plan selected successfully!");
+
+    navigate(URL_PATH.AccountSetup);
+  };
 
   return (
     <Box
@@ -411,7 +409,8 @@ const onSubmit = (data: PlanForm) => {
               sx={{
                 width: "100%",
                 maxWidth: 360,
-                ml: { xs: 2, sm: 6, md: 10 },
+                display: "flex",
+                justifyContent: "center",
               }}
             >
               <RadioField
@@ -425,8 +424,15 @@ const onSubmit = (data: PlanForm) => {
                 ]}
                 sx={{
                   ...radioStyle,
+                  mb: 2,
+                  "& .MuiFormLabel-root": {
+                    color: "#000 !important",
+                  },
+                  "& .MuiFormLabel-root.Mui-focused": {
+                    color: "#000 !important",
+                  },
                   "& .MuiFormLabel-asterisk": {
-                    display: "none", 
+                    display: "none",
                   },
                 }}
               />
@@ -463,7 +469,6 @@ const onSubmit = (data: PlanForm) => {
 };
 
 export default ChoosePlan;
-
 
 
 

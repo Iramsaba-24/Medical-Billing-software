@@ -86,6 +86,7 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
       console.error("Error fetching customers", error);
     }
   };
+  
  
   fetchCustomers();
 }, []);
@@ -114,7 +115,8 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
       row.quantity === "" ||
       Number(row.quantity) <= 0 ||
       row.price === "" ||
-      Number(row.price) <= 0
+      Number(row.price) <= 0 ||
+        (row.maxStock !== undefined && Number(row.quantity) > row.maxStock)
   );
  
   if (hasInvalidItems) return;
@@ -147,6 +149,8 @@ const payload = {
 };
  
     const res = await createRetailInvoice(payload);
+
+    window.dispatchEvent(new Event("invoiceUpdated"));
  
     navigate(URL_PATH.MediPoints, {
       state: {

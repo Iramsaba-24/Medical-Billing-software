@@ -147,15 +147,13 @@ const InvoiceView = () => {
                   amount: Number(item.price) * Number(item.quantity),
                   batch: medicine?.hsnCode || "",
 
-                  manufacturing: medicine?.manufacturingDate
-                    ? new Date(medicine.manufacturingDate).toLocaleDateString(
-                        "en-GB",
-                      )
-                    : "",
+                 manufacturing: medicine?.manufacturingDate
+  ? new Date(medicine.manufacturingDate).toLocaleDateString("en-GB")
+  : "",
 
-                  expiry: medicine?.expiryDate
-                    ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
-                    : "",
+expiry: medicine?.expiryDate
+  ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
+  : "",
                 };
               },
             ),
@@ -237,7 +235,7 @@ const InvoiceView = () => {
             },
           }}
         />
-        <Paper sx={{ p: 2, mx: 0 }} id="invoice">
+     <Paper sx={{ p: 1, mx: 0 }} id="invoice">
           <Typography
             textAlign="center"
             mb={2}
@@ -310,7 +308,7 @@ const InvoiceView = () => {
               border: "1.5px solid #000",
               borderTop: "none",
               display: "grid",
-              gridTemplateColumns: "30px 1fr 50px 50px 55px 55px",
+             gridTemplateColumns: "18px 1fr 55px 55px 45px 45px",
               p: "6px 8px",
               backgroundColor: "#f5f5f5",
             }}
@@ -342,19 +340,29 @@ const InvoiceView = () => {
                 border: "1.5px solid #000",
                 borderTop: "none",
                 display: "grid",
-                gridTemplateColumns: "30px 1fr 50px 50px 55px 55px",
-                p: "5px 8px",
+             gridTemplateColumns: "18px 1fr 55px 55px 45px 45px",
+                p: "5px 6px",
                 backgroundColor: index % 2 === 0 ? "#fff" : "#fafafa",
               }}
             >
               <Typography fontSize={11}>{index + 1}</Typography>
-              <Typography fontSize={11}>{med.name}</Typography>
-              <Typography fontSize={11} textAlign="center">
-                {med.manufacturing}
-              </Typography>
-              <Typography fontSize={11} textAlign="center">
-                {med.expiry}
-              </Typography>
+             <Typography fontSize={11} sx={{ wordBreak: "break-word", minWidth: 0 }}>
+  {med.name}
+</Typography>
+
+
+            <Typography fontSize={11} textAlign="center">
+  {med.manufacturing
+    ? `${med.manufacturing.split("/")[1]}/${med.manufacturing.split("/")[2]?.slice(-2)}`
+    : ""}
+</Typography>
+<Typography fontSize={11} textAlign="center">
+  {med.expiry
+    ? `${med.expiry.split("/")[1]}/${med.expiry.split("/")[2]?.slice(-2)}`
+    : ""}
+</Typography>
+
+
               <Typography fontSize={11} textAlign="center">
                 {med.qty}
               </Typography>
@@ -380,15 +388,22 @@ const InvoiceView = () => {
               </Typography>
               <Typography fontSize={12}>- ₹ {usedPoints.toFixed(2)}</Typography>
             </Box>
-            <Typography fontSize={12} fontWeight={600}>
-              CGST ({gstPercent / 2}%)
-            </Typography>
-            <Typography fontSize={12}>₹ {cgst.toFixed(2)}</Typography>
 
-            <Typography fontSize={12} fontWeight={600}>
-              SGST ({gstPercent / 2}%)
-            </Typography>
-            <Typography fontSize={12}>₹ {sgst.toFixed(2)}</Typography>
+
+
+           <Box display="flex" justifyContent="space-between" mt={0.5}>
+  <Typography fontSize={12} fontWeight={600}>
+    CGST ({gstPercent / 2}%)
+  </Typography>
+  <Typography fontSize={12}>₹ {cgst.toFixed(2)}</Typography>
+</Box>
+
+<Box display="flex" justifyContent="space-between" mt={0.5}>
+  <Typography fontSize={12} fontWeight={600}>
+    SGST ({gstPercent / 2}%)
+  </Typography>
+  <Typography fontSize={12}>₹ {sgst.toFixed(2)}</Typography>
+</Box>
 
             <Box
               display="flex"
