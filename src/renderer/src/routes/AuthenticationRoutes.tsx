@@ -1,3 +1,77 @@
+// import { RouteObject } from "react-router-dom";
+// import LOGIN from "@/view/auth/LoginPage";
+// import { URL_PATH } from "../constants/UrlPath";
+// import RegisterPage from "@/view/auth/RegisterPage";
+// import CardPayment from "@/view/auth/CardPayment";
+// import PaymentSuccess from "@/view/auth/PaymentSuccess";
+// import UpiPayment from "@/view/auth/UpiPaymanet";
+ 
+// import BusinessDetails from "@/view/auth/BusinessDetails";
+// import ChoosePlan from "@/view/auth/ChoosePlan";
+// import AccountSetup from "@/view/auth/AccountSetup";
+// import NetPurchaseDetails from "@/view/auth/NetPurchaseDetails";
+// import ProceedToPaymentPage from "@/view/auth/ProceedToPaymentPage";
+// import NetBanking from "@/view/auth/NetBanking";
+// import ReceiverDetails from "@/view/auth/ReceiverDetails";
+ 
+// export const authRoutes: RouteObject[] = [
+//   {
+//     index: true,
+//     element: <LOGIN />,
+//   },
+ 
+//   {
+//     path: URL_PATH.CardPayment,
+//     element: <CardPayment />,
+//   },
+//   {
+//     path: URL_PATH.UpiPayment,
+//     element: <UpiPayment />,
+//   },
+//   {
+//     path: URL_PATH.PaymentSuccess,
+//     element: <PaymentSuccess />,
+//   },
+ 
+//   {
+//     path: URL_PATH.REGISTER,
+//     element: <RegisterPage />,
+//   },
+//   {
+//     path: URL_PATH.ChoosePlan,
+//     element: <ChoosePlan />,
+//   },
+//   {
+//     path: URL_PATH.AccountSetup,
+//     element: <AccountSetup />,
+//   },
+ 
+//   {
+//     path: URL_PATH.BusinessDetails,
+//     element: <BusinessDetails />,
+//   },
+ 
+//   {
+//     path: URL_PATH.NetPurchaseDetails,
+//     element: <NetPurchaseDetails />,
+//   },
+//   {
+//     path: URL_PATH.ProceedToPaymentPage,
+//     element: <ProceedToPaymentPage />,
+//   },
+//   {
+//     path: URL_PATH.NetBanking,
+//     element: <NetBanking />,
+//   },
+//   {
+//     path: URL_PATH.ReceiverDetails,
+//     element: <ReceiverDetails />,
+//   },
+// ];
+ 
+ 
+ 
+ 
 import { RouteObject } from "react-router-dom";
 import LOGIN from "@/view/auth/LoginPage";
 import { URL_PATH } from "../constants/UrlPath";
@@ -5,7 +79,7 @@ import RegisterPage from "@/view/auth/RegisterPage";
 import CardPayment from "@/view/auth/CardPayment";
 import PaymentSuccess from "@/view/auth/PaymentSuccess";
 import UpiPayment from "@/view/auth/UpiPaymanet";
-
+import ProtectedRoute from "@/routes/ProtectedRoute";
 import BusinessDetails from "@/view/auth/BusinessDetails";
 import ChoosePlan from "@/view/auth/ChoosePlan";
 import AccountSetup from "@/view/auth/AccountSetup";
@@ -13,58 +87,65 @@ import NetPurchaseDetails from "@/view/auth/NetPurchaseDetails";
 import ProceedToPaymentPage from "@/view/auth/ProceedToPaymentPage";
 import NetBanking from "@/view/auth/NetBanking";
 import ReceiverDetails from "@/view/auth/ReceiverDetails";
-
+ 
 export const authRoutes: RouteObject[] = [
+  //  PUBLIC
+  {
+  path: URL_PATH.LOGIN,   
+  element: <LOGIN />,
+},
   {
     index: true,
     element: <LOGIN />,
   },
-
-  {
-    path: URL_PATH.CardPayment,
-    element: <CardPayment />,
-  },
-  {
-    path: URL_PATH.UpiPayment,
-    element: <UpiPayment />,
-  },
-  {
-    path: URL_PATH.PaymentSuccess,
-    element: <PaymentSuccess />,
-  },
-
+ 
   {
     path: URL_PATH.REGISTER,
     element: <RegisterPage />,
   },
+ 
+  //  PROTECTED
+  {
+    path: URL_PATH.CardPayment,
+    element: <ProtectedRoute element={<CardPayment />} />,
+  },
+  {
+    path: URL_PATH.UpiPayment,
+    element: <ProtectedRoute element={<UpiPayment />} />,
+  },
+  {
+    path: URL_PATH.PaymentSuccess,
+    element: <ProtectedRoute element={<PaymentSuccess />} />,
+  },
   {
     path: URL_PATH.ChoosePlan,
-    element: <ChoosePlan />,
+    element: <ProtectedRoute element={<ChoosePlan />} />,
   },
   {
     path: URL_PATH.AccountSetup,
-    element: <AccountSetup />,
+    element: <ProtectedRoute element={<AccountSetup />} />,
   },
-
   {
     path: URL_PATH.BusinessDetails,
-    element: <BusinessDetails />,
+    element: <ProtectedRoute element={<BusinessDetails />} />,
   },
-
   {
     path: URL_PATH.NetPurchaseDetails,
-    element: <NetPurchaseDetails />,
+    element: <ProtectedRoute element={<NetPurchaseDetails />} />,
   },
   {
     path: URL_PATH.ProceedToPaymentPage,
-    element: <ProceedToPaymentPage />,
+    element: <ProtectedRoute element={<ProceedToPaymentPage />} />,
   },
   {
     path: URL_PATH.NetBanking,
-    element: <NetBanking />,
+    element: <ProtectedRoute element={<NetBanking />} />,
   },
   {
     path: URL_PATH.ReceiverDetails,
-    element: <ReceiverDetails />,
+    element: <ProtectedRoute element={<ReceiverDetails />} />,
   },
 ];
+ 
+ 
+ 

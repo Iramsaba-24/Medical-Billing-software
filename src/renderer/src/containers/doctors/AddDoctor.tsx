@@ -45,17 +45,16 @@ const AddDoctor = () => {
       methods.reset(editDataFromState);
     }
   }, [editDataFromState, methods]);
+  const { setError } = methods;
 
 const onSubmit = async (data: AddDoctorFormValues) => {
   try {
     if (data.doctorId) {
-      // edit
       await updateDoctor(data.doctorId, {
         ...data,
         isActive: data.status === "Active",
       });
     } else {
-      // add
       await addDoctor({
         ...data,
         isActive: data.status === "Active",
@@ -63,9 +62,27 @@ const onSubmit = async (data: AddDoctorFormValues) => {
     }
 
     navigate(URL_PATH.Doctors);
-  } catch (error) {
-    console.error(error);
+  } catch (error: unknown) {
+  console.error(error);
+
+  const err = error as {
+    response?: {
+      data?: unknown;
+    };
+  };
+
+  const message =
+    typeof err.response?.data === "string"
+      ? err.response.data
+      : (err.response?.data as { message?: string })?.message;
+
+  if (message?.includes("Phone number already exists")) {
+    setError("phone", {
+      type: "manual",
+      message: "Phone number already exists",
+    });
   }
+}
 };
 
   return (

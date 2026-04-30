@@ -352,7 +352,7 @@ navigate(URL_PATH.Invoices);
  
           <DateTimeField
   name="date"
-  label="Invoice Date"
+  label="Invoice Datesssssss"
   viewMode="date"
   useCurrentDate={true}
   disabled
@@ -495,7 +495,7 @@ onChangeCallback={(val: string) => {
             }}
             onClick={handleSubmit(onSubmit)}
           >
-            Update Invoice
+            Update Invoice 
           </Button>
         </Stack>
       </Paper>
