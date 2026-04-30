@@ -27,6 +27,8 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+ 
+
   //profilePicture: string;
   ownerName: string;
   message: string;
@@ -224,6 +226,4 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   },
 );
-
-
 

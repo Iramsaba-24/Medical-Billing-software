@@ -86,6 +86,7 @@ const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
       console.error("Error fetching customers", error);
     }
   };
+  
  
   fetchCustomers();
 }, []);
