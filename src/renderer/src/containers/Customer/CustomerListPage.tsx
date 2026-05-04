@@ -13,7 +13,7 @@ interface CustomerListProps {
   data: CustomerData[];
   onView: (data: CustomerData) => void;
   onEdit: (data: CustomerData) => void;
-  onDelete: (data: CustomerData) => void;
+  onDelete: (data: CustomerData) => Promise<void>;
 }
 
 export const CustomerListPage = ({
@@ -23,6 +23,7 @@ export const CustomerListPage = ({
   onDelete,
 }: CustomerListProps) => {
   const navigate = useNavigate();
+
   const [searchTerm] = useState("");
   const [customers, setCustomers] = useState<CustomerData[]>([]);
 
@@ -31,8 +32,12 @@ export const CustomerListPage = ({
   }, [data]);
 
   const filteredData = useMemo(() => {
-    if (!searchTerm) return customers;
+    if (!searchTerm) {
+      return customers;
+    }
+
     const lowerSearch = searchTerm.toLowerCase();
+
     return customers.filter(
       (item) =>
         item.name?.toLowerCase().includes(lowerSearch) ||
@@ -41,7 +46,7 @@ export const CustomerListPage = ({
   }, [customers, searchTerm]);
 
   const columns: readonly Column<CustomerData>[] = [
-    { label: "Sr No", key: "srNo" }, 
+    { label: "Sr No", key: "srNo" },
     { label: "Name", key: "name" },
     { label: "Mobile", key: "phone" },
     { label: "Doctor", key: "doctor" },
@@ -50,7 +55,17 @@ export const CustomerListPage = ({
   ];
 
   const handleDelete = async (customer: CustomerData) => {
-    onDelete(customer);
+    try {
+      await onDelete(customer);
+
+      setCustomers((prev) =>
+        prev.filter(
+          (item) => item.customerId !== customer.customerId
+        )
+      );
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
   };
 
   return (
