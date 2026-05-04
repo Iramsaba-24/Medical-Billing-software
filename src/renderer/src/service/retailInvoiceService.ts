@@ -14,6 +14,7 @@ export interface RetailInvoicePayload {
 }
  
 export interface RetailInvoiceResponse {
+  customerId: any;
   retailInvoiceId: number;
   totalAmount: number;
   paymentStatus: string;
@@ -127,10 +128,9 @@ export const updatePaymentStatus = async (
 };
  
 // all invoice
-export const getAllRetailInvoices = async () => {
+export const getAllRetailInvoices = async (): Promise<RetailInvoiceResponse[]> => {
   const res = await axios.get(API_ENDPOINTS.RETAIL_INVOICE, getAuthHeaders());
- 
-  return res.data;
+  return res.data?.data || res.data || [];
 };
 
  
@@ -193,5 +193,4 @@ export const deleteRetailInvoiceItemsByInvoiceId = async (
   );
   return res.data;
 };
- 
  

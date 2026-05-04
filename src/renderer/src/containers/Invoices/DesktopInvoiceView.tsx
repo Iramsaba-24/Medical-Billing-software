@@ -29,7 +29,7 @@ interface DesktopInvoiceViewProps {
   invoice: Invoice | null;
   pharmacyData: PharmacySettingsResponse | null;
   showLogo: boolean;
-  showHsn: boolean;
+  // showHsn: boolean;
   subTotal: number;
   usedPoints: number;
   gstPercent: number;
@@ -43,7 +43,6 @@ const DesktopInvoiceView = ({
   invoice,
   pharmacyData,
   showLogo,
-  showHsn,
   subTotal,
   usedPoints,
   gstPercent,
@@ -59,7 +58,7 @@ const DesktopInvoiceView = ({
   const columns = [
     { label: "Sr No.", width: "7%" },
     { label: "Particulars", width: "33%" },
-    ...(showHsn ? [{ label: "HSN Code", width: "13%" }] : []),
+    { label: "HSN Code", width: "13%" },
     { label: "MFG", width: "12%" },
     { label: "Expiry", width: "12%" },
     { label: "MRP × Qty", width: "10%" },
@@ -170,7 +169,7 @@ const DesktopInvoiceView = ({
                 >
                   <TableCell align="center">{index + 1}</TableCell>
                   <TableCell>{med.name}</TableCell>
-                  {showHsn && <TableCell align="center">{med.batch}</TableCell>}
+                  <TableCell align="center">{med.batch}</TableCell>
                   <TableCell align="center">{med.manufacturing}</TableCell>
                   <TableCell align="center">{med.expiry}</TableCell>
                   <TableCell align="center">{med.qty}</TableCell>

@@ -17,7 +17,6 @@ import DistributorsPage from "@/view/DistributorsPage";
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
 import DistributorDetails from "@/containers/distributors/DistributorsDetails";
-import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 import Setting from "@/containers/layout/Setting";
@@ -194,10 +193,10 @@ export const mainRoutes: RouteObject[] = [
             path: URL_PATH.DoctorSettings.replace("/settings/", ""),
             element: <DoctorSettings />,
           },
-          {
-            path: URL_PATH.DistributorsSetting.replace("/settings/", ""),
-            element: <DistributorsSetting />,
-          },
+          // {
+          //   path: URL_PATH.DistributorsSetting.replace("/settings/", ""),
+          //   element: <DistributorsSetting />,
+          // },
           {
             path: URL_PATH.InventorySettings.replace("/settings/", ""),
             element: <InventorySettings />,

@@ -16,10 +16,10 @@ type Props = {
 export default function InventoryFormFields({
   groupOptions,
   supplierOptions,
-  totalStock,
-  purchasePricePerTablet,
-  mrpPerTablet,
-  finalPrice,
+  // totalStock,
+  // purchasePricePerTablet,
+  // mrpPerTablet,
+  // finalPrice,
 }: Props) {
   const methods = useFormContext<InventoryFormData>();
 
@@ -33,7 +33,7 @@ export default function InventoryFormFields({
 
       <DropdownField name="groupId" label="Medicine Group" options={groupOptions} required freeSolo={false} editable/>
 
-      <TextInputField inputType="all" rows={1} name="batchNumber" label="Batch Number" required minLength={3} maxLength={30} />
+      <TextInputField inputType="all" rows={1} name="batchNumber" label="Batch Number" required minLength={1} maxLength={30} />
 
       <TextInputField inputType="numbers" name="hsnCode" label="HSN Number" minLength={4} maxLength={10} required/>
 
@@ -81,12 +81,12 @@ export default function InventoryFormFields({
         min: { value: 0, message: "Loose tablets cannot be negative" },
       }}/>
 
-      <TextInputField inputType="numbers" name="totalStockTablets" label="Current Stock Quantity" value={totalStock} disabled />
+      {/* <TextInputField inputType="numbers" name="totalStockTablets" label="Current Stock Quantity" value={totalStock} disabled /> */}
 
       {/* Pricing */}
       <TextInputField inputType="numbers" name="purchasePricePerStrip" label="Purchase Price Per Strip" required/>
 
-      <TextInputField inputType="numbers" name="purchasePricePerTablet" label="Purchase Price Per Tablet" value={purchasePricePerTablet} disabled/>
+      {/* <TextInputField inputType="numbers" name="purchasePricePerTablet" label="Purchase Price Per Tablet" value={purchasePricePerTablet} disabled/> */}
 
       <TextInputField
         inputType="numbers"
@@ -101,13 +101,13 @@ export default function InventoryFormFields({
         }}
       />
 
-      <TextInputField inputType="numbers" name="mrpPerTablet" label="MRP Per Tablet" value={mrpPerTablet}
+      {/* <TextInputField inputType="numbers" name="mrpPerTablet" label="MRP Per Tablet" value={mrpPerTablet}
         disabled
-      />
+      /> */}
 
       <TextInputField inputType="numbers" name="gstPercent" label="GST Percentage" />
 
-      <TextInputField name="finalPrice" label="Final Amount (With GST)" value={finalPrice} disabled/>
+      {/* <TextInputField name="finalPrice" label="Final Amount (With GST)" value={finalPrice} disabled/> */}
 
       {/* Distributor */}
       <DropdownField name="distributorId" label="Distributor" options={supplierOptions}required/>

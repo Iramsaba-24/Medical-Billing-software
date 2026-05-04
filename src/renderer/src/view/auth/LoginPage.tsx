@@ -102,6 +102,7 @@ const LoginPage = () => {
 
  const emailToSave = response.email || data.usernameOrEmail;
   localStorage.setItem('userEmail', emailToSave);
+  
 
   // block 
   try {
@@ -118,7 +119,10 @@ const LoginPage = () => {
   if (data.licenseKey && data.licenseKey.trim() !== "") {
     localStorage.setItem('licenseKey', data.licenseKey.trim());
   }
+  
   showToast("success", "Login successful!");
+  //  localStorage.setItem('accessToken', response.token); 
+  
   navigate(URL_PATH.Landing);
 
       } else {
@@ -459,8 +463,6 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
-
 
 
 
