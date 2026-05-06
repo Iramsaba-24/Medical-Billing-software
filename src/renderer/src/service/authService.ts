@@ -1,3 +1,5 @@
+
+
 import axios, { AxiosError } from "axios";
 
 const API_BASE_URL = "http://localhost:5158/api";
@@ -27,6 +29,8 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+ 
+
   //profilePicture: string;
   ownerName: string;
   message: string;
@@ -224,6 +228,4 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   },
 );
-
-
 

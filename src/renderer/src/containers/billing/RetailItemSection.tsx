@@ -51,8 +51,6 @@ const RetailItemSection = ({
   gst = 0,
   setGst,
 }: RetailItemsSectionProps) => {
-
-
   const [inventory, setInventory] = useState<MedicineResponse[]>([]);
 
   useEffect(() => {
@@ -83,12 +81,8 @@ const RetailItemSection = ({
     if (!medicineName) return [];
 
     const strengths = inventory
-      .filter(
-        (item) =>
-          item.medicineName === medicineName && item.strength
-      )
+      .filter((item) => item.medicineName === medicineName && item.strength)
       .map((item) => item.strength as string);
-
 
     const uniqueStrengths = Array.from(new Set(strengths));
 
@@ -97,7 +91,6 @@ const RetailItemSection = ({
       value: s,
     }));
   };
-
 
   const addRow = () =>
     setRows([
@@ -111,7 +104,8 @@ const RetailItemSection = ({
       },
     ]);
 
-  const removeRow = (id: number) => setRows(rows.filter((r) => r.retailItemId !== id));
+  const removeRow = (id: number) =>
+    setRows(rows.filter((r) => r.retailItemId !== id));
 
   const updateRow = (
     id: number,
@@ -135,8 +129,6 @@ const RetailItemSection = ({
     );
   };
 
-
-
   const handleNameChange = (id: number, selectedName: string) => {
     setRows(
       rows.map((r) => {
@@ -155,7 +147,6 @@ const RetailItemSection = ({
       })
     );
   };
-
 
   const subTotal = rows.reduce((acc, row) => {
     return acc + Number(row.quantity) * Number(row.price);
@@ -223,7 +214,6 @@ const RetailItemSection = ({
               value={row.medicineName || ""}
               editable
               freeSolo={false}
-
               required
               error={nameError}
               helperText={nameError ? "Please select item" : ""}
@@ -231,7 +221,6 @@ const RetailItemSection = ({
                 handleNameChange(row.retailItemId, value);
               }}
             />
-
 
             <DropdownField
               name={`strength_${row.retailItemId}`}
@@ -252,14 +241,14 @@ const RetailItemSection = ({
                     rows.map((r) =>
                       r.retailItemId === row.retailItemId
                         ? {
-                          ...r,
-                          strength: selected.strength,
-                          medicineId: String(selected.medicineId),
-                          price: Number(selected.mrpPerTablet),
-                          companyName: selected.companyName,
-                          expiryDate: selected.expiryDate,
-                          maxStock: selected.totalStockTablets,
-                        }
+                            ...r,
+                            strength: selected.strength,
+                            medicineId: String(selected.medicineId),
+                            price: Number(selected.mrpPerTablet),
+                            companyName: selected.companyName,
+                            expiryDate: selected.expiryDate,
+                            maxStock: selected.totalStockTablets,
+                          }
                         : r
                     )
                   );
@@ -281,13 +270,18 @@ const RetailItemSection = ({
               label="Qty"
               type="number"
               value={row.quantity}
-              error={qtyError || (row.maxStock !== undefined && Number(row.quantity) > row.maxStock)}
+              error={
+                qtyError ||
+                (row.maxStock !== undefined &&
+                  Number(row.quantity) > row.maxStock)
+              }
               helperText={
-                row.maxStock !== undefined && Number(row.quantity) > row.maxStock
+                row.maxStock !== undefined &&
+                Number(row.quantity) > row.maxStock
                   ? `Only ${row.maxStock} in stock`
                   : qtyError
-                    ? "Enter valid quantity"
-                    : ""
+                  ? "Enter valid quantity"
+                  : ""
               }
               onKeyDown={(e) =>
                 ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()
@@ -319,7 +313,10 @@ const RetailItemSection = ({
 
             <Box display="flex" justifyContent="center">
               {rows.length > 1 && (
-                <IconButton onClick={() => removeRow(row.retailItemId)} color="error">
+                <IconButton
+                  onClick={() => removeRow(row.retailItemId)}
+                  color="error"
+                >
                   <Remove />
                 </IconButton>
               )}
@@ -382,10 +379,3 @@ const RetailItemSection = ({
 };
 
 export default RetailItemSection;
-
-
-
-
-
-
-

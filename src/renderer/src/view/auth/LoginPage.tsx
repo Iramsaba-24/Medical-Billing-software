@@ -94,7 +94,9 @@ const LoginPage = () => {
       //   navigate(URL_PATH.Landing);
 
    if (response.token) {
-  localStorage.setItem('token', response.token);
+  // localStorage.setItem('token', response.token);
+  // key
+  localStorage.setItem('accessToken', response.token);
   
   if (response.userId) {
     localStorage.setItem('userId', response.userId.toString());
@@ -102,6 +104,7 @@ const LoginPage = () => {
 
  const emailToSave = response.email || data.usernameOrEmail;
   localStorage.setItem('userEmail', emailToSave);
+  
 
   // block 
   try {
@@ -118,7 +121,10 @@ const LoginPage = () => {
   if (data.licenseKey && data.licenseKey.trim() !== "") {
     localStorage.setItem('licenseKey', data.licenseKey.trim());
   }
+  
   showToast("success", "Login successful!");
+ 
+  
   navigate(URL_PATH.Landing);
 
       } else {
@@ -459,6 +465,7 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
 
 
 

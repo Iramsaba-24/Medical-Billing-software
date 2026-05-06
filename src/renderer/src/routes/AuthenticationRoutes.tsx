@@ -68,3 +68,5 @@ export const authRoutes: RouteObject[] = [
     element: <ReceiverDetails />,
   },
 ];
+
+

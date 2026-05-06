@@ -1,5 +1,5 @@
 export const URL_PATH = {
-  LOGIN: "/login",
+  LOGIN: "/LOGIN",
   REGISTER: "/register",
   ChoosePlan: "/chooseplan",
   AccountSetup: "/accountsetup",

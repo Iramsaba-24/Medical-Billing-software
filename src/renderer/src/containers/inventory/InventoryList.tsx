@@ -34,12 +34,13 @@ type MedicineApi = {
   totalStockTablets: number;
   mrpPerStrip: number;
   expiryDate: string;
-  minimumQuantity: number;
+  mrpPerTablet: number;
   groupId: number;
   distributorId: number;
   gstPercent: number;
   type: string; 
-  hsnCode?: string;       
+  hsnCode?: string; 
+    minimumQuantity: number;      
 }
 
 type GroupApi = {
@@ -49,7 +50,7 @@ type GroupApi = {
 
 type DistributorApi = {
   distributorId: number;
-  companyName: string;
+  ownerName: string;
 };
 
 
@@ -93,7 +94,7 @@ const fetchInventory = async () => {
 
     const distributorMap: Record<number, string> = {};
     distributorsData.forEach((d: DistributorApi) => {
-      distributorMap[Number(d.distributorId)] = d.companyName;
+      distributorMap[Number(d.distributorId)] = d.ownerName;
     });
 
     const formatted: InventoryItem[] = medicines.map((item) => ({
@@ -104,7 +105,7 @@ const fetchInventory = async () => {
       groupId: item.groupId,
       type: item.type || "N/A",
       totalStockTablets: item.totalStockTablets,
-      pricePerUnit: item.mrpPerStrip,
+pricePerUnit: item.mrpPerTablet,
       expiryDate: item.expiryDate.split("T")[0],
       companyName: distributorMap[item.distributorId] || "N/A",
       distributorId: item.distributorId,
@@ -163,7 +164,7 @@ const columns: Column<InventoryItem>[] = [
   { key: "totalStockTablets", label: "Stock" },
   {
     key: "pricePerUnit",
-    label: "Price",
+    label: "MRP",
     render: (row) => `₹ ${row.pricePerUnit}`,
   },
   { key: "hsnCode", label: "HSN Number" },

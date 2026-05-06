@@ -150,8 +150,8 @@ const checkboxSx = {
               label=""
               options={[
                 { label: "Show logo on invoice", value: "show_logo" },
-                { label: "Show GST break-up", value: "show_gst_breakup" },
-                { label: "Show HSN code", value: "show_hsn_code" },
+                // { label: "Show GST break-up", value: "show_gst_breakup" },
+                // { label: "Show HSN code", value: "show_hsn_code" },
                 { label: "Print duplicate copy", value: "print_duplicate_copy" },
               ]}
             />
