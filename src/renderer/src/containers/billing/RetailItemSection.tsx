@@ -17,13 +17,13 @@ export interface ItemRow {
   retailInvoiceId?: number;
   medicineId: string;
   medicineName?: string;
-  strength?: string;      
+  strength?: string;
   companyName?: string;
   expiryDate?: string;
   quantity: number | "";
   price: number | "";
   amount?: number;
-   maxStock?: number;
+  maxStock?: number;
 }
 
 export type InventoryItem = {
@@ -52,66 +52,66 @@ const RetailItemSection = ({
   setGst,
 }: RetailItemsSectionProps) => {
 
-  
-const [inventory, setInventory] = useState<MedicineResponse[]>([]);
 
- useEffect(() => {
-  const fetchMedicines = async () => {
-    try {
-      const data = await getMedicines();
-      setInventory(data);
-    } catch (error) {
-      console.error("Error fetching medicines", error);
-    }
-  };
-  fetchMedicines();
-}, []);
+  const [inventory, setInventory] = useState<MedicineResponse[]>([]);
 
- const itemOptions = Array.from(
-  new Map(
-    inventory.map((item) => [
-      item.medicineName,
-      {
-        label: item.medicineName,
-        value: item.medicineName,
-      },
-    ])
-  ).values()
-);
+  useEffect(() => {
+    const fetchMedicines = async () => {
+      try {
+        const data = await getMedicines();
+        setInventory(data);
+      } catch (error) {
+        console.error("Error fetching medicines", error);
+      }
+    };
+    fetchMedicines();
+  }, []);
+
+  const itemOptions = Array.from(
+    new Map(
+      inventory.map((item) => [
+        item.medicineName,
+        {
+          label: item.medicineName,
+          value: item.medicineName,
+        },
+      ])
+    ).values()
+  );
 
   const getStrengthOptions = (medicineName?: string) => {
-  if (!medicineName) return [];
+    if (!medicineName) return [];
 
-const strengths = inventory
-  .filter(
-    (item) =>
-      item.medicineName === medicineName && item.strength
-  )
-  .map((item) => item.strength as string);
-
-
-  const uniqueStrengths = Array.from(new Set(strengths));
-
-  return uniqueStrengths.map((s) => ({
-    label: s,
-    value: s,
-  }));
-};
+    const strengths = inventory
+      .filter(
+        (item) =>
+          item.medicineName === medicineName && item.strength
+      )
+      .map((item) => item.strength as string);
 
 
-const addRow = () =>
-  setRows([
-    ...rows,
-    {
-      retailItemId: Date.now(),
-      medicineId: "",
-      quantity: 1,
-      price: "",
-      amount: 0,
-    },
-  ]);
+    const uniqueStrengths = Array.from(new Set(strengths));
 
-  const removeRow = (id: number) => setRows(rows.filter((r) => r.retailItemId  !== id));
+    return uniqueStrengths.map((s) => ({
+      label: s,
+      value: s,
+    }));
+  };
+
+
+  const addRow = () =>
+    setRows([
+      ...rows,
+      {
+        retailItemId: Date.now(),
+        medicineId: "",
+        quantity: 1,
+        price: "",
+        amount: 0,
+      },
+    ]);
+
+  const removeRow = (id: number) => setRows(rows.filter((r) => r.retailItemId !== id));
 
   const updateRow = (
     id: number,
@@ -120,7 +120,7 @@ const addRow = () =>
   ) => {
     setRows(
       rows.map((r) => {
-        if (r.retailItemId  === id) {
+        if (r.retailItemId === id) {
           if (
             (field === "quantity" || field === "price") &&
             value !== "" &&
@@ -137,24 +137,24 @@ const addRow = () =>
 
 
 
-const handleNameChange = (id: number, selectedName: string) => {
-  setRows(
-    rows.map((r) => {
-      if (r.retailItemId === id) {
-        return {
-          ...r,
-          medicineId: "",
-          medicineName: selectedName,
-          strength: "",
-          companyName: "",
-          expiryDate: "",
-          price: "",
-        };
-      }
-      return r;
-    })
-  );
-};
+  const handleNameChange = (id: number, selectedName: string) => {
+    setRows(
+      rows.map((r) => {
+        if (r.retailItemId === id) {
+          return {
+            ...r,
+            medicineId: "",
+            medicineName: selectedName,
+            strength: "",
+            companyName: "",
+            expiryDate: "",
+            price: "",
+          };
+        }
+        return r;
+      })
+    );
+  };
 
 
   const subTotal = rows.reduce((acc, row) => {
@@ -208,9 +208,9 @@ const handleNameChange = (id: number, selectedName: string) => {
             sx={{
               display: "grid",
               gridTemplateColumns: {
-  md: "3fr 2fr 2fr 1fr 1.5fr 1.5fr 50px",
-  xs: "1fr",
-},
+                md: "3fr 2fr 2fr 1fr 1.5fr 1.5fr 50px",
+                xs: "1fr",
+              },
               gap: 2,
               mb: { xs: 4, md: 2 },
               alignItems: "start",
@@ -220,10 +220,10 @@ const handleNameChange = (id: number, selectedName: string) => {
               name={`item_${row.retailItemId}`}
               label="Item Name"
               options={itemOptions}
-value={row.medicineName || ""}
+              value={row.medicineName || ""}
               editable
               freeSolo={false}
-              
+
               required
               error={nameError}
               helperText={nameError ? "Please select item" : ""}
@@ -233,73 +233,73 @@ value={row.medicineName || ""}
             />
 
 
-<DropdownField
-  name={`strength_${row.retailItemId}`}
-  label="Strength"
-  options={getStrengthOptions(row.medicineName)}
-  value={row.strength || ""}
-  editable
-  onChangeCallback={(value) => {
-    const selected = inventory.find(
-  (i) =>
-    i.medicineName === row.medicineName &&
-    i.strength === value &&
-    i.medicineId
-);
+            <DropdownField
+              name={`strength_${row.retailItemId}`}
+              label="Strength"
+              options={getStrengthOptions(row.medicineName)}
+              value={row.strength || ""}
+              editable
+              onChangeCallback={(value) => {
+                const selected = inventory.find(
+                  (i) =>
+                    i.medicineName === row.medicineName &&
+                    i.strength === value &&
+                    i.medicineId
+                );
 
-if (selected) {
-  setRows(
-    rows.map((r) =>
-      r.retailItemId === row.retailItemId
-        ? {
-            ...r,
-            strength: selected.strength,
-            medicineId: String(selected.medicineId),
-          price: Number(selected.mrpPerTablet),
-            companyName: selected.companyName,
-            expiryDate: selected.expiryDate,
-               maxStock: selected.totalStockTablets,
-          }
-        : r
-    )
-  );
-}
-  }}
-/>
+                if (selected) {
+                  setRows(
+                    rows.map((r) =>
+                      r.retailItemId === row.retailItemId
+                        ? {
+                          ...r,
+                          strength: selected.strength,
+                          medicineId: String(selected.medicineId),
+                          price: Number(selected.mrpPerTablet),
+                          companyName: selected.companyName,
+                          expiryDate: selected.expiryDate,
+                          maxStock: selected.totalStockTablets,
+                        }
+                        : r
+                    )
+                  );
+                }
+              }}
+            />
 
-<TextField
-  fullWidth
-  label="Company"
-  value={row.companyName || ""}
-  onChange={(e) =>
-    updateRow(row.retailItemId, "companyName", e.target.value)
-  }
-/>
+            <TextField
+              fullWidth
+              label="Company"
+              value={row.companyName || ""}
+              onChange={(e) =>
+                updateRow(row.retailItemId, "companyName", e.target.value)
+              }
+            />
 
-           <TextField
-  fullWidth
-  label="Qty"
-  type="number"
-  value={row.quantity}
-  error={qtyError || (row.maxStock !== undefined && Number(row.quantity) > row.maxStock)}
-  helperText={
-    row.maxStock !== undefined && Number(row.quantity) > row.maxStock
-      ? `Only ${row.maxStock} in stock`
-      : qtyError
-      ? "Enter valid quantity"
-      : ""
-  }
-  onKeyDown={(e) =>
-    ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()
-  }
-  onChange={(e) =>
-    updateRow(
-      row.retailItemId,
-      "quantity",
-      e.target.value === "" ? "" : Number(e.target.value)
-    )
-  }
-/>
+            <TextField
+              fullWidth
+              label="Qty"
+              type="number"
+              value={row.quantity}
+              error={qtyError || (row.maxStock !== undefined && Number(row.quantity) > row.maxStock)}
+              helperText={
+                row.maxStock !== undefined && Number(row.quantity) > row.maxStock
+                  ? `Only ${row.maxStock} in stock`
+                  : qtyError
+                    ? "Enter valid quantity"
+                    : ""
+              }
+              onKeyDown={(e) =>
+                ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()
+              }
+              onChange={(e) =>
+                updateRow(
+                  row.retailItemId,
+                  "quantity",
+                  e.target.value === "" ? "" : Number(e.target.value)
+                )
+              }
+            />
 
             <TextField
               fullWidth

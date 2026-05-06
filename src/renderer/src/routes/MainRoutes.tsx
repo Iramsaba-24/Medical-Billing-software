@@ -34,8 +34,10 @@ import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
 import EditInvoice from "@/containers/invoices/EditInvoice"
-import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
 import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
+import ReorderForm from "@/containers/inventory/ReorderForm";
+import ReorderEmail from "@/containers/inventory/ReorderEmail";
 
 
 
@@ -55,7 +57,14 @@ export const mainRoutes: RouteObject[] = [
         element: <AddCustomerForm />,
        },
 
-
+{
+  path: URL_PATH.ReorderForm,
+  element: <ReorderForm />
+},
+{
+  path: URL_PATH.ReorderEmail,
+  element: <ReorderEmail />
+},
       
       
       {

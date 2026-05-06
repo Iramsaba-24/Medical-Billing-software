@@ -27,7 +27,7 @@ import {
   PharmacySettingsResponse,
   pharmacySettingsService,
 } from "@/service/pharmacySettingsService";
-
+ 
 export interface Invoice {
   name: string;
   doctor: string;
@@ -43,7 +43,7 @@ export interface Invoice {
     expiry: string;
   }[];
   subTotal?: number;
-
+ 
   totalAmount?: number;
   usedPoints?: number;
   total?: number;
@@ -51,7 +51,7 @@ export interface Invoice {
   // totalDiscount?: number;
   // totalGST?: number;
 }
-
+ 
 interface Medicine {
   name: string;
   qty: number | string;
@@ -60,38 +60,38 @@ interface Medicine {
   manufacturing?: string;
   expiry?: string;
 }
-
+ 
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
-
+ 
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   const [showHsn, setShowHsn] = useState<boolean>(false);
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+ 
   const columns = [
     { label: "Sr No.", width: "7%" },
     { label: "Particulars", width: "33%" },
     ...(showHsn ? [{ label: "HSN Code", width: "13%" }] : []),
     { label: "MFG", width: "12%" },
-
+ 
     { label: "Expiry", width: "12%" },
     { label: "MRP × Qty", width: "10%" },
     { label: "Amount", width: "15%" },
   ];
-
+ 
   useEffect(() => {
     console.log(" pharmacy useEffect triggered");
     const fetchInvoice = async () => {
       if (!invoiceNo) return;
-
+ 
       try {
         const data = await getRetailInvoiceById(Number(invoiceNo));
         const items = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
         const medicines = (await getMedicines()) || [];
-
+ 
         let doctorName = "";
         if (data?.customerId) {
           try {
@@ -101,19 +101,19 @@ const InvoiceView = () => {
             doctorName = "";
           }
         }
-
+ 
         if (data) {
           console.log("data.totalDiscount:", data.totalDiscount);
           console.log("data.totalAmount:", data.totalAmount);
           console.log("data.medipointsEarned:", data.medipointsEarned);
-
+ 
           setInvoice({
             invoice: String(data.retailInvoiceId),
             name: data.customerName || "",
             doctor: doctorName || "",
             address: "",
             date: new Date(data.invoiceDate).toLocaleDateString("en-GB"),
-
+ 
             medicines: (items || []).map(
               (item: {
                 medicineId: number;
@@ -131,7 +131,7 @@ const InvoiceView = () => {
                     hsnCode?: string;
                   }) => Number(m.medicineId) === Number(item.medicineId),
                 );
-
+ 
                 // combine name, strength nd company name
                 const nameParts = [
                   medicine?.medicineName,
@@ -140,27 +140,27 @@ const InvoiceView = () => {
                 ]
                   .filter(Boolean)
                   .join(" - ");
-
+ 
                 return {
                   name: nameParts || "Medicine",
                   qty: `${item.price} × ${item.quantity}`,
                   amount: Number(item.price) * Number(item.quantity),
                   batch: medicine?.hsnCode || "",
-
+ 
                  manufacturing: medicine?.manufacturingDate
   ? new Date(medicine.manufacturingDate).toLocaleDateString("en-GB")
   : "",
-
+ 
 expiry: medicine?.expiryDate
   ? new Date(medicine.expiryDate).toLocaleDateString("en-GB")
   : "",
                 };
               },
             ),
-
+ 
             totalAmount: data.totalAmount,
             gstPercent: data.gstPercent || 0,
-
+ 
             usedPoints: data.totalDiscount,
           });
         } else {
@@ -169,41 +169,42 @@ expiry: medicine?.expiryDate
       } catch (error) {
         navigate(-1);
       }
-
+ 
       const invoiceSettings = localStorage.getItem("invoiceSettings");
       if (invoiceSettings) {
         const parsed = JSON.parse(invoiceSettings);
         const printOptions: string[] = parsed.product_linking || [];
-
+ 
         setShowLogo(printOptions.includes("show_logo"));
         setShowHsn(printOptions.includes("show_hsn_code"));
       }
     };
-
+ 
     fetchInvoice();
   }, [invoiceNo, navigate]);
-
+ 
   const subTotal =
     invoice?.medicines?.reduce((sum, med) => sum + Number(med.amount), 0) || 0;
-
+ 
   const usedPoints = invoice?.usedPoints || 0;
   const gstPercent = invoice?.gstPercent || 0;
   const netTotal = invoice?.totalAmount || 0;
-
+ 
   const amountAfterDiscount = subTotal - usedPoints;
   const gstAmount = (amountAfterDiscount * gstPercent) / 100;
-
+ 
   const cgst = gstAmount / 2;
   const sgst = gstAmount / 2;
-
+ 
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
   const [pharmacyData, setPharmacyData] =
     useState<PharmacySettingsResponse | null>(null);
-
+ 
   useEffect(() => {
     const fetchPharmacySettings = async () => {
       try {
-        const settings = await pharmacySettingsService.getSettings(1);
+         const settings = await pharmacySettingsService.getSettings(3);
+     
         // console.log("pharmacy settings:", settings);
         setPharmacyData(settings);
       } catch (error: unknown) {
@@ -217,7 +218,7 @@ expiry: medicine?.expiryDate
   }, []);
   const pharmacyName = pharmacyData?.pharmacyName || "Your Pharmacy";
   const pharmacyAddress = pharmacyData?.address || "-";
-
+ 
   if (isMobile) {
     return (
       <>
@@ -349,8 +350,8 @@ expiry: medicine?.expiryDate
              <Typography fontSize={11} sx={{ wordBreak: "break-word", minWidth: 0 }}>
   {med.name}
 </Typography>
-
-
+ 
+ 
             <Typography fontSize={11} textAlign="center">
   {med.manufacturing
     ? `${med.manufacturing.split("/")[1]}/${med.manufacturing.split("/")[2]?.slice(-2)}`
@@ -361,8 +362,8 @@ expiry: medicine?.expiryDate
     ? `${med.expiry.split("/")[1]}/${med.expiry.split("/")[2]?.slice(-2)}`
     : ""}
 </Typography>
-
-
+ 
+ 
               <Typography fontSize={11} textAlign="center">
                 {med.qty}
               </Typography>
@@ -381,30 +382,30 @@ expiry: medicine?.expiryDate
               </Typography>
               <Typography fontSize={12}>₹ {subTotal.toFixed(2)}</Typography>
             </Box>
-
+ 
             <Box display="flex" justifyContent="space-between" mt={0.5}>
               <Typography fontSize={12} fontWeight={600}>
                 Discount
               </Typography>
               <Typography fontSize={12}>- ₹ {usedPoints.toFixed(2)}</Typography>
             </Box>
-
-
-
+ 
+ 
+ 
            <Box display="flex" justifyContent="space-between" mt={0.5}>
   <Typography fontSize={12} fontWeight={600}>
     CGST ({gstPercent / 2}%)
   </Typography>
   <Typography fontSize={12}>₹ {cgst.toFixed(2)}</Typography>
 </Box>
-
+ 
 <Box display="flex" justifyContent="space-between" mt={0.5}>
   <Typography fontSize={12} fontWeight={600}>
     SGST ({gstPercent / 2}%)
   </Typography>
   <Typography fontSize={12}>₹ {sgst.toFixed(2)}</Typography>
 </Box>
-
+ 
             <Box
               display="flex"
               justifyContent="space-between"
@@ -492,7 +493,7 @@ expiry: medicine?.expiryDate
       </>
     );
   }
-
+ 
   // Desktop view
   return (
     <>
@@ -510,7 +511,7 @@ expiry: medicine?.expiryDate
           },
         }}
       />
-
+ 
       <Paper sx={{ p: { xs: 2, md: 4 }, mx: { xs: 0, md: 3 } }} id="invoice">
         <Typography
           textAlign="center"
@@ -552,7 +553,7 @@ expiry: medicine?.expiryDate
                     </Box>
                   </Box>
                 </TableCell>
-
+ 
                 <TableCell colSpan={4} sx={{ border: "2px solid #000" }}>
                   <Typography>
                     <strong>Name:</strong> {invoice?.name}
@@ -580,7 +581,7 @@ expiry: medicine?.expiryDate
                   </Box>
                 </TableCell>
               </TableRow>
-
+ 
               <TableRow>
                 {columns.map((col) => (
                   <TableCell
@@ -596,7 +597,7 @@ expiry: medicine?.expiryDate
                   </TableCell>
                 ))}
               </TableRow>
-
+ 
               {invoice?.medicines?.map((med: Medicine, index: number) => (
                 <TableRow
                   key={index}
@@ -618,7 +619,7 @@ expiry: medicine?.expiryDate
                   </TableCell>
                 </TableRow>
               ))}
-
+ 
               {/* Sub Total */}
               <TableRow
                 sx={{
@@ -638,7 +639,7 @@ expiry: medicine?.expiryDate
                 </TableCell>
                 <TableCell align="center">₹ {subTotal.toFixed(2)}</TableCell>
               </TableRow>
-
+ 
               {/* Discount */}
               <TableRow
                 sx={{
@@ -658,7 +659,7 @@ expiry: medicine?.expiryDate
                 </TableCell>
                 <TableCell align="center">₹ {usedPoints.toFixed(2)}</TableCell>
               </TableRow>
-
+ 
               {/* CGST */}
               <TableRow
                 sx={{
@@ -678,7 +679,7 @@ expiry: medicine?.expiryDate
                 </TableCell>
                 <TableCell align="center">₹ {cgst.toFixed(2)}</TableCell>
               </TableRow>
-
+ 
               {/* SGST */}
               <TableRow
                 sx={{
@@ -715,7 +716,7 @@ expiry: medicine?.expiryDate
                   </Typography>
                 </TableCell>
               </TableRow>
-
+ 
               <TableRow>
                 <TableCell colSpan={5} sx={{ border: "2px solid #000" }}>
                   Vat Tin No. :
@@ -761,7 +762,7 @@ expiry: medicine?.expiryDate
           </Table>
         </TableContainer>
       </Paper>
-
+ 
       <Box m={3} display="flex" justifyContent="flex-end" gap={2}>
         <Button
           variant="outlined"
@@ -777,7 +778,7 @@ expiry: medicine?.expiryDate
         >
           Cancel
         </Button>
-
+ 
         <Button
           startIcon={<PrintIcon />}
           variant="contained"
@@ -802,5 +803,7 @@ expiry: medicine?.expiryDate
     </>
   );
 };
-
+ 
 export default InvoiceView;
+ 
+ 
