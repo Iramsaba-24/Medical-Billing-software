@@ -12,7 +12,7 @@ export interface RetailInvoicePayload {
   medipointsEarned: number;
   paymentStatus: string;
 }
- 
+
 export interface RetailInvoiceResponse {
   customerId: number;
   retailInvoiceId: number;
@@ -21,7 +21,7 @@ export interface RetailInvoiceResponse {
   customerName: string;
   invoiceDate: string;
 }
- 
+
 export interface RetailInvoiceItemPayload {
   retailInvoiceId: number;
   medicineId: number;
@@ -30,7 +30,8 @@ export interface RetailInvoiceItemPayload {
   gstPercent: number;
   discount: number;
 }
- 
+
+//add single item
 export const createSingleRetailInvoiceItem = async (item: {
   retailInvoiceId: number;
   medicineId: number;
@@ -46,10 +47,10 @@ export const createSingleRetailInvoiceItem = async (item: {
     item,
     getAuthHeaders(),
   );
- 
+
   return res.data;
 };
- 
+
 // token
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
@@ -59,7 +60,7 @@ const getAuthHeaders = () => {
     },
   };
 };
- 
+
 // invoice
 export const createRetailInvoice = async (data: {
   userId: number;
@@ -78,10 +79,10 @@ export const createRetailInvoice = async (data: {
     data,
     getAuthHeaders(),
   );
- 
+
   return res.data;
 };
- 
+
 // item
 export const createRetailInvoiceItems = async (
   items: {
@@ -97,16 +98,16 @@ export const createRetailInvoiceItems = async (
     ...item,
     SrNo: index + 1,
   }));
- 
+
   const res = await axios.post(
     `${API_ENDPOINTS.RETAIL_INVOICE_ITEMS}/bulk`,
     itemsWithSrNo,
     getAuthHeaders(),
   );
- 
+
   return res.data;
 };
- 
+
 // payment status
 export const updatePaymentStatus = async (
   invoiceId: number,
@@ -133,24 +134,31 @@ export const getAllRetailInvoices = async (): Promise<RetailInvoiceResponse[]> =
   return res.data?.data || res.data || [];
 };
 
- 
+// // all invoice
+// export const getAllRetailInvoices = async () => {
+//   const res = await axios.get(API_ENDPOINTS.RETAIL_INVOICE, getAuthHeaders());
+
+//   return res.data;
+// };
+
+
 //invoice by id
 export const getRetailInvoiceById = async (id: number) => {
   const res = await axios.get(
     `${API_ENDPOINTS.RETAIL_INVOICE}/${id}`,
     getAuthHeaders(),
   );
- 
+
   return res.data;
 };
- 
+
 // delete
 export const deleteRetailInvoice = async (id: number) => {
   const res = await axios.delete(
     `${API_ENDPOINTS.RETAIL_INVOICE}/${id}`,
     getAuthHeaders(),
   );
- 
+
   return res.data;
 };
 export const getRetailInvoiceItemsByInvoiceId = async (invoiceId: number) => {
@@ -160,7 +168,9 @@ export const getRetailInvoiceItemsByInvoiceId = async (invoiceId: number) => {
   );
   return res.data;
 };
- 
+
+
+//update
 export const updateRetailInvoice = async (
   id: number,
   data: {
@@ -183,7 +193,9 @@ export const updateRetailInvoice = async (
   );
   return res.data;
 };
- 
+
+
+//delete
 export const deleteRetailInvoiceItemsByInvoiceId = async (
   invoiceId: number,
 ) => {

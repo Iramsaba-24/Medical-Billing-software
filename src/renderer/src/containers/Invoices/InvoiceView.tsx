@@ -11,8 +11,8 @@ import {
   PharmacySettingsResponse,
   pharmacySettingsService,
 } from "@/service/pharmacySettingsService";
-import MobileInvoiceView from "@/containers/Invoices/MobileInvoiceView";
-import DesktopInvoiceView from "@/containers/Invoices/DesktopInvoiceView";
+import MobileInvoiceView from "@/containers/invoices/MobileInvoiceView";
+import DesktopInvoiceView from "@/containers/invoices/DesktopInvoiceView";
 
 export interface Invoice {
   name: string;
@@ -34,10 +34,10 @@ export interface Invoice {
   total?: number;
   gstPercent?: number;
 }
-
+ 
 const InvoiceView = () => {
   const { invoiceNo } = useParams<{ invoiceNo: string }>();
-
+ 
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
   // const [showHsn, setShowHsn] = useState<boolean>(false);
@@ -51,12 +51,12 @@ const InvoiceView = () => {
   useEffect(() => {
     const fetchInvoice = async () => {
       if (!invoiceNo) return;
-
+ 
       try {
         const data = await getRetailInvoiceById(Number(invoiceNo));
         const items = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
         const medicines = (await getMedicines()) || [];
-
+ 
         let doctorName = "";
         if (data?.customerId) {
           try {
@@ -66,19 +66,19 @@ const InvoiceView = () => {
             doctorName = "";
           }
         }
-
+ 
         if (data) {
           console.log("data.totalDiscount:", data.totalDiscount);
           console.log("data.totalAmount:", data.totalAmount);
           console.log("data.medipointsEarned:", data.medipointsEarned);
-
+ 
           setInvoice({
             invoice: String(data.retailInvoiceId),
             name: data.customerName || "",
             doctor: doctorName || "",
             address: "",
             date: new Date(data.invoiceDate).toLocaleDateString("en-GB"),
-
+ 
             medicines: (items || []).map(
               (item: {
                 medicineId: number;
@@ -96,7 +96,6 @@ const InvoiceView = () => {
                     hsnCode?: string;
                   }) => Number(m.medicineId) === Number(item.medicineId),
                 );
-
                 const nameParts = [
                   medicine?.medicineName,
                   item.strength || medicine?.strength,
@@ -104,7 +103,7 @@ const InvoiceView = () => {
                 ]
                   .filter(Boolean)
                   .join(" - ");
-
+ 
                 return {
                   name: nameParts || "Medicine",
                   qty: `${item.price} × ${item.quantity}`,
@@ -119,7 +118,7 @@ const InvoiceView = () => {
                 };
               },
             ),
-
+ 
             totalAmount: data.totalAmount,
             gstPercent: data.gstPercent || 0,
             usedPoints: data.totalDiscount,
@@ -139,7 +138,7 @@ const InvoiceView = () => {
         setShowLogo(printOptions.includes("show_logo"));
       }
     };
-
+ 
     fetchInvoice();
   }, [invoiceNo, navigate]);
 
@@ -161,16 +160,16 @@ const InvoiceView = () => {
   //  Computed Values
   const subTotal =
     invoice?.medicines?.reduce((sum, med) => sum + Number(med.amount), 0) || 0;
-
+ 
   const usedPoints = invoice?.usedPoints || 0;
   const gstPercent = invoice?.gstPercent || 0;
   const netTotal = invoice?.totalAmount || 0;
-
+ 
   const amountAfterDiscount = subTotal - usedPoints;
   const gstAmount = (amountAfterDiscount * gstPercent) / 100;
   const cgst = gstAmount / 2;
   const sgst = gstAmount / 2;
-
+ 
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
 
   //Shared Props 

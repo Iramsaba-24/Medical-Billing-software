@@ -2,7 +2,7 @@ import { RouteObject } from "react-router-dom";
 import Layout from "@/containers/layout/Header";
 import { URL_PATH } from "@/constants/UrlPath";
 import Invoices from "@/view/Invoices";
-import InvoiceView from "@/containers/Invoices/InvoiceView";
+import InvoiceView from "@/containers/invoices/InvoiceView";
 import Inventory from "@/view/Inventory";
 import MedicineGroup from "@/containers/inventory/MedicineGroup";
 import MedicineGroupView from "@/containers/inventory/MedicineGroupView";
@@ -32,9 +32,11 @@ import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
-import EditInvoice from "@/containers/Invoices/EditInvoice"
+import EditInvoice from "@/containers/invoices/EditInvoice"
 import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
 import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
+import ReorderForm from "@/containers/inventory/ReorderForm";
+import ReorderEmail from "@/containers/inventory/ReorderEmail";
 
 
 
@@ -54,6 +56,14 @@ export const mainRoutes: RouteObject[] = [
         element: <AddCustomerForm />,
        },
 
+{
+  path: URL_PATH.ReorderForm,
+  element: <ReorderForm />
+},
+{
+  path: URL_PATH.ReorderEmail,
+  element: <ReorderEmail />
+},
       
       
       {

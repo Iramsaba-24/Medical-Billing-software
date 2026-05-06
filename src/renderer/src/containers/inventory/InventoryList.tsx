@@ -1,5 +1,5 @@
-import {Box,Button,Typography,Dialog,DialogTitle,DialogContent,DialogActions} from "@mui/material";
-import {ACTION_KEY,Column,UniversalTable,} from "@/components/uncontrolled/UniversalTable";
+import {Box,Button,Dialog,DialogActions,DialogContent,DialogTitle,Typography,} from "@mui/material";
+import {ACTION_KEY,Column, UniversalTable,} from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
 import {showConfirmation,showSnackbar,} from "@/components/uncontrolled/ToastMessage";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
@@ -23,6 +23,7 @@ export type InventoryItem = {
   distributorId: number;
   hsnCode: string;
   gstPercent: string;
+  minimumQuantity: number;
 };
 
 
@@ -38,7 +39,8 @@ type MedicineApi = {
   distributorId: number;
   gstPercent: number;
   type: string; 
-  hsnCode?: string;       
+  hsnCode?: string; 
+    minimumQuantity: number;      
 }
 
 type GroupApi = {
@@ -109,6 +111,7 @@ pricePerUnit: item.mrpPerTablet,
       distributorId: item.distributorId,
       gstPercent: `${item.gstPercent}%`,
        hsnCode: item.hsnCode || "-",
+       minimumQuantity: item.minimumQuantity,
     }));
 
     setTableData(formatted);
@@ -141,17 +144,18 @@ const handleDelete = (item: InventoryItem) => {
   });
 };
 
-  const getStatus = (qty: number) => {
-    if (qty === 0) return "Out of Stock";
-    if (qty <= 10) return "Low Stock";
-    return "In Stock";
-  };
+const getStatus = (qty: number, minQty: number) => {
+  if (qty === 0) return "Out of Stock";
+  if (qty <= minQty) return "Low Stock";
+  return "In Stock";
+};
 
-  const getStatusColor = (qty: number) => {
-    if (qty === 0) return "error.main";
-    if (qty <= 10) return "warning.main";
-    return "success.main";
-  };
+
+ const getStatusColor = (qty: number, minQty: number) => {
+  if (qty === 0) return "error.main";
+  if (qty <= minQty) return "warning.main";
+  return "success.main";
+};
 
 const columns: Column<InventoryItem>[] = [
   {key:"srNo", label:"Sr.No" },
@@ -170,8 +174,13 @@ const columns: Column<InventoryItem>[] = [
     key: "status",
     label: "Status",
     render: (row) => (
-      <Typography color={getStatusColor(row.totalStockTablets)}>
-        {getStatus(row.totalStockTablets)}
+    <Typography
+  color={getStatusColor(
+    row.totalStockTablets,
+    row.minimumQuantity
+  )}
+>
+       {getStatus(row.totalStockTablets, row.minimumQuantity)}
       </Typography>
     ),
   },
@@ -179,7 +188,7 @@ const columns: Column<InventoryItem>[] = [
 ];
 
 //edit function
-// InventoryList.tsx मध्ये हे function add करा
+
 const handleEdit = async (item: InventoryItem) => {
   try {
     const token = localStorage.getItem("token");
@@ -274,8 +283,16 @@ edit: handleEdit,
               {/* Status */}
               <Box>
                 <Typography fontWeight={600}>Status</Typography>
-                <Typography sx={{ color: getStatusColor(viewItem.totalStockTablets) }}>
-                  {getStatus(viewItem.totalStockTablets)}
+                <Typography sx={{
+  color: getStatusColor(
+    viewItem.totalStockTablets,
+    viewItem.minimumQuantity
+  ),
+}}>
+                {getStatus(
+  viewItem.totalStockTablets,
+  viewItem.minimumQuantity
+)}
                 </Typography>
               </Box>
             </Box>
