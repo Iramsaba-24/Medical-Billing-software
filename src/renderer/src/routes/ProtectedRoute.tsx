@@ -1,14 +1,27 @@
-// import { Navigate, Outlet} from 'react-router-dom';
-// const ProtectedRoute = () => {
-//   const token = localStorage.getItem('accessToken');
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-//   // if (!token) {
-//   //   return <Navigate to="/" replace />;
-//   // }
+const ProtectedRoute = () => {
+  const location = useLocation();
+  const token = localStorage.getItem("accessToken");
 
-//   //  Layout render , Layout  Outlet  children 
+  const isTokenValid = () => {
+    if (!token) return false;
 
-//   return token ? <Outlet /> : <Navigate to="/" replace />;
-// };
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.exp > Date.now() / 1000;
+    } catch {
+      return false;
+    }
+  };
 
-// export default ProtectedRoute;
+  if (!token || !isTokenValid()) {
+    localStorage.removeItem("accessToken");
+
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  return <Outlet />;
+};
+
+export default ProtectedRoute;

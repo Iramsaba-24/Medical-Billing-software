@@ -94,7 +94,9 @@ const LoginPage = () => {
       //   navigate(URL_PATH.Landing);
 
    if (response.token) {
-  localStorage.setItem('token', response.token);
+  // localStorage.setItem('token', response.token);
+  // key
+  localStorage.setItem('accessToken', response.token);
   
   if (response.userId) {
     localStorage.setItem('userId', response.userId.toString());
@@ -121,7 +123,7 @@ const LoginPage = () => {
   }
   
   showToast("success", "Login successful!");
-  //  localStorage.setItem('accessToken', response.token); 
+ 
   
   navigate(URL_PATH.Landing);
 
@@ -463,6 +465,9 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+
+
 
 
 

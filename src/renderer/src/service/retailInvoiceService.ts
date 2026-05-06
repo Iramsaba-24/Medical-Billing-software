@@ -14,7 +14,7 @@ export interface RetailInvoicePayload {
 }
  
 export interface RetailInvoiceResponse {
-  customerId: any;
+  customerId: number;
   retailInvoiceId: number;
   totalAmount: number;
   paymentStatus: string;

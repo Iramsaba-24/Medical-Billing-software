@@ -54,7 +54,6 @@ export const mainRoutes: RouteObject[] = [
         element: <AddCustomerForm />,
        },
 
-
       
       
       {
@@ -214,3 +213,6 @@ export const mainRoutes: RouteObject[] = [
     ],
   },
 ];
+
+
+

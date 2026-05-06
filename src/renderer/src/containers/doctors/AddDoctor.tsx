@@ -71,17 +71,32 @@ const onSubmit = async (data: AddDoctorFormValues) => {
     };
   };
 
-  const message =
-    typeof err.response?.data === "string"
-      ? err.response.data
-      : (err.response?.data as { message?: string })?.message;
+ const message =
+  typeof err.response?.data === "string"
+    ? err.response.data
+    : (err.response?.data as { message?: string })?.message;
 
-  if (message?.includes("Phone number already exists")) {
-    setError("phone", {
-      type: "manual",
-      message: "Phone number already exists",
-    });
-  }
+if (message?.includes("Phone number already exists")) {
+  setError("phone", {
+    type: "manual",
+    message: "Phone number already exists",
+  });
+}
+
+if (message?.includes("Email already exists")) {
+  setError("email", {
+    type: "manual",
+    message: "Email already exists",
+  });
+}
+
+if (message?.includes("Registration number already exists")) {
+  setError("registrationNumber", {
+    type: "manual",
+    message: "Registration number already exists",
+  });
+}
+  
 }
 };
 
@@ -141,7 +156,22 @@ const onSubmit = async (data: AddDoctorFormValues) => {
           mt={3}
         >
           <Box flex={1}>
-            <MobileField name="phone" label="Phone" countryCode preventDuplicate required />
+            <MobileField
+  name="phone"
+  label="Phone"
+  countryCode
+  preventDuplicate
+  required
+  
+  // rules={{
+  //   required: "Phone number is required",
+  //   pattern: {
+  //     value: /^[6-9]\d{9}$/,
+  //     message: "Phone number must start with 6, 7, 8, or 9 and be 10 digits",
+  //   },
+  // }}
+/>
+            {/* <MobileField name="phone" label="Phone" countryCode preventDuplicate required /> */}
           </Box>
 
           <Box flex={1}>
