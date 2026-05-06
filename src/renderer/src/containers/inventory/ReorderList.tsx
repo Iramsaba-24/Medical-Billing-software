@@ -9,8 +9,6 @@ import { UniversalTable, ACTION_KEY, type Column } from "@/components/uncontroll
 import { iconMap } from "@/utils/Icons";
 import TextInputField from "@/components/controlled/TextInputField";
 
-
-
 type MedicineRow = {
   medicineRowId: number;
   medicineId: string;
