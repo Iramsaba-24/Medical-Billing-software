@@ -41,6 +41,7 @@ export const URL_PATH = {
   Reorder: "/inventory/reorder",
   ReorderForm: "/reorder-form",
     ReorderEmail: "/reorder-email",
+    NewOrder:"/neworder",
   MedicineGroup: "/inventory/medicine-group",
   AddMedicineGroup: "/inventory/add-medicine-group",
   AddInventoryItem: "/inventory/add-inventory-item",
