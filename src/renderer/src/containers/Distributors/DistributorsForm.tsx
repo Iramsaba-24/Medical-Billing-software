@@ -9,8 +9,8 @@ import DateTimeField from "@/components/controlled/DateTimeField";
 import { useState } from "react";
 import AppToast from "@/containers/distributors/AppToast";
 import { URL_PATH } from "@/constants/UrlPath";
-import { addDistributor } from "@/service/distributorService";
-import axios from "axios";
+import { addDistributor, checkFieldExists, } from "@/service/distributorService";
+
  import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { updateDistributor } from "@/service/distributorService";
@@ -90,51 +90,57 @@ useEffect(() => {
  
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false);
- 
-//   const onSubmit = async (data: DistributorFormInput) => {
-//     try {
-//       const cleanedData = {
-//         ...data,
-//         ownerName: data.ownerName || "",
-//         website: data.website ? data.website : undefined,
-//       };
-
-
-//         if (editData) {
-//       //  UPDATE
-//       await updateDistributor(editData.id, cleanedData);
-//     } else {
-//       //   ADD
-//       await addDistributor(cleanedData);
-//     }
- 
-//       console.log("Submitting data:", cleanedData);
-//  showToast("success", "Business details saved!");
-      
- 
-//       await addDistributor(cleanedData);
- 
-//       setToastOpen(true);
-//       setTimeout(() => {
-//         navigate(URL_PATH.DistributorsPage);
-//       }, 1500);
-//     } catch (error: unknown) {
-//       if (axios.isAxiosError(error)) {
-//         console.error(
-//           "Error saving distributor:",
-//           error.response?.data || error.message
-//         );
-       
-//       } else if (error instanceof Error) {
-//         console.error("Error saving distributor:", error.message);
-//       } else {
-//         console.error("Error saving distributor:", error);
-//       }
-//     }
-//   };
- 
+  
+  
 const onSubmit = async (data: DistributorFormInput) => {
   try {
+  
+
+    // EMAIL
+const emailExists = await checkFieldExists("email", data.email);
+if (emailExists && data.email !== editData?.email) {
+  methods.setError("email", {
+    type: "manual",
+    message: "Email already exists",
+  });
+  return;
+}
+
+// PHONE
+const phoneExists = await checkFieldExists("phone", data.phone);
+if (phoneExists && data.phone !== editData?.phone) {
+  methods.setError("phone", {
+    type: "manual",
+    message: "Phone number already exists",
+  });
+  return;
+}
+
+// GSTIN
+const gstinExists = await checkFieldExists("gstin", data.gstin);
+if (gstinExists && data.gstin !== editData?.gstin) {
+  methods.setError("gstin", {
+    type: "manual",
+    message: "GSTIN already exists",
+  });
+  return;
+}
+
+//registration number
+
+const regExists = await checkFieldExists(
+  "registrationNumber",
+  data.registrationNumber
+);
+
+if (regExists && data.registrationNumber !== editData?.registrationNumber) {
+  methods.setError("registrationNumber", {
+    type: "manual",
+    message: "Registration number already exists",
+  });
+  return;
+}
+
     const cleanedData = {
       ...data,
       ownerName: data.ownerName || "",
@@ -151,21 +157,12 @@ const onSubmit = async (data: DistributorFormInput) => {
 
     setTimeout(() => {
       navigate(URL_PATH.DistributorsPage);
-    }, 1000); // 1 sec enough
+    }, 1000);
 
   } catch (error: unknown) {
-    if (axios.isAxiosError(error)) {
-      console.error(
-        "Error saving distributor:",
-        error.response?.data || error.message
-      );
-    } else if (error instanceof Error) {
-      console.error("Error saving distributor:", error.message);
-    } else {
-      console.error("Error saving distributor:", error);
-    }
+    console.error(error);
   }
-}; 
+};
 return (
     <Box p={2} sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
       <FormProvider {...methods}>
@@ -327,5 +324,4 @@ return (
  
 export default DistributorsForm;                          
  
- 
- 
+

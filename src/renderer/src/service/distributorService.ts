@@ -1,4 +1,6 @@
-import axios from "axios";
+
+// import axios, { AxiosError } from "axios";
+import axios, { } from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 /*TYPES */
@@ -13,7 +15,7 @@ export interface DistributorFormData {
   website?: string;
   gstin: string;
   address: string;
-      isActive?: boolean;
+   isActive?: boolean;
     IsActive?: boolean;
 
   // bank
@@ -140,6 +142,9 @@ IsActive: data.isActive ?? data.IsActive ?? true,
   return res.data;
 };
 
+
+
+
 //  UPDATE distributor (FIXED)
 export const updateDistributor = async (
   id: number,
@@ -184,3 +189,28 @@ export const deleteDistributor = async (id: number): Promise<void> => {
   );
 };
 
+
+export const checkFieldExists = async (
+  field: "email" | "phone" | "gstin" | "registrationNumber",
+  value: string
+): Promise<boolean> => {
+  try {
+    const res = await axios.get(
+      `${API_ENDPOINTS.DISTRIBUTOR}`,
+      getAuthHeaders()
+    );
+
+    const distributors = res.data as DistributorResponse[];
+
+    return distributors.some((d) => {
+      const fieldValue = d[field];
+      return fieldValue?.toLowerCase() === value.toLowerCase();
+    });
+
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      console.error(error.message);
+    }
+    return false;
+  }
+};
