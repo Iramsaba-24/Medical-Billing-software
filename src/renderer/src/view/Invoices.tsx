@@ -40,10 +40,12 @@ const fetchInvoices = async () => {
     }) => ({
       invoice: String(inv.retailInvoiceId),
       name: inv.customerName || "",
+       customerName: inv.customerName || "", 
+  patient: inv.customerName || "",
       invoiceDate: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
       price: inv.totalAmount,
       paymentStatus: inv.paymentStatus,
-      status: inv.paymentStatus,
+      status: inv.paymentStatus as InvoiceStatus,
       medicines: [],
       doctor: "",
       address: "",
@@ -54,22 +56,6 @@ const fetchInvoices = async () => {
     console.error("Error fetching invoices", error);
   }
 };
-
-// useEffect(() => {
-//   fetchInvoices();
-
-//   const handleInvoiceUpdated = () => {
-//     fetchInvoices(); 
-//   };
-
-//   window.addEventListener("invoiceUpdated", handleInvoiceUpdated); // ← ADD
-
-//   return () => {
-//     window.removeEventListener("invoiceUpdated", handleInvoiceUpdated); // ← cleanup
-//   };
-// }, []);
-
-
 
 useEffect(() => {
   fetchInvoices();
@@ -90,10 +76,12 @@ useEffect(() => {
         }) => ({
           invoice: String(inv.retailInvoiceId),
           name: inv.customerName || "",
+           customerName: inv.customerName || "", 
+  patient: inv.customerName || "",
           invoiceDate: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
           price: inv.totalAmount,
           paymentStatus: inv.paymentStatus,
-          status: inv.paymentStatus,
+      status: inv.paymentStatus as InvoiceStatus,
           medicines: [],
           doctor: "",
           address: "",

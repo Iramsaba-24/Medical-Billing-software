@@ -37,6 +37,7 @@ import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
 import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
 import ReorderForm from "@/containers/inventory/ReorderForm";
 import ReorderEmail from "@/containers/inventory/ReorderEmail";
+import NewOrderForm from "@/containers/inventory/NewOrderForm";
 
 
 
@@ -64,7 +65,10 @@ export const mainRoutes: RouteObject[] = [
   path: URL_PATH.ReorderEmail,
   element: <ReorderEmail />
 },
-      
+      {
+  path: URL_PATH.NewOrder,
+  element: <NewOrderForm />
+},
       
       {
         path: URL_PATH.Invoices,
