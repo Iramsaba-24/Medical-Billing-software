@@ -45,11 +45,17 @@ console.log("isLowStock check:", JSON.stringify(medicines.map(m => ({
 
 
 
-      const totalItems = medicines.length;
-      const lowStockItems = medicines.filter(m => m.isLowStock).length;
-     const totalValue = medicines.reduce((sum, m) => sum + (m.mrpPerTablet * m.totalStockTablets), 0);
+const totalItems = medicines.length;
 
-      setStats({ totalItems, lowStockItems, totalValue });
+const lowStockItems = medicines.filter(m => 
+  m.totalStockTablets < (m.minimumQuantity > 0 ? m.minimumQuantity : 10)
+).length;
+
+const totalValue = medicines.reduce(
+  (sum, m) => sum + (m.mrpPerTablet * m.totalStockTablets), 0
+);
+
+setStats({ totalItems, lowStockItems, totalValue });
     } catch (error) {
       console.error("Error fetching stats:", error);
     }

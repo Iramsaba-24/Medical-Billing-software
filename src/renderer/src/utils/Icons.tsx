@@ -1,6 +1,7 @@
 import { Download, Upload, Print, RestartAlt, ContentCopy } from "@mui/icons-material";
 import { IconEyeSearch, IconPencilMinus, IconShare3, IconCircleCheck, IconCircleX, IconLibraryPlus, IconSend, IconPhone, IconTrashX } from "@tabler/icons-react";
- 
+ import CheckIcon from "@mui/icons-material/Check";
+
 export const iconMap = {
   view: { icon: <IconEyeSearch stroke={2} />, label: "View", color: "#1976d2" },
   edit: { icon: <IconPencilMinus stroke={2} />, label: "Edit", color: "#2e7d32" },
@@ -16,5 +17,10 @@ export const iconMap = {
   share: { icon: <IconShare3 stroke={2} />, label: "Reject", color: "#d32f2f" },
   plus: { icon: <IconLibraryPlus stroke={2} />, label: "Reject", color: "#d32f2f" },
   phone: { icon: <IconPhone stroke={2} />, label: "Reject", color: "#d32f2f" },
+   CheckIcon: {
+    label: "Approve",
+    icon: <CheckIcon />,
+    color: "#d32f2f", 
+  },
 };
  

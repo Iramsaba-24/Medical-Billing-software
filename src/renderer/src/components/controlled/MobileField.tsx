@@ -106,6 +106,11 @@ const MobileField: React.FC<MobileFieldProps> = ({
             return `Mobile number must be ${selectedCountry.digits} digits`;
           }
 
+          //starting digit validation 7 to 9
+              if (sanitized.length > 0 && !/^[6-9]/.test(sanitized)) {
+      return "Mobile number must start with 6, 7, 8, or 9";
+    }
+
           // duplicate check
           if (preventDuplicate) {
             const allNumbers = getAllStoredNumbers();

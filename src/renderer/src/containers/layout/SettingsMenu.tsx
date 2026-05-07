@@ -39,11 +39,11 @@ const SettingsMenu = ({ closeDrawer }: { closeDrawer?: () => void }) => {
       icon: <DashboardIcon fontSize="small" />,
       path: URL_PATH.DashboardSettings,
     },
-    {
-      text: "Distributors Settings",
-      icon: <SettingsIcon fontSize="small" />,
-      path: URL_PATH.DistributorsSetting,
-    },
+    // {
+    //   text: "Distributors Settings",
+    //   icon: <SettingsIcon fontSize="small" />,
+    //   path: URL_PATH.DistributorsSetting,
+    // },
     {
       text: "Inventory Settings",
       icon: <InventoryIcon fontSize="small" />,
