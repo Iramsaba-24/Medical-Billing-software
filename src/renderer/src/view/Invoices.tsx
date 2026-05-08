@@ -40,7 +40,7 @@ const fetchInvoices = async () => {
     }) => ({
       invoice: String(inv.retailInvoiceId),
       name: inv.customerName || "",
-       customerName: inv.customerName || "",
+       customerName: inv.customerName || "", 
   patient: inv.customerName || "",
       invoiceDate: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
       price: inv.totalAmount,
@@ -56,7 +56,6 @@ const fetchInvoices = async () => {
     console.error("Error fetching invoices", error);
   }
 };
- 
 useEffect(() => {
   fetchInvoices();
  
@@ -76,7 +75,7 @@ useEffect(() => {
         }) => ({
           invoice: String(inv.retailInvoiceId),
           name: inv.customerName || "",
-           customerName: inv.customerName || "",
+           customerName: inv.customerName || "", 
   patient: inv.customerName || "",
           invoiceDate: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
           price: inv.totalAmount,

@@ -59,7 +59,7 @@ type DistributorApi = {
 const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]);
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
-  // const [editItem, setEditItem] = useState<InventoryItem | null>(null);
+   
   const navigate = useNavigate();
 
 const fetchInventory = async () => {
@@ -206,7 +206,7 @@ const handleEdit = async (item: InventoryItem) => {
       `${API_ENDPOINTS.MEDICINE}/${item.medicineId}`,
       { headers: { Authorization: token ? `Bearer ${token}` : "" } }
     );
-    const fullMedicine = res.data.data; // full MedicineResponse
+    const fullMedicine = res.data.data; 
     navigate(URL_PATH.AddInventoryItem, { state: fullMedicine });
   } catch (error) {
     console.error("Error fetching medicine details:", error);
@@ -226,10 +226,6 @@ const handleEdit = async (item: InventoryItem) => {
           rowsPerPage={5}
 actions={{
   view: setViewItem,
-// edit: (item) =>
-//   navigate(URL_PATH.AddInventoryItem, {
-//     state: item,
-//   }),
 edit: handleEdit,
 
   delete: handleDelete,

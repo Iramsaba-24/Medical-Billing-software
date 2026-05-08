@@ -7,12 +7,9 @@ import {
 } from "@/service/retailInvoiceService";
 import { getMedicines } from "@/service/medicineService";
 import { getCustomerById } from "@/service/customerService";
-import {
-  PharmacySettingsResponse,
-  pharmacySettingsService,
-} from "@/service/pharmacySettingsService";
-import MobileInvoiceView from "@/containers/invoices/MobileInvoiceView";
-import DesktopInvoiceView from "@/containers/invoices/DesktopInvoiceView";
+import {PharmacySettingsResponse,pharmacySettingsService} from "@/service/pharmacySettingsService";
+import MobileInvoiceView from "@/containers/Invoices/MobileInvoiceView";
+import DesktopInvoiceView from "@/containers/Invoices/DesktopInvoiceView";
 
 export interface Invoice {
   name: string;
