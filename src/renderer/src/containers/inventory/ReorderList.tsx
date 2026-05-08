@@ -10,8 +10,8 @@ import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import { getMedicines, type MedicineResponse } from "@/service/medicineService";
 import { ACTION_KEY } from "@/components/uncontrolled/UniversalTable";
-import NewOrderList from "./NewOrderList";
-import LastPurchaseList from "./LastPurchaseList";
+import NewOrderList from "@/containers/inventory/NewOrderList";
+import LastPurchaseList from "@/containers/inventory/LastPurchaseList";
 
 type StockRow = {
   id: number;
