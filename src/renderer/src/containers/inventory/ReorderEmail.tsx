@@ -7,6 +7,11 @@ import { showToast } from "@/components/uncontrolled/ToastMessage";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import { URL_PATH } from "@/constants/UrlPath";
+import { useEffect, useState } from "react";
+import {
+  pharmacySettingsService,
+  PharmacySettingsResponse,
+} from "@/service/pharmacySettingsService";
 
 type MedicineRow = {
   medicineRowId?: number;
@@ -26,6 +31,8 @@ type LocationState = {
 export default function ReorderEmail() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [pharmacySettings, setPharmacySettings] =
+  useState<PharmacySettingsResponse | null>(null);
 
   const { distributor, email, medicines } = (location.state as LocationState) || {
     distributor: "", email: "", medicines: [],
@@ -62,11 +69,28 @@ export default function ReorderEmail() {
       showToast("error", "Failed to send reorder. Please try again.");
     }
   };
+  useEffect(() => {
+  const fetchPharmacySettings = async () => {
+    try {
+      const userId = Number(localStorage.getItem("userId"));
+
+      if (!userId) return;
+
+      const response = await pharmacySettingsService.getSettings(userId);
+
+      setPharmacySettings(response);
+    } catch (error) {
+      console.error("Failed to fetch pharmacy settings", error);
+    }
+  };
+
+  fetchPharmacySettings();
+}, []);
 
   return (
     <Box sx={{ p: 3, maxWidth: "1100px", mx: "auto" }}>
       <Typography fontSize={20} fontWeight={700} mb={3}>
-        Reorder Email
+        Order Email
       </Typography>
 
       {/* Distributor + Email */}
@@ -112,7 +136,7 @@ export default function ReorderEmail() {
   {item.medicineId || item.medicineName}
 </TableCell>
                 <TableCell>{item.strengthType}</TableCell>
-               <TableCell>
+<TableCell>
   {item.qty || item.quantity}
 </TableCell>
               </TableRow>
@@ -127,8 +151,13 @@ export default function ReorderEmail() {
         <Box mt={4}>
           <Typography>Thank you.</Typography>
           <Typography mt={2}>Best regards,</Typography>
-          <Typography>Medical Store</Typography>
-          <Typography>Contact: +91 XXXXXXXXXX</Typography>
+<Typography>
+  {pharmacySettings?.pharmacyName || "Medical Store"}
+</Typography>
+
+<Typography>
+  Contact: {pharmacySettings?.contactNumber || "+91 XXXXXXXXXX"}
+</Typography>
         </Box>
       </Paper>
 

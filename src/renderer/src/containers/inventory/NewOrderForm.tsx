@@ -141,10 +141,10 @@ function NewOrderForm() {
             data[
               `strength_${row.rowId}`
             ],
-          quantity:
+          qty:
             data[`qty_${row.rowId}`],
-        })
-      );
+                  })
+                );
 
       navigate(
         URL_PATH.ReorderEmail,
