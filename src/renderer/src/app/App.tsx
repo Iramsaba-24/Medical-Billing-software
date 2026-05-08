@@ -7,7 +7,7 @@ import ProtectedRoute from "@/routes/ProtectedRoute";
 function App() {
 
   const routes = useRoutes([
-    // Public Routes (Login/Register)
+    // Public Routes
     {
       path: "/",
       children: authRoutes,
