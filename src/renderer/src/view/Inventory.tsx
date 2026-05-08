@@ -135,28 +135,38 @@ return (
               Medicine Groups
             </Typography>
  
-            <Button
-              size="small"
-              variant="contained"
-              sx={{  
-                px: 2.5,
-                py: 1,
-                minWidth: 100,
-                backgroundColor: "#238878",
-                color: "#fff",
-                border: "2px solid #238878",
-                fontSize: "0.95rem",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                  border: "2px solid #238878",
-                }
-             }}
-              onClick={() => navigate(URL_PATH.MedicineGroup)}
-            >
-              View Details
-            </Button>
+<Button
+  size="small"
+  variant="contained"
+  sx={{
+    px: { xs: 1.5, sm: 2, md: 2.5 },
+    py: { xs: 0.7, sm: 0.8, md: 1 },
+
+    minWidth: { xs: 80, sm: 100, md: 120 },
+
+    fontSize: {
+      xs: "0.75rem",
+      sm: "0.85rem",
+      md: "0.95rem",
+    },
+
+    whiteSpace: "nowrap",
+
+    backgroundColor: "#238878",
+    color: "#fff",
+    border: "2px solid #238878",
+    textTransform: "none",
+
+    "&:hover": {
+      backgroundColor: "#fff",
+      color: "#238878",
+      border: "2px solid #238878",
+    },
+  }}
+  onClick={() => navigate(URL_PATH.MedicineGroup)}
+>
+  View Details
+</Button>
           </Box>
  
              <GroupSummary />

@@ -1,11 +1,17 @@
 import axiosInstance from "@/service/axiosConfig";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
+// export interface DashboardCardsResponse {
+//   TotalRevenue: number;
+//   InventoryStatus: string;
+//   MedicineAvailableCount: number;
+//   MedicineShortageCount: number;
+// }
 export interface DashboardCardsResponse {
-  TotalRevenue: number;
-  InventoryStatus: string;
-  MedicineAvailableCount: number;
-  MedicineShortageCount: number;
+  totalRevenue: number;
+  inventoryStatus: string;
+  medicineAvailableCount: number;
+  medicineShortageCount: number;
 }
 
 export interface DashboardInventoryResponse {

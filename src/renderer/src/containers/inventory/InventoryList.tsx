@@ -24,6 +24,7 @@ export type InventoryItem = {
   hsnCode: string;
   gstPercent: string;
   minimumQuantity: number;
+  strength: string;
 };
 
 
@@ -40,7 +41,8 @@ type MedicineApi = {
   gstPercent: number;
   type: string; 
   hsnCode?: string; 
-    minimumQuantity: number;      
+    minimumQuantity: number;  
+    strength: string;    
 }
 
 type GroupApi = {
@@ -111,6 +113,7 @@ pricePerUnit: item.mrpPerTablet,
       distributorId: item.distributorId,
       gstPercent: `${item.gstPercent}%`,
        hsnCode: item.hsnCode || "-",
+       strength: item.strength || "-",
        minimumQuantity: item.minimumQuantity,
     }));
 
@@ -165,8 +168,15 @@ const columns: Column<InventoryItem>[] = [
   {
     key: "pricePerUnit",
     label: "MRP",
-    render: (row) => `₹ ${row.pricePerUnit}`,
+    render: (row) => `₹ ${Number(row.pricePerUnit).toFixed(2)}`,
   },
+  // { key: "strength", label: "Strength" },
+  {
+  key: "type",
+  label: "Type / Strength",
+  render: (row) =>
+    `${row.type} - ${row.strength} `,
+},
   { key: "hsnCode", label: "HSN Number" },
   { key: "companyName", label: "Supplier" },
   { key: "expiryDate", label: "Expiry Date" },
