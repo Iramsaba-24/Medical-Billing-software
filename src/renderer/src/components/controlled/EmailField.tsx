@@ -26,6 +26,8 @@ type EmailFieldProps = TextFieldProps & {
   maxLength?: number;
   minLength?: number;
   preventDuplicate?: boolean;
+
+ 
 };
  
 type Customer = {
@@ -54,7 +56,7 @@ const EmailField: FC<EmailFieldProps> = ({
     formState: { errors }
   } = useFormContext();
  
-  // ✅ GLOBAL email fetch
+  //  GLOBAL email fetch
   const getAllStoredEmails = (): string[] => {
     const emails: string[] = [];
  

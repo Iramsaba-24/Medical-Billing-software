@@ -11,16 +11,20 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Home } from "@mui/icons-material";
 import PaymentsIcon from "@mui/icons-material/Payments";
+
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import LogoImage from "@/assets/icons.svg";
+
 import { useEffect, useState } from "react";
+
 import {
   AppBar,
   Avatar,
   Box,
   Button,
   CssBaseline,
+  Divider,
   Drawer,
   IconButton,
   InputBase,
@@ -34,8 +38,8 @@ import {
   useTheme,
   Menu,
   MenuItem,
-  Divider,
 } from "@mui/material";
+
 import React from "react";
 import { pharmacySettingsService } from "@/service/pharmacySettingsService";
 
@@ -83,10 +87,12 @@ const Sidebar = ({ open }: { open: boolean }) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const savedSettings = localStorage.getItem("generalSettings");
+
       if (!savedSettings) return;
 
       try {
         const settings = JSON.parse(savedSettings);
+
         if (!settings.keyboardShortcuts) return;
       } catch (error) {
         console.error("Error parsing settings", error);
@@ -111,6 +117,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
     };
 
     document.addEventListener("keydown", handleKeyDown);
+
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
@@ -120,6 +127,7 @@ const Sidebar = ({ open }: { open: boolean }) => {
     <List sx={{ px: 1, mt: { xs: 6, md: 2 } }}>
       {menuItems.map((item) => {
         const isSettings = item.text === "Settings";
+
         const active = isSettings
           ? location.pathname.startsWith(item.path)
           : location.pathname === item.path;
@@ -146,9 +154,11 @@ const Sidebar = ({ open }: { open: boolean }) => {
                   textTransform: "none",
                   background: active ? "#238878" : "#D9D9D9",
                   color: active ? "#fff" : "black",
+
                   "& .MuiButton-startIcon": {
                     margin: open ? "0 12px 0 0" : 0,
                   },
+
                   "&:hover": {
                     background: "#1FA38A",
                   },
@@ -166,21 +176,29 @@ const Sidebar = ({ open }: { open: boolean }) => {
 
 const Header: React.FC = () => {
   const location = useLocation();
+
   const theme = useTheme();
+
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const navigate = useNavigate();
+
   const isSettingsPage = location.pathname.startsWith(URL_PATH.Setting);
+
   const [open, setOpen] = React.useState(false);
+
   const [showSearch, setShowSearch] = React.useState(false);
 
   const email = localStorage.getItem("userEmail") || "";
+
   const firstLetter = email ? email[0].toUpperCase() : "U";
 
   const [pharmacyName, setPharmacyName] = useState<string | null>("");
+
   const [pharmacyLogo, setPharmacyLogo] = React.useState<string | null>(null);
 
-  // NEW STATE (Menu)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   const openMenu = Boolean(anchorEl);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -191,7 +209,6 @@ const Header: React.FC = () => {
     setAnchorEl(null);
   };
 
-  // LOGOUT FUNCTION
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
@@ -201,9 +218,11 @@ const Header: React.FC = () => {
     const loadHeaderData = async () => {
       try {
         const userId = Number(localStorage.getItem("userId"));
+
         const result = await pharmacySettingsService.getSettings(userId);
 
         setPharmacyName(result.pharmacyName ?? null);
+
         setPharmacyLogo(result.logoUrl ?? null);
       } catch (error) {
         console.log("Error loading pharmacy header");
@@ -216,111 +235,165 @@ const Header: React.FC = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
+
+      {/* APPBAR */}
       <StyledAppBar position="fixed">
         <Toolbar
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: 3,
             minHeight: 64,
+            px: { xs: 1, sm: 2 },
+            gap: 1,
           }}
         >
-          <IconButton color="inherit" onClick={() => setOpen(!open)}>
-            <MenuIcon />
-          </IconButton>
+          {/* LEFT */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              minWidth: 0,
+              flex: 1,
+            }}
+          >
+            {/* MENU */}
+            <IconButton
+              color="inherit"
+              onClick={() => setOpen(!open)}
+              sx={{ mr: 0.5 }}
+            >
+              <MenuIcon />
+            </IconButton>
 
-          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Typography sx={{ fontSize: { xs: 16, md: 22 }, mr: 1 }}>
-              {pharmacyName}
-            </Typography>
-            <img
-              src={pharmacyLogo || LogoImage}
-              alt="logo"
-              style={{ width: 50 }}
-            />
+            {/* NAME + LOGO */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                minWidth: 0,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: 13, sm: 16, md: 22 },
+                  fontWeight: 600,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: {
+                    xs: "140px",
+                    sm: "220px",
+                    md: "100%",
+                  },
+                }}
+              >
+                {pharmacyName}
+              </Typography>
+
+              <img
+                src={pharmacyLogo || LogoImage}
+                alt="logo"
+                style={{
+                  width: isMobile ? 30 : 45,
+                  height: isMobile ? 30 : 45,
+                  objectFit: "contain",
+                  marginLeft: 4,
+                  flexShrink: 0,
+                }}
+              />
+            </Box>
           </Box>
 
-          <Home
-            sx={{ cursor: "pointer" }}
-            onClick={() => navigate(URL_PATH.Landing)}
-          />
-
-          <Box>
+          {/* RIGHT */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: 0.3, sm: 1 },
+              flexShrink: 0,
+            }}
+          >
+            {/* SEARCH */}
             {isMobile ? (
               !showSearch && (
-                <IconButton color="inherit" onClick={() => setShowSearch(true)}>
-                  <SearchIcon />
+                <IconButton
+                  color="inherit"
+                  onClick={() => setShowSearch(true)}
+                  size="small"
+                >
+                  <SearchIcon fontSize="small" />
                 </IconButton>
               )
             ) : (
-              <SearchBox>
+              <SearchBox
+                sx={{
+                  width: { sm: 180, md: 240 },
+                }}
+              >
                 <SearchIcon sx={{ mr: 1, color: "#666" }} />
+
                 <InputBase placeholder="Search" fullWidth />
               </SearchBox>
             )}
-          </Box>
 
-          {/*  UPDATED AVATAR */}
-          <Avatar
-            onClick={handleAvatarClick}
-            sx={{
-              width: 38,
-              height: 38,
-              ml: 1,
-              cursor: "pointer",
-              bgcolor: "#e0e0e0",
-              color: "#333",
-              fontWeight: 600,
-              fontSize: 16,
-              border: "2px solid #fff",
-            }}
-          >
-            {firstLetter}
-          </Avatar>
+            {/* HOME */}
+            <IconButton
+              color="inherit"
+              onClick={() => navigate(URL_PATH.Landing)}
+              size="small"
+            >
+              <Home fontSize="small" />
+            </IconButton>
 
-          {/* MENU DROPDOWN */}
-          <Menu
-            anchorEl={anchorEl}
-            open={openMenu}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: "bottom",
-              horizontal: "right",
-            }}
-            transformOrigin={{
-              vertical: "top",
-              horizontal: "right",
-            }}
-          >
-            <MenuItem disabled>{email}</MenuItem>
-            <Divider />
-            <MenuItem
-              onClick={() => {
-                handleLogout();
-                handleClose();
+            {/* AVATAR */}
+            <Avatar
+              onClick={handleAvatarClick}
+              sx={{
+                width: { xs: 30, md: 38 },
+                height: { xs: 30, md: 38 },
+                cursor: "pointer",
+                bgcolor: "#e0e0e0",
+                color: "#333",
+                fontWeight: 600,
+                fontSize: { xs: 13, md: 16 },
+                border: "2px solid #fff",
               }}
             >
-              Logout
-            </MenuItem>
-          </Menu>
+              {firstLetter}
+            </Avatar>
+          </Box>
         </Toolbar>
 
+        {/* MOBILE SEARCH */}
         {isMobile && showSearch && (
-          <Box sx={{ width: "100%", backgroundColor: "#238878", px: 2, py: 1 }}>
+          <Box
+            sx={{
+              width: "100%",
+              backgroundColor: "#238878",
+              px: 2,
+              py: 1,
+            }}
+          >
             <SearchBox sx={{ width: "100%" }}>
+              <SearchIcon sx={{ mr: 1, color: "#666" }} />
+
               <InputBase
                 placeholder="Search..."
                 fullWidth
                 autoFocus
-                sx={{ backgroundColor: "#fff", borderRadius: 5, px: 2 }}
+                sx={{
+                  backgroundColor: "#fff",
+                  borderRadius: 5,
+                  px: 1,
+                }}
               />
-              <IconButton onClick={() => setShowSearch(false)}></IconButton>
             </SearchBox>
           </Box>
         )}
       </StyledAppBar>
 
+      {/* DRAWER */}
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
         open={isMobile ? open : !isSettingsPage}
@@ -333,8 +406,11 @@ const Header: React.FC = () => {
             : open
             ? FULL_WIDTH
             : MINI_WIDTH,
+
           flexShrink: 0,
+
           whiteSpace: "nowrap",
+
           "& .MuiDrawer-paper": {
             width: isSettingsPage
               ? 0
@@ -343,17 +419,23 @@ const Header: React.FC = () => {
               : open
               ? FULL_WIDTH
               : MINI_WIDTH,
+
             overflowX: "hidden",
+
             transition: "width 0.3s",
+
             boxSizing: "border-box",
+
             paddingTop: isMobile ? 5 : 0,
           },
         }}
       >
         {!isMobile && <DrawerHeader />}
+
         <Sidebar open={isMobile ? true : open} />
       </Drawer>
 
+      {/* MAIN */}
       <Box
         component="main"
         sx={{
@@ -362,10 +444,40 @@ const Header: React.FC = () => {
           pt: { xs: showSearch ? 16 : 10, md: 10 },
           px: { xs: 1, sm: 3, md: 5 },
           overflowY: "auto",
+          overflowX: "hidden",
+          width: "100%",
         }}
       >
         <Outlet />
       </Box>
+
+      {/* PROFILE MENU */}
+      <Menu
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem disabled>{email}</MenuItem>
+
+        <Divider />
+
+        <MenuItem
+          onClick={() => {
+            handleLogout();
+            handleClose();
+          }}
+        >
+          Logout
+        </MenuItem>
+      </Menu>
     </Box>
   );
 };
