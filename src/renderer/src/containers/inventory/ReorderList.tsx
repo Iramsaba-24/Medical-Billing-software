@@ -8,20 +8,10 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
-import { getMedicines, type MedicineResponse } from "@/service/medicineService";
-import { ACTION_KEY } from "@/components/uncontrolled/UniversalTable";
 import NewOrderList from "@/containers/inventory/NewOrderList";
 import LastPurchaseList from "@/containers/inventory/LastPurchaseList";
 
-type StockRow = {
-  id: number;
-  supplier: string;
-  medicineName: string;
-  strengthType: string;
-  quantity: string;
-  [ACTION_KEY]: string;
-};
-
+//ReorderHistory types
 type ReorderMedicine = {
   medicineName: string;
   strength: string;
@@ -34,56 +24,41 @@ type ReorderHistory = {
   distributorName: string;
   createdAt: string;
   existingMedicines: ReorderMedicine[];
+  orderType: "reorder" | "neworder"; 
 };
 
 function ReorderList() {
   const navigate = useNavigate();
 
-  const [lowStockData, setLowStockData] = useState<StockRow[]>([]);
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
 
-  const fetchMedicineData = async () => {
-    try {
-      const medicines: MedicineResponse[] = await getMedicines();
+const fetchReorderHistory = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(API_ENDPOINTS.REORDER, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-      const lowStockMedicines = medicines
-        .filter((item) => Number(item.totalStockTablets) <= Number(item.minimumQuantity))
-        .map((item) => ({
-          id: item.medicineId,
-          supplier: item.distributorName || "-",
-          medicineName: item.medicineName,
-          strengthType: item.strength || "-",
-          quantity: item.totalStockTablets.toString(),
-          [ACTION_KEY]: "",
-        }));
+    const allData: ReorderHistory[] = res.data || [];
 
-      setLowStockData(lowStockMedicines);
-    } catch (error) {
-      console.error("Medicine fetch failed:", error);
-    }
-  };
+    // existingMedicines filter for reorder
+    const filtered = allData.filter(
+      (item) => item.existingMedicines && item.existingMedicines.length > 0
+    );
 
-  const fetchReorderHistory = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(API_ENDPOINTS.REORDER, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setReorderHistory(res.data || []);
-    } catch (error) {
-      console.error("Reorder history fetch failed:", error);
-    }
-  };
+    setReorderHistory(filtered);
+  } catch (error) {
+    console.error("Reorder history fetch failed:", error);
+  }
+};
 
   useEffect(() => {
-    fetchMedicineData();
-    fetchReorderHistory();
+    fetchReorderHistory(); 
   }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2 }}>
 
-      {/* Low Stock */}
       <Paper sx={{ borderRadius: 2, p: 2 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5}>
           <Typography fontWeight={700}>Reorder List</Typography>
@@ -97,18 +72,10 @@ function ReorderList() {
           </Box>
         </Box>
 
-        {/* Custom Table */}
         <Table size="small">
           <TableHead>
             <TableRow>
-              {[
-                "Sr No",
-                "Supplier",
-                "Medicine Name",
-                "Strength/Type",
-                "Qty",
-                "Action",
-              ].map((head) => (
+              {["Sr No", "Supplier", "Medicine Name", "Strength/Type", "Qty", "Action"].map((head) => (
                 <TableCell
                   key={head}
                   sx={{
@@ -130,57 +97,51 @@ function ReorderList() {
                   <TableRow
                     key={`${order.id}-${i}`}
                     hover
-                    sx={{
-                      "&:hover": { bgcolor: "#e6f4ea" },
-                    }}
+                    sx={{ "&:hover": { bgcolor: "#e6f4ea" } }}
                   >
-                    {/* Sr No */}
                     {i === 0 && (
                       <TableCell rowSpan={order.existingMedicines.length}>
-                        <Typography fontSize={13}>
-                          {index + 1}
-                        </Typography>
+                        <Typography fontSize={13}>{index + 1}</Typography>
                       </TableCell>
                     )}
-
-                    {/* Supplier */}
                     {i === 0 && (
                       <TableCell rowSpan={order.existingMedicines.length}>
-                        <Typography fontSize={13}>
-                          {order.distributorName}
-                        </Typography>
+                        <Typography fontSize={13}>{order.distributorName}</Typography>
                       </TableCell>
                     )}
-
-                    {/* Medicine */}
                     <TableCell>
-                      <Typography fontSize={13}>
-                        {med.medicineName}
-                      </Typography>
+                      <Typography fontSize={13}>{med.medicineName}</Typography>
                     </TableCell>
-
-                    {/* Strength */}
                     <TableCell>
-                      <Typography fontSize={13}>
-                        {med.strength || "-"}
-                      </Typography>
+                      <Typography fontSize={13}>{med.strength || "-"}</Typography>
                     </TableCell>
-
-                    {/* Qty */}
                     <TableCell>
-                      <Typography fontSize={13}>
-                        {med.qty}
-                      </Typography>
+                      <Typography fontSize={13}>{med.qty}</Typography>
                     </TableCell>
-
-                    {/* Action */}
                     {i === 0 && (
                       <TableCell rowSpan={order.existingMedicines.length}>
                         <Box display="flex" gap={1}>
-                          <IconButton size="small" color="primary">
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() =>
+                              navigate(URL_PATH.ReorderEmail, {
+                                state: {
+                                  distributor: order.distributorName,
+                                  email: "",
+                                  medicines: order.existingMedicines.map((med, index) => ({
+                                    medicineRowId: index + 1,
+                                    medicineName: med.medicineName,
+                                    strengthType: med.strength,
+                                    quantity: med.qty,
+                                  })),
+                                  isViewMode: true,
+                                },
+                              })
+                            }
+                          >
                             <Visibility fontSize="small" />
                           </IconButton>
-
                           <IconButton
                             size="small"
                             color="success"
@@ -199,62 +160,21 @@ function ReorderList() {
                 ))
               )
             ) : (
-              lowStockData.map((row, index) => (
-                <TableRow key={row.id}>
-                  <TableCell><Typography fontSize={13}>{index + 1}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.supplier}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.medicineName}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.strengthType}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.quantity}</Typography></TableCell>
-                  <TableCell>
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      gap={1}
-                    >
-                      {/* Reorder */}
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          navigate(URL_PATH.ReorderForm, {
-                            state: {
-                              medicines: [row],
-                            },
-                          })
-                        }
-                        sx={{
-                          color: "#1976d2",
-                        }}
-                      >
-                        <Visibility fontSize="small" />
-                      </IconButton>
-
-                      {/* Complete */}
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          setLowStockData((prev) =>
-                            prev.filter((item) => item.id !== row.id)
-                          )
-                        }
-                        sx={{
-                          color: "#2e7d32",
-                        }}
-                      >
-                        <Check fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
+              // if there is no reorder history
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  <Typography fontSize={13} color="text.secondary">
+                    No reorder data found.
+                  </Typography>
+                </TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>
       </Paper>
-      <NewOrderList />
-       <LastPurchaseList />
 
+      <NewOrderList />
+      <LastPurchaseList />
     </Box>
   );
 }

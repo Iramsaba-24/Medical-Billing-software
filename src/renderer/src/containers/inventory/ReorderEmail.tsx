@@ -26,6 +26,8 @@ type LocationState = {
   distributor: string;
   email: string;
   medicines: MedicineRow[];
+  isViewMode?: boolean;
+  orderType?: "reorder" | "neworder"; 
 };
 
 export default function ReorderEmail() {
@@ -34,41 +36,62 @@ export default function ReorderEmail() {
   const [pharmacySettings, setPharmacySettings] =
   useState<PharmacySettingsResponse | null>(null);
 
-  const { distributor, email, medicines } = (location.state as LocationState) || {
-    distributor: "", email: "", medicines: [],
-  };
+const {
+  distributor,
+  email,
+  medicines,
+  isViewMode,
+  orderType, 
+} = (location.state as LocationState) || {
+  distributor: "",
+  email: "",
+  medicines: [],
+  isViewMode: false,
+  orderType: "neworder",
+};
 
-  const handleSend = async () => {
-    try {
-      const token = localStorage.getItem("token");
 
-      const payload = {
-        DistributorName: distributor,
-        EmailAddress: email,
-        ExistingMedicines: medicines.map((m) => ({
-         MedicineName:
-  m.medicineId || m.medicineName,
-          Strength: m.strengthType,
-          CompanyName: distributor,
-        Qty: Number(
-  m.qty || m.quantity
-),
-        })),
-        NewMedicines: [],
-      };
+const handleSend = async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-      await axios.post(API_ENDPOINTS.REORDER, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+    // check orderType
+    const isReorder = orderType === "reorder";
 
-      showToast("success", "Reorder email sent successfully!");
-      navigate(URL_PATH.Reorder);
+    const payload = {
+      DistributorName: distributor,
+      EmailAddress: email,
 
-    } catch (error) {
-      console.error("Reorder failed:", error);
-      showToast("error", "Failed to send reorder. Please try again.");
-    }
-  };
+      ExistingMedicines: isReorder
+        ? medicines.map((m) => ({
+            MedicineName: m.medicineId || m.medicineName,
+            Strength: m.strengthType,
+            CompanyName: distributor,
+            Qty: Number(m.qty || m.quantity),
+          }))
+        : [], // if there is reorder then it will be in ExistingMedicines
+
+      NewMedicines: !isReorder
+        ? medicines.map((m) => ({
+            MedicineName: m.medicineId || m.medicineName,
+            Strength: m.strengthType,
+            Qty: Number(m.qty || m.quantity),
+          }))
+        : [], // if there is neworder then it will be in NewMedicines
+    };
+
+    await axios.post(API_ENDPOINTS.REORDER, payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    showToast("success", "Reorder email sent successfully!");
+    navigate(URL_PATH.Reorder);
+
+  } catch (error) {
+    console.error("Reorder failed:", error);
+    showToast("error", "Failed to send reorder. Please try again.");
+  }
+};
   useEffect(() => {
   const fetchPharmacySettings = async () => {
     try {
@@ -161,15 +184,17 @@ export default function ReorderEmail() {
         </Box>
       </Paper>
 
-      <Box display="flex" justifyContent="flex-end" mt={3}>
-        <Button
-          variant="contained"
-          sx={{ backgroundColor: "#238878", textTransform: "none" }}
-          onClick={handleSend}
-        >
-          Send
-        </Button>
-      </Box>
+{!isViewMode && (
+  <Box display="flex" justifyContent="flex-end" mt={3}>
+    <Button
+      variant="contained"
+      sx={{ backgroundColor: "#238878", textTransform: "none" }}
+      onClick={handleSend}
+    >
+      Send
+    </Button>
+  </Box>
+)}
     </Box>
   );
 }
