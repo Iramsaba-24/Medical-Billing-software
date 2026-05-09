@@ -3,6 +3,7 @@ import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { InventoryFormData } from "./AddInventoryItem";
 import { useFormContext } from "react-hook-form";
+import {  Typography } from "@mui/material";
 
 type Props = {
   groupOptions: { label: string; value: string }[];
@@ -11,17 +12,22 @@ type Props = {
   purchasePricePerTablet: number;
   mrpPerTablet: number;
   finalPrice: number;
+  orderedQty?: number; 
 };
 
 export default function InventoryFormFields({
   groupOptions,
   supplierOptions,
-  // totalStock,
-  // purchasePricePerTablet,
-  // mrpPerTablet,
-  // finalPrice,
+  totalStock,
+  orderedQty,
 }: Props) {
   const methods = useFormContext<InventoryFormData>();
+
+  // warning logic
+  const showWarning = orderedQty !== undefined;
+ 
+  const isOver = totalStock > (orderedQty ?? 0);
+  const isUnder = totalStock < (orderedQty ?? 0);
 
   return (
     <>
@@ -81,12 +87,28 @@ export default function InventoryFormFields({
         min: { value: 0, message: "Loose tablets cannot be negative" },
       }}/>
 
-      {/* <TextInputField inputType="numbers" name="totalStockTablets" label="Current Stock Quantity" value={totalStock} disabled /> */}
+      {/* Ordered Qty Warning */}
+      {showWarning && (
+  <Typography
+    gridColumn="1 / -1"
+    fontSize={13}
+    fontWeight={600}
+    color={isOver ? "error.main" : isUnder ? "warning.main" : "success.main"}
+  >
+    {isOver
+      ? `Total stock (${totalStock}) is more than ordered qty (${orderedQty})`
+      : isUnder
+      ? `Total stock (${totalStock}) is less than ordered qty (${orderedQty})`
+      : `Total stock matches ordered qty (${orderedQty})`}
+  </Typography>
+)}
+
+   
 
       {/* Pricing */}
       <TextInputField inputType="numbers" name="purchasePricePerStrip" label="Purchase Price Per Strip" required/>
 
-      {/* <TextInputField inputType="numbers" name="purchasePricePerTablet" label="Purchase Price Per Tablet" value={purchasePricePerTablet} disabled/> */}
+      
 
       <TextInputField
         inputType="numbers"

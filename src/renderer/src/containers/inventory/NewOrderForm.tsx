@@ -469,18 +469,36 @@ function NewOrderForm() {
           ))}
 
           {/* Submit */}
-          <Box
-            display="flex"
-            justifyContent="flex-end"
-            mt={2}
-          >
-            <Button
-              sx={orderButtonSx}
-              onClick={handleOrder}
-            >
-              Order
-            </Button>
-          </Box>
+         {/* Submit Buttons */}
+<Box
+  display="flex"
+  justifyContent="flex-end"
+  gap={2}
+  mt={2}
+>
+  {/* Order History Button */}
+  <Button
+    variant="outlined"
+    sx={{
+      ...orderButtonSx,
+      backgroundColor: "#fff",
+      color: "#238878",
+    }}
+    onClick={() =>
+      navigate(URL_PATH.Reorder)
+    }
+  >
+    Order History
+  </Button>
+
+  {/* Order Button */}
+  <Button
+    sx={orderButtonSx}
+    onClick={handleOrder}
+  >
+    Order
+  </Button>
+</Box>
         </Paper>
       </Box>
     </FormProvider>
