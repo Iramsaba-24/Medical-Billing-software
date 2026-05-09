@@ -154,6 +154,7 @@ function NewOrderForm() {
               data.distributor,
             email: data.email,
             medicines,
+            orderType: "neworder",
           },
         }
       );

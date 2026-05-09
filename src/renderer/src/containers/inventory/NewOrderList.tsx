@@ -1,48 +1,58 @@
+
 import { useEffect, useState } from "react";
-import {Box,  Paper, Typography,Table, TableBody, TableCell, TableHead, TableRow, IconButton,} from "@mui/material";
+import {
+  Box, Paper, Typography, Table, TableBody, TableCell,
+  TableHead, TableRow, IconButton,
+} from "@mui/material";
 import { Visibility, Check } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import { getMedicines, type MedicineResponse } from "@/service/medicineService";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
-type StockRow = {
+type NewMedicine = {
   id: number;
-  supplier: string;
   medicineName: string;
-  strengthType: string;
-  quantity: string;
+  strength: string;
+  qty: number;
+};
+
+type NewOrderHistory = {
+  id: number;
+  distributorName: string;
+  newMedicines: NewMedicine[];
 };
 
 function NewOrderList() {
   const navigate = useNavigate();
-  const [newOrderData, setNewOrderData] = useState<StockRow[]>([]);
+  const [newOrderData, setNewOrderData] = useState<NewOrderHistory[]>([]);
 
-  const fetchMedicineData = async () => {
+  const fetchNewOrders = async () => {
     try {
-      const medicines: MedicineResponse[] = await getMedicines();
+      const token = localStorage.getItem("token");
+      const res = await axios.get(API_ENDPOINTS.REORDER, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      const latestOrders = medicines.slice(0, 5).map((item) => ({
-        id: item.medicineId,
-        supplier: item.distributorName || "-",
-        medicineName: item.medicineName,
-        strengthType: item.strength || "-",
-        quantity: item.totalStockTablets.toString(),
-      }));
+      const allData: NewOrderHistory[] = res.data || [];
 
-      setNewOrderData(latestOrders);
+      // new order filter
+      const filtered = allData.filter(
+        (item) => item.newMedicines && item.newMedicines.length > 0
+      );
+
+      setNewOrderData(filtered);
     } catch (error) {
-      console.error("Medicine fetch failed:", error);
+      console.error("New order fetch failed:", error);
     }
   };
 
   useEffect(() => {
-    fetchMedicineData();
+    fetchNewOrders();
   }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2 }}>
-
-      {/* New Order Table */}
       <Paper sx={{ borderRadius: 2, p: 2 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5}>
           <Typography fontWeight={700}>New Order List</Typography>
@@ -69,45 +79,73 @@ function NewOrderList() {
 
           <TableBody>
             {newOrderData.length > 0 ? (
-              newOrderData.map((row, index) => (
-                <TableRow
-                  key={row.id}
-                  hover
-                  sx={{ "&:hover": { bgcolor: "#e6f4ea" } }}
-                >
-                  <TableCell><Typography fontSize={13}>{index + 1}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.supplier}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.medicineName}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.strengthType}</Typography></TableCell>
-                  <TableCell><Typography fontSize={13}>{row.quantity}</Typography></TableCell>
-                  <TableCell>
-                    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          navigate(URL_PATH.ReorderForm, {
-                            state: { medicines: [row] },
-                          })
-                        }
-                        sx={{ color: "#1976d2" }}
-                      >
-                        <Visibility fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          setNewOrderData((prev) =>
-                            prev.filter((item) => item.id !== row.id)
-                          )
-                        }
-                        sx={{ color: "#2e7d32" }}
-                      >
-                        <Check fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
+              newOrderData.map((order, index) =>
+                order.newMedicines.map((med, i) => (
+                  <TableRow
+                    key={`${order.id}-${i}`}
+                    hover
+                    sx={{ "&:hover": { bgcolor: "#e6f4ea" } }}
+                  >
+                    {i === 0 && (
+                      <TableCell rowSpan={order.newMedicines.length}>
+                        <Typography fontSize={13}>{index + 1}</Typography>
+                      </TableCell>
+                    )}
+                    {i === 0 && (
+                      <TableCell rowSpan={order.newMedicines.length}>
+                        <Typography fontSize={13}>{order.distributorName}</Typography>
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <Typography fontSize={13}>{med.medicineName}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontSize={13}>{med.strength || "-"}</Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography fontSize={13}>{med.qty}</Typography>
+                    </TableCell>
+                    {i === 0 && (
+                      <TableCell rowSpan={order.newMedicines.length}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              navigate(URL_PATH.ReorderEmail, {
+                                state: {
+                                  distributor: order.distributorName,
+                                  email: "",
+                                  medicines: order.newMedicines.map((m, idx) => ({
+                                    medicineRowId: idx + 1,
+                                    medicineName: m.medicineName,
+                                    strengthType: m.strength,
+                                    quantity: m.qty,
+                                  })),
+                                  isViewMode: true,
+                                },
+                              })
+                            }
+                            sx={{ color: "#1976d2" }}
+                          >
+                            <Visibility fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              setNewOrderData((prev) =>
+                                prev.filter((o) => o.id !== order.id)
+                              )
+                            }
+                            sx={{ color: "#2e7d32" }}
+                          >
+                            <Check fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+              )
             ) : (
               <TableRow>
                 <TableCell colSpan={6} align="center">
@@ -120,7 +158,6 @@ function NewOrderList() {
           </TableBody>
         </Table>
       </Paper>
-
     </Box>
   );
 }

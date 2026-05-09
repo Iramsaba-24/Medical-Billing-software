@@ -114,15 +114,7 @@ function ReorderForm() {
   
   }, [incomingMedicines]);
 
-  // const handleReorder = methods.handleSubmit((data) => {
-  //   navigate(URL_PATH.ReorderEmail, {
-  //     state: {
-  //       distributor: data.distributor,
-  //       email: data.email,
-  //       medicines: medicineRows,
-  //     },
-  //   });
-  // });
+
   const handleReorder = methods.handleSubmit((data) => {
 
   const updatedMedicines = medicineRows.map((row) => ({
@@ -136,6 +128,7 @@ function ReorderForm() {
       distributor: data.distributor,
       email: data.email,
       medicines: updatedMedicines,
+      orderType: "reorder",
     },
   });
 });
