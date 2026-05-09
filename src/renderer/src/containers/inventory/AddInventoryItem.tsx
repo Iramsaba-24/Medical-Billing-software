@@ -54,8 +54,24 @@ export default function AddInventoryItem() {
 
 const location = useLocation();
 
-// const editData = location.state as InventoryFormData | undefined;
-const editData = location.state as MedicineResponse | undefined;
+type ApproveOrderState = {
+  approveMode: true;
+  medicineName: string;
+  strength: string;
+  qty: number;
+  orderId: number;
+  distributorId: number;
+};
+
+const locationState = location.state as MedicineResponse | ApproveOrderState | undefined;
+const editData = locationState && !("approveMode" in locationState) 
+  ? locationState 
+  : undefined;
+const approveData = locationState && "approveMode" in locationState 
+  ? locationState 
+  : undefined;
+
+
 const methods = useForm<InventoryFormData>({
   mode: "onChange",
   defaultValues: {
@@ -75,7 +91,7 @@ const methods = useForm<InventoryFormData>({
     purchaseDate: new Date().toISOString().split("T")[0],
   },
 });
-//edit
+
 
   const isEdit = !!editData?.medicineId;
   const navigate = useNavigate();
@@ -107,14 +123,12 @@ useEffect(() => {
   const fetchDistributors = async () => {
     try {
       const data = await getDistributors();
-
       setDistributorData(data);
-
+      console.log("=== DISTRIBUTOR DATA ===", JSON.stringify(data));
       const options = data.map((d) => ({
-        label: d.ownerName, //  owner name in dropdown
-        value: d.distributorId.toString() , 
+        label: d.ownerName,
+        value: d.distributorId.toString(),
       }));
-
       setSupplierOptions(options);
     } catch (error) {
       console.error("Error fetching distributors:", error);
@@ -145,13 +159,38 @@ const onSubmit = async (data: InventoryFormData) => {
   }
 };
 
+// Approve mode 
+const { reset } = methods;
+
+useEffect(() => {
+  if (approveData) {
+    reset({
+      medicineName: approveData.medicineName || "",
+      strength: approveData.strength || "",
+      numberOfStrips: approveData.qty,
+      tabletsPerStrip: 1,
+      looseTablets: 0,
+      purchasePricePerStrip: 0,
+      mrpPerStrip: 0,
+      gstPercent: 5,
+      purchaseDate: new Date().toISOString().split("T")[0],
+      expiryDate: "",
+      type: "",
+      groupId: "",
+      distributorId: String(approveData.distributorId),
+    });
+  }
+}, [approveData, reset]);
+
+
+
 //fetch medicine for edit
 useEffect(() => {
   const fetchMedicine = async () => {
     if (editData?.medicineId) {
       const fullData = await getMedicineById(editData.medicineId);
 
-      methods.reset({
+      reset({
         medicineId: fullData.medicineId,
         medicineName: fullData.medicineName || "",
         batchNumber: fullData.batchNumber || "",
@@ -190,14 +229,13 @@ useEffect(() => {
   };
 
   fetchMedicine();
-}, [editData?.medicineId]);
+}, [editData?.medicineId,reset]);
 
   // calc total stock tablets
 const numberOfStrips = Number(methods.watch("numberOfStrips")) || 0;
 const tabletsPerStrip = Number(methods.watch("tabletsPerStrip")) || 0;
 const looseTablets = Number(methods.watch("looseTablets")) || 0;
-const totalStock =
-  numberOfStrips * tabletsPerStrip + looseTablets;
+const totalStock = numberOfStrips * tabletsPerStrip + looseTablets;
   //calc of price
 const purchasePricePerStrip = Number(methods.watch("purchasePricePerStrip")) || 0;
 
@@ -228,7 +266,7 @@ const finalPrice = totalPrice + gstAmount;
   <Box width="100%" px={{ xs: 1, md: 2 }} mt={4} mb={8}>
     <Paper sx={{ p: { xs: 1, md: 2 }, borderRadius: 2 }}>
       <Typography fontSize={20} fontWeight={600} mb={4}>
-        {isEdit ? "Edit Medicine" : "Add New Medicine"}
+       {isEdit ? "Edit Medicine" : approveData ? "Approve & Add Medicine" : "Add New Medicine"}
       </Typography>
 
       <Box
@@ -245,14 +283,15 @@ const finalPrice = totalPrice + gstAmount;
         gap={1.5}
         sx={{ px: { xs: 0, md: 4 } }}
       >
-        <InventoryFormFields
-          groupOptions={groupOptions}
-          supplierOptions={supplierOptions}
-          totalStock={totalStock}
-          purchasePricePerTablet={purchasePricePerTablet}
-          mrpPerTablet={mrpPerTablet}
-          finalPrice={finalPrice}
-        />
+       <InventoryFormFields
+  groupOptions={groupOptions}
+  supplierOptions={supplierOptions}
+  totalStock={totalStock}
+  purchasePricePerTablet={purchasePricePerTablet}
+  mrpPerTablet={mrpPerTablet}
+  finalPrice={finalPrice}
+  orderedQty={approveData?.qty}
+/>
 
         {/* Buttons SAME */}
         <Box

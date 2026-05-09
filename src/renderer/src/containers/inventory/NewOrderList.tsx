@@ -20,6 +20,7 @@ type NewMedicine = {
 type NewOrderHistory = {
   id: number;
   distributorName: string;
+  distributorId: number;
   newMedicines: NewMedicine[];
 };
 
@@ -130,16 +131,23 @@ function NewOrderList() {
                             <Visibility fontSize="small" />
                           </IconButton>
                           <IconButton
-                            size="small"
-                            onClick={() =>
-                              setNewOrderData((prev) =>
-                                prev.filter((o) => o.id !== order.id)
-                              )
-                            }
-                            sx={{ color: "#2e7d32" }}
-                          >
-                            <Check fontSize="small" />
-                          </IconButton>
+  size="small"
+  onClick={() =>
+    navigate(URL_PATH.AddInventoryItem, {
+  state: {
+    approveMode: true,
+    medicineName: med.medicineName,
+    strength: med.strength || "",
+    qty: med.qty,
+    orderId: order.id,
+    distributorId: order.distributorId,
+  },
+})
+  }
+  sx={{ color: "#2e7d32" }}
+>
+  <Check fontSize="small" />
+</IconButton>
                         </Box>
                       </TableCell>
                     )}
