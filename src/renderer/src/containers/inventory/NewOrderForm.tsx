@@ -303,43 +303,7 @@ function NewOrderForm() {
             </Button>
           </Box>
 
-          {/* Header */}
-          <Box
-            display={{
-              xs: "none",
-              md: "flex",
-            }}
-            gap={2}
-            mb={1}
-            px={0.5}
-          >
-            <Typography
-              sx={{ flex: 2 }}
-              fontWeight={600}
-            >
-              Medicine Name
-            </Typography>
-
-            <Typography
-              sx={{ flex: 2 }}
-              fontWeight={600}
-            >
-              Strength / Type
-            </Typography>
-
-            <Typography
-              sx={{ flex: 1 }}
-              fontWeight={600}
-            >
-              Qty.
-            </Typography>
-
-            <Box
-              sx={{
-                width: 50,
-              }}
-            />
-          </Box>
+        
 
           {/* Rows */}
           {rows.map((row) => (
@@ -380,7 +344,11 @@ function NewOrderForm() {
 
                 <TextInputField
                   name={`medicine_${row.rowId}`}
-                  label=""
+                  label="Medicine Name"
+                  required
+                  minLength={3}
+                  maxLength={9999}
+                  
                 />
               </Box>
 
@@ -406,8 +374,10 @@ function NewOrderForm() {
                 </Box>
 
                 <TextInputField
+              
                   name={`strength_${row.rowId}`}
-                  label=""
+                  label=" Strength / Type"
+                  required
                 />
               </Box>
 
@@ -434,9 +404,10 @@ function NewOrderForm() {
 
                 <NumericField
                   name={`qty_${row.rowId}`}
-                  label=""
+                  label="Quantity"
                   min={1}
                   max={9999}
+                  required
                 />
               </Box>
 
@@ -468,15 +439,14 @@ function NewOrderForm() {
             </Box>
           ))}
 
-          {/* Submit */}
-         {/* Submit Buttons */}
+         
 <Box
   display="flex"
   justifyContent="flex-end"
   gap={2}
   mt={2}
 >
-  {/* Order History Button */}
+
   <Button
     variant="outlined"
     sx={{
@@ -491,7 +461,7 @@ function NewOrderForm() {
     Order History
   </Button>
 
-  {/* Order Button */}
+ 
   <Button
     sx={orderButtonSx}
     onClick={handleOrder}
