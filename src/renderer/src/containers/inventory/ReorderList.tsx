@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Box, Button, Paper, Typography,
-  Table, TableBody, TableCell, TableHead, TableRow, IconButton,
+  Table, TableBody, TableCell, TableHead, TableRow, IconButton,Dialog, DialogActions, DialogContent, DialogTitle
 } from "@mui/material";
 import { Visibility, Check } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +31,7 @@ function ReorderList() {
   const navigate = useNavigate();
 
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
-
+  const [viewOrder, setViewOrder] = useState<ReorderHistory | null>(null);
 const fetchReorderHistory = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -142,17 +142,13 @@ const fetchReorderHistory = async () => {
                           >
                             <Visibility fontSize="small" />
                           </IconButton>
-                          <IconButton
-                            size="small"
-                            color="success"
-                            onClick={() =>
-                              setReorderHistory((prev) =>
-                                prev.filter((o) => o.id !== order.id)
-                              )
-                            }
-                          >
-                            <Check fontSize="small" />
-                          </IconButton>
+<IconButton
+  size="small"
+  color="success"
+  onClick={() => setViewOrder(order)} 
+>
+  <Check fontSize="small" />
+</IconButton>
                         </Box>
                       </TableCell>
                     )}
@@ -175,6 +171,60 @@ const fetchReorderHistory = async () => {
 
       <NewOrderList />
       <LastPurchaseList />
+      {/* View Dialog */}
+<Dialog
+  open={!!viewOrder}
+  onClose={() => setViewOrder(null)}
+  maxWidth="sm"
+  fullWidth
+>
+  <DialogTitle>Reorder Details</DialogTitle>
+  <DialogContent>
+    {viewOrder && (
+      <Box px={2} py={1} display="flex" flexDirection="column" gap={2}>
+        
+        <Box display="flex" gap={4}>
+          <Box>
+            <Typography fontWeight={600}>Supplier</Typography>
+            <Typography>{viewOrder.distributorName}</Typography>
+          </Box>
+        </Box>
+
+        <Typography fontWeight={600} mt={1}>Medicines:</Typography>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 700 }}>Sr No</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Medicine Name</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Strength/Type</TableCell>
+              <TableCell sx={{ fontWeight: 700 }}>Qty</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {viewOrder.existingMedicines.map((med, i) => (
+              <TableRow key={i}>
+                <TableCell>{i + 1}</TableCell>
+                <TableCell>{med.medicineName}</TableCell>
+                <TableCell>{med.strength || "-"}</TableCell>
+                <TableCell>{med.qty}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+      </Box>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button
+      onClick={() => setViewOrder(null)}
+      variant="contained"
+      sx={{ backgroundColor: "#238878", textTransform: "none" }}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
     </Box>
   );
 }
