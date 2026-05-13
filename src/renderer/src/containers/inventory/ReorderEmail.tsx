@@ -69,7 +69,7 @@ const handleSend = async () => {
             CompanyName: distributor,
             Qty: Number(m.qty || m.quantity),
           }))
-        : [], // if there is reorder then it will be in ExistingMedicines
+        : [], 
 
       NewMedicines: !isReorder
         ? medicines.map((m) => ({
