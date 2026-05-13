@@ -1,43 +1,49 @@
 import { useEffect, useState } from "react";
 import {
-  Box, Paper, Typography, Table, TableBody, TableCell,
-  TableHead, TableRow, IconButton,
-} from "@mui/material";
-import { Visibility, Check } from "@mui/icons-material";
+  UniversalTable,
+  ACTION_KEY,
+  type Column,
+} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
-import ApproveOrderDialog from "./ApproveOrderDialog"; // adjust path
-
+import ApproveOrderDialog from "./ApproveOrderDialog";
+import {
+  Box,
+  Paper,
+  Typography,
+} from "@mui/material";
+ 
 type NewMedicine = {
   id: number;
   medicineName: string;
   strength: string;
   qty: number;
 };
-
+ 
 type NewOrderHistory = {
   id: number;
   distributorName: string;
   distributorId: number;
   newMedicines: NewMedicine[];
+  [ACTION_KEY]: string;
 };
-
+ 
 function NewOrderList() {
   const navigate = useNavigate();
   const [newOrderData, setNewOrderData] = useState<NewOrderHistory[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<NewOrderHistory | null>(null);
-
+ 
   const fetchNewOrders = async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(API_ENDPOINTS.REORDER, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+ 
       console.log("=== REORDER API RESPONSE ===", JSON.stringify(res.data));
-
+ 
       const allData: NewOrderHistory[] = res.data || [];
       setNewOrderData(
         allData.filter((item) => item.newMedicines && item.newMedicines.length > 0)
@@ -46,107 +52,117 @@ function NewOrderList() {
       console.error("New order fetch failed:", error);
     }
   };
-
+ 
+ 
+  const columns: Column<NewOrderHistory>[] = [
+  {
+    key: "id",
+    label: "Sr No",
+    render: (row) => row.id,
+  },
+ 
+  {
+    key: "distributorName",
+    label: "Supplier",
+  },
+ 
+  {
+    key: "medicineName",
+    label: "Medicine Name",
+  },
+ 
+  {
+    key: "strength",
+    label: "Strength/Type",
+  },
+ 
+  {
+    key: "qty",
+    label: "Qty",
+  },
+ 
+  {
+    key: ACTION_KEY,
+    label: "Action",
+  },
+];
+ 
   useEffect(() => {
     fetchNewOrders();
   }, []);
-
+ 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2 }}>
-      <Paper sx={{ borderRadius: 2, p: 2 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5}>
+    <Box
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    gap: 3,
+    p: { xs: 1, sm: 2 },
+  }}
+>
+    <Paper
+  sx={{
+    borderRadius: 2,
+    p: { xs: 1, sm: 2 },
+    overflowX: "auto",
+  }}
+>
+       <Box
+  display="flex"
+  justifyContent="space-between"
+  alignItems={{ xs: "flex-start", sm: "center" }}
+  flexDirection={{ xs: "column", sm: "row" }}
+  gap={1}
+  mb={1.5}
+>
           <Typography fontWeight={700}>New Order List</Typography>
         </Box>
-
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              {["Sr No", "Supplier", "Medicine Name", "Strength/Type", "Qty", "Action"].map((head) => (
-                <TableCell
-                  key={head}
-                  sx={{ fontWeight: 700, bgcolor: "#444748ff", color: "#ffffff", whiteSpace: "nowrap" }}
-                >
-                  {head}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {newOrderData.length > 0 ? (
-              newOrderData.map((order, index) =>
-                order.newMedicines.map((med, i) => (
-                  <TableRow key={`${order.id}-${i}`} hover sx={{ "&:hover": { bgcolor: "#e6f4ea" } }}>
-                    {i === 0 && (
-                      <TableCell rowSpan={order.newMedicines.length}>
-                        <Typography fontSize={13}>{index + 1}</Typography>
-                      </TableCell>
-                    )}
-                    {i === 0 && (
-                      <TableCell rowSpan={order.newMedicines.length}>
-                        <Typography fontSize={13}>{order.distributorName}</Typography>
-                      </TableCell>
-                    )}
-                    <TableCell>
-                      <Typography fontSize={13}>{med.medicineName}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontSize={13}>{med.strength || "-"}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography fontSize={13}>{med.qty}</Typography>
-                    </TableCell>
-                    {i === 0 && (
-                      <TableCell rowSpan={order.newMedicines.length}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <IconButton
-                            size="small"
-                            onClick={() =>
-                              navigate(URL_PATH.ReorderEmail, {
-                                state: {
-                                  distributor: order.distributorName,
-                                  email: "",
-                                  medicines: order.newMedicines.map((m, idx) => ({
-                                    medicineRowId: idx + 1,
-                                    medicineName: m.medicineName,
-                                    strengthType: m.strength,
-                                    quantity: m.qty,
-                                  })),
-                                  isViewMode: true,
-                                },
-                              })
-                            }
-                            sx={{ color: "#1976d2" }}
-                          >
-                            <Visibility fontSize="small" />
-                          </IconButton>
-
-                          <IconButton
-                            size="small"
-                            onClick={() => setSelectedOrder(order)}
-                            sx={{ color: "#2e7d32" }}
-                          >
-                            <Check fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))
-              )
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  <Typography fontSize={13} color="text.secondary">
-                    No new orders found.
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+ 
+    <UniversalTable<NewOrderHistory, NewMedicine>
+  data={newOrderData}
+  columns={columns}
+  rowsPerPage={5}
+  tableSize="small"
+  textAlign="center"
+  getRowId={(row) => row.id}
+  subRows={{
+    key: "newMedicines",
+    columns: [
+      {
+        key: "medicineName",
+        label: "Medicine Name",
+      },
+      {
+        key: "strength",
+        label: "Strength/Type",
+      },
+      {
+        key: "qty",
+        label: "Qty",
+      },
+    ],
+  }}
+  actions={{
+  view: (order) =>
+    navigate(URL_PATH.ReorderEmail, {
+      state: {
+        distributor: order.distributorName,
+        email: "",
+        medicines: order.newMedicines.map((m, idx) => ({
+          medicineRowId: idx + 1,
+          medicineName: m.medicineName,
+          strengthType: m.strength,
+          quantity: m.qty,
+        })),
+        isViewMode: true,
+      },
+    }),
+ 
+  CheckIcon: (order) => setSelectedOrder(order),
+}}
+/>
       </Paper>
-
+ 
       <ApproveOrderDialog
         open={!!selectedOrder}
         order={selectedOrder}
@@ -155,5 +171,6 @@ function NewOrderList() {
     </Box>
   );
 }
-
-export default NewOrderList;
+ 
+export default NewOrderList;    
+ 

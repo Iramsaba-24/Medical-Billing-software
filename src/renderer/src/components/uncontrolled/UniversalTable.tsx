@@ -50,8 +50,11 @@ interface TableStyles {
   paperSx?: SxProps;
 }
  
-interface UniversalTableProps<T extends Record<string, unknown>>
-  extends TableStyles {
+interface UniversalTableProps<
+  T extends Record<string, unknown>,
+  S extends Record<string, unknown> = Record<string, never>
+> extends TableStyles {
+ 
   data: readonly T[];
   columns: readonly Column<T>[];
   caption?: ReactNode;
@@ -79,7 +82,17 @@ interface UniversalTableProps<T extends Record<string, unknown>>
   onDataChange?: (rows: T[]) => void;
  
   actions?: Partial<Record<keyof typeof iconMap, (row: T) => void>>;
-  footerRows?: readonly FooterRow[];
+footerRows?: readonly FooterRow[];
+ 
+subRows?: {
+  key: keyof T;
+  columns: Array<{
+    key: keyof S;
+    label: string;
+    render?: (subRow: S) => ReactNode;
+  }>;
+};
+ 
 }
  
 function buildExportData<T extends Record<string, unknown>>(
@@ -96,7 +109,10 @@ function buildExportData<T extends Record<string, unknown>>(
   );
 }
  
-export function UniversalTable<T extends Record<string, unknown>>({
+export function UniversalTable<
+  T extends Record<string, unknown>,
+  S extends Record<string, unknown> = Record<string, never>
+>({
   data,
   columns,
   caption,
@@ -112,14 +128,15 @@ export function UniversalTable<T extends Record<string, unknown>>({
   dropdown,
   autoUpdateDropdown,
   onDataChange,
-  actions,
-  footerRows = [],
-  captionSx,
+ actions,
+footerRows = [],
+subRows,
+captionSx,
   headerSx,
   rowHoverSx,
   paperSx,
   highlightColor = "#ffff00",
-}: UniversalTableProps<T>) {
+}: UniversalTableProps<T, S>) {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string | number>>(
@@ -146,11 +163,11 @@ export function UniversalTable<T extends Record<string, unknown>>({
           );
  
   const DEFAULT_DROPDOWN_SX: SxProps = {
-    width: { xs:110, md:150 }, //width
+    width: { xs:110, md:150 },
     bgcolor: "#1f2937",
     color: "#ffffff",
     fontWeight: 600,
-    fontSize: {xs:11, md:13}, //font
+    fontSize: {xs:11, md:13},
     borderRadius: 2,
     "& .MuiSelect-icon": { color: "#a9a2a2ff" },
   };
@@ -227,14 +244,14 @@ export function UniversalTable<T extends Record<string, unknown>>({
       {(showSearch || showExport) && (
         <Box
           sx={{
-            px: { xs:1, md:2 }, //padding
+            px: { xs:1, md:2 },
             py: 2,
             display: "flex",
             justifyContent: {
               xs: "center",
               md: showSearch ? "space-between" : "flex-end",
             },
-            flexDirection: { xs:"column", md:"row" }, //layout
+            flexDirection: { xs:"column", md:"row" },
             flexWrap: "wrap",
             gap: 2,
           }}
@@ -248,8 +265,8 @@ export function UniversalTable<T extends Record<string, unknown>>({
                 setSearch(e.target.value);
                 setPage(0);
               }}
-              sx={{ 
-                minWidth: { xs:"100%", md:220} //width
+              sx={{
+                minWidth: { xs:"100%", md:220}
                }}
             />
           )}
@@ -271,7 +288,7 @@ export function UniversalTable<T extends Record<string, unknown>>({
             bgcolor: "#0ca678",
             color: "#fff",
             fontWeight: 700,
-            fontSize: { xs:14, md:18 }, //text
+            fontSize: { xs:14, md:18 },
             borderRadius: showSearch || showExport ? "" : "6px 6px 0 0",
             textAlign: "center",
             py: 1,
@@ -312,7 +329,7 @@ export function UniversalTable<T extends Record<string, unknown>>({
                     bgcolor: "#444748ff",
                     color: "#ffffff",
                     ...headerSx,
-                    whiteSpace: "nowrap", 
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {col.label}
@@ -329,15 +346,106 @@ export function UniversalTable<T extends Record<string, unknown>>({
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedData.map((row, index) => {
-                const rowId = resolveRowId(row, index);
+            paginatedData.flatMap((row, index) => {
+               const rowId = resolveRowId(row, index);
  
+const childRows: S[] =
+  subRows && Array.isArray(row[subRows.key])
+    ? (row[subRows.key] as S[])
+    : [];
+ 
+ 
+ 
+    if (childRows.length > 0) {
+  return childRows.map((subRow, childIndex) => (
+    <TableRow
+      key={`${rowId}-${childIndex}`}
+      hover
+      sx={{
+        "&:hover": { bgcolor: "#e6f4ea" },
+        ...rowHoverSx,
+      }}
+    >
+      {columns.map((col) => {
+ 
+       
+        if (col.key === ACTION_KEY && actions) {
+          return childIndex === 0 ? (
+            <TableCell
+  key={ACTION_KEY}
+  rowSpan={childRows.length}
+  align="center"
+  sx={{
+    verticalAlign: "middle",
+  }}
+>
+              <Box
+  display="flex"
+  justifyContent="center"
+  alignItems="center"
+  gap={1}
+  flexWrap="wrap"
+>
+                {Object.entries(iconMap).map(([k, cfg]) =>
+                  actions[k as keyof typeof iconMap] ? (
+                    <Tooltip key={k} title={cfg.label}>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          actions[k as keyof typeof iconMap]?.(row)
+                        }
+                        sx={{ color: cfg.color }}
+                      >
+                        {cfg.icon}
+                      </IconButton>
+                    </Tooltip>
+                  ) : null
+                )}
+              </Box>
+            </TableCell>
+          ) : null;
+        }
+ 
+        // SUB ROW COLUMN
+       const subCol = subRows?.columns.find(
+  (s) => String(s.key) === String(col.key)
+);
+ 
+        if (subCol) {
+          return (
+            <TableCell
+              key={String(col.key)}
+              align={textAlign}
+            >
+              {subCol.render
+                ? subCol.render(subRow)
+                : String(subRow[subCol.key] ?? "")}
+            </TableCell>
+          );
+        }
+ 
+        // PARENT COLUMN
+        return childIndex === 0 ? (
+          <TableCell
+            key={String(col.key)}
+            rowSpan={childRows.length}
+            align={textAlign}
+          >
+            {col.render
+              ? col.render(row)
+              : highlightText(String(row[col.key] ?? ""))}
+          </TableCell>
+        ) : null;
+      })}
+    </TableRow>
+  ));
+}
                 return (
                   <TableRow
                     key={rowId}
                     hover
-                    sx={{ "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx, 
-                  
+                    sx={{ "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx,
+                 
                   }}
                   >
                     {enableCheckbox && (
@@ -350,6 +458,8 @@ export function UniversalTable<T extends Record<string, unknown>>({
                     )}
  
                     {columns.map((col) => {
+ 
+                 
                       /* Dropdown */
                       if (
                         dropdown &&
@@ -395,23 +505,25 @@ export function UniversalTable<T extends Record<string, unknown>>({
                         return (
                           <TableCell key={ACTION_KEY}>
                             <Box display="flex" gap={1}>
-                              {Object.entries(iconMap).map(([k, cfg]) =>
-                                actions[k as keyof typeof iconMap] ? (
-                                  <Tooltip key={k} title={cfg.label}>
-                                    <IconButton
-                                      size="small"
-                                      onClick={() =>
-                                        actions[k as keyof typeof iconMap]?.(
-                                          row
-                                        )
-                                      }
-                                      sx={{ color: cfg.color }}
-                                    >
-                                      {cfg.icon}
-                                    </IconButton>
-                                  </Tooltip>
-                                ) : null
-                              )}
+                           {Object.keys(actions).map((k) => {
+  const cfg = iconMap[k as keyof typeof iconMap];
+ 
+  if (!cfg) return null;
+ 
+  return (
+    <Tooltip key={k} title={cfg.label}>
+      <IconButton
+        size="small"
+        onClick={() =>
+          actions[k as keyof typeof iconMap]?.(row)
+        }
+        sx={{ color: cfg.color }}
+      >
+        {cfg.icon}
+      </IconButton>
+    </Tooltip>
+  );
+})}
                             </Box>
                           </TableCell>
                         );
@@ -494,4 +606,5 @@ export function UniversalTable<T extends Record<string, unknown>>({
     </Paper>
   );
 }
+ 
  
