@@ -55,8 +55,9 @@ function ReorderForm() {
     return s?.medicines ?? [];
   }, [location.state]);
 
-  const [distributorOptions, setDistributorOptions] = useState<{ label: string; value: string }[]>([]);
-
+  const [distributorOptions, setDistributorOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
 
   const [distributors, setDistributors] = useState<DistributorResponse[]>([]);
   const [medicineRows, setMedicineRows] = useState<MedicineRow[]>([]);
@@ -73,7 +74,10 @@ function ReorderForm() {
       const data = await getDistributors();
       setDistributors(data);
       setDistributorOptions(
-        data.map((item) => ({ label: item.companyName, value: item.companyName }))
+        data.map((item) => ({
+          label: item.companyName,
+          value: item.companyName,
+        })),
       );
     } catch (error) {
       console.error("Distributor fetch failed:", error);
@@ -83,7 +87,7 @@ function ReorderForm() {
   useEffect(() => {
     if (!selectedDistributor) return;
     const selected = distributors.find(
-      (item) => item.companyName === selectedDistributor
+      (item) => item.companyName === selectedDistributor,
     );
     if (selected) methods.setValue("email", selected.email);
   }, [selectedDistributor, distributors, methods]);
@@ -109,39 +113,55 @@ function ReorderForm() {
           methods.setValue(`qty_${row.medicineRowId}`, Number(row.qty));
         });
       }, 0);
-    
     }
-  
   }, [incomingMedicines]);
 
-
   const handleReorder = methods.handleSubmit((data) => {
+    const updatedMedicines = medicineRows.map((row) => ({
+      ...row,
 
-  const updatedMedicines = medicineRows.map((row) => ({
-    ...row,
+      qty: data[`qty_${row.medicineRowId}`] as string,
+    }));
 
-    qty: data[`qty_${row.medicineRowId}`] as string,
-  }));
-
-  navigate(URL_PATH.ReorderEmail, {
-    state: {
-      distributor: data.distributor,
-      email: data.email,
-      medicines: updatedMedicines,
-      orderType: "reorder",
-    },
+    navigate(URL_PATH.ReorderEmail, {
+      state: {
+        distributor: data.distributor,
+        email: data.email,
+        medicines: updatedMedicines,
+        orderType: "reorder",
+      },
+    });
   });
-});
 
   return (
     <FormProvider {...methods}>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: { xs: 1, md: 2 } }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 3,
+          p: { xs: 1, md: 2 },
+        }}
+      >
         <Paper
           elevation={2}
-          sx={{ borderRadius: 2, border: "1.5px solid #238878", p: { xs: 2, md: 3 } }}
+          sx={{
+            borderRadius: 2,
+            border: "1.5px solid #238878",
+            p: { xs: 2, md: 3 },
+          }}
         >
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography fontWeight={700} fontSize={{ xs: 14, md: 20 }} color="#238878">
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
+            <Typography
+              fontWeight={700}
+              fontSize={{ xs: 14, md: 20 }}
+              color="#238878"
+            >
               Reorder
             </Typography>
           </Box>
@@ -152,7 +172,12 @@ function ReorderForm() {
                 Distributor
               </Typography>
               <Box sx={{ width: 260, mt: 3 }}>
-                <DropdownField name="distributor" label="" options={distributorOptions} required />
+                <DropdownField
+                  name="distributor"
+                  label=""
+                  options={distributorOptions}
+                  required
+                />
               </Box>
             </Box>
 
@@ -166,10 +191,21 @@ function ReorderForm() {
             </Box>
           </Box>
 
-          <Box display="flex" gap={2} mb={1} sx={{ display: { xs: "none", md: "flex" } }}>
-            <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>Medicine Name</Typography>
-            <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>Strength / Type</Typography>
-            <Typography fontWeight={600} fontSize={15} sx={{ flex: 1 }}>Qty.</Typography>
+          <Box
+            display="flex"
+            gap={2}
+            mb={1}
+            sx={{ display: { xs: "none", md: "flex" } }}
+          >
+            <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
+              Medicine Name
+            </Typography>
+            <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
+              Strength / Type
+            </Typography>
+            <Typography fontWeight={600} fontSize={15} sx={{ flex: 1 }}>
+              Qty.
+            </Typography>
             <Box sx={{ minWidth: 88 }} />
           </Box>
 
@@ -196,19 +232,38 @@ function ReorderForm() {
                 <DropdownField
                   name={`strength_${row.medicineRowId}`}
                   label=""
-                  options={[{ label: row.strengthType, value: row.strengthType }]}
+                  options={[
+                    { label: row.strengthType, value: row.strengthType },
+                  ]}
                   placeholder="Select Strength"
                   sx={{ "& .MuiFormHelperText-root": { mb: 0 } }}
                 />
               </Box>
 
               <Box sx={{ flex: 1, minWidth: { xs: "100%", md: "unset" } }}>
-                <NumericField name={`qty_${row.medicineRowId}`} label="" min={1} max={9999} />
+                <NumericField
+                  name={`qty_${row.medicineRowId}`}
+                  label=""
+                  min={1}
+                  max={9999}
+                />
               </Box>
             </Box>
           ))}
 
-          <Box display="flex" justifyContent="flex-end" mt={2}>
+          <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
+            <Button
+              variant="outlined"
+              sx={{
+                ...reorderButtonSx,
+                backgroundColor: "#fff",
+                color: "#238878",
+              }}
+              onClick={() => navigate(URL_PATH.Reorder)}
+            >
+              Order History
+            </Button>
+
             <Button sx={reorderButtonSx} onClick={handleReorder}>
               Reorder
             </Button>
