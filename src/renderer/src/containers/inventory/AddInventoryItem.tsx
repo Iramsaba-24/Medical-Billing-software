@@ -149,19 +149,13 @@ const onSubmit = async (data: InventoryFormData) => {
       companyName: data.companyName || "NA",
     };
 
-    // if (isEdit && editData?.medicineId) {
-    //   await updateMedicine(editData.medicineId, finalData);
-    // } else {
-    //   await addMedicine(finalData);
-    // }
-
-    // navigate(URL_PATH.Inventory);
+   
     if (isEdit && editData?.medicineId) {
   await updateMedicine(editData.medicineId, finalData);
 } else {
   await addMedicine(finalData);
 
-  // approve order ONLY after inventory add success
+  // approve order after inventory add success
   if (approveData?.orderId) {
     const token = localStorage.getItem("token");
 
@@ -323,7 +317,7 @@ const finalPrice = totalPrice + gstAmount;
   orderedQty={approveData?.qty}
 />
 
-        {/* Buttons SAME */}
+     
         <Box
           gridColumn="1 / -1"
           display="flex"

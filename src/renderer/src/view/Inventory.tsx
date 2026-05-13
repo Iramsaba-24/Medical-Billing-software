@@ -11,76 +11,86 @@ import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import { useState, useEffect } from "react";
 import type { MedicineResponse } from "@/service/medicineService";
 
-
- 
 export default function InventoryPage() {
   const navigate = useNavigate();
- 
 
-const [stats, setStats] = useState({ totalItems: 0, lowStockItems: 0, totalValue: 0 });
-const [medicineList, setMedicineList] = useState<MedicineResponse[]>([]); 
+  const [stats, setStats] = useState({
+    totalItems: 0,
+    lowStockItems: 0,
+    totalValue: 0,
+  });
+  const [medicineList, setMedicineList] = useState<MedicineResponse[]>([]);
 
-useEffect(() => {
-  const fetchStats = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(API_ENDPOINTS.MEDICINE, {
-        headers: { Authorization: token ? `Bearer ${token}` : "" },
-      });
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(API_ENDPOINTS.MEDICINE, {
+          headers: { Authorization: token ? `Bearer ${token}` : "" },
+        });
 
-      const medicines: MedicineResponse[] = res.data.data;
+        const medicines: MedicineResponse[] = res.data.data;
 
+        console.log(
+          "medicine values:",
+          JSON.stringify(
+            medicines.map((m) => ({
+              name: m.medicineName,
+              mrpPerTablet: m.mrpPerTablet,
+              totalStockTablets: m.totalStockTablets,
+              stockValue: m.stockValue,
+            })),
+          ),
+        );
 
-     console.log("medicine values:", JSON.stringify(medicines.map(m => ({
-  name: m.medicineName,
-  mrpPerTablet: m.mrpPerTablet,
-  totalStockTablets: m.totalStockTablets,
-  stockValue: m.stockValue,
-}))));
+        console.log(
+          "isLowStock check:",
+          JSON.stringify(
+            medicines.map((m) => ({
+              name: m.medicineName,
+              isLowStock: m.isLowStock,
+            })),
+          ),
+        );
 
-console.log("isLowStock check:", JSON.stringify(medicines.map(m => ({
-  name: m.medicineName,
-  isLowStock: m.isLowStock,
-}))));
+        const totalItems = medicines.length;
 
+        const lowStockItems = medicines.filter(
+          (m) =>
+            m.totalStockTablets <
+            (m.minimumQuantity > 0 ? m.minimumQuantity : 10),
+        ).length;
 
+        const totalValue = medicines.reduce(
+          (sum, m) => sum + m.mrpPerTablet * m.totalStockTablets,
+          0,
+        );
 
-const totalItems = medicines.length;
-
-const lowStockItems = medicines.filter(m => 
-  m.totalStockTablets < (m.minimumQuantity > 0 ? m.minimumQuantity : 10)
-).length;
-
-const totalValue = medicines.reduce(
-  (sum, m) => sum + (m.mrpPerTablet * m.totalStockTablets), 0
-);
-
-
-setMedicineList(medicines);
-setStats({ totalItems, lowStockItems, totalValue });
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    }
-  };
-  fetchStats();
-}, []);
-return (
+        setMedicineList(medicines);
+        setStats({ totalItems, lowStockItems, totalValue });
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+    fetchStats();
+  }, []);
+  return (
     <Box>
       <Box>
-          <Typography
-            sx={{
-              fontSize: { xs: 20, sm: 24, md: 28 },  
-              fontWeight: 700,
-              color: '#111827',
-              mt: {xs:1 , md:0.5},
-              mb: 0.5,
-            }}
-          >
-            Inventory
-          </Typography>
-          <Divider sx={{ mb: 3 }} />
+        <Typography
+          sx={{
+            fontSize: { xs: 20, sm: 24, md: 28 },
+            fontWeight: 700,
+            color: "#111827",
+            mt: { xs: 1, md: 0.5 },
+            mb: 0.5,
+          }}
+        >
+          Inventory
+        </Typography>
+        <Divider sx={{ mb: 3 }} />
       </Box>
- 
+
       <Box
         display="grid"
         gridTemplateColumns={{ xs: "1fr", md: "repeat(3, 1fr)" }}
@@ -89,8 +99,16 @@ return (
       >
         {[
           { label: "Total Items", value: stats.totalItems, img: TotalItems },
-{ label: "Low Stock Items", value: stats.lowStockItems, img: LowStock },
-{ label: "Total Value ", value: `₹ ${stats.totalValue.toFixed(2)}`, img: TotalValue },
+          {
+            label: "Low Stock Items",
+            value: stats.lowStockItems,
+            img: LowStock,
+          },
+          {
+            label: "Total Value ",
+            value: `₹ ${stats.totalValue.toFixed(2)}`,
+            img: TotalValue,
+          },
         ].map((card) => (
           <Paper
             key={card.label}
@@ -112,11 +130,9 @@ return (
               <Typography fontWeight={600} fontSize={18}>
                 {card.value}
               </Typography>
-              <Typography color="text.secondary">
-                {card.label}
-              </Typography>
+              <Typography color="text.secondary">{card.label}</Typography>
             </Box>
- 
+
             <Box
               component="img"
               src={card.img}
@@ -133,159 +149,152 @@ return (
       >
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" mb={2}>
-            <Typography fontWeight={600}>
-              Medicine Groups
-            </Typography>
- 
-<Button
-  size="small"
-  variant="contained"
-  sx={{
-    px: { xs: 1.5, sm: 2, md: 2.5 },
-    py: { xs: 0.7, sm: 0.8, md: 1 },
+            <Typography fontWeight={600}>Medicine Groups</Typography>
 
-    minWidth: { xs: 80, sm: 100, md: 120 },
+            <Button
+              size="small"
+              variant="contained"
+              sx={{
+                px: { xs: 1.5, sm: 2, md: 2.5 },
+                py: { xs: 0.7, sm: 0.8, md: 1 },
 
-    fontSize: {
-      xs: "0.75rem",
-      sm: "0.85rem",
-      md: "0.95rem",
-    },
+                minWidth: { xs: 80, sm: 100, md: 120 },
 
-    whiteSpace: "nowrap",
+                fontSize: {
+                  xs: "0.75rem",
+                  sm: "0.85rem",
+                  md: "0.95rem",
+                },
 
-    backgroundColor: "#238878",
-    color: "#fff",
-    border: "2px solid #238878",
-    textTransform: "none",
+                whiteSpace: "nowrap",
 
-    "&:hover": {
-      backgroundColor: "#fff",
-      color: "#238878",
-      border: "2px solid #238878",
-    },
-  }}
-  onClick={() => navigate(URL_PATH.MedicineGroup)}
->
-  View Details
-</Button>
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+                textTransform: "none",
+
+                "&:hover": {
+                  backgroundColor: "#fff",
+                  color: "#238878",
+                  border: "2px solid #238878",
+                },
+              }}
+              onClick={() => navigate(URL_PATH.MedicineGroup)}
+            >
+              View Details
+            </Button>
           </Box>
- 
-             <GroupSummary />
- 
+
+          <GroupSummary />
         </Paper>
- 
+
         <Box display="flex" flexDirection="column" gap={2}>
- 
           <Button
             fullWidth
             sx={{
-            px: 2.5,
-            py: 1,
-            minWidth: 100,
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            fontSize: "0.95rem",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
+              px: 2.5,
+              py: 1,
+              minWidth: 100,
+              backgroundColor: "#238878",
+              color: "#fff",
               border: "2px solid #238878",
-            }
-          }}
+              fontSize: "0.95rem",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
             onClick={() => navigate(URL_PATH.AddMedicineGroup)}
           >
             + Add New Group
           </Button>
- 
+
           <Button
             fullWidth
             sx={{
-            px: 2.5,
-            py: 1,
-            minWidth: 100,
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            fontSize: "0.95rem",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
+              px: 2.5,
+              py: 1,
+              minWidth: 100,
+              backgroundColor: "#238878",
+              color: "#fff",
               border: "2px solid #238878",
-            }
-          }}
+              fontSize: "0.95rem",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "#fff",
+                color: "#238878",
+                border: "2px solid #238878",
+              },
+            }}
             onClick={() => navigate(URL_PATH.AddInventoryItem)}
           >
             + Add New Medicine
           </Button>
- 
-         
- <Box display="flex" gap={2}>
-  
-  <Button
-    fullWidth
-    sx={{
-      px: 2.5,
-      py: 1,
-      minWidth: 100,
-      backgroundColor: "#238878",
-      color: "#fff",
-      border: "2px solid #238878",
-      fontSize: "0.95rem",
-      textTransform: "none",
-      "&:hover": {
-        backgroundColor: "#fff",
-        color: "#238878",
-        border: "2px solid #238878",
-      }
-    }}
-    onClick={() => {
-      const lowStockMedicines = medicineList
-        .filter((m) => m.totalStockTablets <= m.minimumQuantity)
-        .map((m) => ({
-          id: m.medicineId,
-          supplier: m.distributorName || "-",
-          medicineName: m.medicineName,
-          strengthType: m.strength || "-",
-          quantity: m.totalStockTablets.toString(),
-        }));
 
-      navigate(URL_PATH.ReorderForm, {
-        state: { medicines: lowStockMedicines },
-      });
-    }}
-  >
-    Reorder
-  </Button>
+          <Box display="flex" gap={2}>
+            <Button
+              fullWidth
+              sx={{
+                px: 2.5,
+                py: 1,
+                minWidth: 100,
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+                fontSize: "0.95rem",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#fff",
+                  color: "#238878",
+                  border: "2px solid #238878",
+                },
+              }}
+              onClick={() => {
+                const lowStockMedicines = medicineList
+                  .filter((m) => m.totalStockTablets <= m.minimumQuantity)
+                  .map((m) => ({
+                    id: m.medicineId,
+                    supplier: m.distributorName || "-",
+                    medicineName: m.medicineName,
+                    strengthType: m.strength || "-",
+                    quantity: m.totalStockTablets.toString(),
+                  }));
 
-  <Button
-    fullWidth
-    sx={{
-      px: 2.5,
-      py: 1,
-      minWidth: 100,
-      backgroundColor: "#238878",
-      color: "#fff",
-      border: "2px solid #238878",
-      fontSize: "0.95rem",
-      textTransform: "none",
-      "&:hover": {
-        backgroundColor: "#fff",
-        color: "#238878",
-        border: "2px solid #238878",
-      }
-    }}
-    onClick={() => navigate(URL_PATH.NewOrder)}
-  >
-    New Order
-  </Button>
+                navigate(URL_PATH.ReorderForm, {
+                  state: { medicines: lowStockMedicines },
+                });
+              }}
+            >
+              Reorder
+            </Button>
 
-</Box>
+            <Button
+              fullWidth
+              sx={{
+                px: 2.5,
+                py: 1,
+                minWidth: 100,
+                backgroundColor: "#238878",
+                color: "#fff",
+                border: "2px solid #238878",
+                fontSize: "0.95rem",
+                textTransform: "none",
+                "&:hover": {
+                  backgroundColor: "#fff",
+                  color: "#238878",
+                  border: "2px solid #238878",
+                },
+              }}
+              onClick={() => navigate(URL_PATH.NewOrder)}
+            >
+              New Order
+            </Button>
+          </Box>
         </Box>
       </Box>
- 
+
       <InventoryList />
     </Box>
   );

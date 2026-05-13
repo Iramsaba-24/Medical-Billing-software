@@ -32,13 +32,14 @@ type DropdownOption = {
 };
  
 type InventoryOption = DropdownOption & {
- label: string;
+  label: string;
   value: string;
   id: number;
   price: number;
-    gstPercent: number;
-      strength: string;   
+  gstPercent: number;
+  strength: string;
   companyName: string;
+  stock: number;
 };
  
 type InvoiceFormData = {
@@ -178,14 +179,14 @@ useEffect(() => {
  
     setInventoryOptions(
   data.map((i: MedicineResponse) => ({
-  label: i.medicineName,
-value: i.medicineName,
-id: i.medicineId,
- price: i.mrpPerTablet, 
-  gstPercent: i.gstPercent,
-      strength: i.strength || "",   
-    companyName: i.companyName || "", 
-
+    label: i.medicineName,
+    value: i.medicineName,
+    id: i.medicineId,
+    price: i.mrpPerTablet,
+    gstPercent: i.gstPercent,
+    strength: i.strength || "",
+    companyName: i.companyName || "",
+    stock: i.totalStockTablets || 0
   }))
 );
   };
@@ -417,11 +418,30 @@ onChangeCallback={(val: string) => {
 }}
 />
  
-            <TextInputField
+          <TextInputField
   name={`items.${index}.qty`}
   label="Qty"
   type="number"
- sx={{ width: { xs: "100%", sm: 100 } }}
+  sx={{ width: { xs: "100%", sm: 100 } }}
+  rules={{
+    required: "Qty is required",
+    min: {
+      value: 1,
+      message: "Minimum qty is 1",
+    },
+    validate: (value: number) => {
+      const selectedItem = inventoryOptions.find(
+        (i) => i.value === methods.getValues(`items.${index}.item`)
+      );
+
+      if (!selectedItem) return true;
+
+      return (
+        value <= selectedItem.stock ||
+        `Only ${selectedItem.stock} stock available`
+      );
+    },
+  }}
 />
  
               <TextInputField
