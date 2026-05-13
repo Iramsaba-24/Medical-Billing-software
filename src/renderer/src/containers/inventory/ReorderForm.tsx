@@ -114,15 +114,24 @@ function ReorderForm() {
   
   }, [incomingMedicines]);
 
+
   const handleReorder = methods.handleSubmit((data) => {
-    navigate(URL_PATH.ReorderEmail, {
-      state: {
-        distributor: data.distributor,
-        email: data.email,
-        medicines: medicineRows,
-      },
-    });
+
+  const updatedMedicines = medicineRows.map((row) => ({
+    ...row,
+
+    qty: data[`qty_${row.medicineRowId}`] as string,
+  }));
+
+  navigate(URL_PATH.ReorderEmail, {
+    state: {
+      distributor: data.distributor,
+      email: data.email,
+      medicines: updatedMedicines,
+      orderType: "reorder",
+    },
   });
+});
 
   return (
     <FormProvider {...methods}>

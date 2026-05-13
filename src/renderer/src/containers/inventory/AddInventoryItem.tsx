@@ -7,6 +7,8 @@ import { addMedicine,  getMedicineById,  MedicineResponse,updateMedicine  } from
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
 import { getMedicineGroups } from "@/service/medicineGroupService";
 import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 export type InventoryFormData = {
   medicineId?: number;
   medicineName: string;
@@ -54,8 +56,24 @@ export default function AddInventoryItem() {
 
 const location = useLocation();
 
-// const editData = location.state as InventoryFormData | undefined;
-const editData = location.state as MedicineResponse | undefined;
+type ApproveOrderState = {
+  approveMode: true;
+  medicineName: string;
+  strength: string;
+  qty: number;
+  orderId: number;
+  distributorName: string;
+};
+
+const locationState = location.state as MedicineResponse | ApproveOrderState | undefined;
+const editData = locationState && !("approveMode" in locationState) 
+  ? locationState 
+  : undefined;
+const approveData = locationState && "approveMode" in locationState 
+  ? locationState 
+  : undefined;
+
+
 const methods = useForm<InventoryFormData>({
   mode: "onChange",
   defaultValues: {
@@ -75,7 +93,7 @@ const methods = useForm<InventoryFormData>({
     purchaseDate: new Date().toISOString().split("T")[0],
   },
 });
-//edit
+
 
   const isEdit = !!editData?.medicineId;
   const navigate = useNavigate();
@@ -107,14 +125,12 @@ useEffect(() => {
   const fetchDistributors = async () => {
     try {
       const data = await getDistributors();
-
       setDistributorData(data);
-
+      console.log("=== DISTRIBUTOR DATA ===", JSON.stringify(data));
       const options = data.map((d) => ({
-        label: d.ownerName, //  owner name in dropdown
-        value: d.distributorId.toString() , 
+      label: d.companyName,
+        value: d.distributorId.toString(),
       }));
-
       setSupplierOptions(options);
     } catch (error) {
       console.error("Error fetching distributors:", error);
@@ -133,17 +149,64 @@ const onSubmit = async (data: InventoryFormData) => {
       companyName: data.companyName || "NA",
     };
 
+   
     if (isEdit && editData?.medicineId) {
-      await updateMedicine(editData.medicineId, finalData);
-    } else {
-      await addMedicine(finalData);
-    }
+  await updateMedicine(editData.medicineId, finalData);
+} else {
+  await addMedicine(finalData);
 
-    navigate(URL_PATH.Inventory);
+  // approve order after inventory add success
+  if (approveData?.orderId) {
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+}
+
+navigate(URL_PATH.Inventory);
   } catch (error) {
     console.error(error);
   }
 };
+
+// Approve mode 
+const { reset } = methods;
+
+useEffect(() => {
+  if (approveData && supplierOptions.length > 0) {
+    
+  
+    const matchedDistributor = supplierOptions.find(
+      (opt) => opt.label.toLowerCase() === approveData.distributorName?.toLowerCase()
+    );
+
+    reset({
+      medicineName: approveData.medicineName || "",
+      strength: approveData.strength || "",
+      numberOfStrips: approveData.qty,
+      tabletsPerStrip: 1,
+      looseTablets: 0,
+      purchasePricePerStrip: 0,
+      mrpPerStrip: 0,
+      gstPercent: 5,
+      purchaseDate: new Date().toISOString().split("T")[0],
+      expiryDate: "",
+      type: "",
+      groupId: "",
+      distributorId: matchedDistributor?.value || "", 
+    });
+  }
+}, [approveData, supplierOptions, reset]);
+
+
 
 //fetch medicine for edit
 useEffect(() => {
@@ -151,7 +214,7 @@ useEffect(() => {
     if (editData?.medicineId) {
       const fullData = await getMedicineById(editData.medicineId);
 
-      methods.reset({
+      reset({
         medicineId: fullData.medicineId,
         medicineName: fullData.medicineName || "",
         batchNumber: fullData.batchNumber || "",
@@ -190,14 +253,13 @@ useEffect(() => {
   };
 
   fetchMedicine();
-}, [editData?.medicineId]);
+}, [editData?.medicineId,reset]);
 
   // calc total stock tablets
 const numberOfStrips = Number(methods.watch("numberOfStrips")) || 0;
 const tabletsPerStrip = Number(methods.watch("tabletsPerStrip")) || 0;
 const looseTablets = Number(methods.watch("looseTablets")) || 0;
-const totalStock =
-  numberOfStrips * tabletsPerStrip + looseTablets;
+const totalStock = numberOfStrips * tabletsPerStrip + looseTablets;
   //calc of price
 const purchasePricePerStrip = Number(methods.watch("purchasePricePerStrip")) || 0;
 
@@ -228,7 +290,7 @@ const finalPrice = totalPrice + gstAmount;
   <Box width="100%" px={{ xs: 1, md: 2 }} mt={4} mb={8}>
     <Paper sx={{ p: { xs: 1, md: 2 }, borderRadius: 2 }}>
       <Typography fontSize={20} fontWeight={600} mb={4}>
-        {isEdit ? "Edit Medicine" : "Add New Medicine"}
+       {isEdit ? "Edit Medicine" : approveData ? "Approve & Add Medicine" : "Add New Medicine"}
       </Typography>
 
       <Box
@@ -245,16 +307,17 @@ const finalPrice = totalPrice + gstAmount;
         gap={1.5}
         sx={{ px: { xs: 0, md: 4 } }}
       >
-        <InventoryFormFields
-          groupOptions={groupOptions}
-          supplierOptions={supplierOptions}
-          totalStock={totalStock}
-          purchasePricePerTablet={purchasePricePerTablet}
-          mrpPerTablet={mrpPerTablet}
-          finalPrice={finalPrice}
-        />
+       <InventoryFormFields
+  groupOptions={groupOptions}
+  supplierOptions={supplierOptions}
+  totalStock={totalStock}
+  purchasePricePerTablet={purchasePricePerTablet}
+  mrpPerTablet={mrpPerTablet}
+  finalPrice={finalPrice}
+  orderedQty={approveData?.qty}
+/>
 
-        {/* Buttons SAME */}
+     
         <Box
           gridColumn="1 / -1"
           display="flex"

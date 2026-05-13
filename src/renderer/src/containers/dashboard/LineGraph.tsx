@@ -9,12 +9,12 @@ const LineGraph: React.FC = () => {
  
 
   // helper function to check if date is today
-  const isToday = (dateStr: string): boolean => {
-    const today = new Date();
-    const d = new Date(dateStr);
+const isToday = (dateStr: string): boolean => {
+  const today = new Date().toISOString().split("T")[0];
+  const d = new Date(dateStr).toISOString().split("T")[0];
 
-    return d.toDateString() === today.toDateString();
-  };
+  return d === today;
+};
 
   useEffect(() => {
     const fetchTodaySales = async () => {

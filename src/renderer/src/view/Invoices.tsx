@@ -1,14 +1,14 @@
 import { Box, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import BillingTable from "@/containers/invoices/BillingTable";
+import BillingTable from "@/containers/Invoices/BillingTable";
 import { Invoice } from "@/types/invoice";
 import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";
 import invoiceImg from "@/assets/TotalInvoices.svg";
 export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
 import { getAllRetailInvoices } from "@/service/retailInvoiceService";
-
-
+ 
+ 
 const cardHover = {
   cursor: "pointer",
   border: "1px solid transparent",
@@ -19,16 +19,16 @@ const cardHover = {
     borderColor: "#1976d2",
   },
 };
-
-
+ 
+ 
 const Billing = () => {
  const [invoices, setInvoices] = useState<Invoice[]>([]);
-
+ 
 const fetchInvoices = async () => {
   try {
     const data = await getAllRetailInvoices();
     const mapped: Invoice[] = data
-  .sort((a: { retailInvoiceId: number }, b: { retailInvoiceId: number }) => 
+  .sort((a: { retailInvoiceId: number }, b: { retailInvoiceId: number }) =>
     a.retailInvoiceId - b.retailInvoiceId
   )
   .map((inv: {
@@ -56,10 +56,9 @@ const fetchInvoices = async () => {
     console.error("Error fetching invoices", error);
   }
 };
-
 useEffect(() => {
   fetchInvoices();
-
+ 
   const handleInvoiceUpdated = async () => {
     try {
       const data = await getAllRetailInvoices();
@@ -92,35 +91,35 @@ useEffect(() => {
       console.error("Error fetching invoices", error);
     }
   };
-
+ 
   window.addEventListener("invoiceUpdated", handleInvoiceUpdated);
-
+ 
   return () => {
     window.removeEventListener("invoiceUpdated", handleInvoiceUpdated);
   };
 }, []);
-
-
+ 
+ 
 // const [dashboard] = useState({
 //   totalRevenue: 0,
 //   pendingAmount: 0,
 //   totalInvoices: 0
 // });
-
-
+ 
+ 
 const dashboard = {
   totalRevenue: invoices
     .filter(inv => inv.paymentStatus === "Paid")
     .reduce((sum, inv) => sum + (inv.price ?? 0), 0),
-
+ 
   pendingAmount: invoices
     .filter(inv => inv.paymentStatus === "Pending" || inv.paymentStatus === "Overdue")
     .reduce((sum, inv) => sum + (inv.price ?? 0), 0),
-
+ 
   totalInvoices: invoices.length,
 };
-
-
+ 
+ 
   return (
     <Box>
       <Typography sx={{
@@ -130,7 +129,7 @@ const dashboard = {
         mt: { xs: 1, md: 0.5 },
         mb: 0.5
       }} >
-
+ 
         Invoices
       </Typography>
       <Divider sx={{ mb: 3 }} />
@@ -141,10 +140,10 @@ const dashboard = {
         mb={4}
         gap={2}
       >
-
+ 
         {/* Revenue Card */}
 <Box
-
+ 
           p={{ xs: 2, md: 5 }}
           bgcolor="#fff"
           borderRadius={2}
@@ -178,7 +177,7 @@ const dashboard = {
             }}
           />
         </Box>
-
+ 
         {/* Pending Card */}
         <Box
           p={{ xs: 2, md: 5 }}
@@ -214,7 +213,7 @@ const dashboard = {
             }}
           />
         </Box>
-
+ 
         {/* Total Invoices */}
         <Box
           p={{ xs: 2, md: 5 }}
@@ -237,7 +236,7 @@ const dashboard = {
               {dashboard.totalInvoices}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-
+ 
               Total Invoices
             </Typography>
           </Box>
@@ -253,17 +252,19 @@ const dashboard = {
           />
         </Box>
       </Box>
-
+ 
       <BillingTable
         invoices={invoices}
         setInvoices={setInvoices}
           refetchInvoices={fetchInvoices}
       />
 </Box>
-
+ 
   );
-
+ 
 };
-
+ 
 export default Billing;
-
+ 
+ 
+ 
