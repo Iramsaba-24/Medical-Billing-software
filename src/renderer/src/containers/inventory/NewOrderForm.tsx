@@ -1,508 +1,363 @@
-import { useState, useEffect } from "react";
-import { Box, Button, Paper, Typography, IconButton } from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import TextInputField from "@/components/controlled/TextInputField";
-import EmailField from "@/components/controlled/EmailField";
-import NumericField from "@/components/controlled/NumericField";
-import DropdownField from "@/components/controlled/DropdownField";
-import { Add, Remove } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
+import { useEffect, useState} from "react";
+import { addMedicine,  getMedicineById,  MedicineResponse,updateMedicine  } from "@/service/medicineService";
+import { DistributorResponse, getDistributors } from "@/service/distributorService";
+import { getMedicineGroups } from "@/service/medicineGroupService";
+import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
+export type InventoryFormData = {
+  medicineId?: number;
+  medicineName: string;
+  batchNumber?: string;
+  hsnCode?: string;
+  numberOfStrips: number;
+  tabletsPerStrip: number;
+  looseTablets: number;
 
-import {
-  getDistributors,
-  type DistributorResponse,
-} from "@/service/distributorService";
+  purchasePricePerStrip: number;
+  mrpPerStrip: number;
+  gstPercent: number;
 
-type OrderRow = {
-  rowId: number;
+  purchaseDate?: string;
+  invoiceNumber?: string;
+  expiryDate: string;
+
+  companyName?: string;
+  strength: string;
+  type: string;
+
+  distributorId: number|string;
+  groupId: string;
+
+  manufacturingDate?: string;
+
+  minimumQuantity: number;
+  maximumQuantity: number;
 };
 
-type NewOrderFormValues = {
-  distributor: string;
-  email: string;
-  [key: string]: string | number;
+export type InventoryItem = {
+  medicineName: string;
+  medicineId: number;
+  totalStockTablets: number;
+  medicineGroup: string;
+  mrpPerStrip: number;
+  expiryDate: string;
+  companyName: string;
+  hsnCode?: string;
+  status: "In Stock" | "Low Stock" | "Out of Stock";
 };
 
-const orderButtonSx = {
-  backgroundColor: "#238878",
-  color: "#fff",
-  border: "2px solid #238878",
-  textTransform: "none",
-  minWidth: "100px",
-  height: "36px",
-  "&:hover": {
-    backgroundColor: "#fff",
-    color: "#238878",
-    border: "2px solid #238878",
+
+export default function AddInventoryItem() {
+
+const location = useLocation();
+
+type ApproveOrderState = {
+  approveMode: true;
+  medicineName: string;
+  strength: string;
+  qty: number;
+  orderId: number;
+  distributorName: string;
+};
+
+const locationState = location.state as MedicineResponse | ApproveOrderState | undefined;
+const editData = locationState && !("approveMode" in locationState) 
+  ? locationState 
+  : undefined;
+const approveData = locationState && "approveMode" in locationState 
+  ? locationState 
+  : undefined;
+
+
+const methods = useForm<InventoryFormData>({
+  mode: "onChange",
+  defaultValues: {
+    medicineName: "",
+    batchNumber: "",
+    hsnCode: "",
+    numberOfStrips: 1,
+    tabletsPerStrip: 1,
+    looseTablets: 0,
+    purchasePricePerStrip: 0,
+    mrpPerStrip: 0,
+    gstPercent: 5,
+    expiryDate: "",
+    strength: "",
+    type: "",
+    groupId: "",
+    purchaseDate: new Date().toISOString().split("T")[0],
   },
-};
+});
 
-function NewOrderForm() {
+
+  const isEdit = !!editData?.medicineId;
   const navigate = useNavigate();
-
-  const [rows, setRows] = useState<OrderRow[]>([
-    {
-      rowId: Date.now(),
-    },
-  ]);
-
-  const [distributorOptions, setDistributorOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
-
-  const [distributors, setDistributors] = useState<
-    DistributorResponse[]
-  >([]);
-
-  const methods = useForm<NewOrderFormValues>({
-    defaultValues: {
-      distributor: "",
-      email: "",
-    },
-    mode: "onChange",
-  });
-
-  const selectedDistributor =
-    methods.watch("distributor");
-
-  const fetchDistributorData = async () => {
+    const [, setDistributorData] = useState<DistributorResponse[]>([]);
+const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
+const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
+  // Load Medicine Groups
+useEffect(() => {
+  const fetchGroups = async () => {
     try {
-      const data = await getDistributors();
+      const data = await getMedicineGroups();
 
-      setDistributors(data);
-
-      const options = data.map((item) => ({
-        label: item.companyName,
-        value: item.companyName,
+      const options = data.map((g: { groupId: number; groupName: string }) => ({
+        label: g.groupName,
+        value: g.groupId.toString() 
       }));
 
-      setDistributorOptions(options);
+      setGroupOptions(options);
     } catch (error) {
-      console.error(
-        "Distributor fetch failed:",
-        error
-      );
+      console.error("Error fetching groups:", error);
     }
   };
 
-  useEffect(() => {
-    fetchDistributorData();
-  }, []);
+  fetchGroups();
+}, []);
 
-  useEffect(() => {
-    if (!selectedDistributor) return;
-
-    const selected = distributors.find(
-      (item) =>
-        item.companyName === selectedDistributor
-    );
-
-    if (selected) {
-      methods.setValue(
-        "email",
-        selected.email
-      );
+  // Load Distributors
+useEffect(() => {
+  const fetchDistributors = async () => {
+    try {
+      const data = await getDistributors();
+      setDistributorData(data);
+      console.log("=== DISTRIBUTOR DATA ===", JSON.stringify(data));
+      const options = data.map((d) => ({
+      label: d.companyName,
+        value: d.distributorId.toString(),
+      }));
+      setSupplierOptions(options);
+    } catch (error) {
+      console.error("Error fetching distributors:", error);
     }
-  }, [
-    selectedDistributor,
-    distributors,
-    methods,
-  ]);
+  };
 
-  const handleAddRow = () => {
-    setRows((prev) => [
-      ...prev,
+  fetchDistributors();
+}, []);
+
+const onSubmit = async (data: InventoryFormData) => {
+  try {
+    const finalData = {
+      ...data,
+      distributorId: Number(data.distributorId),
+      groupId: Number(data.groupId),
+      companyName: data.companyName || "NA",
+    };
+
+    // if (isEdit && editData?.medicineId) {
+    //   await updateMedicine(editData.medicineId, finalData);
+    // } else {
+    //   await addMedicine(finalData);
+    // }
+
+    // navigate(URL_PATH.Inventory);
+    if (isEdit && editData?.medicineId) {
+  await updateMedicine(editData.medicineId, finalData);
+} else {
+  await addMedicine(finalData);
+
+  // approve order ONLY after inventory add success
+  if (approveData?.orderId) {
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
+      {},
       {
-        rowId: Date.now(),
-      },
-    ]);
-  };
-
-  const handleRemoveRow = (
-    rowId: number
-  ) => {
-    setRows((prev) =>
-      prev.filter(
-        (item) => item.rowId !== rowId
-      )
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
-  };
-
-  const handleOrder =
-    methods.handleSubmit((data) => {
-      const medicines = rows.map(
-        (row) => ({
-          medicineName:
-            data[
-              `medicine_${row.rowId}`
-            ],
-          strengthType:
-            data[
-              `strength_${row.rowId}`
-            ],
-          qty:
-            data[`qty_${row.rowId}`],
-                  })
-                );
-
-      navigate(
-        URL_PATH.ReorderEmail,
-        {
-          state: {
-            distributor:
-              data.distributor,
-            email: data.email,
-            medicines,
-            orderType: "neworder",
-          },
-        }
-      );
-    });
-
-  return (
-    <FormProvider {...methods}>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 3,
-          p: {
-            xs: 1,
-            md: 2,
-          },
-        }}
-      >
-        <Paper
-          elevation={2}
-          sx={{
-            borderRadius: 2,
-            border:
-              "1.5px solid #238878",
-            p: {
-              xs: 2,
-              md: 3,
-            },
-          }}
-        >
-          <Typography
-            fontWeight={700}
-            fontSize={{
-              xs: 16,
-              md: 22,
-            }}
-            color="#238878"
-            mb={3}
-          >
-            New Order
-          </Typography>
-
-          {/* Distributor */}
-          <Box
-            display="flex"
-            flexDirection="column"
-            gap={2}
-            mb={3}
-          >
-            <Box
-              display="flex"
-              flexDirection={{
-                xs: "column",
-                sm: "row",
-              }}
-              alignItems={{
-                xs: "flex-start",
-                sm: "center",
-              }}
-              gap={1.5}
-            >
-              <Typography
-                sx={{
-                  width: {
-                    sm: 120,
-                  },
-                }}
-                fontWeight={600}
-              >
-                Distributor
-              </Typography>
-
-              <Box
-                sx={{
-                  width: {
-                    xs: "100%",
-                    sm: 260,
-                  },
-                }}
-              >
-                <DropdownField
-                  name="distributor"
-                  label=""
-                  options={
-                    distributorOptions
-                  }
-                  required
-                />
-              </Box>
-            </Box>
-
-            <Box
-              display="flex"
-              flexDirection={{
-                xs: "column",
-                sm: "row",
-              }}
-              alignItems={{
-                xs: "flex-start",
-                sm: "center",
-              }}
-              gap={1.5}
-            >
-              <Typography
-                sx={{
-                  width: {
-                    sm: 120,
-                  },
-                }}
-                fontWeight={600}
-              >
-                Email
-              </Typography>
-
-              <Box
-                sx={{
-                  width: {
-                    xs: "100%",
-                    sm: 260,
-                  },
-                }}
-              >
-                <EmailField
-                  name="email"
-                  label=""
-                />
-              </Box>
-            </Box>
-          </Box>
-
-          {/* Add Button */}
-          <Box
-            display="flex"
-            justifyContent="flex-end"
-            mb={2}
-          >
-            <Button
-              startIcon={<Add />}
-              onClick={handleAddRow}
-              sx={{
-                color: "#238878",
-                fontWeight: "bold",
-              }}
-            >
-              ADD ITEM
-            </Button>
-          </Box>
-
-          {/* Header */}
-          <Box
-            display={{
-              xs: "none",
-              md: "flex",
-            }}
-            gap={2}
-            mb={1}
-            px={0.5}
-          >
-            <Typography
-              sx={{ flex: 2 }}
-              fontWeight={600}
-            >
-              Medicine Name
-            </Typography>
-
-            <Typography
-              sx={{ flex: 2 }}
-              fontWeight={600}
-            >
-              Strength / Type
-            </Typography>
-
-            <Typography
-              sx={{ flex: 1 }}
-              fontWeight={600}
-            >
-              Qty.
-            </Typography>
-
-            <Box
-              sx={{
-                width: 50,
-              }}
-            />
-          </Box>
-
-          {/* Rows */}
-          {rows.map((row) => (
-            <Box
-              key={row.rowId}
-              display="flex"
-              flexDirection={{
-                xs: "column",
-                md: "row",
-              }}
-              gap={2}
-              mb={2}
-              alignItems={{
-                xs: "stretch",
-                md: "center",
-              }}
-            >
-              <Box
-                sx={{
-                  flex: 2,
-                  width: "100%",
-                }}
-              >
-                <Box
-                  display={{
-                    xs: "block",
-                    md: "none",
-                  }}
-                  mb={0.5}
-                >
-                  <Typography
-                    fontWeight={600}
-                    fontSize={14}
-                  >
-                    Medicine Name
-                  </Typography>
-                </Box>
-
-                <TextInputField
-                  name={`medicine_${row.rowId}`}
-                  label=""
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  flex: 2,
-                  width: "100%",
-                }}
-              >
-                <Box
-                  display={{
-                    xs: "block",
-                    md: "none",
-                  }}
-                  mb={0.5}
-                >
-                  <Typography
-                    fontWeight={600}
-                    fontSize={14}
-                  >
-                    Strength / Type
-                  </Typography>
-                </Box>
-
-                <TextInputField
-                  name={`strength_${row.rowId}`}
-                  label=""
-                />
-              </Box>
-
-              <Box
-                sx={{
-                  flex: 1,
-                  width: "100%",
-                }}
-              >
-                <Box
-                  display={{
-                    xs: "block",
-                    md: "none",
-                  }}
-                  mb={0.5}
-                >
-                  <Typography
-                    fontWeight={600}
-                    fontSize={14}
-                  >
-                    Qty.
-                  </Typography>
-                </Box>
-
-                <NumericField
-                  name={`qty_${row.rowId}`}
-                  label=""
-                  min={1}
-                  max={9999}
-                />
-              </Box>
-
-              {rows.length > 1 && (
-                <Box
-                  display="flex"
-                  justifyContent={{
-                    xs: "flex-end",
-                    md: "center",
-                  }}
-                  alignItems="center"
-                  mt={{
-                    xs: -1,
-                    md: 2,
-                  }}
-                >
-                  <IconButton
-                    color="error"
-                    onClick={() =>
-                      handleRemoveRow(
-                        row.rowId
-                      )
-                    }
-                  >
-                    <Remove />
-                  </IconButton>
-                </Box>
-              )}
-            </Box>
-          ))}
-
-          {/* Submit */}
-         {/* Submit Buttons */}
-<Box
-  display="flex"
-  justifyContent="flex-end"
-  gap={2}
-  mt={2}
->
-  {/* Order History Button */}
-  <Button
-    variant="outlined"
-    sx={{
-      ...orderButtonSx,
-      backgroundColor: "#fff",
-      color: "#238878",
-    }}
-    onClick={() =>
-      navigate(URL_PATH.Reorder)
-    }
-  >
-    Order History
-  </Button>
-
-  {/* Order Button */}
-  <Button
-    sx={orderButtonSx}
-    onClick={handleOrder}
-  >
-    Order
-  </Button>
-</Box>
-        </Paper>
-      </Box>
-    </FormProvider>
-  );
+  }
 }
 
-export default NewOrderForm;
+navigate(URL_PATH.Inventory);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// Approve mode 
+const { reset } = methods;
+
+useEffect(() => {
+  if (approveData && supplierOptions.length > 0) {
+    
+  
+    const matchedDistributor = supplierOptions.find(
+      (opt) => opt.label.toLowerCase() === approveData.distributorName?.toLowerCase()
+    );
+
+    reset({
+      medicineName: approveData.medicineName || "",
+      strength: approveData.strength || "",
+      numberOfStrips: approveData.qty,
+      tabletsPerStrip: 1,
+      looseTablets: 0,
+      purchasePricePerStrip: 0,
+      mrpPerStrip: 0,
+      gstPercent: 5,
+      purchaseDate: new Date().toISOString().split("T")[0],
+      expiryDate: "",
+      type: "",
+      groupId: "",
+      distributorId: matchedDistributor?.value || "", 
+    });
+  }
+}, [approveData, supplierOptions, reset]);
+
+
+
+//fetch medicine for edit
+useEffect(() => {
+  const fetchMedicine = async () => {
+    if (editData?.medicineId) {
+      const fullData = await getMedicineById(editData.medicineId);
+
+      reset({
+        medicineId: fullData.medicineId,
+        medicineName: fullData.medicineName || "",
+        batchNumber: fullData.batchNumber || "",
+        hsnCode: fullData.hsnCode || "",
+        strength: fullData.strength || "",
+        type: fullData.type || "",
+        groupId: String(fullData.groupId),
+        distributorId: String(fullData.distributorId) as unknown as number,
+
+        numberOfStrips: fullData.numberOfStrips ?? 0,
+        tabletsPerStrip: fullData.tabletsPerStrip ?? 1,
+        looseTablets: fullData.looseTablets ?? 0,
+
+        purchasePricePerStrip: fullData.purchasePricePerStrip || 0,
+        mrpPerStrip: fullData.mrpPerStrip || 0,
+        gstPercent: fullData.gstPercent || 0,
+
+        expiryDate: fullData.expiryDate
+          ? new Date(fullData.expiryDate).toISOString().split("T")[0]
+          : "",
+
+        manufacturingDate: fullData.manufacturingDate
+          ? new Date(fullData.manufacturingDate).toISOString().split("T")[0]
+          : "",
+
+        purchaseDate: fullData.purchaseDate
+          ? new Date(fullData.purchaseDate).toISOString().split("T")[0]
+          : "",
+
+        companyName: fullData.companyName || "",
+        invoiceNumber: fullData.invoiceNumber || "",
+        minimumQuantity: fullData.minimumQuantity || 0,
+        maximumQuantity: fullData.maximumQuantity || 0,
+      });
+    }
+  };
+
+  fetchMedicine();
+}, [editData?.medicineId,reset]);
+
+  // calc total stock tablets
+const numberOfStrips = Number(methods.watch("numberOfStrips")) || 0;
+const tabletsPerStrip = Number(methods.watch("tabletsPerStrip")) || 0;
+const looseTablets = Number(methods.watch("looseTablets")) || 0;
+const totalStock = numberOfStrips * tabletsPerStrip + looseTablets;
+  //calc of price
+const purchasePricePerStrip = Number(methods.watch("purchasePricePerStrip")) || 0;
+
+const purchasePricePerTablet =
+  tabletsPerStrip > 0
+    ? purchasePricePerStrip / tabletsPerStrip
+    : 0;
+//cal mrp per tablet
+const mrpPerStrip = Number(methods.watch("mrpPerStrip")) || 0;
+
+const mrpPerTablet =
+  tabletsPerStrip > 0
+    ? mrpPerStrip / tabletsPerStrip
+    : 0;
+
+const gstPercent = Number(methods.watch("gstPercent")) || 0;
+
+// Base Amount (total price without GST)
+const totalPrice = totalStock * purchasePricePerTablet;
+
+// GST Amount
+const gstAmount = totalPrice * (gstPercent / 100);
+
+// Final Amount (with GST)
+const finalPrice = totalPrice + gstAmount;    
+  return (
+<FormProvider {...methods}>
+  <Box width="100%" px={{ xs: 1, md: 2 }} mt={4} mb={8}>
+    <Paper sx={{ p: { xs: 1, md: 2 }, borderRadius: 2 }}>
+      <Typography fontSize={20} fontWeight={600} mb={4}>
+       {isEdit ? "Edit Medicine" : approveData ? "Approve & Add Medicine" : "Add New Medicine"}
+      </Typography>
+
+      <Box
+        component="form"
+        noValidate
+        onSubmit={methods.handleSubmit(onSubmit)}
+        display="grid"
+        gridTemplateColumns={{
+          xs: "1fr",
+          sm: "repeat(2, 1fr)",
+          md: "repeat(3, 1fr)",
+          lg: "repeat(4, 1fr)",
+        }}
+        gap={1.5}
+        sx={{ px: { xs: 0, md: 4 } }}
+      >
+       <InventoryFormFields
+  groupOptions={groupOptions}
+  supplierOptions={supplierOptions}
+  totalStock={totalStock}
+  purchasePricePerTablet={purchasePricePerTablet}
+  mrpPerTablet={mrpPerTablet}
+  finalPrice={finalPrice}
+  orderedQty={approveData?.qty}
+/>
+
+        {/* Buttons SAME */}
+        <Box
+          gridColumn="1 / -1"
+          display="flex"
+          justifyContent="flex-end"
+          gap={2}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => navigate(-1)}
+            sx={{
+              px: 4,
+              textTransform: "none",
+              border: "2px solid #1b7f6b",
+              color: "#1b7f6b",
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              px: 4,
+              textTransform: "none",
+              backgroundColor: "#1b7f6b",
+            }}
+          >
+            Save
+          </Button>
+        </Box>
+      </Box>
+    </Paper>
+  </Box>
+</FormProvider>
+  );
+}

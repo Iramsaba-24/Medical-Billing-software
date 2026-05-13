@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
 import {
   Box, Paper, Typography,
 } from "@mui/material";
 // import { useNavigate } from "react-router-dom";
-import { getMedicines, type MedicineResponse } from "@/service/medicineService";
+// import { getMedicines, type MedicineResponse } from "@/service/medicineService";
 import {
   UniversalTable,
   ACTION_KEY,
@@ -28,37 +28,45 @@ const purchaseColumns: Column<StockRow>[] = [
   { key: ACTION_KEY, label: "Action" },
 ];
 
-function LastPurchaseList() {
-//   const navigate = useNavigate();
+type LastPurchaseListProps = {
+  lastPurchaseData: StockRow[];
+};
 
-  const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
+function LastPurchaseList({ lastPurchaseData }: LastPurchaseListProps) {
 
   const purchaseActions = {
     view: (row: StockRow) => console.log("View", row),
   };
+//   const navigate = useNavigate();
 
-  const fetchMedicineData = async () => {
-    try {
-      const medicines: MedicineResponse[] = await getMedicines();
+  // const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
 
-      const latestPurchases = medicines.slice(0, 5).map((item) => ({
-        id: item.medicineId,
-        supplier: item.distributorName || "-",
-        medicineName: item.medicineName,
-        strengthType: item.strength || "-",
-        quantity: item.totalStockTablets.toString(),
-        [ACTION_KEY]: "",
-      }));
+  // const purchaseActions = {
+  //   view: (row: StockRow) => console.log("View", row),
+  // };
 
-      setLastPurchaseData(latestPurchases);
-    } catch (error) {
-      console.error("Medicine fetch failed:", error);
-    }
-  };
+  // const fetchMedicineData = async () => {
+  //   try {
+  //     const medicines: MedicineResponse[] = await getMedicines();
 
-  useEffect(() => {
-    fetchMedicineData();
-  }, []);
+  //     const latestPurchases = medicines.slice(0, 5).map((item) => ({
+  //       id: item.medicineId,
+  //       supplier: item.distributorName || "-",
+  //       medicineName: item.medicineName,
+  //       strengthType: item.strength || "-",
+  //       quantity: item.totalStockTablets.toString(),
+  //       [ACTION_KEY]: "",
+  //     }));
+
+  //     setLastPurchaseData(latestPurchases);
+  //   } catch (error) {
+  //     console.error("Medicine fetch failed:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchMedicineData();
+  // }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2 }}>

@@ -10,7 +10,23 @@ import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import NewOrderList from "@/containers/inventory/NewOrderList";
 import LastPurchaseList from "@/containers/inventory/LastPurchaseList";
+import {
+  ACTION_KEY,
+} from "@/components/uncontrolled/UniversalTable";
 
+import {
+  getMedicines,
+  type MedicineResponse,
+} from "@/service/medicineService";
+
+type StockRow = {
+  id: number;
+  supplier: string;
+  medicineName: string;
+  strengthType: string;
+  quantity: string;
+  [ACTION_KEY]: string;
+};
 //ReorderHistory types
 type ReorderMedicine = {
   medicineName: string;
@@ -29,7 +45,7 @@ type ReorderHistory = {
 
 function ReorderList() {
   const navigate = useNavigate();
-
+  const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
   const [viewOrder, setViewOrder] = useState<ReorderHistory | null>(null);
 const fetchReorderHistory = async () => {
@@ -52,10 +68,50 @@ const fetchReorderHistory = async () => {
   }
 };
 
-  useEffect(() => {
-    fetchReorderHistory(); 
-  }, []);
+  // useEffect(() => {
+  //   fetchReorderHistory(); 
+  // }, []);
+const fetchMedicineData = async () => {
+  try {
+    // const medicines = await getMedicines();
+    const medicines: MedicineResponse[] = await getMedicines();
 
+    const latestPurchases = medicines.slice(0, 5).map((item) => ({
+      id: item.medicineId,
+      supplier: item.distributorName || "-",
+      medicineName: item.medicineName,
+      strengthType: item.strength || "-",
+      quantity: item.totalStockTablets.toString(),
+      [ACTION_KEY]: "",
+    }));
+
+    setLastPurchaseData(latestPurchases);
+  } catch (error) {
+    console.error("Medicine fetch failed:", error);
+  }
+};
+useEffect(() => {
+  fetchReorderHistory();
+  fetchMedicineData();
+}, []);
+const handleCloseDialog = () => {
+  if (viewOrder) {
+    const newRows: StockRow[] = viewOrder.existingMedicines.map(
+      (med, index) => ({
+        id: Date.now() + index,
+        supplier: viewOrder.distributorName,
+        medicineName: med.medicineName,
+        strengthType: med.strength || "-",
+        quantity: med.qty.toString(),
+        [ACTION_KEY]: "",
+      })
+    );
+
+    setLastPurchaseData((prev) => [...newRows, ...prev]);
+  }
+
+  setViewOrder(null);
+};
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2 }}>
 
@@ -145,7 +201,7 @@ const fetchReorderHistory = async () => {
 <IconButton
   size="small"
   color="success"
-  onClick={() => setViewOrder(order)} 
+  onClick={() => setViewOrder(order)}
 >
   <Check fontSize="small" />
 </IconButton>
@@ -170,7 +226,8 @@ const fetchReorderHistory = async () => {
       </Paper>
 
       <NewOrderList />
-      <LastPurchaseList />
+      {/* <LastPurchaseList /> */}
+      <LastPurchaseList lastPurchaseData={lastPurchaseData} />
       {/* View Dialog */}
 <Dialog
   open={!!viewOrder}
@@ -217,11 +274,12 @@ const fetchReorderHistory = async () => {
   </DialogContent>
   <DialogActions>
     <Button
-      onClick={() => setViewOrder(null)}
+      // onClick={() => setViewOrder(null)}
+      onClick={handleCloseDialog}
       variant="contained"
       sx={{ backgroundColor: "#238878", textTransform: "none" }}
     >
-      Close
+      Ok
     </Button>
   </DialogActions>
 </Dialog>

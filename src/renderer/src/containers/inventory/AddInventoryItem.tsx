@@ -7,6 +7,8 @@ import { addMedicine,  getMedicineById,  MedicineResponse,updateMedicine  } from
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
 import { getMedicineGroups } from "@/service/medicineGroupService";
 import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
+import axios from "axios";
+import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 export type InventoryFormData = {
   medicineId?: number;
   medicineName: string;
@@ -60,7 +62,7 @@ type ApproveOrderState = {
   strength: string;
   qty: number;
   orderId: number;
-  distributorId: number;
+  distributorName: string;
 };
 
 const locationState = location.state as MedicineResponse | ApproveOrderState | undefined;
@@ -126,7 +128,7 @@ useEffect(() => {
       setDistributorData(data);
       console.log("=== DISTRIBUTOR DATA ===", JSON.stringify(data));
       const options = data.map((d) => ({
-        label: d.ownerName,
+      label: d.companyName,
         value: d.distributorId.toString(),
       }));
       setSupplierOptions(options);
@@ -147,13 +149,35 @@ const onSubmit = async (data: InventoryFormData) => {
       companyName: data.companyName || "NA",
     };
 
-    if (isEdit && editData?.medicineId) {
-      await updateMedicine(editData.medicineId, finalData);
-    } else {
-      await addMedicine(finalData);
-    }
+    // if (isEdit && editData?.medicineId) {
+    //   await updateMedicine(editData.medicineId, finalData);
+    // } else {
+    //   await addMedicine(finalData);
+    // }
 
-    navigate(URL_PATH.Inventory);
+    // navigate(URL_PATH.Inventory);
+    if (isEdit && editData?.medicineId) {
+  await updateMedicine(editData.medicineId, finalData);
+} else {
+  await addMedicine(finalData);
+
+  // approve order ONLY after inventory add success
+  if (approveData?.orderId) {
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+}
+
+navigate(URL_PATH.Inventory);
   } catch (error) {
     console.error(error);
   }
@@ -163,7 +187,13 @@ const onSubmit = async (data: InventoryFormData) => {
 const { reset } = methods;
 
 useEffect(() => {
-  if (approveData) {
+  if (approveData && supplierOptions.length > 0) {
+    
+  
+    const matchedDistributor = supplierOptions.find(
+      (opt) => opt.label.toLowerCase() === approveData.distributorName?.toLowerCase()
+    );
+
     reset({
       medicineName: approveData.medicineName || "",
       strength: approveData.strength || "",
@@ -177,10 +207,10 @@ useEffect(() => {
       expiryDate: "",
       type: "",
       groupId: "",
-      distributorId: String(approveData.distributorId),
+      distributorId: matchedDistributor?.value || "", 
     });
   }
-}, [approveData, reset]);
+}, [approveData, supplierOptions, reset]);
 
 
 

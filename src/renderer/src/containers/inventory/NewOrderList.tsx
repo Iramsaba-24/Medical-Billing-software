@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import {
   Box, Paper, Typography, Table, TableBody, TableCell,
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
+import ApproveOrderDialog from "./ApproveOrderDialog"; // adjust path
 
 type NewMedicine = {
   id: number;
@@ -27,6 +27,7 @@ type NewOrderHistory = {
 function NewOrderList() {
   const navigate = useNavigate();
   const [newOrderData, setNewOrderData] = useState<NewOrderHistory[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<NewOrderHistory | null>(null);
 
   const fetchNewOrders = async () => {
     try {
@@ -35,14 +36,12 @@ function NewOrderList() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log("=== REORDER API RESPONSE ===", JSON.stringify(res.data));
+
       const allData: NewOrderHistory[] = res.data || [];
-
-      // new order filter
-      const filtered = allData.filter(
-        (item) => item.newMedicines && item.newMedicines.length > 0
+      setNewOrderData(
+        allData.filter((item) => item.newMedicines && item.newMedicines.length > 0)
       );
-
-      setNewOrderData(filtered);
     } catch (error) {
       console.error("New order fetch failed:", error);
     }
@@ -65,12 +64,7 @@ function NewOrderList() {
               {["Sr No", "Supplier", "Medicine Name", "Strength/Type", "Qty", "Action"].map((head) => (
                 <TableCell
                   key={head}
-                  sx={{
-                    fontWeight: 700,
-                    bgcolor: "#444748ff",
-                    color: "#ffffff",
-                    whiteSpace: "nowrap",
-                  }}
+                  sx={{ fontWeight: 700, bgcolor: "#444748ff", color: "#ffffff", whiteSpace: "nowrap" }}
                 >
                   {head}
                 </TableCell>
@@ -82,11 +76,7 @@ function NewOrderList() {
             {newOrderData.length > 0 ? (
               newOrderData.map((order, index) =>
                 order.newMedicines.map((med, i) => (
-                  <TableRow
-                    key={`${order.id}-${i}`}
-                    hover
-                    sx={{ "&:hover": { bgcolor: "#e6f4ea" } }}
-                  >
+                  <TableRow key={`${order.id}-${i}`} hover sx={{ "&:hover": { bgcolor: "#e6f4ea" } }}>
                     {i === 0 && (
                       <TableCell rowSpan={order.newMedicines.length}>
                         <Typography fontSize={13}>{index + 1}</Typography>
@@ -130,24 +120,14 @@ function NewOrderList() {
                           >
                             <Visibility fontSize="small" />
                           </IconButton>
+
                           <IconButton
-  size="small"
-  onClick={() =>
-    navigate(URL_PATH.AddInventoryItem, {
-  state: {
-    approveMode: true,
-    medicineName: med.medicineName,
-    strength: med.strength || "",
-    qty: med.qty,
-    orderId: order.id,
-    distributorId: order.distributorId,
-  },
-})
-  }
-  sx={{ color: "#2e7d32" }}
->
-  <Check fontSize="small" />
-</IconButton>
+                            size="small"
+                            onClick={() => setSelectedOrder(order)}
+                            sx={{ color: "#2e7d32" }}
+                          >
+                            <Check fontSize="small" />
+                          </IconButton>
                         </Box>
                       </TableCell>
                     )}
@@ -166,6 +146,12 @@ function NewOrderList() {
           </TableBody>
         </Table>
       </Paper>
+
+      <ApproveOrderDialog
+        open={!!selectedOrder}
+        order={selectedOrder}
+        onClose={() => setSelectedOrder(null)}
+      />
     </Box>
   );
 }
