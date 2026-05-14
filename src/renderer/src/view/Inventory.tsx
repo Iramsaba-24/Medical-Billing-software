@@ -18,7 +18,7 @@ export default function InventoryPage() {
  
 
 const [stats, setStats] = useState({ totalItems: 0, lowStockItems: 0, totalValue: 0 });
-
+const [medicineList, setMedicineList] = useState<MedicineResponse[]>([]); 
 
 useEffect(() => {
   const fetchStats = async () => {
@@ -45,11 +45,19 @@ console.log("isLowStock check:", JSON.stringify(medicines.map(m => ({
 
 
 
-      const totalItems = medicines.length;
-      const lowStockItems = medicines.filter(m => m.isLowStock).length;
-     const totalValue = medicines.reduce((sum, m) => sum + (m.mrpPerTablet * m.totalStockTablets), 0);
+const totalItems = medicines.length;
 
-      setStats({ totalItems, lowStockItems, totalValue });
+const lowStockItems = medicines.filter(m => 
+  m.totalStockTablets < (m.minimumQuantity > 0 ? m.minimumQuantity : 10)
+).length;
+
+const totalValue = medicines.reduce(
+  (sum, m) => sum + (m.mrpPerTablet * m.totalStockTablets), 0
+);
+
+
+setMedicineList(medicines);
+setStats({ totalItems, lowStockItems, totalValue });
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
@@ -129,28 +137,38 @@ return (
               Medicine Groups
             </Typography>
  
-            <Button
-              size="small"
-              variant="contained"
-              sx={{  
-                px: 2.5,
-                py: 1,
-                minWidth: 100,
-                backgroundColor: "#238878",
-                color: "#fff",
-                border: "2px solid #238878",
-                fontSize: "0.95rem",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                  border: "2px solid #238878",
-                }
-             }}
-              onClick={() => navigate(URL_PATH.MedicineGroup)}
-            >
-              View Details
-            </Button>
+<Button
+  size="small"
+  variant="contained"
+  sx={{
+    px: { xs: 1.5, sm: 2, md: 2.5 },
+    py: { xs: 0.7, sm: 0.8, md: 1 },
+
+    minWidth: { xs: 80, sm: 100, md: 120 },
+
+    fontSize: {
+      xs: "0.75rem",
+      sm: "0.85rem",
+      md: "0.95rem",
+    },
+
+    whiteSpace: "nowrap",
+
+    backgroundColor: "#238878",
+    color: "#fff",
+    border: "2px solid #238878",
+    textTransform: "none",
+
+    "&:hover": {
+      backgroundColor: "#fff",
+      color: "#238878",
+      border: "2px solid #238878",
+    },
+  }}
+  onClick={() => navigate(URL_PATH.MedicineGroup)}
+>
+  View Details
+</Button>
           </Box>
  
              <GroupSummary />
@@ -204,28 +222,67 @@ return (
           </Button>
  
          
- 
-           <Button
-            fullWidth
-           sx={{
-            px: 2.5,
-            py: 1,
-            minWidth: 100,
-            backgroundColor: "#238878",
-            color: "#fff",
-            border: "2px solid #238878",
-            fontSize: "0.95rem",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "#fff",
-              color: "#238878",
-              border: "2px solid #238878",
-            }
-          }}
-            onClick={() => navigate(URL_PATH.Reorder)}
-          >
-            Reorder Medicines
-          </Button>
+ <Box display="flex" gap={2}>
+  
+  <Button
+    fullWidth
+    sx={{
+      px: 2.5,
+      py: 1,
+      minWidth: 100,
+      backgroundColor: "#238878",
+      color: "#fff",
+      border: "2px solid #238878",
+      fontSize: "0.95rem",
+      textTransform: "none",
+      "&:hover": {
+        backgroundColor: "#fff",
+        color: "#238878",
+        border: "2px solid #238878",
+      }
+    }}
+    onClick={() => {
+      const lowStockMedicines = medicineList
+        .filter((m) => m.totalStockTablets <= m.minimumQuantity)
+        .map((m) => ({
+          id: m.medicineId,
+          supplier: m.distributorName || "-",
+          medicineName: m.medicineName,
+          strengthType: m.strength || "-",
+          quantity: m.totalStockTablets.toString(),
+        }));
+
+      navigate(URL_PATH.ReorderForm, {
+        state: { medicines: lowStockMedicines },
+      });
+    }}
+  >
+    Reorder
+  </Button>
+
+  <Button
+    fullWidth
+    sx={{
+      px: 2.5,
+      py: 1,
+      minWidth: 100,
+      backgroundColor: "#238878",
+      color: "#fff",
+      border: "2px solid #238878",
+      fontSize: "0.95rem",
+      textTransform: "none",
+      "&:hover": {
+        backgroundColor: "#fff",
+        color: "#238878",
+        border: "2px solid #238878",
+      }
+    }}
+    onClick={() => navigate(URL_PATH.NewOrder)}
+  >
+    New Order
+  </Button>
+
+</Box>
         </Box>
       </Box>
  

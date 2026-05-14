@@ -17,7 +17,6 @@ import DistributorsPage from "@/view/DistributorsPage";
 import ReportPage from "@/view/ReportPage";
 import Reorder from "@/containers/inventory/ReorderList";
 import DistributorDetails from "@/containers/distributors/DistributorsDetails";
-import DistributorsSetting from "@/containers/setting/DistributorsSetting";
 import ReportSettings from "@/containers/setting/ReportSettings";
 import GeneralSettings from "@/containers/setting/GeneralSettings";
 import Setting from "@/containers/layout/Setting";
@@ -36,6 +35,9 @@ import SalesView from "@/containers/dashboard/SalesView";
 import EditInvoice from "@/containers/Invoices/EditInvoice";
 import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
 import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
+import ReorderForm from "@/containers/inventory/ReorderForm";
+import ReorderEmail from "@/containers/inventory/ReorderEmail";
+import NewOrderForm from "@/containers/inventory/NewOrderForm";
 
 
 
@@ -55,8 +57,18 @@ export const mainRoutes: RouteObject[] = [
         element: <AddCustomerForm />,
        },
 
-
-      
+{
+  path: URL_PATH.ReorderForm,
+  element: <ReorderForm />
+},
+{
+  path: URL_PATH.ReorderEmail,
+  element: <ReorderEmail />
+},
+      {
+  path: URL_PATH.NewOrder,
+  element: <NewOrderForm />
+},
       
       {
         path: URL_PATH.Invoices,
@@ -194,10 +206,10 @@ export const mainRoutes: RouteObject[] = [
             path: URL_PATH.DoctorSettings.replace("/settings/", ""),
             element: <DoctorSettings />,
           },
-          {
-            path: URL_PATH.DistributorsSetting.replace("/settings/", ""),
-            element: <DistributorsSetting />,
-          },
+          // {
+          //   path: URL_PATH.DistributorsSetting.replace("/settings/", ""),
+          //   element: <DistributorsSetting />,
+          // },
           {
             path: URL_PATH.InventorySettings.replace("/settings/", ""),
             element: <InventorySettings />,
@@ -215,3 +227,6 @@ export const mainRoutes: RouteObject[] = [
     ],
   },
 ];
+
+
+

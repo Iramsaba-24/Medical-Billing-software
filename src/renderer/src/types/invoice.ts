@@ -4,7 +4,7 @@ export type InvoiceStatus = "Paid" | "Pending" | "Overdue";
 
 export type MedicineItem = {
   name: string;
-  medicineName?: string;   
+  medicineName?: string;
   batch?: string;
   expiry?: string;
   qty: string;
@@ -12,13 +12,14 @@ export type MedicineItem = {
   amount: number;
   companyName?: string;
   strength?: string;
-  medicineId?: number;   
+  medicineId?: number;
 };
 
 export type Invoice = {
+  srNo: number;
   customerName: ReactNode;
   invoice: string;
-  retailInvoiceId?: number;  
+  retailInvoiceId?: number;
   patient: string;
   invoiceDate?: string;
   price: number;
@@ -26,7 +27,7 @@ export type Invoice = {
   status: InvoiceStatus;
   medicines: MedicineItem[];
   type?: "retail" | "distributor";
-  gstIn?: string;        
+  gstIn?: string;
   distributorId?: string;
   totalAmount?: number;
   usedPoints?: number;

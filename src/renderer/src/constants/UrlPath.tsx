@@ -1,5 +1,5 @@
 export const URL_PATH = {
-  LOGIN: "/login",
+  LOGIN: "/LOGIN",
   REGISTER: "/register",
   ChoosePlan: "/chooseplan",
   AccountSetup: "/accountsetup",
@@ -39,6 +39,9 @@ export const URL_PATH = {
   Inventory: "/inventory",
 
   Reorder: "/inventory/reorder",
+  ReorderForm: "/reorder-form",
+    ReorderEmail: "/reorder-email",
+    NewOrder:"/neworder",
   MedicineGroup: "/inventory/medicine-group",
   AddMedicineGroup: "/inventory/add-medicine-group",
   AddInventoryItem: "/inventory/add-inventory-item",

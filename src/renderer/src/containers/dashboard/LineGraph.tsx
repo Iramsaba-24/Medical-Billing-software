@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Card, Divider } from "@mui/material";
 import { getAllRetailInvoices, RetailInvoiceResponse } from "@/service/retailInvoiceService";
-
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
 const LineGraph: React.FC = () => {
   const [totalSales, setTotalSales] = useState<number>(0);
-  const [totalPurchase] = useState<number>(0); 
+  // const [totalPurchase] = useState<number>(0);
+  const [totalPurchase, setTotalPurchase] = useState<number>(0);
+ 
 
   // helper function to check if date is today
-  const isToday = (dateStr: string): boolean => {
-    const today = new Date();
-    const d = new Date(dateStr);
+const isToday = (dateStr: string): boolean => {
+  const today = new Date().toISOString().split("T")[0];
+  const d = new Date(dateStr).toISOString().split("T")[0];
 
-    return d.toDateString() === today.toDateString();
-  };
+  return d === today;
+};
 
   useEffect(() => {
     const fetchTodaySales = async () => {
@@ -41,6 +43,30 @@ const LineGraph: React.FC = () => {
 
     fetchTodaySales();
   }, []);
+  //for todays purchase
+useEffect(() => {
+  const fetchTodayPurchase = async () => {
+    try {
+      const medicines: MedicineResponse[] = await getMedicines();
+
+      const todayMedicines = medicines.filter(
+        (med) => med.purchaseDate && isToday(med.purchaseDate)
+      );
+
+      const total = todayMedicines.reduce((sum, med) => {
+        const strips = med.numberOfStrips || 0;
+        const pricePerStrip = med.purchasePricePerStrip || 0;
+        return sum + strips * pricePerStrip;
+      }, 0);
+
+      setTotalPurchase(total);
+    } catch (error) {
+      console.error("Error fetching purchase", error);
+    }
+  };
+
+  fetchTodayPurchase();
+}, []);
 
   const max = Math.max(totalSales, totalPurchase, 1);
 

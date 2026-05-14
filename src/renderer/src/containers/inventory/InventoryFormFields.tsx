@@ -140,7 +140,7 @@ import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";
 import { InventoryFormData } from "./AddInventoryItem";
 import { useFormContext } from "react-hook-form";
-import { useAutoSave } from "@/hooks/Useautosave";
+import {  Typography } from "@mui/material";
 
 type Props = {
   groupOptions: { label: string; value: string }[];
@@ -149,22 +149,22 @@ type Props = {
   purchasePricePerTablet: number;
   mrpPerTablet: number;
   finalPrice: number;
+  orderedQty?: number; 
 };
 
 export default function InventoryFormFields({
   groupOptions,
   supplierOptions,
   totalStock,
-  purchasePricePerTablet,
-  mrpPerTablet,
-  finalPrice,
+  orderedQty,
 }: Props) {
   const methods = useFormContext<InventoryFormData>();
 
-  useAutoSave({
-    storageKey: "add_inventory_form",
-    methods,
-  });
+  // warning logic
+  const showWarning = orderedQty !== undefined;
+ 
+  const isOver = totalStock > (orderedQty ?? 0);
+  const isUnder = totalStock < (orderedQty ?? 0);
 
   return (
     <>
@@ -201,15 +201,7 @@ export default function InventoryFormFields({
         editable
       />
 
-      <TextInputField
-        inputType="all"
-        rows={1}
-        name="batchNumber"
-        label="Batch Number"
-        required
-        minLength={3}
-        maxLength={30}
-      />
+      <TextInputField inputType="all" rows={1} name="batchNumber" label="Batch Number" required minLength={1} maxLength={30} />
 
       <TextInputField
         inputType="numbers"
@@ -288,13 +280,23 @@ export default function InventoryFormFields({
         }}
       />
 
-      <TextInputField
-        inputType="numbers"
-        name="totalStockTablets"
-        label="Current Stock Quantity"
-        value={totalStock}
-        disabled
-      />
+      {/* Ordered Qty Warning */}
+      {showWarning && (
+  <Typography
+    gridColumn="1 / -1"
+    fontSize={13}
+    fontWeight={600}
+    color={isOver ? "error.main" : isUnder ? "warning.main" : "success.main"}
+  >
+    {isOver
+      ? `Total stock (${totalStock}) is more than ordered qty (${orderedQty})`
+      : isUnder
+      ? `Total stock (${totalStock}) is less than ordered qty (${orderedQty})`
+      : `Total stock matches ordered qty (${orderedQty})`}
+  </Typography>
+)}
+
+   
 
       <TextInputField
         inputType="numbers"
@@ -303,13 +305,7 @@ export default function InventoryFormFields({
         required
       />
 
-      <TextInputField
-        inputType="numbers"
-        name="purchasePricePerTablet"
-        label="Purchase Price Per Tablet"
-        value={purchasePricePerTablet}
-        disabled
-      />
+      
 
       <TextInputField
         inputType="numbers"
@@ -326,13 +322,9 @@ export default function InventoryFormFields({
         }}
       />
 
-      <TextInputField
-        inputType="numbers"
-        name="mrpPerTablet"
-        label="MRP Per Tablet"
-        value={mrpPerTablet}
+      {/* <TextInputField inputType="numbers" name="mrpPerTablet" label="MRP Per Tablet" value={mrpPerTablet}
         disabled
-      />
+      /> */}
 
       <TextInputField
         inputType="numbers"
@@ -340,12 +332,7 @@ export default function InventoryFormFields({
         label="GST Percentage"
       />
 
-      <TextInputField
-        name="finalPrice"
-        label="Final Amount (With GST)"
-        value={finalPrice}
-        disabled
-      />
+      {/* <TextInputField name="finalPrice" label="Final Amount (With GST)" value={finalPrice} disabled/> */}
 
       <DropdownField
         name="distributorId"

@@ -8,7 +8,7 @@ import {
   type Theme,
   type TextFieldProps
 } from "@mui/material";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller,  useFormContext } from "react-hook-form";
 import { SanitizeMobileRegex } from "@/utils/RegexPattern";
 import { useTranslation } from "react-i18next";
 import { getComponentTranslations } from "@/helpers/useTranslations";
@@ -20,6 +20,7 @@ type MobileFieldProps = TextFieldProps & {
   sx?: SxProps<Theme>;
   countryCode?: boolean;
   preventDuplicate?: boolean;
+  
 };
 
 type Customer = {
@@ -104,6 +105,11 @@ const MobileField: React.FC<MobileFieldProps> = ({
           if (selectedCountry && sanitized.length !== selectedCountry.digits) {
             return `Mobile number must be ${selectedCountry.digits} digits`;
           }
+
+          //starting digit validation 7 to 9
+              if (sanitized.length > 0 && !/^[6-9]/.test(sanitized)) {
+      return "Mobile number must start with 6, 7, 8, or 9";
+    }
 
           // duplicate check
           if (preventDuplicate) {

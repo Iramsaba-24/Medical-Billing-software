@@ -612,7 +612,7 @@ function PharmacyProfile() {
                     required
                   />
 
-                  <TextInputField
+                  {/* <TextInputField
                     name="drugLicenseNumber"
                     label="Drug License No."
                     placeholder="DL-KA-2023-001245"
@@ -621,7 +621,7 @@ function PharmacyProfile() {
                     minLength={15}
                     maxLength={20}
                     required
-                  />
+                  /> */}
                 </Stack>
               </Grid>
 
@@ -723,7 +723,7 @@ function PharmacyProfile() {
                     </Box>
                   </Box>
 
-                  <Box sx={{ mt: { xs: 0, md: 12 }, width: "100%" }}>
+                  {/* <Box sx={{ mt: { xs: 0, md: 12 }, width: "100%" }}>
                     <TextInputField
                       name="fssaiNumber"
                       label="FSSAI No."
@@ -734,7 +734,7 @@ function PharmacyProfile() {
                       required
                       sx={{ mt: 8 }}
                     />
-                  </Box>
+                  </Box> */}
                 </Stack>
               </Grid>
             </Grid>

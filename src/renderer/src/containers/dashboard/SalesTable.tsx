@@ -111,6 +111,7 @@ const SalesTable: React.FC = () => {
 
         return {
           id: item.retailInvoiceId,
+          customerId: item.customerId,
           name: item.customerName || "-",
           medicine: medicineNames || "-",
           quantity: totalQty,

@@ -10,6 +10,7 @@ import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 
 export type InvoiceData = {
+  srNo: number;
   invoice: string;
   name: string;
   date: string;
@@ -43,33 +44,44 @@ const InvoiceTable = () => {
   });
 
   const { watch } = methods;
+
   const statusFilter = watch("statusFilter");
   const timeFilter = watch("timeFilter");
 
-  const fetchInvoices = async () => {
+  const fetchInvoices = async (): Promise<void> => {
     try {
       const token = localStorage.getItem("token");
-      const headers = { Authorization: token ? `Bearer ${token}` : "" };
 
-      const res = await axios.get<InvoiceApi[]>(API_ENDPOINTS.RETAIL_INVOICE, {
-        headers,
-      });
+      const headers = {
+        Authorization: token ? `Bearer ${token}` : "",
+      };
 
-      const apiData: InvoiceApi[] = res.data || [];
+      const response = await axios.get<InvoiceApi[]>(
+        API_ENDPOINTS.RETAIL_INVOICE,
+        {
+          headers,
+        }
+      );
 
-      const formatted: InvoiceData[] = apiData.map((inv) => ({
-        invoice: String(inv.retailInvoiceId),
-        name: inv.customerName,
-        date: new Date(inv.invoiceDate).toLocaleDateString("en-GB"),
-        price: inv.totalAmount,
-        gst: 0,
-        total: inv.totalAmount,
-        status: inv.paymentStatus,
-      }));
+      const apiData: InvoiceApi[] = response.data || [];
 
-      setInvoices(formatted);
+      const formattedData: InvoiceData[] = apiData.map(
+        (invoice, index): InvoiceData => ({
+          srNo: index + 1,
+          invoice: String(invoice.retailInvoiceId),
+          name: invoice.customerName,
+          date: new Date(invoice.invoiceDate).toLocaleDateString("en-GB"),
+          price: invoice.totalAmount,
+          gst: 0,
+          total: invoice.totalAmount,
+          status: invoice.paymentStatus,
+        })
+      );
+
+      setInvoices(formattedData);
     } catch (error) {
       console.error("Error fetching invoices:", error);
+
       setInvoices([]);
     }
   };
@@ -85,17 +97,17 @@ const InvoiceTable = () => {
   }, []);
 
   const filteredData = useMemo(() => {
-    return invoices.filter((inv) => {
+    return invoices.filter((invoice) => {
       const matchesStatus =
-        statusFilter === "All" || inv.status === statusFilter;
+        statusFilter === "All" || invoice.status === statusFilter;
 
-      if (!inv.date) return false;
+      if (!invoice.date) return false;
 
-      const parts = inv.date.split("/");
+      const parts = invoice.date.split("/");
 
       if (parts.length !== 3) return false;
 
-      const invDate = new Date(
+      const invoiceDate = new Date(
         Number(parts[2]),
         Number(parts[1]) - 1,
         Number(parts[0])
@@ -107,24 +119,33 @@ const InvoiceTable = () => {
 
       if (timeFilter === "This Month") {
         matchesTime =
-          invDate.getMonth() === today.getMonth() &&
-          invDate.getFullYear() === today.getFullYear();
+          invoiceDate.getMonth() === today.getMonth() &&
+          invoiceDate.getFullYear() === today.getFullYear();
       }
 
+    
       if (timeFilter === "Last 7 Days") {
         const sevenDaysAgo = new Date();
+
         sevenDaysAgo.setDate(today.getDate() - 7);
 
-        matchesTime = invDate >= sevenDaysAgo && invDate <= today;
+        matchesTime =
+          invoiceDate >= sevenDaysAgo && invoiceDate <= today;
       }
 
       return matchesStatus && matchesTime;
     });
   }, [invoices, statusFilter, timeFilter]);
 
-  const handleDeleteSelected = (rowsToDelete: InvoiceData[]) => {
+
+  const handleDeleteSelected = (
+    rowsToDelete: InvoiceData[]
+  ): void => {
     const updatedInvoices = invoices.filter(
-      (inv) => !rowsToDelete.some((row) => row.invoice === inv.invoice)
+      (invoice) =>
+        !rowsToDelete.some(
+          (row) => row.invoice === invoice.invoice
+        )
     );
 
     setInvoices(updatedInvoices);
@@ -146,33 +167,61 @@ const InvoiceTable = () => {
   ];
 
   const columns: Column<InvoiceData>[] = [
-    { key: "invoice", label: "Invoice" },
-    { key: "name", label: "Name" },
-    { key: "date", label: "Date" },
+    {
+      key: "srNo",
+      label: "Sr No",
+    },
+    {
+      key: "invoice",
+      label: "Invoice",
+    },
+    {
+      key: "name",
+      label: "Name",
+    },
+    {
+      key: "date",
+      label: "Date",
+    },
     {
       key: "price",
       label: "Price",
-      render: (row) => `₹ ${row.price.toFixed(2)}`,
+      render: (row) => `₹ ${row.price.toLocaleString()}`,
     },
     {
       key: "status",
       label: "Status",
       render: (row) => {
-        const styles: Record<string, { bg: string; color: string }> = {
-          Paid: { bg: "#E8F5E9", color: "#2E7D32" },
-          Pending: { bg: "#FFF9C4", color: "#F9A825" },
-          Overdue: { bg: "#FFEBEE", color: "#D32F2F" },
+        const statusStyles: Record<
+          InvoiceData["status"],
+          {
+            bg: string;
+            color: string;
+          }
+        > = {
+          Paid: {
+            bg: "#E8F5E9",
+            color: "#2E7D32",
+          },
+          Pending: {
+            bg: "#FFF9C4",
+            color: "#F9A825",
+          },
+          Overdue: {
+            bg: "#FFEBEE",
+            color: "#D32F2F",
+          },
         };
 
-        const current = styles[row.status];
+        const currentStyle = statusStyles[row.status];
 
         return (
           <Chip
             label={row.status}
             size="small"
             sx={{
-              backgroundColor: current.bg,
-              color: current.color,
+              backgroundColor: currentStyle.bg,
+              color: currentStyle.color,
               fontWeight: 600,
               borderRadius: "4px",
             }}
@@ -184,8 +233,17 @@ const InvoiceTable = () => {
 
   return (
     <FormProvider {...methods}>
-      <Paper sx={{ p: 3, borderRadius: 2 }}>
-        <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+      <Paper
+        sx={{
+          p: 3,
+          borderRadius: 2,
+        }}
+      >
+        <Typography
+          variant="h6"
+          fontWeight="bold"
+          sx={{ mb: 1 }}
+        >
           Invoice Report Table
         </Typography>
 
@@ -210,7 +268,12 @@ const InvoiceTable = () => {
           />
         </Stack>
 
-        <div style={{ width: "100%", overflowX: "auto" }}>
+        <div
+          style={{
+            width: "100%",
+            overflowX: "auto",
+          }}
+        >
           <UniversalTable<InvoiceData>
             data={filteredData}
             columns={columns}

@@ -402,7 +402,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     mode: "onChange",
   });
 
-  // ✅ AutoSave hook — form data save & restore hoga automatically
+  // AutoSave hook — form data save & restore hoga automatically
   const { clearData } = useAutoSave({
     storageKey: "add_customer_form",
     methods,
@@ -709,7 +709,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
           <Button
             variant="contained"
             onClick={() => {
-              clearData(); // ✅ cancel pe bhi draft clear karo
+              clearData(); 
               if (onBack) {
                 onBack();
               } else {

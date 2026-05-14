@@ -265,6 +265,11 @@
 // export default GenralSettings;
 
 
+
+
+
+
+
  
 import { FormProvider, useForm, type SubmitHandler } from "react-hook-form";
 import { Button, Paper, Typography, Box } from "@mui/material";
@@ -564,4 +569,3 @@ const timeZoneOptions = [
  
 export default GenralSettings;
  
-
