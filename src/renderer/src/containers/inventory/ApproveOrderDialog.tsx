@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
+import { approveReorder } from "@/service/reorderService";
 
 type NewMedicine = {
   id: number;
@@ -50,9 +51,10 @@ type Props = {
   open: boolean;
   order: NewOrderHistory | null;
   onClose: () => void;
+  onSuccess?: () => void; 
 };
 
-function ApproveOrderDialog({ open, order, onClose }: Props) {
+function ApproveOrderDialog({ open, order, onClose, onSuccess }: Props) {
   const navigate = useNavigate();
 
   const methods = useForm<FormValues>({
@@ -82,31 +84,38 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
   const amountMismatch =
     medTotal > 0 && paidUnpaidTotal > 0 && Math.abs(medTotal - paidUnpaidTotal) > 0.01;
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     if (amountMismatch || !order) return;
 
-    navigate(URL_PATH.AddInventoryItem, {
-      state: {
-        approveMode: true,
-        orderId: order.id,
-        distributorName: order.distributorName,
-        medicines: order.newMedicines.map((m) => ({
-          medicineName: m.medicineName,
-          strength: m.strength || "",
-          qty: m.qty,
-          amount: data.medicineAmounts?.[String(m.id)] || "0",
-        })),
-        payment: {
-          paid: data.paid,
-          unpaid: data.unpaid,
-          paymentMode: data.paymentMode,
+    try {
+      await approveReorder(order.id);
+
+      onSuccess?.(); // ← LastPurchaseList refresh trigger
+
+      navigate(URL_PATH.AddInventoryItem, {
+        state: {
+          approveMode: true,
+          orderId: order.id,
+          distributorName: order.distributorName,
+          medicines: order.newMedicines.map((m) => ({
+            medicineName: m.medicineName,
+            strength: m.strength || "",
+            qty: m.qty,
+            amount: data.medicineAmounts?.[String(m.id)] || "0",
+          })),
+          payment: {
+            paid: data.paid,
+            unpaid: data.unpaid,
+            paymentMode: data.paymentMode,
+          },
         },
-      },
-    });
+      });
 
-    onClose();
+      onClose();
+    } catch (error) {
+      console.error("Approve failed:", error);
+    }
   };
-
   return (
     <FormProvider {...methods}>
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

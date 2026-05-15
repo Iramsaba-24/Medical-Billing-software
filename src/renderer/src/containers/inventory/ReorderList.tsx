@@ -63,14 +63,10 @@ const fetchReorderHistory = async () => {
     console.error("Reorder history fetch failed:", error);
   }
 };
- 
+ const [refreshKey, setRefreshKey] = useState(0);
+
  
 const columns: Column<ReorderHistory>[] = [
-  {
-    key: "id",
-    label: "Sr No",
-    render: (row) => row.id,
-  },
  
   {
     key: "distributorName",
@@ -184,7 +180,7 @@ actions={{
 }}
 />
       </Paper>
-      <ApproveOrderDialog
+      {/* <ApproveOrderDialog
   open={!!approveOrder}
   onClose={() => setApproveOrder(null)}
   order={
@@ -206,10 +202,30 @@ actions={{
         }
       : null
   }
+/> */}
+<ApproveOrderDialog
+  open={!!approveOrder}
+  onClose={() => setApproveOrder(null)}
+  onSuccess={() => setRefreshKey((k) => k + 1)}
+  order={
+    approveOrder
+      ? {
+          id: approveOrder.id,
+          distributorName: approveOrder.distributorName,
+          distributorId: 0,
+          newMedicines: approveOrder.existingMedicines.map((med, index) => ({
+            id: index + 1,
+            medicineName: med.medicineName,
+            strength: med.strength,
+            qty: med.qty,
+          })),
+        }
+      : null
+  }
 />
  
       <NewOrderList />
-      <LastPurchaseList />
+      <LastPurchaseList key={refreshKey} />
     </Box>
   );
 }

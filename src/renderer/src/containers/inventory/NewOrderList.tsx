@@ -53,24 +53,15 @@ function NewOrderList() {
     }
   };
  
- 
-  const columns: Column<NewOrderHistory>[] = [
-  {
-    key: "id",
-    label: "Sr No",
-    render: (row) => row.id,
-  },
- 
+  const columns: Column<NewOrderHistory>[] = [ 
   {
     key: "distributorName",
     label: "Supplier",
   },
- 
   {
     key: "medicineName",
     label: "Medicine Name",
   },
- 
   {
     key: "strength",
     label: "Strength/Type",
@@ -118,7 +109,7 @@ function NewOrderList() {
           <Typography fontWeight={700}>New Order List</Typography>
         </Box>
  
-    <UniversalTable<NewOrderHistory, NewMedicine>
+  <UniversalTable<NewOrderHistory, NewMedicine>
   data={newOrderData}
   columns={columns}
   rowsPerPage={5}
@@ -161,8 +152,7 @@ function NewOrderList() {
   CheckIcon: (order) => setSelectedOrder(order),
 }}
 />
-      </Paper>
- 
+      </Paper> 
       <ApproveOrderDialog
         open={!!selectedOrder}
         order={selectedOrder}
@@ -170,7 +160,6 @@ function NewOrderList() {
       />
     </Box>
   );
-}
- 
+} 
 export default NewOrderList;    
  

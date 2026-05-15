@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import {
   Box, Paper, Typography,
 } from "@mui/material";
-import { getMedicines, type MedicineResponse } from "@/service/medicineService";
-import {
+import { getLastPurchases } from "@/service/reorderService";import {
   UniversalTable,
   ACTION_KEY,
   type Column,
@@ -36,27 +35,37 @@ function LastPurchaseList() {
     view: (row: StockRow) => console.log("View", row),
   };
    
-  const fetchMedicineData = async () => {
-    try {
-      const medicines: MedicineResponse[] = await getMedicines();
- 
-      const latestPurchases = medicines.slice(0, 5).map((item) => ({
-        id: item.medicineId,
-        supplier: item.distributorName || "-",
-        medicineName: item.medicineName,
-        strengthType: item.strength || "-",
-        quantity: item.totalStockTablets.toString(),
-        [ACTION_KEY]: "",
-      }));
- 
-      setLastPurchaseData(latestPurchases);
-    } catch (error) {
-      console.error("Medicine fetch failed:", error);
-    }
-  };
+const fetchLastPurchaseData = async () => {
+  try {
+    const data = await getLastPurchases();
+    console.log("RAW DATA:", data);
+    console.log("TYPE:", typeof data);
+
+    const mapped: StockRow[] = [];
+
+    data.forEach((order) => {
+      order.existingMedicines
+        .filter((med) => med.medicineName)
+        .forEach((med, idx) => {
+          mapped.push({
+            id: order.id * 100 + idx,
+            supplier: order.distributorName || "-",
+            medicineName: med.medicineName,
+            strengthType: med.strength || "-",
+            quantity: med.qty?.toString() || "-",
+            [ACTION_KEY]: "",
+          });
+        });
+    });
+
+    setLastPurchaseData(mapped);
+  } catch (error) {
+    console.error("Last purchase fetch failed:", error);
+  }
+};
  
   useEffect(() => {
-    fetchMedicineData();
+    fetchLastPurchaseData();
   }, []);
  
   return (

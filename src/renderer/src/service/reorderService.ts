@@ -16,6 +16,18 @@ export type LowStockResponse = {
   quantity: number;
   unit: string;
 };
+export type ApproveOrderPayload = {
+  distributorName: string; 
+  paid: number;
+  unpaid: number;
+  paymentMode: string;
+  medicines: {
+    medicineName: string;
+    strength: string;
+    qty: number;
+    amount: number;
+  }[];
+};
 
 export type LowStockApiResponse = {
   message: string;
@@ -45,7 +57,25 @@ export type ReorderApiResponse = {
   message: string;
   data: ReorderLevelsResponse[];
 };
-
+export type ReorderResponse = {
+  id: number;
+  distributorName: string;
+  emailAddress: string;
+  createdAt: string;
+  existingMedicines: {
+    id: number;
+    medicineName: string;
+    strength: string;
+    companyName: string;
+    qty: number;
+  }[];
+  newMedicines: {
+    id: number;
+    medicineName: string;
+    strength: string;
+    qty: number;
+  }[];
+};
 // reorder
 export const createReorder = async (data: {
   distributorId: number;
@@ -70,10 +100,22 @@ export const getLowStock = async (): Promise<LowStockApiResponse> => {
 };
 
 // last purchase
-export const getLastPurchases = async (): Promise<ReorderApiResponse> => {
-  const res = await axios.get<ReorderApiResponse>(
-    API_ENDPOINTS.LAST_PURCHASE,
+export const getLastPurchases = async (): Promise<ReorderResponse[]> => {
+  const res = await axios.get<ReorderResponse[]>(
+    API_ENDPOINTS.REORDER,
     getAuthHeaders()
   );
-  return res.data;
+  return res.data; 
+};
+// approve order
+export const approveReorder = async (id: number): Promise<void> => {
+  await axios.put(
+    `${API_ENDPOINTS.REORDER}/${id}`,
+    {
+      status: "Approved",
+      newMedicines: [],       
+      existingMedicines: [],  
+    },
+    getAuthHeaders()
+  );
 };
