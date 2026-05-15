@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   Box, Paper, Typography,
 } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
 import { getMedicines, type MedicineResponse } from "@/service/medicineService";
 import {
   UniversalTable,
@@ -36,7 +35,7 @@ function LastPurchaseList() {
   const purchaseActions = {
     view: (row: StockRow) => console.log("View", row),
   };
-
+   
   const fetchMedicineData = async () => {
     try {
       const medicines: MedicineResponse[] = await getMedicines();
@@ -61,19 +60,47 @@ function LastPurchaseList() {
   }, []);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 3, p: 2 }}>
+   <Box
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    gap: 3,
+    width: "100%",
+  }}
+>
 
       {/* Last Purchase */}
-      <Paper sx={{ borderRadius: 2, p: 2 }}>
-        <Typography fontWeight={700} mb={1.5}>Last Purchase</Typography>
-        <UniversalTable
-          data={lastPurchaseData}
-          columns={purchaseColumns}
-          getRowId={(row) => row.id}
-          actions={purchaseActions}
-          tableSize="small"
-          rowsPerPage={5}
-        />
+<Paper
+  sx={{
+    borderRadius: 2,
+    p: { xs: 1, sm: 2 },
+    overflowX: "auto",
+    width: "100%",
+    boxShadow: 4,
+    backgroundColor: "#fff",
+  }}
+>
+       <Box
+  display="flex"
+  justifyContent="space-between"
+  alignItems={{ xs: "flex-start", sm: "center" }}
+  flexDirection={{ xs: "column", sm: "row" }}
+  gap={1}
+  mb={1.5}
+>
+  <Typography fontWeight={700}>
+    Last Purchase
+  </Typography>
+</Box>
+       <UniversalTable
+  data={lastPurchaseData}
+  columns={purchaseColumns}
+  getRowId={(row) => row.id}
+  actions={purchaseActions}
+  tableSize="small"
+  rowsPerPage={5}
+  textAlign="center"
+/>
       </Paper>
 
     </Box>

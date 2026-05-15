@@ -8,7 +8,6 @@ import DropdownField from "@/components/controlled/DropdownField";
 import { Add, Remove } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-
 import {
   getDistributors,
   type DistributorResponse,
