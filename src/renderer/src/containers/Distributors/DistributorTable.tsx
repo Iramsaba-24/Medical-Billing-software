@@ -37,6 +37,7 @@ const convertToDistributor = (response: DistributorResponse): Distributor => {
     address: response.address,
    status: response.isActive ? "Active" : "Inactive",
     ownerName: response.ownerName,
+
     website: response.website,
     gstin: response.gstin,
     bankDetails: response.bankDetails ? {

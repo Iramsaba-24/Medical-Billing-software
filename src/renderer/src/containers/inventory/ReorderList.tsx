@@ -206,7 +206,11 @@ actions={{
 <ApproveOrderDialog
   open={!!approveOrder}
   onClose={() => setApproveOrder(null)}
-  onSuccess={() => setRefreshKey((k) => k + 1)}
+onSuccess={() => {
+  setRefreshKey((k) => k + 1);
+  fetchReorderHistory(); // ← हे add कर - reorder list refresh होईल
+}}
+
   order={
     approveOrder
       ? {

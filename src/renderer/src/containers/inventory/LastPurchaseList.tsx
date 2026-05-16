@@ -14,6 +14,8 @@ type StockRow = {
   medicineName: string;
   strengthType: string;
   quantity: string;
+    paidAmount: string;   
+  unpaidAmount: string;
   [ACTION_KEY]: string;
 };
  
@@ -23,6 +25,8 @@ const purchaseColumns: Column<StockRow>[] = [
   { key: "medicineName", label: "Medicine Name" },
   { key: "strengthType", label: "Strength/Type" },
   { key: "quantity", label: "Quantity" },
+    { key: "paidAmount", label: "Paid (₹)" },    
+  { key: "unpaidAmount", label: "Unpaid (₹)" },
   { key: ACTION_KEY, label: "Action" },
 ];
  
@@ -53,6 +57,8 @@ const fetchLastPurchaseData = async () => {
             medicineName: med.medicineName,
             strengthType: med.strength || "-",
             quantity: med.qty?.toString() || "-",
+              paidAmount: med.paidAmount?.toString() || "0",   
+  unpaidAmount: med.unPaidAmount?.toString() || "0",
             [ACTION_KEY]: "",
           });
         });

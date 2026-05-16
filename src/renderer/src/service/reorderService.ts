@@ -68,6 +68,9 @@ export type ReorderResponse = {
     strength: string;
     companyName: string;
     qty: number;
+        paidAmount: number | null;    
+    unPaidAmount: number | null;  
+    paymentType: string | null;
   }[];
   newMedicines: {
     id: number;
@@ -108,14 +111,41 @@ export const getLastPurchases = async (): Promise<ReorderResponse[]> => {
   return res.data; 
 };
 // approve order
-export const approveReorder = async (id: number): Promise<void> => {
+export const approveReorder = async (
+  id: number,
+  payload: {
+    distributorName: string;
+    emailAddress: string;
+    existingMedicines: {
+      medicineName: string;
+      strength: string;
+      companyName: string;
+      qty: number;
+      paidAmount: number;
+      unPaidAmount: number;
+      paymentType: string;
+    }[];
+    newMedicines: {
+      medicineName: string;
+      strength: string;
+      qty: number;
+      paidAmount: number;
+      unPaidAmount: number;
+      paymentType: string;
+    }[];
+  }
+): Promise<void> => {
   await axios.put(
     `${API_ENDPOINTS.REORDER}/${id}`,
-    {
-      status: "Approved",
-      newMedicines: [],       
-      existingMedicines: [],  
-    },
+    payload,
+    getAuthHeaders()
+  );
+};
+
+// हे add कर - file च्या शेवटी
+export const deleteReorder = async (id: number): Promise<void> => {
+  await axios.delete(
+    `${API_ENDPOINTS.REORDER}/${id}`,
     getAuthHeaders()
   );
 };

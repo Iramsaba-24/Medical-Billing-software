@@ -1,3 +1,4 @@
+
 import TextInputField from "@/components/controlled/TextInputField";
 import DropdownField from "@/components/controlled/DropdownField";
 import DateTimeField from "@/components/controlled/DateTimeField";
@@ -82,10 +83,12 @@ export default function InventoryFormFields({
         min: { value: 1, message: "Tablets per strip must be greater than 0" },
       }}/>
 
-      <TextInputField inputType="numbers" name="looseTablets" label="Extra Medicine (Loose)" 
+      <TextInputField inputType="numbers" name="invoiceNumber" label="Invoice Number" />
+
+      {/* <TextInputField inputType="numbers" name="looseTablets" label="Extra Medicine (Loose)" 
       rules={{
         min: { value: 0, message: "Loose tablets cannot be negative" },
-      }}/>
+      }}/> */}
 
       {/* Ordered Qty Warning */}
       {showWarning && (
@@ -152,7 +155,8 @@ export default function InventoryFormFields({
         required
       />
 
-      <TextInputField inputType="numbers" name="invoiceNumber" label="Invoice Number" />
+      
     </>
   );
 }
+

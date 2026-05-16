@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
-import { approveReorder } from "@/service/reorderService";
+import { approveReorder, deleteReorder } from "@/service/reorderService";
 
 type NewMedicine = {
   id: number;
@@ -84,38 +84,54 @@ function ApproveOrderDialog({ open, order, onClose, onSuccess }: Props) {
   const amountMismatch =
     medTotal > 0 && paidUnpaidTotal > 0 && Math.abs(medTotal - paidUnpaidTotal) > 0.01;
 
-  const onSubmit = async (data: FormValues) => {
-    if (amountMismatch || !order) return;
+const onSubmit = async (data: FormValues) => {
+  if (amountMismatch || !order) return;
 
-    try {
-      await approveReorder(order.id);
+  try {
+    const payload = {
+      distributorName: order.distributorName,
+      emailAddress: "",
+      existingMedicines: order.newMedicines.map((m) => ({
+        medicineName: m.medicineName,
+        strength: m.strength || "",
+        companyName: "",
+        qty: m.qty,
+        paidAmount: parseFloat(data.paid) || 0,
+        unPaidAmount: parseFloat(data.unpaid) || 0,
+        paymentType: data.paymentMode || "",
+      })),
+      newMedicines: [],
+    };
 
-      onSuccess?.(); // ← LastPurchaseList refresh trigger
+    await approveReorder(order.id, payload); // 1. Update with amounts
+    await deleteReorder(order.id);           // 2. Delete from reorder list
 
-      navigate(URL_PATH.AddInventoryItem, {
-        state: {
-          approveMode: true,
-          orderId: order.id,
-          distributorName: order.distributorName,
-          medicines: order.newMedicines.map((m) => ({
-            medicineName: m.medicineName,
-            strength: m.strength || "",
-            qty: m.qty,
-            amount: data.medicineAmounts?.[String(m.id)] || "0",
-          })),
-          payment: {
-            paid: data.paid,
-            unpaid: data.unpaid,
-            paymentMode: data.paymentMode,
-          },
+    onSuccess?.(); // 3. LastPurchaseList refresh
+
+    navigate(URL_PATH.AddInventoryItem, {
+      state: {
+        approveMode: true,
+        orderId: order.id,
+        distributorName: order.distributorName,
+        medicines: order.newMedicines.map((m) => ({
+          medicineName: m.medicineName,
+          strength: m.strength || "",
+          qty: m.qty,
+          amount: data.medicineAmounts?.[String(m.id)] || "0",
+        })),
+        payment: {
+          paid: data.paid,
+          unpaid: data.unpaid,
+          paymentMode: data.paymentMode,
         },
-      });
+      },
+    });
 
-      onClose();
-    } catch (error) {
-      console.error("Approve failed:", error);
-    }
-  };
+    onClose();
+  } catch (error) {
+    console.error("Approve failed:", error);
+  }
+};
   return (
     <FormProvider {...methods}>
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>

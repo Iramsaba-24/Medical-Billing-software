@@ -1,13 +1,6 @@
 import {
-  Box,
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
+  Box, Button, Paper, Table, TableBody, TableCell,
+  TableHead, TableRow, Typography,
 } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
@@ -34,81 +27,88 @@ type LocationState = {
   email: string;
   medicines: MedicineRow[];
   isViewMode?: boolean;
-  orderType?: "reorder" | "neworder";
+  orderType?: "reorder" | "neworder"; 
 };
 
 export default function ReorderEmail() {
   const location = useLocation();
   const navigate = useNavigate();
   const [pharmacySettings, setPharmacySettings] =
-    useState<PharmacySettingsResponse | null>(null);
+  useState<PharmacySettingsResponse | null>(null);
 
-  const { distributor, email, medicines, isViewMode, orderType } =
-    (location.state as LocationState) || {
-      distributor: "",
-      email: "",
-      medicines: [],
-      isViewMode: false,
-      orderType: "neworder",
+const {
+  distributor,
+  email,
+  medicines,
+  isViewMode,
+  orderType, 
+} = (location.state as LocationState) || {
+  distributor: "",
+  email: "",
+  medicines: [],
+  isViewMode: false,
+  orderType: "neworder",
+};
+
+
+const handleSend = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    // check orderType
+    const isReorder = orderType === "reorder";
+
+    const payload = {
+      DistributorName: distributor,
+      EmailAddress: email,
+
+      ExistingMedicines: isReorder
+        ? medicines.map((m) => ({
+            MedicineName: m.medicineId || m.medicineName,
+            Strength: m.strengthType,
+            CompanyName: distributor,
+            Qty: Number(m.qty || m.quantity),
+          }))
+        : [], 
+
+      NewMedicines: !isReorder
+        ? medicines.map((m) => ({
+            MedicineName: m.medicineId || m.medicineName,
+            Strength: m.strengthType,
+            Qty: Number(m.qty || m.quantity),
+          }))
+        : [], // if there is neworder then it will be in NewMedicines
     };
 
-  const handleSend = async () => {
+    await axios.post(API_ENDPOINTS.REORDER, payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    showToast("success", "Reorder email sent successfully!");
+    navigate(URL_PATH.Reorder);
+
+  } catch (error) {
+    console.error("Reorder failed:", error);
+    showToast("error", "Failed to send reorder. Please try again.");
+  }
+};
+  useEffect(() => {
+  const fetchPharmacySettings = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const userId = Number(localStorage.getItem("userId"));
 
-      // check orderType
-      const isReorder = orderType === "reorder";
+      if (!userId) return;
 
-      const payload = {
-        DistributorName: distributor,
-        EmailAddress: email,
+      const response = await pharmacySettingsService.getSettings(userId);
 
-        ExistingMedicines: isReorder
-          ? medicines.map((m) => ({
-              MedicineName: m.medicineId || m.medicineName,
-              Strength: m.strengthType,
-              CompanyName: distributor,
-              Qty: Number(m.qty || m.quantity),
-            }))
-          : [],
-
-        NewMedicines: !isReorder
-          ? medicines.map((m) => ({
-              MedicineName: m.medicineId || m.medicineName,
-              Strength: m.strengthType,
-              Qty: Number(m.qty || m.quantity),
-            }))
-          : [],
-      };
-
-      await axios.post(API_ENDPOINTS.REORDER, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      showToast("success", "Reorder email sent successfully!");
-      navigate(URL_PATH.Reorder);
+      setPharmacySettings(response);
     } catch (error) {
-      console.error("Reorder failed:", error);
-      showToast("error", "Failed to send reorder. Please try again.");
+      console.error("Failed to fetch pharmacy settings", error);
     }
   };
-  useEffect(() => {
-    const fetchPharmacySettings = async () => {
-      try {
-        const userId = Number(localStorage.getItem("userId"));
 
-        if (!userId) return;
-
-        const response = await pharmacySettingsService.getSettings(userId);
-
-        setPharmacySettings(response);
-      } catch (error) {
-        console.error("Failed to fetch pharmacy settings", error);
-      }
-    };
-
-    fetchPharmacySettings();
-  }, []);
+  fetchPharmacySettings();
+}, []);
 
   return (
     <Box sx={{ p: 3, maxWidth: "1100px", mx: "auto" }}>
@@ -134,19 +134,13 @@ export default function ReorderEmail() {
       </Box>
 
       {/* Mail Preview */}
-      <Paper
-        elevation={2}
-        sx={{ p: 3, borderRadius: 2, border: "1px solid #ddd" }}
-      >
+      <Paper elevation={2} sx={{ p: 3, borderRadius: 2, border: "1px solid #ddd" }}>
         <Typography mb={1}>Dear {distributor},</Typography>
         <Typography mb={3}>Good day.</Typography>
         <Typography mb={3}>
-          We would like to place a reorder for the following medicines for our
-          medical store.
+          We would like to place a reorder for the following medicines for our medical store.
         </Typography>
-        <Typography fontWeight={600} mb={2}>
-          Order Details:
-        </Typography>
+        <Typography fontWeight={600} mb={2}>Order Details:</Typography>
 
         <Table size="small">
           <TableHead>
@@ -161,9 +155,13 @@ export default function ReorderEmail() {
             {medicines.map((item, index) => (
               <TableRow key={item.medicineRowId}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{item.medicineId || item.medicineName}</TableCell>
+                <TableCell>
+  {item.medicineId || item.medicineName}
+</TableCell>
                 <TableCell>{item.strengthType}</TableCell>
-                <TableCell>{item.qty || item.quantity}</TableCell>
+<TableCell>
+  {item.qty || item.quantity}
+</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -176,27 +174,27 @@ export default function ReorderEmail() {
         <Box mt={4}>
           <Typography>Thank you.</Typography>
           <Typography mt={2}>Best regards,</Typography>
-          <Typography>
-            {pharmacySettings?.pharmacyName || "Medical Store"}
-          </Typography>
+<Typography>
+  {pharmacySettings?.pharmacyName || "Medical Store"}
+</Typography>
 
-          <Typography>
-            Contact: {pharmacySettings?.contactNumber || "+91 XXXXXXXXXX"}
-          </Typography>
+<Typography>
+  Contact: {pharmacySettings?.contactNumber || "+91 XXXXXXXXXX"}
+</Typography>
         </Box>
       </Paper>
 
-      {!isViewMode && (
-        <Box display="flex" justifyContent="flex-end" mt={3}>
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: "#238878", textTransform: "none" }}
-            onClick={handleSend}
-          >
-            Send
-          </Button>
-        </Box>
-      )}
+{!isViewMode && (
+  <Box display="flex" justifyContent="flex-end" mt={3}>
+    <Button
+      variant="contained"
+      sx={{ backgroundColor: "#238878", textTransform: "none" }}
+      onClick={handleSend}
+    >
+      Send
+    </Button>
+  </Box>
+)}
     </Box>
   );
 }

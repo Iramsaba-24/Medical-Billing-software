@@ -1,4 +1,3 @@
- 
 import { Box, Button, Typography } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
 import BgImage from "@/assets/bgloginpage.svg";
@@ -18,9 +17,9 @@ const ChoosePlan = () => {
       plan: "",
     },
   });
- 
+
   const navigate = useNavigate();
- 
+
   const radioStyle = {
     "& .MuiRadio-root": {
       color: "default.main",
@@ -29,32 +28,28 @@ const ChoosePlan = () => {
       },
     },
   };
- 
+
   const onSubmit = (data: PlanForm) => {
     console.log("Selected Plan:", data.plan);
- 
+
     // Get existing registration data
     const existingData = JSON.parse(
       localStorage.getItem("registrationData") || "{}"
     );
- 
     // Merge selected plan
     const updatedData = {
       ...existingData,
       selectedPlan: data.plan,
     };
- 
     // Save updated registration data
     localStorage.setItem(
       "registrationData",
       JSON.stringify(updatedData)
     );
- 
     console.log(
       "Saved registrationData:",
       localStorage.getItem("registrationData")
     );
- 
     showToast("success", "Plan selected successfully!");
  
     navigate(URL_PATH.AccountSetup);
@@ -187,6 +182,5 @@ const ChoosePlan = () => {
     </Box>
   );
 };
- 
+
 export default ChoosePlan;
- 
