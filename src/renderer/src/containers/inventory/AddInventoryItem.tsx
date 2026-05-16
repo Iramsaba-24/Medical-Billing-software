@@ -1,9 +1,10 @@
+
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate,useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { useEffect, useState} from "react";
-import { addMedicine,  getMedicineById,  MedicineResponse,updateMedicine  } from "@/service/medicineService";
+import { addMedicine,  getMedicineById,  MedicineResponse, updateMedicine } from "@/service/medicineService";
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
 import { getMedicineGroups } from "@/service/medicineGroupService";
 import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
@@ -56,23 +57,33 @@ export default function AddInventoryItem() {
 
 const location = useLocation();
 
-type ApproveOrderState = {
-  approveMode: true;
+type ApproveMedicine = {
   medicineName: string;
   strength: string;
   qty: number;
+  amount: string;
+};
+
+type ApproveOrderState = {
+  approveMode: true;
   orderId: number;
   distributorName: string;
+  medicines?: ApproveMedicine[];
 };
 
 const locationState = location.state as MedicineResponse | ApproveOrderState | undefined;
 const editData = locationState && !("approveMode" in locationState) 
   ? locationState 
   : undefined;
-const approveData = locationState && "approveMode" in locationState 
-  ? locationState 
-  : undefined;
+const approveData =
+  locationState && "approveMode" in locationState
+    ? (locationState as ApproveOrderState)
+    : undefined;
 
+    const [currentMedicineIndex, setCurrentMedicineIndex] = useState(0);
+
+const currentMedicine =
+  approveData?.medicines?.[currentMedicineIndex];
 
 const methods = useForm<InventoryFormData>({
   mode: "onChange",
@@ -100,6 +111,8 @@ const methods = useForm<InventoryFormData>({
     const [, setDistributorData] = useState<DistributorResponse[]>([]);
 const [groupOptions, setGroupOptions] = useState<{ label: string; value: string }[]>([]);
 const [supplierOptions, setSupplierOptions] = useState<{ label: string; value: string }[]>([]);
+
+
   // Load Medicine Groups
 useEffect(() => {
   const fetchGroups = async () => {
@@ -140,6 +153,8 @@ useEffect(() => {
   fetchDistributors();
 }, []);
 
+
+
 const onSubmit = async (data: InventoryFormData) => {
   try {
     const finalData = {
@@ -149,63 +164,93 @@ const onSubmit = async (data: InventoryFormData) => {
       companyName: data.companyName || "NA",
     };
 
-   
+    
     if (isEdit && editData?.medicineId) {
-  await updateMedicine(editData.medicineId, finalData);
-} else {
-  await addMedicine(finalData);
 
-  // approve order after inventory add success
-  if (approveData?.orderId) {
-    const token = localStorage.getItem("token");
+      await updateMedicine(
+        editData.medicineId,
+        finalData
+      );
 
-    await axios.put(
-      `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-  }
-}
+      navigate(URL_PATH.Inventory);
+      return;
+    }
 
-navigate(URL_PATH.Inventory);
+   
+    await addMedicine(finalData);
+
+   
+    const totalMedicines =
+      approveData?.medicines?.length || 0;
+
+    if (currentMedicineIndex < totalMedicines - 1) {
+      setCurrentMedicineIndex((prev) => prev + 1);
+      return;
+    }
+
+    if (approveData?.orderId) {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    }
+
+    navigate(URL_PATH.Inventory);
+
   } catch (error) {
     console.error(error);
   }
 };
-
 // Approve mode 
 const { reset } = methods;
 
 useEffect(() => {
-  if (approveData && supplierOptions.length > 0) {
-    
-  
-    const matchedDistributor = supplierOptions.find(
-      (opt) => opt.label.toLowerCase() === approveData.distributorName?.toLowerCase()
-    );
+  if (!currentMedicine || supplierOptions.length === 0) return;
 
-    reset({
-      medicineName: approveData.medicineName || "",
-      strength: approveData.strength || "",
-      numberOfStrips: approveData.qty,
-      tabletsPerStrip: 1,
-      looseTablets: 0,
-      purchasePricePerStrip: 0,
-      mrpPerStrip: 0,
-      gstPercent: 5,
-      purchaseDate: new Date().toISOString().split("T")[0],
-      expiryDate: "",
-      type: "",
-      groupId: "",
-      distributorId: matchedDistributor?.value || "", 
-    });
-  }
-}, [approveData, supplierOptions, reset]);
+  const matchedDistributor = supplierOptions.find(
+    (opt) =>
+      opt.label.toLowerCase() ===
+      approveData?.distributorName?.toLowerCase()
+  );
 
+  const amount = Number(currentMedicine.amount || 0);
+  const qty = Number(currentMedicine.qty || 0);
+
+  const calculatedPurchasePrice =
+    qty > 0 ? amount / qty : 0;
+
+  reset({
+    medicineName: currentMedicine.medicineName || "",
+    strength: currentMedicine.strength || "",
+
+    numberOfStrips: qty,
+    tabletsPerStrip: 1,
+    looseTablets: 0,
+
+    purchasePricePerStrip: Number(
+      calculatedPurchasePrice.toFixed(2)
+    ),
+
+    mrpPerStrip: 0,
+    gstPercent: 5,
+
+    purchaseDate: new Date().toISOString().split("T")[0],
+
+    expiryDate: "",
+    type: "",
+    groupId: "",
+
+    distributorId: matchedDistributor?.value || "",
+  });
+
+}, [currentMedicine, supplierOptions, reset, approveData]);
 
 
 //fetch medicine for edit
@@ -290,7 +335,12 @@ const finalPrice = totalPrice + gstAmount;
   <Box width="100%" px={{ xs: 1, md: 2 }} mt={4} mb={8}>
     <Paper sx={{ p: { xs: 1, md: 2 }, borderRadius: 2 }}>
       <Typography fontSize={20} fontWeight={600} mb={4}>
-       {isEdit ? "Edit Medicine" : approveData ? "Approve & Add Medicine" : "Add New Medicine"}
+        {isEdit
+  ? "Edit Medicine"
+  : approveData?.medicines?.length
+  ? "Approve & Add Medicine"
+  : "Add New Medicine"}
+       {/* {isEdit ? "Edit Medicine" : approveData ? "Approve & Add Medicine" : "Add New Medicine"} */}
       </Typography>
 
       <Box
@@ -314,11 +364,13 @@ const finalPrice = totalPrice + gstAmount;
   purchasePricePerTablet={purchasePricePerTablet}
   mrpPerTablet={mrpPerTablet}
   finalPrice={finalPrice}
-  orderedQty={approveData?.qty}
+//  orderedQty={approveData?.medicines?.[0]?.qty}
+orderedQty={currentMedicine?.qty}
+
 />
 
      
-        <Box
+        {/* <Box
           gridColumn="1 / -1"
           display="flex"
           justifyContent="flex-end"
@@ -348,10 +400,67 @@ const finalPrice = totalPrice + gstAmount;
           >
             Save
           </Button>
-        </Box>
+        </Box> */}
+
+
+        <Box
+  gridColumn="1 / -1"
+  display="flex"
+  justifyContent={{ xs: "center", md: "flex-end" }}
+  gap={2}
+  flexWrap="wrap"
+>
+  <Button
+    variant="outlined"
+    onClick={() => navigate(-1)}
+    sx={{
+      px: 4,
+      textTransform: "none",
+      border: "2px solid #1b7f6b",
+      color: "#1b7f6b",
+       transition: "0.3s",
+
+
+         "&:hover": {
+        backgroundColor: "#1b7f6b",
+        color: "#fff",
+        border: "2px solid #1b7f6b",
+      },
+    }}
+  >
+    Cancel
+  </Button>
+
+  <Button
+    type="submit"
+    variant="contained"
+    sx={{
+      px: 4,
+      textTransform: "none",
+      backgroundColor: "#1b7f6b",
+      color: "#fff",
+
+       transition: "0.3s",
+
+      "&:hover": {
+        backgroundColor: "#fff",
+        color: "#1b7f6b",
+        border: "2px solid #1b7f6b",
+      },
+      
+    }}
+  >
+    Save
+  </Button>
+</Box>
       </Box>
     </Paper>
   </Box>
 </FormProvider>
   );
 }
+
+
+
+
+

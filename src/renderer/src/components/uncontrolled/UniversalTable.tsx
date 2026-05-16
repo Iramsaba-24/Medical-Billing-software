@@ -83,7 +83,7 @@ interface UniversalTableProps<
  
   actions?: Partial<Record<keyof typeof iconMap, (row: T) => void>>;
 footerRows?: readonly FooterRow[];
-
+ 
 subRows?: {
   key: keyof T;
   columns: Array<{
@@ -92,7 +92,7 @@ subRows?: {
     render?: (subRow: S) => ReactNode;
   }>;
 };
-
+ 
 }
  
 function buildExportData<T extends Record<string, unknown>>(
@@ -163,11 +163,11 @@ captionSx,
           );
  
   const DEFAULT_DROPDOWN_SX: SxProps = {
-    width: { xs:110, md:150 }, 
+    width: { xs:110, md:150 },
     bgcolor: "#1f2937",
     color: "#ffffff",
     fontWeight: 600,
-    fontSize: {xs:11, md:13}, 
+    fontSize: {xs:11, md:13},
     borderRadius: 2,
     "& .MuiSelect-icon": { color: "#a9a2a2ff" },
   };
@@ -252,14 +252,14 @@ captionSx,
       {(showSearch || showExport) && (
         <Box
           sx={{
-            px: { xs:1, md:2 }, 
+            px: { xs:1, md:2 },
             py: 2,
             display: "flex",
             justifyContent: {
               xs: "center",
               md: showSearch ? "space-between" : "flex-end",
             },
-            flexDirection: { xs:"column", md:"row" }, 
+            flexDirection: { xs:"column", md:"row" },
             flexWrap: "wrap",
             gap: 2,
           }}
@@ -273,7 +273,7 @@ captionSx,
                 setSearch(e.target.value);
                 setPage(0);
               }}
-              sx={{ 
+              sx={{
                 minWidth: { xs:"100%", md:220}
                }}
             />
@@ -337,7 +337,7 @@ captionSx,
                     bgcolor: "#444748ff",
                     color: "#ffffff",
                     ...headerSx,
-                    whiteSpace: "nowrap", 
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {col.label}
@@ -356,14 +356,14 @@ captionSx,
             ) : (
             paginatedData.flatMap((row, index) => {
                const rowId = resolveRowId(row, index);
-
+ 
 const childRows: S[] =
   subRows && Array.isArray(row[subRows.key])
     ? (row[subRows.key] as S[])
     : [];
  
-
-
+ 
+ 
     if (childRows.length > 0) {
   return childRows.map((subRow, childIndex) => (
     <TableRow
@@ -375,7 +375,7 @@ const childRows: S[] =
       }}
     >
       {columns.map((col) => {
-
+ 
        
         if (col.key === ACTION_KEY && actions) {
           return childIndex === 0 ? (
@@ -413,12 +413,12 @@ const childRows: S[] =
             </TableCell>
           ) : null;
         }
-
+ 
         // SUB ROW COLUMN
        const subCol = subRows?.columns.find(
   (s) => String(s.key) === String(col.key)
 );
-
+ 
         if (subCol) {
           return (
             <TableCell
@@ -431,7 +431,7 @@ const childRows: S[] =
             </TableCell>
           );
         }
-
+ 
         // PARENT COLUMN
         return childIndex === 0 ? (
           <TableCell
@@ -452,8 +452,8 @@ const childRows: S[] =
                   <TableRow
                     key={rowId}
                     hover
-                    sx={{ "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx, 
-                  
+                    sx={{ "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx,
+                 
                   }}
                   >
                     {enableCheckbox && (
@@ -466,8 +466,8 @@ const childRows: S[] =
                     )}
  
                     {columns.map((col) => {
-
-                  
+ 
+                 
                       /* Dropdown */
                       if (
                         dropdown &&
@@ -515,9 +515,9 @@ const childRows: S[] =
                             <Box display="flex" gap={1}>
                            {Object.keys(actions).map((k) => {
   const cfg = iconMap[k as keyof typeof iconMap];
-
+ 
   if (!cfg) return null;
-
+ 
   return (
     <Tooltip key={k} title={cfg.label}>
       <IconButton
@@ -614,4 +614,5 @@ const childRows: S[] =
     </Paper>
   );
 }
+ 
  

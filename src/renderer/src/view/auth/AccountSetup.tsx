@@ -1,3 +1,4 @@
+
 import { Box, Button, Typography, Checkbox, FormControlLabel, FormHelperText } from "@mui/material";
 import { FormProvider, useForm, Controller } from "react-hook-form";
 import BgImage from "@/assets/bgloginpage.svg";
@@ -130,8 +131,16 @@ const onSubmit = async (data: AccountForm): Promise<void> => {
   setIsLoading(true);
   
   try {
-    const registrationData = JSON.parse(localStorage.getItem('registrationData') || '{}');
-    const selectedPlan = localStorage.getItem('selectedPlan');
+   // const registrationData = JSON.parse(localStorage.getItem('registrationData') || '{}');
+    // const selectedPlan = localStorage.getItem('selectedPlan');
+
+    const registrationData = JSON.parse(
+  localStorage.getItem("registrationData") || "{}"
+);
+
+const selectedPlan = registrationData.selectedPlan;
+
+console.log("selectedPlan:", selectedPlan);
 
     if (!registrationData.email || !registrationData.fullName) {
       showToast("error", "Registration data missing. Please start over.");

@@ -5,7 +5,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-
+ 
 import {
   UniversalTable,
   ACTION_KEY,
@@ -17,87 +17,91 @@ import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import NewOrderList from "@/containers/inventory/NewOrderList";
 import LastPurchaseList from "@/containers/inventory/LastPurchaseList";
-
-
+import ApproveOrderDialog from "@/containers/inventory/ApproveOrderDialog";
+ 
+ 
 type ReorderMedicine = {
   medicineName: string;
   strength: string;
   companyName: string;
   qty: number;
 };
-
+ 
 type ReorderHistory = {
   id: number;
   distributorName: string;
+  distributorId?: number;
   createdAt: string;
   existingMedicines: ReorderMedicine[];
   orderType: "reorder" | "neworder";
   [ACTION_KEY]: string;
 };
-
+ 
 function ReorderList() {
   const navigate = useNavigate();
-
+  const [approveOrder, setApproveOrder] =
+  useState<ReorderHistory | null>(null);
+ 
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
-
+ 
 const fetchReorderHistory = async () => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.get(API_ENDPOINTS.REORDER, {
       headers: { Authorization: `Bearer ${token}` },
     });
-
+ 
     const allData: ReorderHistory[] = res.data || [];
-
+ 
     // existingMedicines filter for reorder
     const filtered = allData.filter(
       (item) => item.existingMedicines && item.existingMedicines.length > 0
     );
-
+ 
     setReorderHistory(filtered);
   } catch (error) {
     console.error("Reorder history fetch failed:", error);
   }
 };
-
-
+ 
+ 
 const columns: Column<ReorderHistory>[] = [
   {
     key: "id",
     label: "Sr No",
     render: (row) => row.id,
   },
-
+ 
   {
     key: "distributorName",
     label: "Supplier",
   },
-
+ 
   {
     key: "medicineName",
     label: "Medicine Name",
   },
-
+ 
   {
     key: "strength",
     label: "Strength/Type",
   },
-
+ 
   {
     key: "qty",
     label: "Qty",
   },
-
+ 
   {
     key: ACTION_KEY,
     label: "Action",
   },
 ];
-
+ 
   useEffect(() => {
-    fetchReorderHistory(); 
+    fetchReorderHistory();
   }, []);
-
+ 
   return (
    <Box
   sx={{
@@ -107,15 +111,12 @@ const columns: Column<ReorderHistory>[] = [
     p: { xs: 1, sm: 2 },
   }}
 >
-
-    <Paper
+ 
+     <Paper
   sx={{
     borderRadius: 2,
     p: { xs: 1, sm: 2 },
     overflowX: "auto",
-    backgroundColor: "#fff",
-    boxShadow: 4,
-    width: "100%",
   }}
 >
         <Box
@@ -136,7 +137,7 @@ const columns: Column<ReorderHistory>[] = [
             </Button>
           </Box>
         </Box>
-
+ 
  <UniversalTable<ReorderHistory, ReorderMedicine>
   data={reorderHistory}
   columns={columns}
@@ -176,16 +177,42 @@ actions={{
         isViewMode: true,
       },
     }),
-
-  CheckIcon: () => {},
+ 
+  CheckIcon: (order) => {
+  setApproveOrder(order);
+},
 }}
 />
       </Paper>
+      <ApproveOrderDialog
+  open={!!approveOrder}
+  onClose={() => setApproveOrder(null)}
+  order={
+    approveOrder
+      ? {
+          id: approveOrder.id,
+          distributorName: approveOrder.distributorName,
+          distributorId: 0,
 
+          newMedicines:
+            approveOrder.existingMedicines.map(
+              (med, index) => ({
+                id: index + 1,
+                medicineName: med.medicineName,
+                strength: med.strength,
+                qty: med.qty,
+              })
+            ),
+        }
+      : null
+  }
+/>
+ 
       <NewOrderList />
       <LastPurchaseList />
     </Box>
   );
 }
-
+ 
 export default ReorderList;  
+ 

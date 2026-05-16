@@ -8,20 +8,20 @@ import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
-import ApproveOrderDialog from "./ApproveOrderDialog"; 
+import ApproveOrderDialog from "./ApproveOrderDialog";
 import {
   Box,
   Paper,
   Typography,
 } from "@mui/material";
-
+ 
 type NewMedicine = {
   id: number;
   medicineName: string;
   strength: string;
   qty: number;
 };
-
+ 
 type NewOrderHistory = {
   id: number;
   distributorName: string;
@@ -29,21 +29,21 @@ type NewOrderHistory = {
   newMedicines: NewMedicine[];
   [ACTION_KEY]: string;
 };
-
+ 
 function NewOrderList() {
   const navigate = useNavigate();
   const [newOrderData, setNewOrderData] = useState<NewOrderHistory[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<NewOrderHistory | null>(null);
-
+ 
   const fetchNewOrders = async () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(API_ENDPOINTS.REORDER, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+ 
       console.log("=== REORDER API RESPONSE ===", JSON.stringify(res.data));
-
+ 
       const allData: NewOrderHistory[] = res.data || [];
       setNewOrderData(
         allData.filter((item) => item.newMedicines && item.newMedicines.length > 0)
@@ -52,62 +52,59 @@ function NewOrderList() {
       console.error("New order fetch failed:", error);
     }
   };
-
-
+ 
+ 
   const columns: Column<NewOrderHistory>[] = [
   {
     key: "id",
     label: "Sr No",
     render: (row) => row.id,
   },
-
+ 
   {
     key: "distributorName",
     label: "Supplier",
   },
-
+ 
   {
     key: "medicineName",
     label: "Medicine Name",
   },
-
+ 
   {
     key: "strength",
     label: "Strength/Type",
   },
-
+ 
   {
     key: "qty",
     label: "Qty",
   },
-
+ 
   {
     key: ACTION_KEY,
     label: "Action",
   },
 ];
-
+ 
   useEffect(() => {
     fetchNewOrders();
   }, []);
-
+ 
   return (
     <Box
   sx={{
     display: "flex",
     flexDirection: "column",
     gap: 3,
-    width: "100%",
+    p: { xs: 1, sm: 2 },
   }}
 >
-  <Paper
+    <Paper
   sx={{
     borderRadius: 2,
     p: { xs: 1, sm: 2 },
     overflowX: "auto",
-    width: "100%",
-    boxShadow: 4,
-    backgroundColor: "#fff",
   }}
 >
        <Box
@@ -120,7 +117,7 @@ function NewOrderList() {
 >
           <Typography fontWeight={700}>New Order List</Typography>
         </Box>
-
+ 
     <UniversalTable<NewOrderHistory, NewMedicine>
   data={newOrderData}
   columns={columns}
@@ -160,12 +157,12 @@ function NewOrderList() {
         isViewMode: true,
       },
     }),
-
+ 
   CheckIcon: (order) => setSelectedOrder(order),
 }}
 />
       </Paper>
-
+ 
       <ApproveOrderDialog
         open={!!selectedOrder}
         order={selectedOrder}
@@ -174,5 +171,6 @@ function NewOrderList() {
     </Box>
   );
 }
-
+ 
 export default NewOrderList;    
+ 

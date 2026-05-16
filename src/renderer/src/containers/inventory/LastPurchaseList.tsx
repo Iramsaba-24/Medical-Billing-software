@@ -8,7 +8,7 @@ import {
   ACTION_KEY,
   type Column,
 } from "@/components/uncontrolled/UniversalTable";
-
+ 
 type StockRow = {
   id: number;
   supplier: string;
@@ -17,7 +17,7 @@ type StockRow = {
   quantity: string;
   [ACTION_KEY]: string;
 };
-
+ 
 // Last Purchase columns
 const purchaseColumns: Column<StockRow>[] = [
   { key: "supplier", label: "Supplier" },
@@ -26,12 +26,12 @@ const purchaseColumns: Column<StockRow>[] = [
   { key: "quantity", label: "Quantity" },
   { key: ACTION_KEY, label: "Action" },
 ];
-
+ 
 function LastPurchaseList() {
 //   const navigate = useNavigate();
-
+ 
   const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
-
+ 
   const purchaseActions = {
     view: (row: StockRow) => console.log("View", row),
   };
@@ -39,7 +39,7 @@ function LastPurchaseList() {
   const fetchMedicineData = async () => {
     try {
       const medicines: MedicineResponse[] = await getMedicines();
-
+ 
       const latestPurchases = medicines.slice(0, 5).map((item) => ({
         id: item.medicineId,
         supplier: item.distributorName || "-",
@@ -48,50 +48,41 @@ function LastPurchaseList() {
         quantity: item.totalStockTablets.toString(),
         [ACTION_KEY]: "",
       }));
-
+ 
       setLastPurchaseData(latestPurchases);
     } catch (error) {
       console.error("Medicine fetch failed:", error);
     }
   };
-
+ 
   useEffect(() => {
     fetchMedicineData();
   }, []);
-
+ 
   return (
    <Box
   sx={{
     display: "flex",
     flexDirection: "column",
     gap: 3,
-    width: "100%",
+   p: { xs: 0.5, sm: 2 },
   }}
 >
-
+ 
       {/* Last Purchase */}
-<Paper
+    <Paper
   sx={{
     borderRadius: 2,
     p: { xs: 1, sm: 2 },
     overflowX: "auto",
-    width: "100%",
     boxShadow: 4,
-    backgroundColor: "#fff",
   }}
 >
-       <Box
-  display="flex"
-  justifyContent="space-between"
-  alignItems={{ xs: "flex-start", sm: "center" }}
-  flexDirection={{ xs: "column", sm: "row" }}
-  gap={1}
+        <Typography
+  fontWeight={700}
   mb={1.5}
->
-  <Typography fontWeight={700}>
-    Last Purchase
-  </Typography>
-</Box>
+  fontSize={{ xs: 16, sm: 20 }}
+>Last Purchase</Typography>
        <UniversalTable
   data={lastPurchaseData}
   columns={purchaseColumns}
@@ -102,8 +93,9 @@ function LastPurchaseList() {
   textAlign="center"
 />
       </Paper>
-
+ 
     </Box>
   );
 }
 export default LastPurchaseList;
+ 
