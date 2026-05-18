@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import { Box, Button, Typography, Paper, SxProps, Theme } from "@mui/material";
 import { useForm, FormProvider } from "react-hook-form";
@@ -15,19 +13,19 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { getDoctors, DoctorResponse } from "@/service/doctorService";
 import { createCustomer, updateCustomer } from "@/service/customerService";
 import { useAutoSave } from "@/hooks/Useautosave";
- 
+
 interface Props {
   onBack?: () => void;
   onSave?: (data: CustomerData) => void;
   initialData?: CustomerData | null;
 }
- 
+
 const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   const navigate = useNavigate();
   const [doctorOptions, setDoctorOptions] = useState<
     { label: string; value: string; address: string }[]
   >([]);
- 
+
   const methods = useForm<CustomerData>({
     defaultValues: {
       name: "",
@@ -41,25 +39,25 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     },
     mode: "onChange",
   });
- 
-  // ✅ AutoSave hook — form data save & restore hoga automatically
+
+  // AutoSave hook — form data save & restore hoga automatically
   const { clearData } = useAutoSave({
     storageKey: "add_customer_form",
     methods,
   });
+  // end
 
- 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
     let value = input.value.replace(/[^0-9]/g, "");
- 
+
     if (value !== "" && Number(value) > 100) {
       value = value.slice(0, -1);
     }
- 
+
     input.value = value;
   };
- 
+
   const buttonStyle: SxProps<Theme> = {
     backgroundColor: "#238878",
     color: "#fff",
@@ -74,60 +72,60 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       border: "2px solid #238878",
     },
   };
- 
+
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
         const doctors: DoctorResponse[] = await getDoctors();
- 
+
         const options = doctors.map((doc) => ({
           label: doc.doctorName,
           value: doc.doctorName,
           address: doc.hospitalAddress,
         }));
- 
+
         setDoctorOptions([
           { label: "+ Add Doctor", value: "add_doctor", address: "" },
           ...options,
         ]);
       } catch (error) {
         console.error("Failed to fetch doctors", error);
- 
+
         setDoctorOptions([
           { label: "+ Add Doctor", value: "add_doctor", address: "" },
         ]);
       }
     };
- 
+
     fetchDoctors();
   }, []);
- 
+
   const selectedDoctor = methods.watch("doctor");
- 
+
   useEffect(() => {
     if (!selectedDoctor) return;
     if (selectedDoctor === "add_doctor") {
       navigate(URL_PATH.AddDoctor);
       return;
     }
- 
+
     const doctorData = doctorOptions.find(
       (doc) => doc.value === selectedDoctor
     );
- 
+
     if (doctorData) {
       methods.setValue("doctorAddress", doctorData.address, {
         shouldValidate: true,
       });
     }
   }, [selectedDoctor, doctorOptions, methods, navigate]);
- 
+
   useEffect(() => {
     if (initialData) {
       methods.reset(initialData);
     }
   }, [initialData, methods]);
- 
+
   const handleActualSave = async (data: CustomerData) => {
     try {
       const formattedData = {
@@ -141,18 +139,18 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
         doctor: data.doctor,
         doctorAddress: data.doctorAddress,
       };
- 
+
       let savedData: CustomerData;
- 
+
       if (initialData && initialData.customerId) {
         savedData = await updateCustomer(initialData.customerId, formattedData);
       } else {
         savedData = await createCustomer(formattedData);
       }
- 
+
       onSave?.(savedData);
       clearData(); // ✅ submit ke baad draft clear karo
- 
+
       if (!initialData) {
         navigate(URL_PATH.Billing);
       }
@@ -160,7 +158,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       console.error("Save failed:", error);
     }
   };
- 
+
   return (
     <FormProvider {...methods}>
       <Box
@@ -189,7 +187,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Customer Details
               </Typography>
- 
+
               <Box
                 sx={{
                   display: "grid",
@@ -220,9 +218,9 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                     },
                   }}
                 />
- 
+
                 <DateTimeField name="date" label="Date" disabled required />
- 
+
                 <TextInputField
                   name="age"
                   label="Age"
@@ -257,7 +255,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   required
                   preventDuplicate={!initialData}
                 />
- 
+
                 <TextInputField
                   name="address"
                   label="Address"
@@ -292,7 +290,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
               <Typography variant="subtitle1" fontWeight="bold" mb={2}>
                 Doctor Information
               </Typography>
- 
+
               <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2 }}>
                 <DropdownField
                   name="doctor"
@@ -303,7 +301,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
                   placeholder="Select Doctors"
                   required
                 />
- 
+
                 <TextInputField
                   name="doctorAddress"
                   label="Doctor Address/Clinic"
@@ -349,7 +347,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
           <Button
             variant="contained"
             onClick={() => {
-              clearData(); // ✅ cancel pe bhi draft clear karo
+              clearData(); 
               if (onBack) {
                 onBack();
               } else {
@@ -374,4 +372,4 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   );
 };
 
-export default AddCustomerForm; 
+export default AddCustomerForm;

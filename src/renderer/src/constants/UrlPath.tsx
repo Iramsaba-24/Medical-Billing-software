@@ -57,12 +57,12 @@ export const URL_PATH = {
   PharmacyProfile: "/settings/PharmacyProfile",
   CustomerSettings: "/settings/Customer",
 
-  NewInvoice: "/billing/new-invoice",
+  // NewInvoice: "/billing/new-invoice",
   Billing: "/billing/retail-invoice",
   MediPoints: "/billing/medi-points",
   PaymentMethod: "/billing/payment-method",
   PaymentDetails: "/billing/payment-details",
 
   DoctorsSettings: "/settings/doctors-settings",
-  NewInvoiceBill: "/billing/invoice-bill/:invoiceNo",
+  // NewInvoiceBill: "/billing/invoice-bill/:invoiceNo",
 };

@@ -24,11 +24,15 @@ type Props = {
 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
 
-const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
-  // const location = useLocation();
-
+const BillingTable = ({
+  invoices,
+  setInvoices,
+  refetchInvoices,
+}: Props) => {
   const navigate = useNavigate();
+
   const [filterType, setFilterType] = useState<FilterType>("all");
+
   const filterOptions = [
     { label: "All", value: "all" },
     { label: "Daily", value: "daily" },
@@ -40,9 +44,11 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
     if (!filterType || filterType === "all") return true;
 
     const dateStr = invoice.invoiceDate ?? "";
+
     if (!dateStr) return false;
 
     const parts = dateStr.split("/");
+
     const invoiceDate = new Date(
       Number(parts[2]),
       Number(parts[1]) - 1,
@@ -72,26 +78,44 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
 
     return true;
   });
+
   console.log("Filtered Invoices →", filteredInvoices);
 
   const columns: Column<Invoice>[] = [
-    { key: "invoice", label: "Invoice" },
-    { key: "name", label: "Name" },
-    { key: "invoiceDate", label: "Date" },
+    {
+      key: "srNo",
+      label: "Sr No",
+    },
+    {
+      key: "invoice",
+      label: "Invoice",
+    },
+    {
+      key: "name",
+      label: "Name",
+    },
+    {
+      key: "invoiceDate",
+      label: "Date",
+    },
     {
       key: "price",
       label: "Price",
       render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
     },
-    { key: "paymentStatus", label: "Status" },
-    { key: "actionbutton", label: "Action" },
+    {
+      key: "paymentStatus",
+      label: "Status",
+    },
+    {
+      key: "actionbutton",
+      label: "Action",
+    },
   ];
 
   const statusOptions: DropdownOption[] = [
     { value: "Paid", label: "Paid" },
-
     { value: "Pending", label: "Pending" },
-
     { value: "Overdue", label: "Overdue" },
   ];
 
@@ -101,21 +125,25 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
     },
   });
 
-  // delete invoice
   const handleDelete = async (invoiceNo: string) => {
     const confirmed = await showConfirmation(
       "Are you sure you want to delete this invoice?",
       "Confirm Delete"
     );
+
     if (!confirmed) return;
 
     try {
       await deleteRetailInvoice(Number(invoiceNo));
+
       await refetchInvoices();
+
       window.dispatchEvent(new Event("invoiceUpdated"));
+
       showToast("success", "Invoice deleted successfully");
     } catch (error) {
       console.error("Error deleting invoice", error);
+
       showToast("error", "Failed to delete invoice");
     }
   };
@@ -147,7 +175,9 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
                 name="filterType"
                 label="Filter"
                 options={filterOptions}
-                onChangeCallback={(value) => setFilterType(value as FilterType)}
+                onChangeCallback={(value) =>
+                  setFilterType(value as FilterType)
+                }
                 size="small"
               />
             </Box>
@@ -159,21 +189,22 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
           columns={columns}
           showSearch
           showExport
-          enableCheckbox
           getRowId={(row) => row.invoice}
           dropdown={{
             key: "paymentStatus",
-
             options: statusOptions,
-
             onChange: (row, value) => {
               setInvoices((prev) =>
                 prev.map((inv) =>
                   inv.invoice === row.invoice
-                    ? { ...inv, paymentStatus: value as InvoiceStatus }
+                    ? {
+                        ...inv,
+                        paymentStatus: value as InvoiceStatus,
+                      }
                     : inv
                 )
               );
+
               showToast("success", "Status updated successfully");
             },
           }}
@@ -183,30 +214,12 @@ const BillingTable = ({ invoices, setInvoices, refetchInvoices }: Props) => {
                 state: { invoice },
               }),
 
-            
             edit: (invoice) =>
               navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
                 state: { invoice },
               }),
-            delete: (invoice) => handleDelete(invoice.invoice),
-          }}
-          onDeleteSelected={async (rows) => {
-            const confirmed = await showConfirmation(
-              "Delete selected invoices?",
-              "Confirm Delete"
-            );
-            if (!confirmed) return;
 
-            try {
-              for (const row of rows) {
-                await deleteRetailInvoice(Number(row.invoice));
-              }
-              await refetchInvoices();
-              showToast("success", "Selected invoices deleted");
-            } catch (error) {
-              console.error("Error deleting selected invoices", error);
-              showToast("error", "Failed to delete selected invoices");
-            }
+            delete: (invoice) => handleDelete(invoice.invoice),
           }}
         />
       </Paper>

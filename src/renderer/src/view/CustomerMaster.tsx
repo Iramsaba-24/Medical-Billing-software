@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
-import CustomerListPage from "@/containers/Customer/CustomerListPage";
-import CustomerViewDetails from "@/containers/Customer/CustomerViewDetails";
+import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+import CustomerListPage from "@/containers/customer/CustomerListPage";
+import CustomerViewDetails from "@/containers/customer/CustomerViewDetails";
 import {
   showToast,
   showConfirmation,
@@ -11,9 +11,15 @@ import { deleteCustomer } from "@/service/customerService";
 import {
   getAllRetailInvoices,
   getRetailInvoiceItemsByInvoiceId,
+  RetailInvoiceResponse,
 } from "@/service/retailInvoiceService";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
-import { Invoice } from "@/types/invoice";
+
+import {
+  Invoice,
+  InvoiceStatus,
+  MedicineItem,
+} from "@/types/invoice";
 
 export interface PurchaseHistory {
   id: string;
@@ -46,52 +52,104 @@ export interface CustomerData {
 
 type InvoiceWithItems = Invoice & {
   retailInvoiceId?: number;
-  medicines?: {
-    medicineName?: string;
-    name?: string;
-    companyName?: string;
-    strength?: string;
-    quantity?: number;
-    qty?: string;
-    medicineId?: number;
-  }[];
+  customerName?: string;
+  totalAmount?: number;
+  medicines?: MedicineItem[];
 };
 
 const CustomerMaster = () => {
   const [view, setView] = useState<"list" | "add" | "view">("list");
-  const [customerList, setCustomerList] = useState<CustomerData[]>([]);
-  const [invoices, setInvoices] = useState<InvoiceWithItems[]>([]);
-  const [medicines, setMedicines] = useState<MedicineResponse[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<CustomerData | null>(null);
 
-  const fetchMedicines = async () => {
+  const [customerList, setCustomerList] = useState<CustomerData[]>([]);
+
+  const [invoices, setInvoices] = useState<InvoiceWithItems[]>([]);
+
+  const [medicines, setMedicines] = useState<MedicineResponse[]>([]);
+
+  const [selectedCustomer, setSelectedCustomer] =
+    useState<CustomerData | null>(null);
+
+  const fetchMedicines = async (): Promise<void> => {
     try {
       const data = await getMedicines();
+
       setMedicines(data);
     } catch (error) {
       console.error("Failed to fetch medicines", error);
     }
   };
 
-  const fetchInvoices = async () => {
+  const fetchInvoices = async (): Promise<void> => {
     try {
-      const invoiceData = await getAllRetailInvoices();
+      const invoiceData: RetailInvoiceResponse[] =
+        await getAllRetailInvoices();
 
-      const invoicesWithItems = await Promise.all(
-        invoiceData.map(async (inv: InvoiceWithItems) => {
-          try {
-            const items = await getRetailInvoiceItemsByInvoiceId(
-              inv.retailInvoiceId ?? 0
-            );
-            return { ...inv, medicines: items };
-          } catch (error) {
-            console.error(
-              `Failed to fetch items for invoice ${inv.retailInvoiceId}`,
-              error
-            );
-            return { ...inv, medicines: [] };
+      const invoicesWithItems: InvoiceWithItems[] = await Promise.all(
+        invoiceData.map(
+          async (
+            inv: RetailInvoiceResponse
+          ): Promise<InvoiceWithItems> => {
+            try {
+              const items: MedicineItem[] =
+                await getRetailInvoiceItemsByInvoiceId(
+                  inv.retailInvoiceId ?? 0
+                );
+
+              return {
+                srNo: 0,
+
+                invoice: String(inv.retailInvoiceId ?? ""),
+
+                retailInvoiceId: inv.retailInvoiceId,
+
+                customerName: inv.customerName,
+
+                patient: inv.customerName ?? "",
+
+                invoiceDate: inv.invoiceDate,
+
+                paymentStatus: inv.paymentStatus,
+
+                status: inv.paymentStatus as InvoiceStatus,
+
+                totalAmount: inv.totalAmount,
+
+                price: inv.totalAmount ?? 0,
+
+                medicines: items,
+              };
+            } catch (error) {
+              console.error(
+                `Failed to fetch items for invoice ${inv.retailInvoiceId}`,
+                error
+              );
+
+              return {
+                srNo: 0,
+
+                invoice: String(inv.retailInvoiceId ?? ""),
+
+                retailInvoiceId: inv.retailInvoiceId,
+
+                customerName: inv.customerName,
+
+                patient: inv.customerName ?? "",
+
+                invoiceDate: inv.invoiceDate,
+
+                paymentStatus: inv.paymentStatus,
+
+                status: inv.paymentStatus as InvoiceStatus,
+
+                totalAmount: inv.totalAmount,
+
+                price: inv.totalAmount ?? 0,
+
+                medicines: [],
+              };
+            }
           }
-        })
+        )
       );
 
       setInvoices(invoicesWithItems);
@@ -100,9 +158,10 @@ const CustomerMaster = () => {
     }
   };
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = async (): Promise<void> => {
     try {
       const data = await getAllCustomers();
+
       setCustomerList(data);
     } catch (error) {
       console.error("Failed to fetch customers", error);
@@ -111,34 +170,48 @@ const CustomerMaster = () => {
 
   useEffect(() => {
     fetchCustomers();
+
     fetchInvoices();
+
     fetchMedicines();
   }, []);
 
-  const handleSave = async () => {
+  const handleSave = async (): Promise<void> => {
     await fetchCustomers();
+
     setView("list");
   };
 
-  const handleEditInvoice = (invoice: PurchaseHistory) => {
+
+  const handleEditInvoice = (invoice: PurchaseHistory): void => {
     if (!selectedCustomer) return;
+
     const editData: CustomerData = {
       ...selectedCustomer,
+
       doctor: invoice.doctor,
+
       date: invoice.date,
     };
+
     setSelectedCustomer(editData);
+
     setView("add");
   };
 
-  const handleDeleteCustomer = async (cust: CustomerData) => {
+  const handleDeleteCustomer = async (
+    cust: CustomerData
+  ): Promise<void> => {
     const confirmed = await showConfirmation(
       `Are you sure you want to delete ${cust.name}?`,
       "Confirm Delete"
     );
+
     if (confirmed && cust.customerId) {
       await deleteCustomer(cust.customerId);
+
       await fetchCustomers();
+
       showToast("success", "Customer deleted successfully!");
     }
   };
@@ -153,7 +226,9 @@ const CustomerMaster = () => {
 
       return {
         ...customer,
+
         srNo: index + 1,
+
         history: customerInvoices.map((inv) => ({
           id: String(inv.retailInvoiceId ?? inv.invoice ?? ""),
 
@@ -161,15 +236,28 @@ const CustomerMaster = () => {
             inv.medicines
               ?.map((med) => {
                 const found = medicines.find(
-                  (m) => String(m.medicineId) === String(med.medicineId)
+                  (m) =>
+                    String(m.medicineId) ===
+                    String(med.medicineId)
                 );
-                return found?.medicineName ?? `${med.companyName ?? ""} ${med.strength ?? ""}`.trim();
+
+                return (
+                  found?.medicineName ??
+                  `${med.companyName ?? ""} ${
+                    med.strength ?? ""
+                  }`.trim()
+                );
               })
               .join(", ") ?? "",
 
           totalQty:
             inv.medicines?.reduce(
-              (sum: number, med) => sum + Number(med.quantity ?? med.qty ?? 0),
+              (
+                sum: number,
+                med: MedicineItem
+              ): number =>
+                sum +
+                Number(med.quantity ?? med.qty ?? 0),
               0
             ) ?? 0,
 
@@ -178,14 +266,18 @@ const CustomerMaster = () => {
           doctor: customer.doctor ?? "",
 
           date: inv.invoiceDate
-            ? new Date(inv.invoiceDate).toLocaleDateString("en-IN")
+            ? new Date(inv.invoiceDate).toLocaleDateString(
+                "en-IN"
+              )
             : "",
         })),
       };
     }
   );
 
-  const handleDeleteInvoice = async (invoice: PurchaseHistory) => {
+  const handleDeleteInvoice = async (
+    invoice: PurchaseHistory
+  ): Promise<void> => {
     if (!selectedCustomer) return;
 
     const confirmed = await showConfirmation(
@@ -203,14 +295,24 @@ const CustomerMaster = () => {
             const updatedHistory = (cust.history || []).filter(
               (inv) => inv.id !== invoice.id
             );
-            const updatedCust = { ...cust, history: updatedHistory };
+
+            const updatedCust = {
+              ...cust,
+
+              history: updatedHistory,
+            };
+
             setSelectedCustomer(updatedCust);
+
             return updatedCust;
           }
+
           return cust;
         });
+
         return updatedList;
       });
+
       showToast("success", "Invoice deleted from history!");
     }
   };
@@ -222,10 +324,12 @@ const CustomerMaster = () => {
           data={customerDataWithHistory}
           onView={(cust) => {
             setSelectedCustomer(cust);
+
             setView("view");
           }}
           onEdit={(cust) => {
             setSelectedCustomer(cust);
+
             setView("add");
           }}
           onDelete={handleDeleteCustomer}

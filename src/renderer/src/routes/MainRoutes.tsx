@@ -27,14 +27,13 @@ import Billing from "@/view/Billing";
 import InvoiceSettings from "@/containers/setting/InvoiceSetting";
 import DashboardSettings from "@/containers/setting/DashboardSettings";
 import DoctorSettings from "@/containers/setting/DoctorSettings";
-import NewInvoice from "@/containers/billing/NewInvoice";
 import PharmacyProfile from "@/containers/setting/PharmacyProfile";
 import CustomerSettings from "@/containers/setting/CustomerSettings";
 import PaymentMethod from "@/containers/billing/PaymentMethod";
 import SalesView from "@/containers/dashboard/SalesView";
-import EditInvoice from "@/containers/invoices/EditInvoice"
-import AddCustomerForm from "@/containers/Customer/AddCustomerForm";
-import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
+import EditInvoice from "@/containers/invoices/EditInvoice";
+import AddCustomerForm from "@/containers/customer/AddCustomerForm";
+// import NewInvoiceBill from "@/containers/billing/NewInvoiceBill";
 import ReorderForm from "@/containers/inventory/ReorderForm";
 import ReorderEmail from "@/containers/inventory/ReorderEmail";
 import NewOrderForm from "@/containers/inventory/NewOrderForm";
@@ -82,10 +81,10 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.Doctors,
         element: <DoctorTable />,
       },
-       {
-        path: URL_PATH.NewInvoiceBill,
-        element: <NewInvoiceBill />,
-      },
+      //  {
+      //   path: URL_PATH.NewInvoiceBill,
+      //   element: <NewInvoiceBill />,
+      // },
       {
         path: URL_PATH.AddDoctor,
         element: <AddDoctor />,
@@ -111,10 +110,10 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.Inventory,
         element: <Inventory />,
       },
-      {
-        path: URL_PATH.NewInvoice,
-        element: <NewInvoice />,
-      },
+      // {
+      //   path: URL_PATH.NewInvoice,
+      //   element: <NewInvoice />,
+      // },
       {
         path: URL_PATH.Reorder,
         element: <Reorder />,
@@ -176,10 +175,10 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.AddCustomerForm,
         element: <AddCustomerForm />,
       },
-      {
-        path: URL_PATH.NewInvoiceBill,
-        element: <NewInvoiceBill />,
-      },
+      // {
+      //   path: URL_PATH.NewInvoiceBill,
+      //   element: <NewInvoiceBill />,
+      // },
       {
         path: URL_PATH.Setting,
         element: <Setting />,
