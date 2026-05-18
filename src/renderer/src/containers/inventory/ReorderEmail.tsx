@@ -77,7 +77,7 @@ const handleSend = async () => {
             Strength: m.strengthType,
             Qty: Number(m.qty || m.quantity),
           }))
-        : [], // if there is neworder then it will be in NewMedicines
+        : [], 
     };
 
     await axios.post(API_ENDPOINTS.REORDER, payload, {
@@ -111,22 +111,51 @@ const handleSend = async () => {
 }, []);
 
   return (
-    <Box sx={{ p: 3, maxWidth: "1100px", mx: "auto" }}>
-      <Typography fontSize={20} fontWeight={700} mb={3}>
+   <Box
+  sx={{
+    p: { xs: 1.5, sm: 3 },
+    maxWidth: "1100px",
+    mx: "auto",
+    width: "100%",
+  }}
+>
+   <Typography
+  fontSize={{ xs: 18, sm: 20 }}
+  fontWeight={700}
+  mb={3}
+>
         Order Email
       </Typography>
 
       {/* Distributor + Email */}
       <Box display="flex" flexDirection="column" gap={2} mb={4}>
-        <Box display="flex" gap={3}>
-          <Typography fontWeight={600} sx={{ width: 180 }}>
+      <Box
+  display="flex"
+  flexDirection={{ xs: "column", sm: "row" }}
+  gap={1}
+>
+          <Typography
+  fontWeight={600}
+  sx={{
+    width: { xs: "100%", sm: 180 },
+  }}
+>
             Distributor / Company
           </Typography>
           <Typography>{distributor}</Typography>
         </Box>
 
-        <Box display="flex" gap={3}>
-          <Typography fontWeight={600} sx={{ width: 180 }}>
+        <Box
+  display="flex"
+  flexDirection={{ xs: "column", sm: "row" }}
+  gap={1}
+>
+          <Typography
+  fontWeight={600}
+  sx={{
+    width: { xs: "100%", sm: 180 },
+  }}
+>
             Email Address
           </Typography>
           <Typography>{email}</Typography>
@@ -134,7 +163,15 @@ const handleSend = async () => {
       </Box>
 
       {/* Mail Preview */}
-      <Paper elevation={2} sx={{ p: 3, borderRadius: 2, border: "1px solid #ddd" }}>
+<Paper
+  elevation={2}
+  sx={{
+    p: { xs: 1.5, sm: 3 },
+    borderRadius: 2,
+    border: "1px solid #ddd",
+    overflowX: "auto",
+  }}
+>
         <Typography mb={1}>Dear {distributor},</Typography>
         <Typography mb={3}>Good day.</Typography>
         <Typography mb={3}>
@@ -142,6 +179,7 @@ const handleSend = async () => {
         </Typography>
         <Typography fontWeight={600} mb={2}>Order Details:</Typography>
 
+<Box sx={{ overflowX: "auto" }}>
         <Table size="small">
           <TableHead>
             <TableRow>
@@ -165,7 +203,7 @@ const handleSend = async () => {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
+        </Table></Box>
 
         <Typography mt={3}>
           Please confirm the availability and expected delivery timeline.

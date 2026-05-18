@@ -2,7 +2,7 @@ import {
   Box,
   Button,
   Typography,
-  TextField,
+  
   IconButton,
   Divider,
   Paper,
@@ -11,6 +11,7 @@ import { Add, Remove } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import DropdownField from "@/components/controlled/DropdownField";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
+import TextInputField from "@/components/controlled/TextInputField";
 
 export interface ItemRow {
   retailItemId: number;
@@ -256,7 +257,8 @@ const RetailItemSection = ({
               }}
             />
 
-            <TextField
+            <TextInputField
+            name="Company"
               fullWidth
               label="Company"
               value={row.companyName || ""}
@@ -265,7 +267,8 @@ const RetailItemSection = ({
               }
             />
 
-            <TextField
+            <TextInputField
+            name="Qty"
               fullWidth
               label="Qty"
               type="number"
@@ -295,17 +298,19 @@ const RetailItemSection = ({
               }
             />
 
-            <TextField
+            <TextInputField
+            name="Price"
               fullWidth
               label="Price"
               type="number"
-              required
+              
               disabled
               value={row.price}
               error={priceError}
             />
 
-            <TextField
+            <TextInputField
+            name="Total"
               label="Total"
               value={(Number(row.quantity) * Number(row.price)).toFixed(2)}
               disabled

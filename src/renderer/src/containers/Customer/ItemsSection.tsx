@@ -1,348 +1,353 @@
-import {
-  Box,
-  Button,
-  Typography,
-  TextField,
-  IconButton,
-  Divider,
-  Paper,
-} from "@mui/material";
-import { Add, Remove } from "@mui/icons-material";
-import { useEffect, useState } from "react";
-import DropdownField from "@/components/controlled/DropdownField";
-import { getMedicines, MedicineResponse } from "@/service/medicineService";
+// import {
+//   Box,
+//   Button,
+//   Typography,
+  
+//   IconButton,
+//   Divider,
+//   Paper,
+// } from "@mui/material";
+// import { Add, Remove } from "@mui/icons-material";
+// import { useEffect, useState } from "react";
+// import TextInputField from "@/components/controlled/TextInputField";
+// import DropdownField from "@/components/controlled/DropdownField";
+// import { getMedicines, MedicineResponse } from "@/service/medicineService";
 
-export interface ItemRow {
-  id: number;
-  name: string;
-  medicineId?: number;
-  quantity: number | "";
-  mrp: number | "";
-  expiry?: string;
-}
 
-export type InventoryItem = {
-  itemName: string;
-  medicineId: number;
-  quantity: number;
-  pricePerUnit: number;
-  expiryDate: string;
-};
+// export interface ItemRow {
+//   id: number;
+//   name: string;
+//   medicineId?: number;
+//   quantity: number | "";
+//   mrp: number | "";
+//   expiry?: string;
+// }
 
-interface ItemsSectionProps {
-  rows: ItemRow[];
-  setRows: (rows: ItemRow[]) => void;
-  finalTotal: number;
-  isSubmitted: boolean;
-  gst?: number;
-  setGst?: (value: number) => void;
-}
+// export type InventoryItem = {
+//   itemName: string;
+//   medicineId: number;
+//   quantity: number;
+//   pricePerUnit: number;
+//   expiryDate: string;
+// };
 
-const ItemsSection = ({
-  rows,
-  setRows,
+// interface ItemsSectionProps {
+//   rows: ItemRow[];
+//   setRows: (rows: ItemRow[]) => void;
+//   finalTotal: number;
+//   isSubmitted: boolean;
+//   gst?: number;
+//   setGst?: (value: number) => void;
+// }
 
-  isSubmitted,
-  gst = 0,
-  setGst,
-}: ItemsSectionProps) => {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+// const ItemsSection = ({
+//   rows,
+//   setRows,
 
-  useEffect(() => {
-    const fetchInventory = async (): Promise<void> => {
-      try {
-        const data: MedicineResponse[] = await getMedicines();
+//   isSubmitted,
+//   gst = 0,
+//   setGst,
+// }: ItemsSectionProps) => {
+//   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
-        const formatted: InventoryItem[] = data.map(
-          (item: MedicineResponse): InventoryItem => ({
-            itemName:
-              item.medicineName ??
-              `${item.companyName ?? ""} ${
-                item.strength ?? ""
-              }`.trim(),
+//   useEffect(() => {
+//     const fetchInventory = async (): Promise<void> => {
+//       try {
+//         const data: MedicineResponse[] = await getMedicines();
 
-            medicineId: item.medicineId,
+//         const formatted: InventoryItem[] = data.map(
+//           (item: MedicineResponse): InventoryItem => ({
+//             itemName:
+//               item.medicineName ??
+//               `${item.companyName ?? ""} ${
+//                 item.strength ?? ""
+//               }`.trim(),
 
-            quantity: 0,
+//             medicineId: item.medicineId,
 
-            pricePerUnit: 0,
+//             quantity: 0,
 
-            expiryDate: item.expiryDate ?? "",
-          })
-        );
+//             pricePerUnit: 0,
 
-        setInventory(formatted);
-      } catch (error) {
-        console.error("Inventory fetch error:", error);
-      }
-    };
+//             expiryDate: item.expiryDate ?? "",
+//           })
+//         );
 
-    fetchInventory();
-  }, []);
+//         setInventory(formatted);
+//       } catch (error) {
+//         console.error("Inventory fetch error:", error);
+//       }
+//     };
 
-  const itemOptions = inventory.map((item) => ({
-    label: item.itemName,
-    value: item.itemName,
-  }));
+//     fetchInventory();
+//   }, []);
 
-  const addRow = () =>
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-        name: "",
-        quantity: "",
-        mrp: "",
-        expiry: "",
-      },
-    ]);
+//   const itemOptions = inventory.map((item) => ({
+//     label: item.itemName,
+//     value: item.itemName,
+//   }));
 
-  const removeRow = (id: number) =>
-    setRows(rows.filter((r) => r.id !== id));
+//   const addRow = () =>
+//     setRows([
+//       ...rows,
+//       {
+//         id: Date.now(),
+//         name: "",
+//         quantity: "",
+//         mrp: "",
+//         expiry: "",
+//       },
+//     ]);
 
-  const updateRow = (
-    id: number,
-    field: keyof ItemRow,
-    value: string | number
-  ) => {
-    setRows(
-      rows.map((r) => {
-        if (r.id === id) {
-          if (
-            (field === "quantity" || field === "mrp") &&
-            value !== "" &&
-            Number(value) < 0
-          ) {
-            return r;
-          }
+//   const removeRow = (id: number) =>
+//     setRows(rows.filter((r) => r.id !== id));
 
-          return { ...r, [field]: value };
-        }
+//   const updateRow = (
+//     id: number,
+//     field: keyof ItemRow,
+//     value: string | number
+//   ) => {
+//     setRows(
+//       rows.map((r) => {
+//         if (r.id === id) {
+//           if (
+//             (field === "quantity" || field === "mrp") &&
+//             value !== "" &&
+//             Number(value) < 0
+//           ) {
+//             return r;
+//           }
 
-        return r;
-      })
-    );
-  };
+//           return { ...r, [field]: value };
+//         }
 
-  const handleNameChange = (
-    id: number,
-    selectedName: string
-  ) => {
-    const item = inventory.find(
-      (i) =>
-        i.itemName.trim().toLowerCase() ===
-        selectedName.trim().toLowerCase()
-    );
+//         return r;
+//       })
+//     );
+//   };
 
-    setRows(
-      rows.map((r) => {
-        if (r.id === id) {
-          return {
-            ...r,
+//   const handleNameChange = (
+//     id: number,
+//     selectedName: string
+//   ) => {
+//     const item = inventory.find(
+//       (i) =>
+//         i.itemName.trim().toLowerCase() ===
+//         selectedName.trim().toLowerCase()
+//     );
 
-            medicineId: item?.medicineId || 0,
+//     setRows(
+//       rows.map((r) => {
+//         if (r.id === id) {
+//           return {
+//             ...r,
 
-            name: selectedName,
+//             medicineId: item?.medicineId || 0,
 
-            mrp: item ? Number(item.pricePerUnit) : "",
+//             name: selectedName,
 
-            expiry: item ? item.expiryDate : "",
-          };
-        }
+//             mrp: item ? Number(item.pricePerUnit) : "",
 
-        return r;
-      })
-    );
-  };
+//             expiry: item ? item.expiryDate : "",
+//           };
+//         }
 
-  const subTotal = rows.reduce((acc, row) => {
-    return acc + Number(row.quantity) * Number(row.mrp);
-  }, 0);
+//         return r;
+//       })
+//     );
+//   };
 
-  const finalWithGst = subTotal + (subTotal * gst) / 100;
+//   const subTotal = rows.reduce((acc, row) => {
+//     return acc + Number(row.quantity) * Number(row.mrp);
+//   }, 0);
 
-  return (
-    <Paper
-      sx={{
-        p: { xs: 2, md: 3 },
-        borderRadius: "7px",
-        border: "1px solid #e0e0e0",
-      }}
-      elevation={3}
-    >
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        mb={2}
-        alignItems="center"
-      >
-        <Typography variant="h6" fontWeight={600}>
-          Items List
-        </Typography>
+//   const finalWithGst = subTotal + (subTotal * gst) / 100;
 
-        <Button
-          startIcon={<Add />}
-          onClick={addRow}
-          sx={{ color: "#248a76", fontWeight: "bold" }}
-        >
-          ADD ITEM
-        </Button>
-      </Box>
+//   return (
+//     <Paper
+//       sx={{
+//         p: { xs: 2, md: 3 },
+//         borderRadius: "7px",
+//         border: "1px solid #e0e0e0",
+//       }}
+//       elevation={3}
+//     >
+//       <Box
+//         display="flex"
+//         justifyContent="space-between"
+//         mb={2}
+//         alignItems="center"
+//       >
+//         <Typography variant="h6" fontWeight={600}>
+//           Items List
+//         </Typography>
 
-      <Divider sx={{ mb: 3 }} />
+//         <Button
+//           startIcon={<Add />}
+//           onClick={addRow}
+//           sx={{ color: "#248a76", fontWeight: "bold" }}
+//         >
+//           ADD ITEM
+//         </Button>
+//       </Box>
 
-      {rows.map((row) => {
-        const qtyError =
-          isSubmitted &&
-          (row.quantity === "" || Number(row.quantity) <= 0);
+//       <Divider sx={{ mb: 3 }} />
 
-        const priceError =
-          isSubmitted &&
-          (row.mrp === "" || Number(row.mrp) <= 0);
+//       {rows.map((row) => {
+//         const qtyError =
+//           isSubmitted &&
+//           (row.quantity === "" || Number(row.quantity) <= 0);
 
-        const nameError =
-          isSubmitted && row.name.trim() === "";
+//         const priceError =
+//           isSubmitted &&
+//           (row.mrp === "" || Number(row.mrp) <= 0);
 
-        return (
-          <Box
-            key={row.id}
-            sx={{
-              display: "grid",
-              gridTemplateColumns: {
-                md: "4fr 1fr 1.5fr 1.5fr 50px",
-                xs: "1fr",
-              },
-              gap: 2,
-              mb: { xs: 4, md: 2 },
-              alignItems: "start",
-            }}
-          >
-            <DropdownField
-              name={`item_${row.id}`}
-              label="Item Name"
-              options={itemOptions}
-              value={row.name}
-              editable
-              freeSolo={false}
-              alphanumeric
-              required
-              error={nameError}
-              helperText={
-                nameError ? "Please select item" : ""
-              }
-              onChangeCallback={(value) => {
-                handleNameChange(row.id, value);
-              }}
-            />
+//         const nameError =
+//           isSubmitted && row.name.trim() === "";
 
-            <TextField
-              fullWidth
-              label="Qty"
-              type="number"
-              value={row.quantity}
-              error={qtyError}
-              onKeyDown={(e) =>
-                ["e", "E", "-", "+"].includes(e.key) &&
-                e.preventDefault()
-              }
-              onChange={(e) =>
-                updateRow(
-                  row.id,
-                  "quantity",
-                  e.target.value === ""
-                    ? ""
-                    : Number(e.target.value)
-                )
-              }
-            />
+//         return (
+//           <Box
+//             key={row.id}
+//             sx={{
+//               display: "grid",
+//               gridTemplateColumns: {
+//                 md: "4fr 1fr 1.5fr 1.5fr 50px",
+//                 xs: "1fr",
+//               },
+//               gap: 2,
+//               mb: { xs: 4, md: 2 },
+//               alignItems: "start",
+//             }}
+//           >
+//             <DropdownField
+//               name={`item_${row.id}`}
+//               label="Item Name"
+//               options={itemOptions}
+//               value={row.name}
+//               editable
+//               freeSolo={false}
+//               alphanumeric
+//               required
+//               error={nameError}
+//               helperText={
+//                 nameError ? "Please select item" : ""
+//               }
+//               onChangeCallback={(value) => {
+//                 handleNameChange(row.id, value);
+//               }}
+//             />
 
-            <TextField
-              fullWidth
-              label="Price"
-              type="number"
-              required
-              disabled
-              value={row.mrp}
-              error={priceError}
-            />
+//             <TextInputField
+//               fullWidth
+//               name="Qty"
+//               label="Qty"
+//               type="number"
+//               value={row.quantity}
+//               error={qtyError}
+//               onKeyDown={(e) =>
+//                 ["e", "E", "-", "+"].includes(e.key) &&
+//                 e.preventDefault()
+//               }
+//               onChange={(e) =>
+//                 updateRow(
+//                   row.id,
+//                   "quantity",
+//                   e.target.value === ""
+//                     ? ""
+//                     : Number(e.target.value)
+//                 )
+//               }
+//             />
 
-            <TextField
-              label="Total"
-              value={(
-                Number(row.quantity) * Number(row.mrp)
-              ).toFixed(2)}
-              disabled
-            />
+//             <TextInputField
+//             name="Price"
+//               fullWidth
+//               label="Price"
+//               type="number"
+//               required
+//               disabled
+//               value={row.mrp}
+//               error={priceError}
+//             />
 
-            <Box display="flex" justifyContent="center">
-              {rows.length > 1 && (
-                <IconButton
-                  onClick={() => removeRow(row.id)}
-                  color="error"
-                >
-                  <Remove />
-                </IconButton>
-              )}
-            </Box>
-          </Box>
-        );
-      })}
+//             <TextInputField
+//             name="Total"
+//               label="Total"
+//               value={(
+//                 Number(row.quantity) * Number(row.mrp)
+//               ).toFixed(2)}
+//               disabled
+//             />
 
-      <Box
-        sx={{
-          borderTop: "1px solid #eee",
-          pt: 3,
-          display: "flex",
-          flexDirection: "column",
-          gap: 3,
-        }}
-      >
-        {setGst && (
-          <Box sx={{ width: "150px" }}>
-            <DropdownField
-              name="gst"
-              label="GST (%)"
-              value={String(gst)}
-              options={[
-                { label: "5%", value: "5" },
-                { label: "12%", value: "12" },
-                { label: "18%", value: "18" },
-              ]}
-              onChangeCallback={(value) =>
-                setGst(Number(value))
-              }
-            />
-          </Box>
-        )}
+//             <Box display="flex" justifyContent="center">
+//               {rows.length > 1 && (
+//                 <IconButton
+//                   onClick={() => removeRow(row.id)}
+//                   color="error"
+//                 >
+//                   <Remove />
+//                 </IconButton>
+//               )}
+//             </Box>
+//           </Box>
+//         );
+//       })}
 
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: {
-              xs: "center",
-              md: "flex-end",
-            },
-            width: "100%",
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: "bold",
-              bgcolor: "#e8f5f2",
-              px: { xs: 5, md: 3 },
-              py: 1,
-              borderRadius: "8px",
-              width: { xs: "100%", sm: "auto" },
-              textAlign: "center",
-            }}
-          >
-            Grand Total: ₹{finalWithGst.toFixed(2)}
-          </Typography>
-        </Box>
-      </Box>
-    </Paper>
-  );
-};
+//       <Box
+//         sx={{
+//           borderTop: "1px solid #eee",
+//           pt: 3,
+//           display: "flex",
+//           flexDirection: "column",
+//           gap: 3,
+//         }}
+//       >
+//         {setGst && (
+//           <Box sx={{ width: "150px" }}>
+//             <DropdownField
+//               name="gst"
+//               label="GST (%)"
+//               value={String(gst)}
+//               options={[
+//                 { label: "5%", value: "5" },
+//                 { label: "12%", value: "12" },
+//                 { label: "18%", value: "18" },
+//               ]}
+//               onChangeCallback={(value) =>
+//                 setGst(Number(value))
+//               }
+//             />
+//           </Box>
+//         )}
 
-export default ItemsSection;
+//         <Box
+//           sx={{
+//             display: "flex",
+//             justifyContent: {
+//               xs: "center",
+//               md: "flex-end",
+//             },
+//             width: "100%",
+//           }}
+//         >
+//           <Typography
+//             variant="h6"
+//             sx={{
+//               fontWeight: "bold",
+//               bgcolor: "#e8f5f2",
+//               px: { xs: 5, md: 3 },
+//               py: 1,
+//               borderRadius: "8px",
+//               width: { xs: "100%", sm: "auto" },
+//               textAlign: "center",
+//             }}
+//           >
+//             Grand Total: ₹{finalWithGst.toFixed(2)}
+//           </Typography>
+//         </Box>
+//       </Box>
+//     </Paper>
+//   );
+// };
+
+// export default ItemsSection;

@@ -1,327 +1,451 @@
-
 import { useForm, FormProvider } from "react-hook-form";
-import { Box, Button, Typography, Paper } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import TextInputField from "@/components/controlled/TextInputField";
-import EmailField from "@/components/controlled/EmailField";
-import MobileField from "@/components/controlled/MobileField";
-import DateTimeField from "@/components/controlled/DateTimeField";
-import { useState } from "react";
-import AppToast from "@/containers/distributors/AppToast";
-import { URL_PATH } from "@/constants/UrlPath";
-import { addDistributor, checkFieldExists, } from "@/service/distributorService";
 
- import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import { updateDistributor } from "@/service/distributorService";
-import { showToast } from "@/components/uncontrolled/ToastMessage";
+import { Box, Button, Typography, Paper } from "@mui/material";
+
+import { useNavigate } from "react-router-dom";
+
+import TextInputField from "@/components/controlled/TextInputField";
+
+import EmailField from "@/components/controlled/EmailField";
+
+import MobileField from "@/components/controlled/MobileField";
+
+import DateTimeField from "@/components/controlled/DateTimeField";
+
+import { useState } from "react";
+
+import AppToast from "@/containers/distributors/AppToast";
+
+import { URL_PATH } from "@/constants/UrlPath";
+
+import BankDetailsForm from "@/containers/distributors/BankDetailForm";
+
+import { useAutoSave } from "@/hooks/Useautosave";
  
 type DistributorFormInput = {
-  distributorId: number;
+
   companyName: string;
+
   ownerName?: string;
-  phone: string;
+
+  mobile: string;
+
   email: string;
-  createdAt: string;
+
+  date: string;
+
   registrationNumber: string;
+
   website: string;
-  gstin: string;
+
+  gstIn: string;
+
   address: string;
+
   bankName: string;
+
   accountNumber: string;
+
   accountHolderName: string;
+
   branch: string;
-  ifscCode: string;
+
+  ifsc: string;
+
   upiId: string;
+
 };
  
 const DistributorsForm = () => {
+
   const methods = useForm<DistributorFormInput>({
+
     defaultValues: {
+
       companyName: "",
+
       ownerName: "",
-      phone: "",
+
+      mobile: "",
+
       email: "",
-      createdAt: "",
+ 
       registrationNumber: "",
+
       website: "",
-      gstin: "",
+
+      gstIn: "",
+
       address: "",
+
       bankName: "",
+
       accountNumber: "",
+
       accountHolderName: "",
+
       branch: "",
-      ifscCode: "",
+
+      ifsc: "",
+
       upiId: "",
+
     },
+
     mode: "onChange",
+
   });
- 
-  const location = useLocation();
-const editData = location.state?.distributor;
- 
- 
-useEffect(() => {
-  if (editData) {
-    methods.reset({
-      companyName: editData.companyName,
-      ownerName: editData.ownerName,
-      phone: editData.phone,
-      email: editData.email,
- 
- 
-       createdAt: editData.createdDate
-        ? editData.createdDate.split("T")[0]
-        : "",
-     // createdAt: editData.createdDate,
-      registrationNumber: editData.registrationNumber,
-      website: editData.website || "",
-      gstin: editData.gstin,
-      address: editData.address,
-      bankName: editData.bankDetails?.bankName || "",
-      accountNumber: editData.bankDetails?.accountNumber || "",
-      accountHolderName: editData.bankDetails?.accountHolderName || "",
-      branch: editData.bankDetails?.branch || "",
-      ifscCode: editData.bankDetails?.ifscCode || "",
-      upiId: editData.bankDetails?.upiId || "",
-    });
-  }
-}, [editData, methods]);
  
   const navigate = useNavigate();
+
   const [toastOpen, setToastOpen] = useState(false);
-  
-  
-const onSubmit = async (data: DistributorFormInput) => {
-  try {
-  
+ 
+  const { clearData } = useAutoSave({
 
-    // EMAIL
-const emailExists = await checkFieldExists("email", data.email);
-if (emailExists && data.email !== editData?.email) {
-  methods.setError("email", {
-    type: "manual",
-    message: "Email already exists",
+    storageKey: "add_distributor_form",
+
+    methods,
+
   });
-  return;
-}
+ 
+  const onSubmit = (data: DistributorFormInput) => {
 
-// PHONE
-const phoneExists = await checkFieldExists("phone", data.phone);
-if (phoneExists && data.phone !== editData?.phone) {
-  methods.setError("phone", {
-    type: "manual",
-    message: "Phone number already exists",
-  });
-  return;
-}
+    const stored = localStorage.getItem("distributors");
 
-// GSTIN
-const gstinExists = await checkFieldExists("gstin", data.gstin);
-if (gstinExists && data.gstin !== editData?.gstin) {
-  methods.setError("gstin", {
-    type: "manual",
-    message: "GSTIN already exists",
-  });
-  return;
-}
+    const currentData = stored ? JSON.parse(stored) : [];
+ 
+    const newEntry = {
 
-//registration number
-
-const regExists = await checkFieldExists(
-  "registrationNumber",
-  data.registrationNumber
-);
-
-if (regExists && data.registrationNumber !== editData?.registrationNumber) {
-  methods.setError("registrationNumber", {
-    type: "manual",
-    message: "Registration number already exists",
-  });
-  return;
-}
-
-    const cleanedData = {
       ...data,
-      ownerName: data.ownerName || "",
-      website: data.website ? data.website : undefined,
+
+      id: Date.now().toString(),
+
+      status: "Active",
+
     };
+ 
+    const updatedData = [...currentData, newEntry];
 
-    if (editData) {
-      await updateDistributor(editData.id, cleanedData);
-    } else {
-      await addDistributor(cleanedData);
-    }
+    localStorage.setItem("distributors", JSON.stringify(updatedData));
+ 
+    clearData();
 
-    showToast("success", "Business details saved!");
+    setToastOpen(true);
 
     setTimeout(() => {
-      navigate(URL_PATH.DistributorsPage);
-    }, 1000);
 
-  } catch (error: unknown) {
-    console.error(error);
-  }
-};
-return (
-    <Box p={2} sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-      <FormProvider {...methods}>
-        <form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
-         
-          <Paper
+      navigate(URL_PATH.DistributorsPage);
+
+    }, 1500);
+
+  };
+ 
+  return (
+<Box p={2} sx={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+<FormProvider {...methods}>
+<form noValidate onSubmit={methods.handleSubmit(onSubmit)}>
+<Paper
+
             sx={{
+
               maxWidth: 800,
+
               mx: "auto",
+
               p: 2,
+
               backgroundColor: "#fff",
+
               borderRadius: "10px",
+
               boxShadow: 3,
+
               mb: 3,
+
             }}
-          >
-            <Typography variant="h6" mb={3} fontWeight={600}>
+>
+<Typography variant="h6" mb={3} fontWeight={600}>
+
               Add Distributor
-            </Typography>
+</Typography>
  
             <Box
+
               sx={{
+
                 display: "grid",
+
                 gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+
                 gap: 2,
+
                 mt: 2,
+
               }}
-            >
-              <TextInputField
+>
+<TextInputField
+
                 name="companyName"
+
                 label="Company Name"
-                minLength={3}
+
                 maxLength={30}
+
                 inputType="textarea"
+
                 rows={1}
+
                 required
+
               />
  
               <TextInputField
+
                 name="ownerName"
+
                 label="Owner Name"
+
                 inputType="alphabet"
-                minLength={3}
+
                 maxLength={30}
+
                 required
+
               />
  
               <MobileField
-                name="phone"
+
+                name="mobile"
+
                 label="Phone"
+
                 placeholder="Mobile Number"
+
                 countryCode
-                preventDuplicate
+
                 required
+
               />
  
               <EmailField
+
                 name="email"
+
                 label="Email"
+
                 required
+
                 maxLength={50}
-                preventDuplicate
+
               />
  
               <DateTimeField
-                name="createdAt"
+
+                name="date"
+
                 label="Date"
+
                 viewMode="date"
-                useCurrentDate={true}
-                disabled
+
+                useCurrentDate={false}
+
                 dateRestriction="current-future-only"
-                required
+
               />
  
               <TextInputField
+
                 name="registrationNumber"
+
                 label="Registration Number"
+
                 type="number"
-                preventDuplicate
+
                 required
+
                 maxLength={14}
+
               />
- 
-              <TextInputField
-                name="gstin"
-                label="GSTIN"
-                placeholder=" e.g 27AAAAA0000A1ZS"
-                preventDuplicate
+<TextInputField
+
+                name="website"
+
+                label="Website (Optional)"
+
+                inputType="textarea"
+
                 rows={1}
-                required
+
                 rules={{
+
                   pattern: {
+
                     value:
-                      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
-                    message: "Enter valid GSTIN (e.g., 22AAAAA0000A1Z5)",
+
+                      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6})(\/[\w.-]*)*\/?$/i,
+
+                    message: "Invalid website URL (www.google.com)",
+
                   },
+
                 }}
+
               />
-            </Box>
+<TextInputField
+
+                name="gstIn"
+
+                label="GSTIN"
+
+                placeholder=" e.g 27AAAAA0000A1ZS"
+
+                maxLength={15}
+
+                rows={1}
+
+                rules={{
+
+                  pattern: {
+
+                    value:
+
+                      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+
+                    message: "Enter valid GSTIN (e.g., 22AAAAA0000A1Z5)",
+
+                  },
+
+                }}
+
+              />
+</Box>
  
             <Box sx={{ mt: 2 }}>
-              <TextInputField
+<TextInputField
+
                 name="address"
+
                 label="Address"
+
                 inputType="textarea"
+
                 rows={2}
-                required
-                maxLength={50}
-                minLength={10}
+
               />
-            </Box>
-          </Paper>
-          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}>
-            <Button
-              variant="outlined"
-              onClick={() => navigate(URL_PATH.DistributorsPage)}
-              sx={{
-                color: "#238878",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#238878",
-                  color: "#fff",
-                },
-              }}
-            >
-              Cancel
-            </Button>
+</Box>
+</Paper>
  
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                backgroundColor: "#238878",
-                color: "#fff",
-                border: "2px solid #238878",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#238878",
-                },
+          <Paper
+
+            sx={{
+
+              maxWidth: 800,
+
+              mx: "auto",
+
+              p: 4,
+
+              backgroundColor: "#fff",
+
+              borderRadius: "10px",
+
+              boxShadow: 3,
+
+            }}
+>
+<BankDetailsForm />
+</Paper>
+ 
+          <Box
+
+            sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}
+>
+<Button
+
+              variant="outlined"
+
+              onClick={() => {
+
+                clearData();
+
+                navigate(URL_PATH.DistributorsPage);
+
               }}
-            >
+
+              sx={{
+
+                color: "#238878",
+
+                border: "2px solid #238878",
+
+                textTransform: "none",
+
+                "&:hover": {
+
+                  backgroundColor: "#238878",
+
+                  color: "#fff",
+
+                  border: "2px solid #238878",
+
+                },
+
+              }}
+>
+
+              Cancel
+</Button>
+<Button
+
+              type="submit"
+
+              variant="contained"
+
+              sx={{
+
+                backgroundColor: "#238878",
+
+                color: "#fff",
+
+                border: "2px solid #238878",
+
+                textTransform: "none",
+
+                "&:hover": {
+
+                  backgroundColor: "#fff",
+
+                  color: "#238878",
+
+                  border: "2px solid #238878",
+
+                },
+
+              }}
+>
+
               Save
-            </Button>
-          </Box>
-        </form>
-      </FormProvider>
+</Button>
+</Box>
+</form>
+</FormProvider>
  
       <AppToast
+
         open={toastOpen}
+
         message="Data saved successfully"
+
         severity="success"
+
         onClose={() => setToastOpen(false)}
+
       />
-    </Box>
+</Box>
+
   );
+
 };
  
-export default DistributorsForm;                          
+export default DistributorsForm;
  
-
