@@ -1,4 +1,3 @@
-
 import { Box, Button, Typography, Checkbox, FormControlLabel, FormHelperText } from "@mui/material";
 import { FormProvider, useForm, Controller } from "react-hook-form";
 import BgImage from "@/assets/bgloginpage.svg";
@@ -129,7 +128,7 @@ const AccountSetup = () => {
  
 const onSubmit = async (data: AccountForm): Promise<void> => {
   setIsLoading(true);
-  
+ 
   try {
    // const registrationData = JSON.parse(localStorage.getItem('registrationData') || '{}');
     // const selectedPlan = localStorage.getItem('selectedPlan');
@@ -147,13 +146,13 @@ console.log("selectedPlan:", selectedPlan);
       navigate(URL_PATH.REGISTER);
       return;
     }
-
+ 
     if (!selectedPlan) {
       showToast("error", "Plan not selected. Please start over.");
       navigate(URL_PATH.ChoosePlan);
       return;
     }
-
+ 
     const completeUserData = {
       username: registrationData.email.split('@')[0],
       password: data.password,
@@ -171,19 +170,19 @@ console.log("selectedPlan:", selectedPlan);
         }
       })
     };
-
+ 
     const response = await authService.register(completeUserData) as RegistrationResponse;
     console.log("Registration response:", response);
-
+ 
     if (response.userId) {
       const userId = response.userId;
       const planId = getPlanId(selectedPlan);
       const planDetails = getPlanDetails(planId);
-
+ 
       localStorage.setItem('userId', userId.toString());
       localStorage.setItem('planId', planId.toString());
       localStorage.setItem('selectedPlan', selectedPlan);
-
+ 
       //first activate subscription, then login, then save payment data
       try {
         await activateSubscription(userId, planId);
@@ -191,7 +190,7 @@ console.log("selectedPlan:", selectedPlan);
       } catch (err) {
         console.error("Activation error:", err);
       }
-
+ 
       //auto-login after registration to get token for payment page
       try {
         const loginResult = await authService.login({
@@ -203,7 +202,7 @@ console.log("selectedPlan:", selectedPlan);
       } catch (loginErr) {
         console.error("Auto-login failed:", loginErr);
       }
-
+ 
       // Store payment data in localStorage for use in payment page
       const paymentData = {
         userId: userId,
@@ -213,10 +212,10 @@ console.log("selectedPlan:", selectedPlan);
         couponCode: ''
       };
       localStorage.setItem('paymentData', JSON.stringify(paymentData));
-
+ 
       showToast("success", `Account created! ${planDetails.name} plan active.`);
       navigate(URL_PATH.ProceedToPaymentPage);
-
+ 
     } else {
       showToast("error", response.message || "Registration failed");
     }
@@ -371,6 +370,8 @@ console.log("selectedPlan:", selectedPlan);
 };
  
 export default AccountSetup;
+ 
+ 
  
  
  

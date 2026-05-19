@@ -137,18 +137,43 @@ export const updateMedicine = async (
   data: MedicineFormData
 ) => {
 
-  const payload = {
-    ...data,
-    hsnCode: data.hsnCode || "",
-    batchNumber: data.batchNumber?.toString() || "",
-    expiryDate: new Date(data.expiryDate).toISOString(),
-    purchaseDate: data.purchaseDate
-      ? new Date(data.purchaseDate).toISOString()
-      : undefined,
-    manufacturingDate: data.manufacturingDate
-      ? new Date(data.manufacturingDate).toISOString()
-      : undefined,
-  };
+ const payload = {
+  medicineName: data.medicineName,
+  batchNumber: data.batchNumber || "",
+  hsnCode: data.hsnCode || "",
+
+  numberOfStrips: Number(data.numberOfStrips),
+  tabletsPerStrip: Number(data.tabletsPerStrip),
+  looseTablets: Number(data.looseTablets),
+
+  purchasePricePerStrip: Number(data.purchasePricePerStrip),
+  mrpPerStrip: Number(data.mrpPerStrip),
+  gstPercent: Number(data.gstPercent),
+
+  expiryDate: data.expiryDate
+    ? new Date(data.expiryDate).toISOString()
+    : null,
+
+  purchaseDate: data.purchaseDate
+    ? new Date(data.purchaseDate).toISOString()
+    : null,
+
+  manufacturingDate: data.manufacturingDate
+    ? new Date(data.manufacturingDate).toISOString()
+    : null,
+
+  invoiceNumber: data.invoiceNumber || "",
+  companyName: data.companyName || "",
+
+  strength: data.strength,
+  type: data.type,
+
+  distributorId: Number(data.distributorId),
+  groupId: Number(data.groupId),
+
+  minimumQuantity: Number(data.minimumQuantity),
+  maximumQuantity: Number(data.maximumQuantity),
+};
 
   console.log("UPDATE PAYLOAD:", payload);
 
