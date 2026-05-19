@@ -1,218 +1,186 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Paper,
-  Typography,
-} from "@mui/material";
- 
-import {
-  UniversalTable,
-  ACTION_KEY,
-  type Column,
-} from "@/components/uncontrolled/UniversalTable";
+import { Box, Button, Paper, Typography } from "@mui/material";
+import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import axios from "axios";
-import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
-import NewOrderList from "@/containers/inventory/NewOrderList";
+import { getExistingReorders } from "@/service/reorderService";
 import LastPurchaseList from "@/containers/inventory/LastPurchaseList";
 import ApproveOrderDialog from "@/containers/inventory/ApproveOrderDialog";
- 
- 
+import NewOrderList from "@/containers/inventory/NewOrderList";
 type ReorderMedicine = {
   medicineName: string;
   strength: string;
   companyName: string;
   qty: number;
 };
- 
+
 type ReorderHistory = {
   id: number;
-  distributorName: string;
-  distributorId?: number;
   createdAt: string;
+  companyName: string;
+  medicineName: string;
+  strength: string;
+  qty: number;
   existingMedicines: ReorderMedicine[];
-  orderType: "reorder" | "neworder";
-  [ACTION_KEY]: string;
 };
- 
+
 function ReorderList() {
   const navigate = useNavigate();
-  const [approveOrder, setApproveOrder] =
-  useState<ReorderHistory | null>(null);
- 
+  const [approveOrder, setApproveOrder] = useState<ReorderHistory | null>(null);
+
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
- 
+
 const fetchReorderHistory = async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get(API_ENDPOINTS.REORDER, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
- 
-    const allData: ReorderHistory[] = res.data || [];
- 
-    // existingMedicines filter for reorder
-    const filtered = allData.filter(
-      (item) => item.existingMedicines && item.existingMedicines.length > 0
-    );
- 
-    setReorderHistory(filtered);
+    const data = await getExistingReorders();
+    setReorderHistory(data);
   } catch (error) {
     console.error("Reorder history fetch failed:", error);
   }
 };
- 
- 
-const columns: Column<ReorderHistory>[] = [
-  {
-    key: "id",
-    label: "Sr No",
-    render: (row) => row.id,
-  },
- 
-  {
-    key: "distributorName",
-    label: "Supplier",
-  },
- 
-  {
-    key: "medicineName",
-    label: "Medicine Name",
-  },
- 
-  {
-    key: "strength",
-    label: "Strength/Type",
-  },
- 
-  {
-    key: "qty",
-    label: "Qty",
-  },
- 
-  {
-    key: ACTION_KEY,
-    label: "Action",
-  },
-];
- 
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const columns: Column<ReorderHistory>[] = [
+    {
+      key: "companyName",
+      label: "Supplier",
+    },
+    {
+      key: "medicineName",
+      label: "Medicine Name",
+    },
+    {
+      key: "strength",
+      label: "Strength/Type",
+    },
+    {
+      key: "qty",
+      label: "Qty",
+    },
+    {
+      key: ACTION_KEY,
+      label: "Action",
+    },
+  ];
+
   useEffect(() => {
     fetchReorderHistory();
   }, []);
- 
+
   return (
-   <Box
-  sx={{
-    display: "flex",
-    flexDirection: "column",
-    gap: 3,
-    p: { xs: 1, sm: 2 },
-  }}
->
- 
-     <Paper
-  sx={{
-    borderRadius: 2,
-    p: { xs: 1, sm: 2 },
-    overflowX: "auto",
-  }}
->
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 3,
+        p: { xs: 1, sm: 2 },
+      }}
+    >
+      <Paper
+        sx={{
+          borderRadius: 2,
+          p: { xs: 1, sm: 2 },
+          overflowX: "auto",
+        }}
+      >
         <Box
-  display="flex"
-  justifyContent="space-between"
-  alignItems={{ xs: "flex-start", sm: "center" }}
-  flexDirection={{ xs: "column", sm: "row" }}
-  gap={1}
-  mb={1.5}
->
+          display="flex"
+          justifyContent="space-between"
+          alignItems={{ xs: "flex-start", sm: "center" }}
+          flexDirection={{ xs: "column", sm: "row" }}
+          gap={1}
+          mb={1.5}
+        >
           <Typography fontWeight={700}>Reorder List</Typography>
           <Box display="flex" gap={1}>
             <Button
               variant="contained"
               sx={{ textTransform: "none", backgroundColor: "#238878" }}
-              onClick={() => navigate(URL_PATH.Inventory)}>
+              onClick={() => navigate(URL_PATH.Inventory)}
+            >
               Home
             </Button>
           </Box>
         </Box>
- 
- <UniversalTable<ReorderHistory, ReorderMedicine>
-  data={reorderHistory}
-  columns={columns}
-  rowsPerPage={5}
-  tableSize="small"
-  textAlign="center"
-  getRowId={(row) => row.id}
-  subRows={{
-    key: "existingMedicines",
-    columns: [
-      {
-        key: "medicineName",
-        label: "Medicine Name",
-      },
-      {
-        key: "strength",
-        label: "Strength/Type",
-      },
-      {
-        key: "qty",
-        label: "Qty",
-      },
-    ],
-  }}
-actions={{
-  view: (order) =>
-    navigate(URL_PATH.ReorderEmail, {
-      state: {
-        distributor: order.distributorName,
-        email: "",
-        medicines: order.existingMedicines.map((m, idx) => ({
-          medicineRowId: idx + 1,
-          medicineName: m.medicineName,
-          strengthType: m.strength,
-          quantity: m.qty,
-        })),
-        isViewMode: true,
-      },
-    }),
- 
-  CheckIcon: (order) => {
-  setApproveOrder(order);
-},
-}}
-/>
+
+        <UniversalTable<ReorderHistory, ReorderMedicine>
+          data={reorderHistory}
+          columns={columns}
+          rowsPerPage={5}
+          tableSize="small"
+          textAlign="center"
+          getRowId={(row) => row.id}
+          subRows={{
+            key: "existingMedicines",
+            columns: [
+              {
+                key: "medicineName",
+                label: "Medicine Name",
+              },
+              {
+                key: "strength",
+                label: "Strength/Type",
+              },
+              {
+                key: "qty",
+                label: "Qty",
+              },
+            ],
+          }}
+          actions={{
+            view: (order) =>
+              navigate(URL_PATH.ReorderEmail, {
+                state: {
+                  distributor: order.companyName,
+                  email: "",
+                  medicines: (order.existingMedicines ?? []).map((m, idx) => ({
+                    medicineRowId: idx + 1,
+                    medicineName: m.medicineName,
+                    strengthType: m.strength,
+                    quantity: m.qty,
+                  })),
+                  isViewMode: true,
+                },
+              }),
+
+            CheckIcon: (order) => {
+              setApproveOrder(order);
+            },
+          }}
+        />
       </Paper>
       <ApproveOrderDialog
-  open={!!approveOrder}
-  onClose={() => setApproveOrder(null)}
-  order={
-    approveOrder
-      ? {
-          id: approveOrder.id,
-          distributorName: approveOrder.distributorName,
-          distributorId: 0,
-
-          newMedicines:
-            approveOrder.existingMedicines.map(
-              (med, index) => ({
-                id: index + 1,
-                medicineName: med.medicineName,
-                strength: med.strength,
-                qty: med.qty,
-              })
-            ),
+        open={!!approveOrder}
+        onClose={() => setApproveOrder(null)}
+        orderType="existing"
+        onSuccess={() => {
+          setRefreshKey((k) => k + 1);
+          fetchReorderHistory();
+          setApproveOrder(null);
+        }}
+        order={
+          approveOrder
+            ? {
+                id: approveOrder.id,
+                distributorName: approveOrder.companyName || "",
+                distributorId: 0,
+                newMedicines: [
+                  {
+                    id: approveOrder.id,
+                    medicineName: approveOrder.medicineName,
+                    strength: approveOrder.strength,
+                    qty: approveOrder.qty,
+                  },
+                ],
+              }
+            : null
         }
-      : null
-  }
-/>
- 
+      />
+
       <NewOrderList />
-      <LastPurchaseList />
+      <LastPurchaseList key={refreshKey} />
     </Box>
   );
 }
- 
-export default ReorderList;  
- 
+
+export default ReorderList;

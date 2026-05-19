@@ -1,3 +1,4 @@
+
 import { useForm, FormProvider } from "react-hook-form";
 
 import { Box, Button, Typography, Paper } from "@mui/material";
@@ -18,27 +19,37 @@ import AppToast from "@/containers/distributors/AppToast";
 
 import { URL_PATH } from "@/constants/UrlPath";
 
-import BankDetailsForm from "@/containers/distributors/BankDetailForm";
+import { addDistributor, checkFieldExists, } from "@/service/distributorService";
+
+import { useLocation } from "react-router-dom";
+
+import { useEffect } from "react";
+
+import { updateDistributor } from "@/service/distributorService";
+
+import { showToast } from "@/components/uncontrolled/ToastMessage";
 
 import { useAutoSave } from "@/hooks/Useautosave";
  
 type DistributorFormInput = {
 
+  distributorId: number;
+
   companyName: string;
 
   ownerName?: string;
 
-  mobile: string;
+  phone: string;
 
   email: string;
 
-  date: string;
+  createdAt: string;
 
   registrationNumber: string;
 
   website: string;
 
-  gstIn: string;
+  gstin: string;
 
   address: string;
 
@@ -50,7 +61,7 @@ type DistributorFormInput = {
 
   branch: string;
 
-  ifsc: string;
+  ifscCode: string;
 
   upiId: string;
 
@@ -66,15 +77,17 @@ const DistributorsForm = () => {
 
       ownerName: "",
 
-      mobile: "",
+      phone: "",
 
       email: "",
- 
+
+      createdAt: "",
+
       registrationNumber: "",
 
       website: "",
 
-      gstIn: "",
+      gstin: "",
 
       address: "",
 
@@ -86,7 +99,7 @@ const DistributorsForm = () => {
 
       branch: "",
 
-      ifsc: "",
+      ifscCode: "",
 
       upiId: "",
 
@@ -96,47 +109,171 @@ const DistributorsForm = () => {
 
   });
  
-  const navigate = useNavigate();
+  const location = useLocation();
 
-  const [toastOpen, setToastOpen] = useState(false);
+  const editData = location.state?.distributor;
  
   const { clearData } = useAutoSave({
 
-    storageKey: "add_distributor_form",
+    storageKey: "add_distributor_form_v2",
 
     methods,
 
   });
  
-  const onSubmit = (data: DistributorFormInput) => {
+  useEffect(() => {
 
-    const stored = localStorage.getItem("distributors");
+    if (editData) {
 
-    const currentData = stored ? JSON.parse(stored) : [];
+      methods.reset({
+
+        companyName: editData.companyName,
+
+        ownerName: editData.ownerName,
+
+        phone: editData.phone,
+
+        email: editData.email,
+
+        createdAt: editData.createdDate
+
+          ? editData.createdDate.split("T")[0]
+
+          : "",
+
+        registrationNumber: editData.registrationNumber,
+
+        website: editData.website || "",
+
+        gstin: editData.gstin,
+
+        address: editData.address,
+
+        bankName: editData.bankDetails?.bankName || "",
+
+        accountNumber: editData.bankDetails?.accountNumber || "",
+
+        accountHolderName: editData.bankDetails?.accountHolderName || "",
+
+        branch: editData.bankDetails?.branch || "",
+
+        ifscCode: editData.bankDetails?.ifscCode || "",
+
+        upiId: editData.bankDetails?.upiId || "",
+
+      });
+
+    }
+
+  }, [editData, methods]);
  
-    const newEntry = {
+  const navigate = useNavigate();
 
-      ...data,
-
-      id: Date.now().toString(),
-
-      status: "Active",
-
-    };
+  const [toastOpen, setToastOpen] = useState(false);
  
-    const updatedData = [...currentData, newEntry];
+  const onSubmit = async (data: DistributorFormInput) => {
 
-    localStorage.setItem("distributors", JSON.stringify(updatedData));
+    try {
+
+      const emailExists = await checkFieldExists("email", data.email);
+
+      if (emailExists && data.email !== editData?.email) {
+
+        methods.setError("email", {
+
+          type: "manual",
+
+          message: "Email already exists",
+
+        });
+
+        return;
+
+      }
  
-    clearData();
+      const phoneExists = await checkFieldExists("phone", data.phone);
 
-    setToastOpen(true);
+      if (phoneExists && data.phone !== editData?.phone) {
 
-    setTimeout(() => {
+        methods.setError("phone", {
 
-      navigate(URL_PATH.DistributorsPage);
+          type: "manual",
 
-    }, 1500);
+          message: "Phone number already exists",
+
+        });
+
+        return;
+
+      }
+ 
+      const gstinExists = await checkFieldExists("gstin", data.gstin);
+
+      if (gstinExists && data.gstin !== editData?.gstin) {
+
+        methods.setError("gstin", {
+
+          type: "manual",
+
+          message: "GSTIN already exists",
+
+        });
+
+        return;
+
+      }
+ 
+      const regExists = await checkFieldExists("registrationNumber", data.registrationNumber);
+
+      if (regExists && data.registrationNumber !== editData?.registrationNumber) {
+
+        methods.setError("registrationNumber", {
+
+          type: "manual",
+
+          message: "Registration number already exists",
+
+        });
+
+        return;
+
+      }
+ 
+      const cleanedData = {
+
+        ...data,
+
+        ownerName: data.ownerName || "",
+
+        website: data.website ? data.website : undefined,
+
+      };
+ 
+      if (editData) {
+
+        await updateDistributor(editData.id, cleanedData);
+
+      } else {
+
+        await addDistributor(cleanedData);
+
+      }
+ 
+      showToast("success", "Business details saved!");
+
+      clearData();
+ 
+      setTimeout(() => {
+
+        navigate(URL_PATH.DistributorsPage);
+
+      }, 1000);
+ 
+    } catch (error: unknown) {
+
+      console.error(error);
+
+    }
 
   };
  
@@ -189,6 +326,8 @@ const DistributorsForm = () => {
 
                 label="Company Name"
 
+                minLength={3}
+
                 maxLength={30}
 
                 inputType="textarea"
@@ -207,6 +346,8 @@ const DistributorsForm = () => {
 
                 inputType="alphabet"
 
+                minLength={3}
+
                 maxLength={30}
 
                 required
@@ -215,13 +356,15 @@ const DistributorsForm = () => {
  
               <MobileField
 
-                name="mobile"
+                name="phone"
 
                 label="Phone"
 
                 placeholder="Mobile Number"
 
                 countryCode
+
+                preventDuplicate
 
                 required
 
@@ -237,19 +380,25 @@ const DistributorsForm = () => {
 
                 maxLength={50}
 
+                preventDuplicate
+
               />
  
               <DateTimeField
 
-                name="date"
+                name="createdAt"
 
                 label="Date"
 
                 viewMode="date"
 
-                useCurrentDate={false}
+                useCurrentDate={true}
+
+                disabled
 
                 dateRestriction="current-future-only"
+
+                required
 
               />
  
@@ -261,47 +410,27 @@ const DistributorsForm = () => {
 
                 type="number"
 
+                preventDuplicate
+
                 required
 
                 maxLength={14}
 
               />
-<TextInputField
+ 
+              <TextInputField
 
-                name="website"
-
-                label="Website (Optional)"
-
-                inputType="textarea"
-
-                rows={1}
-
-                rules={{
-
-                  pattern: {
-
-                    value:
-
-                      /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6})(\/[\w.-]*)*\/?$/i,
-
-                    message: "Invalid website URL (www.google.com)",
-
-                  },
-
-                }}
-
-              />
-<TextInputField
-
-                name="gstIn"
+                name="gstin"
 
                 label="GSTIN"
 
                 placeholder=" e.g 27AAAAA0000A1ZS"
 
-                maxLength={15}
+                preventDuplicate
 
                 rows={1}
+
+                required
 
                 rules={{
 
@@ -331,35 +460,17 @@ const DistributorsForm = () => {
 
                 rows={2}
 
+                required
+
+                maxLength={50}
+
+                minLength={10}
+
               />
 </Box>
 </Paper>
  
-          <Paper
-
-            sx={{
-
-              maxWidth: 800,
-
-              mx: "auto",
-
-              p: 4,
-
-              backgroundColor: "#fff",
-
-              borderRadius: "10px",
-
-              boxShadow: 3,
-
-            }}
->
-<BankDetailsForm />
-</Paper>
- 
-          <Box
-
-            sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}
->
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 6 }}>
 <Button
 
               variant="outlined"
@@ -386,8 +497,6 @@ const DistributorsForm = () => {
 
                   color: "#fff",
 
-                  border: "2px solid #238878",
-
                 },
 
               }}
@@ -395,7 +504,8 @@ const DistributorsForm = () => {
 
               Cancel
 </Button>
-<Button
+ 
+            <Button
 
               type="submit"
 
@@ -416,8 +526,6 @@ const DistributorsForm = () => {
                   backgroundColor: "#fff",
 
                   color: "#238878",
-
-                  border: "2px solid #238878",
 
                 },
 
