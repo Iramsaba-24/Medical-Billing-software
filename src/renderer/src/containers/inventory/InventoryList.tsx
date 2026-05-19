@@ -1,3 +1,4 @@
+
 import {Box,Button,Dialog,DialogActions,DialogContent,DialogTitle,Typography,} from "@mui/material";
 import {ACTION_KEY,Column, UniversalTable,} from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
@@ -123,8 +124,26 @@ pricePerUnit: item.mrpPerTablet,
   }
 };
 
+// useEffect(() => {
+//   fetchInventory();
+// }, []);
+
+
 useEffect(() => {
   fetchInventory();
+
+  const handleUpdate = () => {
+    fetchInventory();
+  };
+
+  window.addEventListener("inventoryUpdated", handleUpdate);
+
+  return () => {
+    window.removeEventListener(
+      "inventoryUpdated",
+      handleUpdate
+    );
+  };
 }, []);
 
 

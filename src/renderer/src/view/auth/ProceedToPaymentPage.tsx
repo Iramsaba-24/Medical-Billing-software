@@ -1,3 +1,4 @@
+
 import { useForm, FormProvider } from "react-hook-form";
 import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -91,14 +92,15 @@ const ProceedToPaymentPage = () => {
       'premium': 3
     };
  
+
     const paymentData = {
-      userId: userId ? parseInt(userId) : 0,
-      amount: parseFloat(data.amount),
-      paymentMethod: data.paymentMethod,
-      planId: planMapping[selectedPlan] || 1,
-      couponCode: ''
-    };
- 
+  userId: userId ? parseInt(userId) : 0,
+  amount: parseFloat(data.amount),
+  paymentMethod: data.paymentMethod,
+  planId: planMapping[selectedPlan] || 1,
+  couponCode: '',
+  invoiceId: 0
+};
     localStorage.setItem('paymentData', JSON.stringify(paymentData));
  
     if (data.paymentMethod === "upi") {
@@ -286,4 +288,4 @@ const ProceedToPaymentPage = () => {
  
 export default ProceedToPaymentPage;
  
- 
+
