@@ -1,6 +1,6 @@
 import { Box, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import BillingTable from "@/containers/Invoices/BillingTable";
+import BillingTable from "@/containers/invoices/BillingTable";
 import { Invoice } from "@/types/invoice";
 import revenueImg from "@/assets/TotalRevenue(Paid).svg";
 import pendingImg from "@/assets/PendingAmount.svg";

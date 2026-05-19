@@ -240,7 +240,15 @@ captionSx,
   };
  
   return (
-    <Paper sx={{ borderRadius: 3, boxShadow: 4, ...paperSx }}>
+   <Paper
+  elevation={0}
+  sx={{
+    borderRadius: 0,
+    boxShadow: "none",
+    backgroundColor: "transparent",
+    ...paperSx,
+  }}
+>
       {(showSearch || showExport) && (
         <Box
           sx={{

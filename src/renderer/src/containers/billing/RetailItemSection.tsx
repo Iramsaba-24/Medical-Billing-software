@@ -11,7 +11,7 @@ import { Add, Remove } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import DropdownField from "@/components/controlled/DropdownField";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
-
+ 
 export interface ItemRow {
   retailItemId: number;
   retailInvoiceId?: number;
@@ -25,7 +25,7 @@ export interface ItemRow {
   amount?: number;
   maxStock?: number;
 }
-
+ 
 export type InventoryItem = {
   itemName: string;
   medicineId: string;
@@ -33,7 +33,7 @@ export type InventoryItem = {
   pricePerUnit: number;
   expiryDate: string;
 };
-
+ 
 interface RetailItemsSectionProps {
   rows: ItemRow[];
   setRows: (rows: ItemRow[]) => void;
@@ -42,17 +42,17 @@ interface RetailItemsSectionProps {
   gst?: number;
   setGst?: (value: number) => void;
 }
-
+ 
 const RetailItemSection = ({
   rows,
   setRows,
-
+ 
   isSubmitted,
   gst = 0,
   setGst,
 }: RetailItemsSectionProps) => {
   const [inventory, setInventory] = useState<MedicineResponse[]>([]);
-
+ 
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
@@ -64,7 +64,7 @@ const RetailItemSection = ({
     };
     fetchMedicines();
   }, []);
-
+ 
   const itemOptions = Array.from(
     new Map(
       inventory.map((item) => [
@@ -76,22 +76,22 @@ const RetailItemSection = ({
       ])
     ).values()
   );
-
+ 
   const getStrengthOptions = (medicineName?: string) => {
     if (!medicineName) return [];
-
+ 
     const strengths = inventory
       .filter((item) => item.medicineName === medicineName && item.strength)
       .map((item) => item.strength as string);
-
+ 
     const uniqueStrengths = Array.from(new Set(strengths));
-
+ 
     return uniqueStrengths.map((s) => ({
       label: s,
       value: s,
     }));
   };
-
+ 
   const addRow = () =>
     setRows([
       ...rows,
@@ -103,10 +103,10 @@ const RetailItemSection = ({
         amount: 0,
       },
     ]);
-
+ 
   const removeRow = (id: number) =>
     setRows(rows.filter((r) => r.retailItemId !== id));
-
+ 
   const updateRow = (
     id: number,
     field: keyof ItemRow,
@@ -121,14 +121,14 @@ const RetailItemSection = ({
             Number(value) < 0
           )
             return r;
-
+ 
           return { ...r, [field]: value };
         }
         return r;
       })
     );
   };
-
+ 
   const handleNameChange = (id: number, selectedName: string) => {
     setRows(
       rows.map((r) => {
@@ -147,13 +147,13 @@ const RetailItemSection = ({
       })
     );
   };
-
+ 
   const subTotal = rows.reduce((acc, row) => {
     return acc + Number(row.quantity) * Number(row.price);
   }, 0);
-
+ 
   const finalWithGst = subTotal + (subTotal * gst) / 100;
-
+ 
   return (
     <Paper
       sx={{
@@ -172,7 +172,7 @@ const RetailItemSection = ({
         <Typography variant="h6" fontWeight={600}>
           Items List
         </Typography>
-
+ 
         <Button
           startIcon={<Add />}
           onClick={addRow}
@@ -181,18 +181,18 @@ const RetailItemSection = ({
           ADD ITEM
         </Button>
       </Box>
-
+ 
       <Divider sx={{ mb: 3 }} />
-
+ 
       {rows.map((row) => {
         const qtyError =
           isSubmitted && (row.quantity === "" || Number(row.quantity) <= 0);
-
+ 
         const priceError =
           isSubmitted && (row.price === "" || Number(row.price) <= 0);
-
+ 
         const nameError = isSubmitted && row.medicineId.trim() === "";
-
+ 
         return (
           <Box
             key={row.retailItemId}
@@ -221,7 +221,7 @@ const RetailItemSection = ({
                 handleNameChange(row.retailItemId, value);
               }}
             />
-
+ 
             <DropdownField
               name={`strength_${row.retailItemId}`}
               label="Strength"
@@ -235,7 +235,7 @@ const RetailItemSection = ({
                     i.strength === value &&
                     i.medicineId
                 );
-
+ 
                 if (selected) {
                   setRows(
                     rows.map((r) =>
@@ -255,7 +255,7 @@ const RetailItemSection = ({
                 }
               }}
             />
-
+ 
             <TextField
               fullWidth
               label="Company"
@@ -264,7 +264,7 @@ const RetailItemSection = ({
                 updateRow(row.retailItemId, "companyName", e.target.value)
               }
             />
-
+ 
             <TextField
               fullWidth
               label="Qty"
@@ -294,7 +294,7 @@ const RetailItemSection = ({
                 )
               }
             />
-
+ 
             <TextField
               fullWidth
               label="Price"
@@ -304,13 +304,13 @@ const RetailItemSection = ({
               value={row.price}
               error={priceError}
             />
-
+ 
             <TextField
               label="Total"
               value={(Number(row.quantity) * Number(row.price)).toFixed(2)}
               disabled
             />
-
+ 
             <Box display="flex" justifyContent="center">
               {rows.length > 1 && (
                 <IconButton
@@ -324,7 +324,7 @@ const RetailItemSection = ({
           </Box>
         );
       })}
-
+ 
       <Box
         sx={{
           borderTop: "1px solid #eee",
@@ -350,7 +350,7 @@ const RetailItemSection = ({
             />
           </Box>
         )}
-
+ 
         <Box
           sx={{
             display: "flex",
@@ -377,5 +377,8 @@ const RetailItemSection = ({
     </Paper>
   );
 };
-
+ 
 export default RetailItemSection;
+ 
+ 
+ 

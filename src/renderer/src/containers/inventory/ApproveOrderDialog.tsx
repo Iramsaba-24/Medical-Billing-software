@@ -97,7 +97,19 @@ const onSubmit = async (data: FormValues) => {
 };
   return (
     <FormProvider {...methods}>
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+<Dialog
+  open={open}
+  onClose={onClose}
+  maxWidth="md"
+  fullWidth
+  PaperProps={{
+    sx: {
+      mx: { xs: 1, sm: 2 },
+      width: { xs: "95%", sm: "100%" },
+      borderRadius: 2,
+    },
+  }}
+>
         <DialogTitle>New Medicine Details</DialogTitle>
 
         <DialogContent>
@@ -106,8 +118,8 @@ const onSubmit = async (data: FormValues) => {
               component="form"
               id="approve-form"
               onSubmit={handleSubmit(onSubmit)}
-              px={1}
-              py={0}
+             px={{ xs: 0, sm: 1 }}
+py={0}
               display="flex"
               flexDirection="column"
               gap={2}
@@ -121,7 +133,14 @@ const onSubmit = async (data: FormValues) => {
                 </Typography>
               </Box>
 
-              <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1.5}>
+          <Box
+  display="grid"
+  gridTemplateColumns={{
+    xs: "1fr",
+    sm: "1fr 1fr 1fr",
+  }}
+  gap={1.5}
+>
                 <TextField
                   label="Paid Amount"
                   size="small"
@@ -154,11 +173,20 @@ const onSubmit = async (data: FormValues) => {
                 Medicine Details
               </Typography>
 
+
+<Box sx={{ overflowX: "auto" }}>
               <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 700 }}>Medicine Name</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Strength/Type</TableCell>
+<TableCell
+  sx={{
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+  }}
+>
+  Strength/Type
+</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Qty</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Amount (₹)</TableCell>
                   </TableRow>
@@ -186,7 +214,9 @@ const onSubmit = async (data: FormValues) => {
                               size="small"
                               type="number"
                               inputProps={{ min: 0, step: "0.01" }}
-                              sx={{ width: 110 }}
+                              sx={{
+  width: { xs: 90, sm: 110 },
+}}
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">₹</InputAdornment>
@@ -199,7 +229,7 @@ const onSubmit = async (data: FormValues) => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table></Box>
 
               {amountMismatch && (
                 <Typography fontSize={12} color="error">
@@ -210,13 +240,19 @@ const onSubmit = async (data: FormValues) => {
           )}
         </DialogContent>
 
-        <DialogActions>
+      <DialogActions
+  sx={{
+    flexDirection: { xs: "column", sm: "row" },
+    gap: 1,
+    p: 2,
+  }}
+>
           <Button
             variant="outlined"
             onClick={onClose}
             sx={{
               px: 4,
-              width: "14%",
+             width: { xs: "100%", sm: "14%" },
               textTransform: "none",
               border: "2px solid #1b7f6b",
               color: "#1b7f6b",
@@ -232,7 +268,7 @@ const onSubmit = async (data: FormValues) => {
             disabled={amountMismatch}
             sx={{
               px: 4,
-              width: "14%",
+             width: { xs: "100%", sm: "14%" },
               textTransform: "none",
               backgroundColor: "#1b7f6b",
               "&:hover": { backgroundColor: "#fff", color: "#1b7f6b", border: "2px solid #1b7f6b" },

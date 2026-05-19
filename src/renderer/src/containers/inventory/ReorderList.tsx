@@ -22,7 +22,6 @@ type ReorderHistory = {
   strength: string;
   qty: number;
   existingMedicines: ReorderMedicine[];
-  
 };
 
 function ReorderList() {
