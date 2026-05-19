@@ -1,4 +1,4 @@
- 
+
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate,useLocation } from "react-router-dom";
@@ -64,11 +64,27 @@ type ApproveMedicine = {
   amount: string;
 };
  
+// type ApproveOrderState = {
+//   approveMode: true;
+//   orderId: number;
+//   distributorName: string;
+//   medicines?: ApproveMedicine[];
+// };
+
+
+
 type ApproveOrderState = {
   approveMode: true;
   orderId: number;
   distributorName: string;
+
   medicines?: ApproveMedicine[];
+
+  payment?: {
+    paid: string;
+    unpaid: string;
+    paymentMode: string;
+  };
 };
  
 const locationState = location.state as MedicineResponse | ApproveOrderState | undefined;
@@ -158,99 +174,206 @@ useEffect(() => {
 const onSubmit = async (data: InventoryFormData) => {
   try {
     const finalData = {
-      ...data,
-      distributorId: Number(data.distributorId),
-      groupId: Number(data.groupId),
-      companyName: data.companyName || "NA",
-    };
- 
-   
+  ...data,
+  distributorId: Number(data.distributorId),
+  groupId: Number(data.groupId),
+  companyName: data.companyName || "NA",
+};
+
+console.log("FINAL DATA", finalData);
+
+    // EDIT MODE
     if (isEdit && editData?.medicineId) {
- 
-      await updateMedicine(
-        editData.medicineId,
-        finalData
-      );
- 
+      await updateMedicine(editData.medicineId, finalData);
+
+      window.dispatchEvent(new Event("inventoryUpdated"));
+
       navigate(URL_PATH.Inventory);
       return;
     }
- 
-   
+
+
+    console.log("FINAL DATA", finalData);
+    // SAVE MEDICINE
     await addMedicine(finalData);
- 
-   
+
     const totalMedicines =
       approveData?.medicines?.length || 0;
- 
-    if (currentMedicineIndex < totalMedicines - 1) {
+
+    // NEXT MEDICINE FORM
+    if (
+      approveData?.medicines &&
+      currentMedicineIndex < totalMedicines - 1
+    ) {
       setCurrentMedicineIndex((prev) => prev + 1);
       return;
     }
- 
+
+    // LAST MEDICINE → APPROVE ORDER
+    // if (approveData?.orderId) {
+    //   const token = localStorage.getItem("token");
+
+    //   await axios.put(
+    //     `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
+    //     {},
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     }
+    //   );
+    // }
+
+
+
+
     if (approveData?.orderId) {
-      const token = localStorage.getItem("token");
- 
-      await axios.put(
-        `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    }
- 
-    navigate(URL_PATH.Inventory);
- 
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
   } catch (error) {
-    console.error(error);
+    console.error("Approve API Error", error);
   }
+}
+
+window.dispatchEvent(new Event("inventoryUpdated"));
+
+navigate(URL_PATH.Inventory);
+
+    // REFRESH INVENTORY
+    window.dispatchEvent(new Event("inventoryUpdated"));
+
+    // REDIRECT
+    navigate(URL_PATH.Inventory);
+
+  // } catch (error) {
+  //   console.error(error);
+  // }
+  } catch (error) {
+  if (axios.isAxiosError(error)) {
+    console.log("BACKEND ERROR =>", error.response?.data);
+  }
+
+  console.error(error);
+}
 };
 // Approve mode
 const { reset } = methods;
  
-useEffect(() => {
-  if (!currentMedicine || supplierOptions.length === 0) return;
+// useEffect(() => {
+//   if (!currentMedicine || supplierOptions.length === 0) return;
  
+//   const matchedDistributor = supplierOptions.find(
+//     (opt) =>
+//       opt.label.toLowerCase() ===
+//       approveData?.distributorName?.toLowerCase()
+//   );
+ 
+//   const amount = Number(currentMedicine.amount || 0);
+//   const qty = Number(currentMedicine.qty || 0);
+ 
+//   const calculatedPurchasePrice =
+//     qty > 0 ? amount / qty : 0;
+ 
+//   reset({
+//     medicineName: currentMedicine.medicineName || "",
+//     strength: currentMedicine.strength || "",
+ 
+//     numberOfStrips: qty,
+//     tabletsPerStrip: 1,
+//     looseTablets: 0,
+ 
+//     purchasePricePerStrip: Number(
+//       calculatedPurchasePrice.toFixed(2)
+//     ),
+ 
+//     mrpPerStrip: 0,
+//     gstPercent: 5,
+ 
+//     purchaseDate: new Date().toISOString().split("T")[0],
+ 
+//     expiryDate: "",
+//     type: "",
+//     groupId: "",
+ 
+//     distributorId: matchedDistributor?.value || "",
+//   });
+ 
+// }, [currentMedicine, supplierOptions, reset, approveData]);
+
+
+
+useEffect(() => {
+  if (!approveData?.medicines?.length) return;
+
+  const medicine =
+    approveData.medicines[currentMedicineIndex];
+
+  if (!medicine || supplierOptions.length === 0) return;
+
   const matchedDistributor = supplierOptions.find(
     (opt) =>
       opt.label.toLowerCase() ===
-      approveData?.distributorName?.toLowerCase()
+      approveData.distributorName?.toLowerCase()
   );
- 
-  const amount = Number(currentMedicine.amount || 0);
-  const qty = Number(currentMedicine.qty || 0);
- 
+
+  const amount = Number(medicine.amount || 0);
+  const qty = Number(medicine.qty || 0);
+
   const calculatedPurchasePrice =
     qty > 0 ? amount / qty : 0;
- 
+
   reset({
-    medicineName: currentMedicine.medicineName || "",
-    strength: currentMedicine.strength || "",
- 
+    medicineName: medicine.medicineName || "",
+    strength: medicine.strength || "",
+
     numberOfStrips: qty,
     tabletsPerStrip: 1,
     looseTablets: 0,
- 
+
     purchasePricePerStrip: Number(
       calculatedPurchasePrice.toFixed(2)
     ),
- 
+
     mrpPerStrip: 0,
     gstPercent: 5,
- 
-    purchaseDate: new Date().toISOString().split("T")[0],
- 
+
+    purchaseDate:
+      new Date().toISOString().split("T")[0],
+
     expiryDate: "",
+    manufacturingDate: "",
+
     type: "",
     groupId: "",
- 
-    distributorId: matchedDistributor?.value || "",
+
+    batchNumber: "",
+    hsnCode: "",
+    companyName: "",
+    invoiceNumber: "",
+
+    minimumQuantity: 0,
+    maximumQuantity: 0,
+
+    distributorId:
+      matchedDistributor?.value || "",
   });
- 
-}, [currentMedicine, supplierOptions, reset, approveData]);
+
+}, [
+  currentMedicineIndex,
+  approveData,
+  supplierOptions,
+  reset,
+]);
  
  
 //fetch medicine for edit
@@ -459,4 +582,5 @@ orderedQty={currentMedicine?.qty}
 </FormProvider>
   );
 }
+ 
  
