@@ -1,16 +1,11 @@
 import DropdownField from "@/components/controlled/DropdownField";
 import TextInputField from "@/components/controlled/TextInputField";
 import { URL_PATH } from "@/constants/UrlPath";
-import {
-  Box,
-  Button,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { addMedicineGroup } from "@/service/medicineGroupService";
-
+import { useAutoSave } from "@/hooks/Useautosave";
 export interface AddMedicineGroupFormValues {
   groupId: number;
   groupName: string;
@@ -23,42 +18,29 @@ const AddMedicineGroup = () => {
       groupName: "",
       category: "",
     },
-    mode: "onChange", 
+    mode: "onChange",
+  });
+
+  const { clearData } = useAutoSave({
+    storageKey: "add_medicine_group_form",
+    methods,
   });
 
   const navigate = useNavigate();
 
-  // const onSubmit = (data: AddMedicineGroupFormValues) => {
-  //   const existingGroups = JSON.parse(
-  //     localStorage.getItem("medicineGroups") || "[]"
-  //   );
-
-  //   const newGroup = {
-  //     groupId: Date.now(),
-  //     groupName: data.groupName,
-  //     category: data.category,
-  //   };
-
-  //   localStorage.setItem(
-  //     "medicineGroups",
-  //     JSON.stringify([...existingGroups, newGroup])
-  //   );
-
-  //   navigate(URL_PATH.MedicineGroup);
-  // };
-
   const onSubmit = async (data: AddMedicineGroupFormValues) => {
-  try {
-    await addMedicineGroup({
-      groupName: data.groupName,
-      category: data.category,
-    });
+    try {
+      await addMedicineGroup({
+        groupName: data.groupName,
+        category: data.category,
+      });
 
-    navigate(URL_PATH.MedicineGroup);
-  } catch (error) {
-    console.error(error);
-  }
-};
+      clearData();
+      navigate(URL_PATH.MedicineGroup);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <FormProvider {...methods}>
@@ -67,19 +49,17 @@ const AddMedicineGroup = () => {
           <Paper
             elevation={3}
             sx={{
-  width: 520,
-  p: 3,
-  borderRadius: 2,
-  mb: { xs: 1, md: 4 },
-}}
+              width: 520,
+              p: 3,
+              borderRadius: 2,
+              mb: { xs: 1, md: 4 },
+            }}
           >
             <Typography fontWeight={600} mb={3}>
               Add New Group
             </Typography>
 
             <Box display="flex" flexDirection="column" gap={3} mb={4}>
-
-              {/* Group Name */}
               <TextInputField
                 name="groupName"
                 label="Group Name"
@@ -93,7 +73,6 @@ const AddMedicineGroup = () => {
                 }}
               />
 
-              {/* Category */}
               <DropdownField
                 name="category"
                 label="Category"
@@ -107,9 +86,7 @@ const AddMedicineGroup = () => {
                 ]}
                 editable={true}
                 freeSolo={false}
-                
               />
-
             </Box>
 
             <Box display="flex" justifyContent="flex-end" gap={2}>
@@ -130,7 +107,10 @@ const AddMedicineGroup = () => {
                     boxShadow: "0 6px 18px rgba(35, 136, 120, 0.35)",
                   },
                 }}
-                onClick={() => navigate(-1)}
+                onClick={() => {
+                  clearData();
+                  navigate(-1);
+                }}
               >
                 Cancel
               </Button>

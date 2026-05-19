@@ -6,8 +6,7 @@ import {
 } from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import axios from "axios";
-import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
+import { getNewReorders } from "@/service/reorderService";
 import ApproveOrderDialog from "./ApproveOrderDialog";
 import {
   Box,
@@ -27,51 +26,32 @@ type NewOrderHistory = {
   distributorName: string;
   distributorId: number;
   newMedicines: NewMedicine[];
-  [ACTION_KEY]: string;
+ 
 };
  
 function NewOrderList() {
   const navigate = useNavigate();
   const [newOrderData, setNewOrderData] = useState<NewOrderHistory[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<NewOrderHistory | null>(null);
+const fetchNewOrders = async () => {
+  try {
+    const data = await getNewReorders();
+
+    setNewOrderData(
+      data.filter(
+        (item) => item.newMedicines && item.newMedicines.length > 0
+      )
+    );
+  } catch (error) {
+    console.error("New order fetch failed:", error);
+  }
+};
  
-  const fetchNewOrders = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(API_ENDPOINTS.REORDER, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
- 
-      console.log("=== REORDER API RESPONSE ===", JSON.stringify(res.data));
- 
-      const allData: NewOrderHistory[] = res.data || [];
-      setNewOrderData(
-        allData.filter((item) => item.newMedicines && item.newMedicines.length > 0)
-      );
-    } catch (error) {
-      console.error("New order fetch failed:", error);
-    }
-  };
- 
-  const columns: Column<NewOrderHistory>[] = [ 
+const columns: Column<NewOrderHistory>[] = [
   {
     key: "distributorName",
     label: "Supplier",
   },
-  {
-    key: "medicineName",
-    label: "Medicine Name",
-  },
-  {
-    key: "strength",
-    label: "Strength/Type",
-  },
- 
-  {
-    key: "qty",
-    label: "Qty",
-  },
- 
   {
     key: ACTION_KEY,
     label: "Action",
@@ -157,6 +137,11 @@ function NewOrderList() {
         open={!!selectedOrder}
         order={selectedOrder}
         onClose={() => setSelectedOrder(null)}
+        orderType="new"
+          onSuccess={() => {
+    fetchNewOrders();
+    setSelectedOrder(null);
+  }}
       />
     </Box>
   );

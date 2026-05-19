@@ -1,26 +1,8 @@
-import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  TextField,
-  InputAdornment,
-} from "@mui/material";
+import {Box,Typography,Table,TableBody,TableCell,TableHead,TableRow,Dialog,DialogActions,DialogContent,DialogTitle,Button,TextField,InputAdornment,} from "@mui/material";
 import { useForm, FormProvider, Controller } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
-import { approveReorder, deleteReorder } from "@/service/reorderService";
-
+import {  approveAndDeleteExistingMedicine, approveAndDeleteNewMedicine } from "@/service/reorderService";
 type NewMedicine = {
   id: number;
   medicineName: string;
@@ -52,10 +34,11 @@ type Props = {
   order: NewOrderHistory | null;
   onClose: () => void;
   onSuccess?: () => void; 
+   orderType?: "existing" | "new";
 };
 
-function ApproveOrderDialog({ open, order, onClose, onSuccess }: Props) {
-  const navigate = useNavigate();
+function ApproveOrderDialog({ open, order, onClose, onSuccess,orderType = "existing" }: Props) {
+  // const navigate = useNavigate();
 
   const methods = useForm<FormValues>({
     defaultValues: { paid: "", unpaid: "", paymentMode: "", medicineAmounts: {} },
@@ -88,46 +71,26 @@ const onSubmit = async (data: FormValues) => {
   if (amountMismatch || !order) return;
 
   try {
-    const payload = {
-      distributorName: order.distributorName,
-      emailAddress: "",
-      existingMedicines: order.newMedicines.map((m) => ({
-        medicineName: m.medicineName,
-        strength: m.strength || "",
-        companyName: "",
-        qty: m.qty,
-        paidAmount: parseFloat(data.paid) || 0,
-        unPaidAmount: parseFloat(data.unpaid) || 0,
-        paymentType: data.paymentMode || "",
-      })),
-      newMedicines: [],
-    };
+    const medicines = order.newMedicines.map((m) => ({
+      medicineName: m.medicineName,
+      strength: m.strength || "",
+      companyName: order.distributorName,
+      qty: m.qty,
+      paidAmount: parseFloat(data.paid) || 0,
+      unPaidAmount: parseFloat(data.unpaid) || 0,
+      paymentType: data.paymentMode || "",
+    }));
 
-    await approveReorder(order.id, payload); // 1. Update with amounts
-    await deleteReorder(order.id);           // 2. Delete from reorder list
+    // Call the appropriate service based on orderType
+    if (orderType === "new") {
+      await approveAndDeleteNewMedicine(order.id, medicines);
+    } else {
+      await approveAndDeleteExistingMedicine(order.id, medicines);
+    }
 
-    onSuccess?.(); // 3. LastPurchaseList refresh
-
-    navigate(URL_PATH.AddInventoryItem, {
-      state: {
-        approveMode: true,
-        orderId: order.id,
-        distributorName: order.distributorName,
-        medicines: order.newMedicines.map((m) => ({
-          medicineName: m.medicineName,
-          strength: m.strength || "",
-          qty: m.qty,
-          amount: data.medicineAmounts?.[String(m.id)] || "0",
-        })),
-        payment: {
-          paid: data.paid,
-          unpaid: data.unpaid,
-          paymentMode: data.paymentMode,
-        },
-      },
-    });
-
+    onSuccess?.();
     onClose();
+
   } catch (error) {
     console.error("Approve failed:", error);
   }

@@ -37,14 +37,13 @@ const InvoiceView = () => {
  
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [showLogo, setShowLogo] = useState<boolean>(false);
-  // const [showHsn, setShowHsn] = useState<boolean>(false);
   const [pharmacyData, setPharmacyData] = useState<PharmacySettingsResponse | null>(null);
 
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Fetch Invoice Data
+
   useEffect(() => {
     const fetchInvoice = async () => {
       if (!invoiceNo) return;
@@ -127,7 +126,6 @@ const InvoiceView = () => {
         navigate(-1);
       }
 
-      // Read invoice display settings from localStorage
       const invoiceSettings = localStorage.getItem("invoiceSettings");
       if (invoiceSettings) {
         const parsed = JSON.parse(invoiceSettings);
@@ -139,7 +137,6 @@ const InvoiceView = () => {
     fetchInvoice();
   }, [invoiceNo, navigate]);
 
-  // Fetch Pharmacy Settings
   useEffect(() => {
     const fetchPharmacySettings = async () => {
       try {
@@ -154,7 +151,7 @@ const InvoiceView = () => {
     fetchPharmacySettings();
   }, []);
 
-  //  Computed Values
+
   const subTotal =
     invoice?.medicines?.reduce((sum, med) => sum + Number(med.amount), 0) || 0;
  
@@ -169,7 +166,6 @@ const InvoiceView = () => {
  
   const currentDate = invoice?.date || new Date().toLocaleDateString("en-GB");
 
-  //Shared Props 
   const sharedProps = {
     invoice,
     pharmacyData,
@@ -183,7 +179,6 @@ const InvoiceView = () => {
     currentDate,
   };
 
-  // ─── Render ───────────────────────────────────────────────────────────────
   return (
     <>
       <GlobalStyles

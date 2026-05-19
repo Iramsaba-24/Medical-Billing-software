@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  Box, Paper, Typography,
-} from "@mui/material";
-import { getLastPurchases } from "@/service/reorderService";import {
-  UniversalTable,
-  ACTION_KEY,
-  type Column,
-} from "@/components/uncontrolled/UniversalTable";
+import {Box, Paper, Typography,} from "@mui/material";
+import { getPurchaseHistory } from "@/service/reorderService";
+import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
  
 type StockRow = {
   id: number;
@@ -31,7 +26,6 @@ const purchaseColumns: Column<StockRow>[] = [
 ];
  
 function LastPurchaseList() {
-//   const navigate = useNavigate();
  
   const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
  
@@ -41,28 +35,18 @@ function LastPurchaseList() {
    
 const fetchLastPurchaseData = async () => {
   try {
-    const data = await getLastPurchases();
-    console.log("RAW DATA:", data);
-    console.log("TYPE:", typeof data);
+    const data = await getPurchaseHistory();
 
-    const mapped: StockRow[] = [];
-
-    data.forEach((order) => {
-      order.existingMedicines
-        .filter((med) => med.medicineName)
-        .forEach((med, idx) => {
-          mapped.push({
-            id: order.id * 100 + idx,
-            supplier: order.distributorName || "-",
-            medicineName: med.medicineName,
-            strengthType: med.strength || "-",
-            quantity: med.qty?.toString() || "-",
-              paidAmount: med.paidAmount?.toString() || "0",   
-  unpaidAmount: med.unPaidAmount?.toString() || "0",
-            [ACTION_KEY]: "",
-          });
-        });
-    });
+    const mapped: StockRow[] = data.map((item, idx) => ({
+      id: item.id ?? idx,
+      supplier: item.companyName || "-",      
+      medicineName: item.medicineName || "-",
+      strengthType: item.strength || "-",
+      quantity: item.qty?.toString() || "-",
+      paidAmount: item.paidAmount?.toString() || "0",
+      unpaidAmount: item.unPaidAmount?.toString() || "0",
+      [ACTION_KEY]: "",
+    }));
 
     setLastPurchaseData(mapped);
   } catch (error) {

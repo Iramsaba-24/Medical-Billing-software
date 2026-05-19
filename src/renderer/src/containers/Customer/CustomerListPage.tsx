@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { CustomerData } from "@/view/CustomerMaster";
 import {
   UniversalTable,
@@ -25,25 +25,20 @@ export const CustomerListPage = ({
   const navigate = useNavigate();
 
   const [searchTerm] = useState("");
-  const [customers, setCustomers] = useState<CustomerData[]>([]);
-
-  useEffect(() => {
-    setCustomers(data);
-  }, [data]);
 
   const filteredData = useMemo(() => {
     if (!searchTerm) {
-      return customers;
+      return data;
     }
 
     const lowerSearch = searchTerm.toLowerCase();
 
-    return customers.filter(
+    return data.filter(
       (item) =>
         item.name?.toLowerCase().includes(lowerSearch) ||
         item.phone?.toLowerCase().includes(lowerSearch)
     );
-  }, [customers, searchTerm]);
+  }, [data, searchTerm]);
 
   const columns: readonly Column<CustomerData>[] = [
     { label: "Sr No", key: "srNo" },
@@ -53,20 +48,6 @@ export const CustomerListPage = ({
     { label: "Date", key: "date" },
     { label: "Actions", key: "actionbutton" },
   ];
-
-  const handleDelete = async (customer: CustomerData) => {
-    try {
-      await onDelete(customer);
-
-      setCustomers((prev) =>
-        prev.filter(
-          (item) => item.customerId !== customer.customerId
-        )
-      );
-    } catch (error) {
-      console.error("Delete failed:", error);
-    }
-  };
 
   return (
     <Box sx={{ bgcolor: "#f8f9fa" }}>
@@ -130,11 +111,19 @@ export const CustomerListPage = ({
             data={filteredData}
             showExport={true}
             showSearch={true}
-            getRowId={(row) => row.customerId || row.phone}
+            getRowId={(row) =>
+              String(row.customerId ?? row.phone)
+            }
             actions={{
               view: (customer) => onView(customer),
+
               edit: (customer) => onEdit(customer),
-              delete: (customer) => handleDelete(customer),
+
+              delete: async (
+                customer: CustomerData
+              ): Promise<void> => {
+                await onDelete(customer);
+              },
             }}
           />
         </Box>

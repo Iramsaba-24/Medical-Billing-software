@@ -9,7 +9,7 @@ import GroupSummary from "@/containers/inventory/GroupSummary";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import { useState, useEffect } from "react";
-import type { MedicineResponse } from "@/service/medicineService";
+import type { MedicineResponse } from "@/service/medicineService"
 
 export default function InventoryPage() {
   const navigate = useNavigate();

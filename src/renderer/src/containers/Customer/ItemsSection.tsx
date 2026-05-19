@@ -49,17 +49,27 @@ const ItemsSection = ({
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
   useEffect(() => {
-    const fetchInventory = async () => {
+    const fetchInventory = async (): Promise<void> => {
       try {
         const data: MedicineResponse[] = await getMedicines();
 
-        const formatted: InventoryItem[] = data.map((item) => ({
-          itemName: item.itemName,
-          medicineId: item.medicineId,
-          quantity: item.quantity,
-          pricePerUnit: item.pricePerUnit,
-          expiryDate: item.expiryDate,
-        }));
+        const formatted: InventoryItem[] = data.map(
+          (item: MedicineResponse): InventoryItem => ({
+            itemName:
+              item.medicineName ??
+              `${item.companyName ?? ""} ${
+                item.strength ?? ""
+              }`.trim(),
+
+            medicineId: item.medicineId,
+
+            quantity: 0,
+
+            pricePerUnit: 0,
+
+            expiryDate: item.expiryDate ?? "",
+          })
+        );
 
         setInventory(formatted);
       } catch (error) {
@@ -78,10 +88,17 @@ const ItemsSection = ({
   const addRow = () =>
     setRows([
       ...rows,
-      { id: Date.now(), name: "", quantity: "", mrp: "", expiry: "" },
+      {
+        id: Date.now(),
+        name: "",
+        quantity: "",
+        mrp: "",
+        expiry: "",
+      },
     ]);
 
-  const removeRow = (id: number) => setRows(rows.filter((r) => r.id !== id));
+  const removeRow = (id: number) =>
+    setRows(rows.filter((r) => r.id !== id));
 
   const updateRow = (
     id: number,
@@ -95,20 +112,26 @@ const ItemsSection = ({
             (field === "quantity" || field === "mrp") &&
             value !== "" &&
             Number(value) < 0
-          )
+          ) {
             return r;
+          }
 
           return { ...r, [field]: value };
         }
+
         return r;
       })
     );
   };
 
-  const handleNameChange = (id: number, selectedName: string) => {
+  const handleNameChange = (
+    id: number,
+    selectedName: string
+  ) => {
     const item = inventory.find(
       (i) =>
-        i.itemName.trim().toLowerCase() === selectedName.trim().toLowerCase()
+        i.itemName.trim().toLowerCase() ===
+        selectedName.trim().toLowerCase()
     );
 
     setRows(
@@ -116,12 +139,17 @@ const ItemsSection = ({
         if (r.id === id) {
           return {
             ...r,
+
             medicineId: item?.medicineId || 0,
+
             name: selectedName,
+
             mrp: item ? Number(item.pricePerUnit) : "",
+
             expiry: item ? item.expiryDate : "",
           };
         }
+
         return r;
       })
     );
@@ -165,12 +193,15 @@ const ItemsSection = ({
 
       {rows.map((row) => {
         const qtyError =
-          isSubmitted && (row.quantity === "" || Number(row.quantity) <= 0);
+          isSubmitted &&
+          (row.quantity === "" || Number(row.quantity) <= 0);
 
         const priceError =
-          isSubmitted && (row.mrp === "" || Number(row.mrp) <= 0);
+          isSubmitted &&
+          (row.mrp === "" || Number(row.mrp) <= 0);
 
-        const nameError = isSubmitted && row.name.trim() === "";
+        const nameError =
+          isSubmitted && row.name.trim() === "";
 
         return (
           <Box
@@ -196,7 +227,9 @@ const ItemsSection = ({
               alphanumeric
               required
               error={nameError}
-              helperText={nameError ? "Please select item" : ""}
+              helperText={
+                nameError ? "Please select item" : ""
+              }
               onChangeCallback={(value) => {
                 handleNameChange(row.id, value);
               }}
@@ -209,13 +242,16 @@ const ItemsSection = ({
               value={row.quantity}
               error={qtyError}
               onKeyDown={(e) =>
-                ["e", "E", "-", "+"].includes(e.key) && e.preventDefault()
+                ["e", "E", "-", "+"].includes(e.key) &&
+                e.preventDefault()
               }
               onChange={(e) =>
                 updateRow(
                   row.id,
                   "quantity",
-                  e.target.value === "" ? "" : Number(e.target.value)
+                  e.target.value === ""
+                    ? ""
+                    : Number(e.target.value)
                 )
               }
             />
@@ -232,13 +268,18 @@ const ItemsSection = ({
 
             <TextField
               label="Total"
-              value={(Number(row.quantity) * Number(row.mrp)).toFixed(2)}
+              value={(
+                Number(row.quantity) * Number(row.mrp)
+              ).toFixed(2)}
               disabled
             />
 
             <Box display="flex" justifyContent="center">
               {rows.length > 1 && (
-                <IconButton onClick={() => removeRow(row.id)} color="error">
+                <IconButton
+                  onClick={() => removeRow(row.id)}
+                  color="error"
+                >
                   <Remove />
                 </IconButton>
               )}
@@ -256,7 +297,6 @@ const ItemsSection = ({
           gap: 3,
         }}
       >
-        {/* GST Dropdown */}
         {setGst && (
           <Box sx={{ width: "150px" }}>
             <DropdownField
@@ -268,7 +308,9 @@ const ItemsSection = ({
                 { label: "12%", value: "12" },
                 { label: "18%", value: "18" },
               ]}
-              onChangeCallback={(value) => setGst(Number(value))}
+              onChangeCallback={(value) =>
+                setGst(Number(value))
+              }
             />
           </Box>
         )}
@@ -276,7 +318,10 @@ const ItemsSection = ({
         <Box
           sx={{
             display: "flex",
-            justifyContent: { xs: "center", md: "flex-end" },
+            justifyContent: {
+              xs: "center",
+              md: "flex-end",
+            },
             width: "100%",
           }}
         >

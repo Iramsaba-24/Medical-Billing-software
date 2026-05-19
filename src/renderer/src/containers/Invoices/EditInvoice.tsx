@@ -23,7 +23,7 @@ type InvoiceItem = {
   price: number;
    unitPrice: number;
   gstPercent: number;  
-  discount: number; 
+  discount: number;
 };
  
 type DropdownOption = {
@@ -56,7 +56,7 @@ type RetailInvoiceItemResponse = {
   amount: number;
   price: number;
     gstPercent: number;  
-  discount: number; 
+  discount: number;
    gstAmount: number;
 };
  
@@ -87,7 +87,7 @@ const EditInvoice = () => {
  
   const [customerOptions, setCustomerOptions] = useState<DropdownOption[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<InventoryOption[]>([]);
-
+ 
 const [invoiceGstPercent, setInvoiceGstPercent] = useState(0);
 const [invoiceOriginalTotal, setInvoiceOriginalTotal] = useState(0);
  
@@ -117,7 +117,7 @@ useEffect(() => {
  
   // Load Inventory
 //  useEffect(() => {
-//   if (!invoiceLoaded) return; 
+//   if (!invoiceLoaded) return;
 //   watchedItems?.forEach((item, index) => {
 //     const selectedItem = inventoryOptions.find(
 //       (i) => i.value === item.item
@@ -130,26 +130,26 @@ useEffect(() => {
 //     }
 //   });
 // }, [watchedItems, inventoryOptions, setValue, invoiceLoaded]);
-
-
+ 
+ 
 useEffect(() => {
   if (!watchedItems) return;
-
-
+ 
+ 
   const grandSubtotal = watchedItems.reduce((sum, item) => {
     return sum + (Number(item.qty) * (item.unitPrice || 0));
   }, 0);
-
+ 
   watchedItems.forEach((item, index) => {
     if (!item.item) return;
     const unitPrice = item.unitPrice || 0;
     if (unitPrice === 0) return;
-
+ 
     const qty = Number(item.qty) || 1;
     const thisSubtotal = qty * unitPrice;
-
+ 
     let total = 0;
-
+ 
     if (grandSubtotal < invoiceOriginalTotal) {
      
       const medipoints = Math.floor(grandSubtotal / 200) * 5;
@@ -159,12 +159,12 @@ useEffect(() => {
       const ratio = thisSubtotal / grandSubtotal;
       total = Number((grandFinal * ratio).toFixed(2));
     } else {
-  
+ 
       const discountedSubtotal = thisSubtotal - (item.discount || 0);
       const gstAmount = (discountedSubtotal * invoiceGstPercent) / 100;
       total = Number((discountedSubtotal + gstAmount).toFixed(2));
     }
-
+ 
     if (item.price !== total) {
       setValue(`items.${index}.price`, total);
     }
@@ -199,26 +199,26 @@ useEffect(() => {
   if (!invoiceNo) return;
   if (inventoryOptions.length === 0) return;
  
-    setInvoiceGstPercent(0);       
-  setInvoiceOriginalTotal(0); 
-
-
+    setInvoiceGstPercent(0);      
+  setInvoiceOriginalTotal(0);
+ 
+ 
   const fetchInvoice = async () => {
     try {
       const invoice = await getRetailInvoiceById(Number(invoiceNo));
       const items: RetailInvoiceItemResponse[] = await getRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
-
+ 
   console.log("DB items:", JSON.stringify(items));
-    
+   
  
      const mappedItems = items.map((i: RetailInvoiceItemResponse) => {
   const med = inventoryOptions.find(m => m.id === i.medicineId);
-
+ 
   return {
     item: med?.value || "",
     qty: i.quantity,
     price: i.amount,
-      unitPrice: i.price, 
+      unitPrice: i.price,
      gstPercent: i.gstPercent,  
   discount: i.discount,
   };
@@ -228,14 +228,14 @@ useEffect(() => {
  const originalSubtotal = items.reduce(
   (sum: number, i: RetailInvoiceItemResponse) => sum + (i.price * i.quantity), 0
 );
-
+ 
     console.log("originalSubtotal:", originalSubtotal);
-
+ 
 setInvoiceOriginalTotal(originalSubtotal);
-
+ 
 console.log("invoiceOriginalTotal set to:", originalSubtotal);
-
-
+ 
+ 
      reset({
   name: invoice.customerName,
   date: dayjs(invoice.invoiceDate),
@@ -254,28 +254,28 @@ console.log("invoiceOriginalTotal set to:", originalSubtotal);
   fetchInvoice();
 }, [invoiceNo, reset, inventoryOptions]);
  
-
+ 
 const onSubmit = async (data: InvoiceFormData) => {
   try {
     const invoice = await getRetailInvoiceById(Number(invoiceNo));
-
-    
+ 
+   
     const newTotal = data.items.reduce((sum: number, item: InvoiceItem) => {
       const selectedItem = inventoryOptions.find(i => i.value === item.item);
       if (!selectedItem) return sum;
       return sum + (Number(item.qty) * selectedItem.price);
     }, 0);
-
-
+ 
+ 
      
-  
+ 
     const originalTotal = invoice.totalAmount;
-
-    
+ 
+   
     let finalAmount = newTotal;
     let medipoints = 0;
     let totalGST = 0;
-
+ 
     if (newTotal < originalTotal) {
       medipoints = Math.floor(newTotal / 200) * 5;
       const amountAfterMedipoints = newTotal - medipoints;
@@ -290,14 +290,14 @@ const onSubmit = async (data: InvoiceFormData) => {
   finalAmount = amountAfterDiscount + totalGST;
     medipoints = originalDiscount;
     }
-
-
+ 
+ 
     await deleteRetailInvoiceItemsByInvoiceId(Number(invoiceNo));
-
+ 
     for (const item of data.items) {
       const selectedItem = inventoryOptions.find(i => i.value === item.item);
       if (!selectedItem) continue;
-
+ 
       await createSingleRetailInvoiceItem({
         retailInvoiceId: Number(invoiceNo),
         medicineId: selectedItem?.id || 0,
@@ -305,11 +305,11 @@ const onSubmit = async (data: InvoiceFormData) => {
         price: selectedItem?.price || 0,
         gstPercent: invoiceGstPercent,
        discount: Number(item.discount) || 0,
-           strength: selectedItem.strength,     
+           strength: selectedItem.strength,    
     companyName: selectedItem.companyName,
       });
     }
-
+ 
    
     await updateRetailInvoice(Number(invoiceNo), {
       userId: invoice.userId,
@@ -323,16 +323,16 @@ const onSubmit = async (data: InvoiceFormData) => {
       gstPercent: invoiceGstPercent,
       paymentStatus: data.status,
     });
-
-   window.dispatchEvent(new Event("invoiceUpdated")); 
+ 
+   window.dispatchEvent(new Event("invoiceUpdated"));
 navigate(URL_PATH.Invoices);
   } catch (error) {
     console.error("Error updating invoice", error);
   }
 };
-
-
-
+ 
+ 
+ 
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 4, maxWidth: 900, mx: "auto" }}>
@@ -379,27 +379,27 @@ navigate(URL_PATH.Invoices);
                 label="Item"
                 options={inventoryOptions}
                sx={{ width: { xs: "100%", sm: 500 } }}
-
-
-
+ 
+ 
+ 
 onChangeCallback={(val: string) => {
   const selectedItem = inventoryOptions.find((i) => i.value === val);
   if (!selectedItem) return;
   const qty = Number(methods.getValues(`items.${index}.qty`)) || 1;
   const thisSubtotal = qty * selectedItem.price;
-
-
+ 
+ 
   const allItems = methods.getValues("items");
   const otherSubtotal = allItems.reduce((sum: number, it: InvoiceItem, i: number) => {
     if (i === index) return sum;
     return sum + (Number(it.qty) * (it.unitPrice || 0));
   }, 0);
-
+ 
   const grandSubtotal = otherSubtotal + thisSubtotal;
-
+ 
   let displayPrice = thisSubtotal;
   if (grandSubtotal < invoiceOriginalTotal) {
-    // medipoints apply 
+    // medipoints apply
     const medipoints = Math.floor(grandSubtotal / 200) * 5;
     const afterMedipoints = grandSubtotal - medipoints;
     const gstAmount = (afterMedipoints * invoiceGstPercent) / 100;
@@ -410,10 +410,10 @@ onChangeCallback={(val: string) => {
  
     displayPrice = thisSubtotal + (thisSubtotal * invoiceGstPercent / 100);
   }
-
+ 
   setValue(`items.${index}.unitPrice`, selectedItem.price);
   setValue(`items.${index}.gstPercent`, invoiceGstPercent);
-
+ 
   setValue(`items.${index}.price`, Number(displayPrice.toFixed(2)));
 }}
 />
@@ -433,9 +433,9 @@ onChangeCallback={(val: string) => {
       const selectedItem = inventoryOptions.find(
         (i) => i.value === methods.getValues(`items.${index}.item`)
       );
-
+ 
       if (!selectedItem) return true;
-
+ 
       return (
         value <= selectedItem.stock ||
         `Only ${selectedItem.stock} stock available`
@@ -504,7 +504,7 @@ onChangeCallback={(val: string) => {
             }}
             onClick={handleSubmit(onSubmit)}
           >
-            Update Invoice 
+            Update Invoice
           </Button>
         </Stack>
       </Paper>
@@ -513,6 +513,7 @@ onChangeCallback={(val: string) => {
 };
  
 export default EditInvoice;
+ 
  
  
  

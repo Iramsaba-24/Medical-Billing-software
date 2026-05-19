@@ -79,19 +79,6 @@ export type ReorderResponse = {
     qty: number;
   }[];
 };
-// reorder
-export const createReorder = async (data: {
-  distributorId: number;
-  email: string;
-  items: { medicineId: number; quantity: number }[];
-}) => {
-  const res = await axios.post(
-    API_ENDPOINTS.REORDER,
-    data,
-    getAuthHeaders()
-  );
-  return res.data;
-};
 
 // low stock
 export const getLowStock = async (): Promise<LowStockApiResponse> => {
@@ -102,16 +89,93 @@ export const getLowStock = async (): Promise<LowStockApiResponse> => {
   return res.data;
 };
 
-// last purchase
-export const getLastPurchases = async (): Promise<ReorderResponse[]> => {
-  const res = await axios.get<ReorderResponse[]>(
-    API_ENDPOINTS.REORDER,
+// last purchasehistory
+export type PurchaseHistoryResponse = {
+  id: number;
+  medicineName: string;
+  strength: string;
+  companyName: string;
+  qty: number;
+  paidAmount: number | null;
+  unPaidAmount: number | null;
+  paymentType: string | null;
+  medicineType: string;
+};
+
+export const getPurchaseHistory = async (): Promise<PurchaseHistoryResponse[]> => {
+  const res = await axios.get<PurchaseHistoryResponse[]>(
+    API_ENDPOINTS.REORDER_PURCHASE_HISTORY,
     getAuthHeaders()
   );
-  return res.data; 
+  return res.data;
 };
-// approve order
-export const approveReorder = async (
+
+export const deletePurchaseHistory = async (id: number): Promise<void> => {
+  await axios.delete(
+    `${API_ENDPOINTS.REORDER_PURCHASE_HISTORY}/${id}`,
+    getAuthHeaders()
+  );
+};
+//email send
+export const sendReorderEmail = async (
+  orderType: "reorder" | "neworder",
+  distributor: string,
+  medicines: {
+    medicineName?: string;
+    medicineId?: string;
+    strengthType: string;
+    qty?: string;
+    quantity?: string | number;
+  }[]
+): Promise<void> => {
+  const endpoint =
+    orderType === "reorder"
+      ? API_ENDPOINTS.REORDER_EXISTING
+      : API_ENDPOINTS.REORDER_NEW;
+
+  const requests = medicines.map((m) => {
+    const payload = {
+      MedicineName: m.medicineName || m.medicineId || "",
+      Strength: m.strengthType || "",
+      CompanyName: distributor,
+      Qty: Number(m.qty || m.quantity || 0),
+      PaidAmount: null,
+      UnPaidAmount: null,
+      PaymentType: null,
+      IsApproved: false,
+    };
+
+    return axios.post(endpoint, payload, getAuthHeaders());
+  });
+
+  await Promise.all(requests);
+};
+// existing reorder
+export type ExistingReorderResponse = {
+  id: number;
+  createdAt: string;
+  companyName: string;
+  medicineName: string;
+  strength: string;
+  qty: number;
+  existingMedicines: {
+    medicineName: string;
+    strength: string;
+    companyName: string;
+    qty: number;
+  }[];
+};
+
+export const getExistingReorders = async (): Promise<ExistingReorderResponse[]> => {
+  const res = await axios.get<ExistingReorderResponse[]>(
+    API_ENDPOINTS.REORDER_EXISTING,
+    getAuthHeaders()
+  );
+
+  return res.data;
+};
+// Approve existing reorder
+export const approveExistingReorder = async (
   id: number,
   payload: {
     distributorName: string;
@@ -125,27 +189,111 @@ export const approveReorder = async (
       unPaidAmount: number;
       paymentType: string;
     }[];
-    newMedicines: {
-      medicineName: string;
-      strength: string;
-      qty: number;
-      paidAmount: number;
-      unPaidAmount: number;
-      paymentType: string;
-    }[];
+    newMedicines: never[];
   }
 ): Promise<void> => {
   await axios.put(
-    `${API_ENDPOINTS.REORDER}/${id}`,
+    `${API_ENDPOINTS.REORDER_EXISTING}/${id}`,
     payload,
     getAuthHeaders()
   );
 };
+//new order
+export type NewOrderResponse = {
+  id: number;
+  distributorName: string;
+  distributorId: number;
+  newMedicines: {
+    id: number;
+    medicineName: string;
+    strength: string;
+    qty: number;
+  }[];
+};
 
-// हे add कर - file च्या शेवटी
-export const deleteReorder = async (id: number): Promise<void> => {
-  await axios.delete(
-    `${API_ENDPOINTS.REORDER}/${id}`,
+export const getNewReorders = async (): Promise<NewOrderResponse[]> => {
+  const res = await axios.get<NewOrderResponse[]>(
+    API_ENDPOINTS.REORDER_NEW,
     getAuthHeaders()
+  );
+
+  return res.data;
+};
+// Approve and delete existing medicines
+export const approveAndDeleteExistingMedicine = async (
+  id: number,
+  medicines: {
+    medicineName: string;
+    strength: string;
+    companyName: string;
+    qty: number;
+    paidAmount: number;
+    unPaidAmount: number;
+    paymentType: string;
+  }[]
+): Promise<void> => {
+  const token = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // Save each medicine to the existing purchase history
+  for (const m of medicines) {
+    await axios.post(
+      API_ENDPOINTS.REORDER_EXISTING,
+      {
+        medicineName: m.medicineName,
+        strength: m.strength,
+        companyName: m.companyName,
+        qty: m.qty,
+        paidAmount: m.paidAmount,
+        unPaidAmount: m.unPaidAmount,
+        paymentType: m.paymentType,
+        isApproved: true,  
+      },
+      { headers }
+    );
+  }
+
+  // Delete the existing purchase history
+  await axios.delete(
+    `${API_ENDPOINTS.REORDER_EXISTING}/${id}`,
+    { headers }
+  );
+};
+export const approveAndDeleteNewMedicine = async (
+  id: number,
+  medicines: {
+    medicineName: string;
+    strength: string;
+    companyName: string;
+    qty: number;
+    paidAmount: number;
+    unPaidAmount: number;
+    paymentType: string;
+  }[]
+): Promise<void> => {
+  const token = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // Save each medicine to the new purchase history
+  for (const m of medicines) {
+    await axios.post(
+      API_ENDPOINTS.REORDER_NEW,
+      {
+        medicineName: m.medicineName,
+        strength: m.strength,
+        companyName: m.companyName,
+        qty: m.qty,
+        paidAmount: m.paidAmount,
+        unPaidAmount: m.unPaidAmount,
+        paymentType: m.paymentType,
+        isApproved: true,  
+      },
+      { headers }
+    );
+  }
+  // Delete the new purchase history
+  await axios.delete(
+    `${API_ENDPOINTS.REORDER_NEW}/${id}`,
+    { headers }
   );
 };
