@@ -155,28 +155,28 @@ export const sendReorderEmail = async (
     quantity?: string | number;
   }[]
 ): Promise<void> => {
-
+ 
   const endpoint =
     orderType === "reorder"
       ? API_ENDPOINTS.REORDER_EXISTING
       : API_ENDPOINTS.REORDER_NEW;
-
+ 
   const requests = medicines.map((m) => {
-
+ 
     const payload =
       orderType === "neworder"
         ? {
             medicineName:
               m.medicineName || m.medicineId || "",
-
+ 
             strength: m.strengthType || "",
-
+ 
             companyName: distributor,
-
+ 
             qty: Number(
               m.qty || m.quantity || 0
             ),
-
+ 
             paidAmount: null,
             unPaidAmount: null,
             paymentType: null,
@@ -190,20 +190,20 @@ export const sendReorderEmail = async (
             qty: Number(
               m.qty || m.quantity || 0
             ),
-
+ 
             paidAmount: null,
             unPaidAmount: null,
             paymentType: null,
             isApproved: false,
           };
-
+ 
     return axios.post(
       endpoint,
       payload,
       getAuthHeaders()
     );
   });
-
+ 
   await Promise.all(requests);
 };
 // existing reorder
@@ -257,7 +257,7 @@ export const getNewReorders = async (): Promise<NewOrderResponse[]> => {
    const existing = acc.find(
   g => g.companyName === item.companyName
 );
-
+ 
 if (existing) {
   existing.newMedicines.push({
     id: item.id,
@@ -362,4 +362,5 @@ export const approveAndDeleteNewMedicine = async (
     { headers }
   );
 };
+ 
  
