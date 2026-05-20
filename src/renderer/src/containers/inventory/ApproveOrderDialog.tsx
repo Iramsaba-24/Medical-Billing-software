@@ -1,114 +1,111 @@
-import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  TextField,
-  InputAdornment,
-} from "@mui/material";
-import { useForm, FormProvider, Controller } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import {Box,Typography,Table,TableBody,TableCell,TableHead,TableRow,Dialog,DialogActions,DialogContent,DialogTitle,Button,InputAdornment,} from "@mui/material";
+import { useForm, FormProvider } from "react-hook-form";
 import { useEffect } from "react";
-import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
-
+import {  approveAndDeleteExistingMedicine, approveAndDeleteNewMedicine } from "@/service/reorderService";
+import TextInputField from "@/components/controlled/TextInputField";
 type NewMedicine = {
   id: number;
   medicineName: string;
   strength: string;
   qty: number;
 };
-
+ 
 type NewOrderHistory = {
   id: number;
-  distributorName: string;
-  distributorId: number;
+  companyName: string;
   newMedicines: NewMedicine[];
 };
-
+ 
 type FormValues = {
   paid: string;
   unpaid: string;
   paymentMode: string;
   medicineAmounts: Record<string, string>;
 };
-
+ 
 const PAYMENT_MODE_OPTIONS = [
   { label: "Cash", value: "Cash" },
   { label: "UPI", value: "UPI" },
 ];
-
+ 
+type ApprovedMedicine = {
+  medicineName: string;
+  strength: string;
+  qty: number;
+  paidAmount: number;
+  unPaidAmount: number;
+};
+ 
 type Props = {
   open: boolean;
   order: NewOrderHistory | null;
   onClose: () => void;
+  onSuccess?: (
+    order: NewOrderHistory,
+    medicines: ApprovedMedicine[]
+  ) => void;
+  orderType?: "existing" | "new";
 };
-
-function ApproveOrderDialog({ open, order, onClose }: Props) {
-  const navigate = useNavigate();
-
+ 
+function ApproveOrderDialog({ open, order, onClose, onSuccess,orderType = "existing" }: Props) {
+  // const navigate = useNavigate();
   const methods = useForm<FormValues>({
     defaultValues: { paid: "", unpaid: "", paymentMode: "", medicineAmounts: {} },
   });
-
-  const { register, handleSubmit, watch, reset, control } = methods;
-
+ 
+  const { handleSubmit, watch, reset } = methods;
   const watchedPaid = watch("paid");
   const watchedUnpaid = watch("unpaid");
   const watchedAmounts = watch("medicineAmounts");
-
+ 
   useEffect(() => {
     if (open) {
       reset({ paid: "", unpaid: "", paymentMode: "", medicineAmounts: {} });
     }
   }, [open, reset]);
-
+ 
   const paidVal = parseFloat(watchedPaid) || 0;
   const unpaidVal = parseFloat(watchedUnpaid) || 0;
   const paidUnpaidTotal = paidVal + unpaidVal;
-
+ 
   const medTotal = order?.newMedicines.reduce((sum, med) => {
     return sum + (parseFloat(watchedAmounts?.[String(med.id)] ?? "") || 0);
   }, 0) ?? 0;
-
+ 
   const amountMismatch =
     medTotal > 0 && paidUnpaidTotal > 0 && Math.abs(medTotal - paidUnpaidTotal) > 0.01;
-
-  const onSubmit = (data: FormValues) => {
-    if (amountMismatch || !order) return;
-
-    navigate(URL_PATH.AddInventoryItem, {
-      state: {
-        approveMode: true,
-        orderId: order.id,
-        distributorName: order.distributorName,
-        medicines: order.newMedicines.map((m) => ({
-          medicineName: m.medicineName,
-          strength: m.strength || "",
-          qty: m.qty,
-          amount: data.medicineAmounts?.[String(m.id)] || "0",
-        })),
-        payment: {
-          paid: data.paid,
-          unpaid: data.unpaid,
-          paymentMode: data.paymentMode,
-        },
-      },
-    });
-
+ 
+const onSubmit = async (data: FormValues) => {
+  if (amountMismatch || !order) return;
+ 
+  try {
+    const medicines = order.newMedicines.map((m) => ({
+      medicineName: m.medicineName,
+      strength: m.strength || "",
+      companyName: order.companyName,
+      qty: m.qty,
+      paidAmount: parseFloat(data.paid) || 0,
+      unPaidAmount: parseFloat(data.unpaid) || 0,
+      paymentType: data.paymentMode || "",
+    }));
+ 
+    // Call the appropriate service based on orderType
+    if (orderType === "new") {
+      await approveAndDeleteNewMedicine(order.id, medicines);
+    } else {
+      await approveAndDeleteExistingMedicine(order.id, medicines);
+    }
+ 
+    onSuccess?.(order, medicines);
     onClose();
-  };
-
+ 
+  } catch (error) {
+    console.error("Approve failed:", error);
+  }
+};
   return (
-    <FormProvider {...methods}>
+    <FormProvider {...methods} >
 <Dialog
   open={open}
   onClose={onClose}
@@ -123,10 +120,11 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
   }}
 >
         <DialogTitle>New Medicine Details</DialogTitle>
-
+ 
         <DialogContent>
           {order && (
             <Box
+            noValidate
               component="form"
               id="approve-form"
               onSubmit={handleSubmit(onSubmit)}
@@ -141,10 +139,10 @@ py={0}
                   Supplier
                 </Typography>
                 <Typography fontSize={14} fontWeight={500} mb={1}>
-                  {order.distributorName}
+                  {order.companyName}
                 </Typography>
               </Box>
-
+ 
           <Box
   display="grid"
   gridTemplateColumns={{
@@ -153,39 +151,45 @@ py={0}
   }}
   gap={1.5}
 >
-                <TextField
-                  label="Paid Amount"
-                  size="small"
-                  type="number"
-                  inputProps={{ min: 0, step: "0.01" }}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                  }}
-                  {...register("paid")}
-                />
-                <TextField
-                  label="Unpaid Amount"
-                  size="small"
-                  type="number"
-                  inputProps={{ min: 0, step: "0.01" }}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                  }}
-                  {...register("unpaid")}
-                />
+<TextInputField
+  name="paid"
+  label="Paid Amount"
+  size="small"
+  type="number"
+  required={true}
+  inputProps={{ min: 0, step: "0.01" }}
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">₹</InputAdornment>
+    ),
+  }}
+/>
+<TextInputField
+  name="unpaid"
+  label="Unpaid Amount"
+  size="small"
+  type="number"
+  inputProps={{ min: 0, step: "0.01" }}
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">₹</InputAdornment>
+    ),
+  }}
+/>
                 <DropdownField
                   name="paymentMode"
                   label="Payment Mode"
                   options={PAYMENT_MODE_OPTIONS}
                   size="small"
+                  required={true}
                 />
               </Box>
-
+ 
               <Typography fontWeight={600} fontSize={13}>
                 Medicine Details
               </Typography>
-
-
+ 
+ 
 <Box sx={{ overflowX: "auto" }}>
               <Table size="small">
                 <TableHead>
@@ -216,33 +220,28 @@ py={0}
                         <Typography fontSize={13}>{med.qty}</Typography>
                       </TableCell>
                       <TableCell>
-                        <Controller
-                          name={`medicineAmounts.${String(med.id)}`}
-                          control={control}
-                          defaultValue=""
-                          render={({ field }) => (
-                            <TextField
-                              {...field}
-                              size="small"
-                              type="number"
-                              inputProps={{ min: 0, step: "0.01" }}
-                              sx={{
-  width: { xs: 90, sm: 110 },
-}}
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">₹</InputAdornment>
-                                ),
-                              }}
-                            />
-                          )}
-                        />
+<TextInputField
+  name={`medicineAmounts.${String(med.id)}`}
+  label=""
+  size="small"
+  type="number"
+  required={true}
+  inputProps={{ min: 0, step: "0.01" }}
+  sx={{
+    width: { xs: 90, sm: 110 },
+  }}
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">₹</InputAdornment>
+    ),
+  }}
+/>
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table></Box>
-
+ 
               {amountMismatch && (
                 <Typography fontSize={12} color="error">
                   Medicine total ₹{medTotal.toFixed(2)} must match Paid + Unpaid ₹{paidUnpaidTotal.toFixed(2)}
@@ -251,7 +250,7 @@ py={0}
             </Box>
           )}
         </DialogContent>
-
+ 
       <DialogActions
   sx={{
     flexDirection: { xs: "column", sm: "row" },
@@ -293,5 +292,6 @@ py={0}
     </FormProvider>
   );
 }
-
+ 
 export default ApproveOrderDialog;
+ 

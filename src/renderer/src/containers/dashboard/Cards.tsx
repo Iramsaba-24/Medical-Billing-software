@@ -90,26 +90,46 @@ const totalMedicines = (): string => {
 const totalMedicineGroups = (): string => {
   return (inventoryData?.medicineGroupCount ?? 0).toString();
 };
- useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const duration = durationMap[filters[0]];
+//  useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const duration = durationMap[filters[0]];
 
-        const [inventoryRes, topRes] = await Promise.all([
-          getDashboardInventory(duration),
-          getTopSellingMedicine(duration),
-        ]);
+//         const [inventoryRes, topRes] = await Promise.all([
+//           getDashboardInventory(duration),
+//           getTopSellingMedicine(duration),
+//         ]);
 
-        setInventoryData(inventoryRes);
-        setTopMedicine(topRes);
-      } catch (error) {
-        console.error("Dashboard Cards Error:", error);
-      }
-    };
+//         setInventoryData(inventoryRes);
+//         setTopMedicine(topRes);
+//       } catch (error) {
+//         console.error("Dashboard Cards Error:", error);
+//       }
+//     };
 
-    fetchData();
-  }, [filters]);
+//     fetchData();
+//   }, [filters]);
  
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const inventoryDuration = durationMap[filters[0]];
+      const topSellingDuration = durationMap[filters[1]];
+
+      const [inventoryRes, topRes] = await Promise.all([
+        getDashboardInventory(inventoryDuration),
+        getTopSellingMedicine(topSellingDuration),
+      ]);
+
+      setInventoryData(inventoryRes);
+      setTopMedicine(topRes);
+    } catch (error) {
+      console.error("Dashboard Cards Error:", error);
+    }
+  };
+
+  fetchData();
+}, [filters]);
   return (
     <Box
       sx={{

@@ -68,16 +68,13 @@ export const updateCustomer = async (
     ...data,
     userId: getUserId(),
   };
-
   const res = await axios.put(
     `${API_ENDPOINTS.CUSTOMER}/${id}`,
     customerData,
     getAuthHeaders() 
   );
-
   return res.data;
 };
-
 
 //  DELETE customer
 export const deleteCustomer = async (

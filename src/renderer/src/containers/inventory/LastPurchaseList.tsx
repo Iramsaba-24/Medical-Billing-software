@@ -1,13 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  Box, Paper, Typography,
-} from "@mui/material";
-import { getMedicines, type MedicineResponse } from "@/service/medicineService";
-import {
-  UniversalTable,
-  ACTION_KEY,
-  type Column,
-} from "@/components/uncontrolled/UniversalTable";
+import {Box, Paper, Typography,} from "@mui/material";
+import { getPurchaseHistory } from "@/service/reorderService";
+import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
  
 type StockRow = {
   id: number;
@@ -15,6 +9,8 @@ type StockRow = {
   medicineName: string;
   strengthType: string;
   quantity: string;
+    paidAmount: string;   
+  unpaidAmount: string;
   [ACTION_KEY]: string;
 };
  
@@ -24,11 +20,12 @@ const purchaseColumns: Column<StockRow>[] = [
   { key: "medicineName", label: "Medicine Name" },
   { key: "strengthType", label: "Strength/Type" },
   { key: "quantity", label: "Quantity" },
+    { key: "paidAmount", label: "Paid (₹)" },    
+  { key: "unpaidAmount", label: "Unpaid (₹)" },
   { key: ACTION_KEY, label: "Action" },
 ];
  
 function LastPurchaseList() {
-//   const navigate = useNavigate();
  
   const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
  
@@ -36,27 +33,29 @@ function LastPurchaseList() {
     view: (row: StockRow) => console.log("View", row),
   };
    
-  const fetchMedicineData = async () => {
-    try {
-      const medicines: MedicineResponse[] = await getMedicines();
- 
-      const latestPurchases = medicines.slice(0, 5).map((item) => ({
-        id: item.medicineId,
-        supplier: item.distributorName || "-",
-        medicineName: item.medicineName,
-        strengthType: item.strength || "-",
-        quantity: item.totalStockTablets.toString(),
-        [ACTION_KEY]: "",
-      }));
- 
-      setLastPurchaseData(latestPurchases);
-    } catch (error) {
-      console.error("Medicine fetch failed:", error);
-    }
-  };
+const fetchLastPurchaseData = async () => {
+  try {
+    const data = await getPurchaseHistory();
+
+    const mapped: StockRow[] = data.map((item, idx) => ({
+      id: item.id ?? idx,
+      supplier: item.companyName || "-",      
+      medicineName: item.medicineName || "-",
+      strengthType: item.strength || "-",
+      quantity: item.qty?.toString() || "-",
+      paidAmount: item.paidAmount?.toString() || "0",
+      unpaidAmount: item.unPaidAmount?.toString() || "0",
+      [ACTION_KEY]: "",
+    }));
+
+    setLastPurchaseData(mapped);
+  } catch (error) {
+    console.error("Last purchase fetch failed:", error);
+  }
+};
  
   useEffect(() => {
-    fetchMedicineData();
+    fetchLastPurchaseData();
   }, []);
  
   return (
