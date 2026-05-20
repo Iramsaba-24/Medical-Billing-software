@@ -3,6 +3,8 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import landing_img from "@/assets/LandingPage.svg";
 import { URL_PATH } from "@/constants/UrlPath";
+import axios from "axios";
+import { useEffect, useState } from "react";
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -20,18 +22,29 @@ const LandingPage = () => {
 
   //  localStorage  API call 
   const username = localStorage.getItem('username') || "User";
- // const licenseNumber = localStorage.getItem('licenseKey') || "Not Available";
+ 
 
- const registrationData = JSON.parse(
-  localStorage.getItem('registrationData') || '{}'
-);
 
-// const licenseNumber =
-//   registrationData?.businessDetails?.licenseNumber || "Not Available";
+const [licenseNumber, setLicenseNumber] = useState("Loading...");
 
-const licenseNumber =
-  registrationData?.businessDetail?.licenseNumber || "Not Available";
+useEffect(() => {
+  const userId = localStorage.getItem("userId");
 
+  const fetchLicense = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5158/api/Auth/user-license/${userId}`
+      );
+
+      setLicenseNumber(res.data.licenseNumber);
+    } catch (err) {
+      console.log(err);
+      setLicenseNumber("Not Available");
+    }
+  };
+
+  if (userId) fetchLicense();
+}, []);
 
 
   return (

@@ -149,21 +149,35 @@ const fetchReorderHistory = async () => {
           }}
         />
       </Paper>
-      <ApproveOrderDialog
-        open={!!approveOrder}
-        onClose={() => setApproveOrder(null)}
-        orderType="existing"
-        onSuccess={() => {
-          setRefreshKey((k) => k + 1);
-          fetchReorderHistory();
-          setApproveOrder(null);
-        }}
+<ApproveOrderDialog
+  open={!!approveOrder}
+  onClose={() => setApproveOrder(null)}
+  orderType="existing"
+  onSuccess={(order, medicines) => {
+    setRefreshKey((k) => k + 1);
+    fetchReorderHistory();
+    setApproveOrder(null);
+
+    // Navigate to edit inventory with medicine data
+    navigate(URL_PATH.AddInventoryItem, {
+      state: {
+        reorderEditMode: true,
+        orderId: order.id,
+        companyName: order.companyName,
+        medicines: medicines.map((m) => ({
+          medicineName: m.medicineName,
+          strength: m.strength,
+          qty: m.qty,
+          amount: String(m.paidAmount + m.unPaidAmount),
+        })),
+      },
+    });
+  }}
         order={
           approveOrder
             ? {
                 id: approveOrder.id,
-                distributorName: approveOrder.companyName || "",
-                distributorId: 0,
+                companyName: approveOrder.companyName || "",
                 newMedicines: [
                   {
                     id: approveOrder.id,

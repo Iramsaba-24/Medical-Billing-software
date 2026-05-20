@@ -12,7 +12,7 @@ type NewMedicine = {
   strength: string;
   qty: number;
 };
- 
+
 type NewOrderHistory = {
   id: number;
   companyName: string;
@@ -21,7 +21,7 @@ type NewOrderHistory = {
   strength: string;
   qty: number;
 };
- 
+
 function NewOrderList() {
   const navigate = useNavigate();
   const [newOrderData, setNewOrderData] = useState<NewOrderHistory[]>([]);
@@ -77,7 +77,7 @@ setNewOrderData(flatData);
   useEffect(() => {
     fetchNewOrders();
   }, []);
- 
+
   return (
     <Box
       sx={{

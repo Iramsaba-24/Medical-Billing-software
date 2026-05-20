@@ -29,6 +29,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  licenseNumber: string | undefined;
  
 
   //profilePicture: string;
