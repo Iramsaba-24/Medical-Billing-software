@@ -101,6 +101,35 @@ export const getMedicines = async (search?: string) => {
 };
 
 //new medicine
+// export const addMedicine = async (
+//   data: MedicineFormData
+// ) => {
+
+//   const payload = {
+//     ...data,
+//     hsnCode: data.hsnCode || "",
+//     batchNumber: data.batchNumber?.toString() || "",
+//     expiryDate: new Date(data.expiryDate).toISOString(),
+//     purchaseDate: data.purchaseDate
+//       ? new Date(data.purchaseDate).toISOString()
+//       : undefined,
+//     manufacturingDate: data.manufacturingDate
+//       ? new Date(data.manufacturingDate).toISOString()
+//       : undefined,
+//   };
+
+//   console.log("FINAL PAYLOAD:", payload);
+
+//   const res = await axios.post(
+//     API_ENDPOINTS.MEDICINE,
+//     payload,
+//     getAuthHeaders()
+//   );
+
+//   return res.data.data;
+// };
+
+
 export const addMedicine = async (
   data: MedicineFormData
 ) => {
@@ -110,25 +139,50 @@ export const addMedicine = async (
     hsnCode: data.hsnCode || "",
     batchNumber: data.batchNumber?.toString() || "",
     expiryDate: new Date(data.expiryDate).toISOString(),
+
     purchaseDate: data.purchaseDate
       ? new Date(data.purchaseDate).toISOString()
-      : undefined,
+      : null,
+
     manufacturingDate: data.manufacturingDate
       ? new Date(data.manufacturingDate).toISOString()
-      : undefined,
+      : null,
+
+    distributorId: Number(data.distributorId),
+    groupId: Number(data.groupId),
+
+    numberOfStrips: Number(data.numberOfStrips),
+    tabletsPerStrip: Number(data.tabletsPerStrip),
+    looseTablets: Number(data.looseTablets),
+
+    purchasePricePerStrip: Number(data.purchasePricePerStrip),
+    mrpPerStrip: Number(data.mrpPerStrip),
+    gstPercent: Number(data.gstPercent),
+
+    minimumQuantity: Number(data.minimumQuantity),
+    maximumQuantity: Number(data.maximumQuantity),
   };
 
   console.log("FINAL PAYLOAD:", payload);
 
-  const res = await axios.post(
-    API_ENDPOINTS.MEDICINE,
-    payload,
-    getAuthHeaders()
-  );
+  try {
+    const res = await axios.post(
+      API_ENDPOINTS.MEDICINE,
+      payload,
+      getAuthHeaders()
+    );
 
-  return res.data.data;
+    return res.data.data;
+
+  } catch (error) {
+
+    if (axios.isAxiosError(error)) {
+      console.log("BACKEND ERROR =>", error.response?.data);
+    }
+
+    throw error;
+  }
 };
-
 
 
 //update medicine
