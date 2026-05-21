@@ -17,6 +17,9 @@ type NewOrderHistory = {
   id: number;
   companyName: string;
   newMedicines: NewMedicine[];
+  medicineName: string;
+  strength: string;
+  qty: number;
 };
 
 function NewOrderList() {
@@ -29,15 +32,24 @@ function NewOrderList() {
     try {
       const data = await getNewReorders();
       console.log("NEW ORDER DATA:", JSON.stringify(data, null, 2));
-      setNewOrderData(
-        data.filter(
-          (item) => item.newMedicines && item.newMedicines.length > 0,
-        ),
-      );
+const flatData = data
+  .filter((item) => item.newMedicines && item.newMedicines.length > 0)
+  .flatMap((item) =>
+    item.newMedicines.map((m) => ({
+      id: m.id,
+      companyName: item.companyName,
+      newMedicines: item.newMedicines,
+      medicineName: m.medicineName,
+      strength: m.strength,
+      qty: m.qty,
+    }))
+  );
+setNewOrderData(flatData);
     } catch (error) {
       console.error("New order fetch failed:", error);
     }
   };
+  
 
   const columns: Column<NewOrderHistory>[] = [
     {
@@ -100,23 +112,23 @@ function NewOrderList() {
           tableSize="small"
           textAlign="center"
           getRowId={(row) => row.id}
-          subRows={{
-            key: "newMedicines",
-            columns: [
-              {
-                key: "medicineName",
-                label: "Medicine Name",
-              },
-              {
-                key: "strength",
-                label: "Strength/Type",
-              },
-              {
-                key: "qty",
-                label: "Qty",
-              },
-            ],
-          }}
+          // Rows={{
+          //   key: "newMedicines",
+          //   columns: [
+          //     {
+          //       key: "medicineName",
+          //       label: "Medicine Name",
+          //     },
+          //     {
+          //       key: "strength",
+          //       label: "Strength/Type",
+          //     },
+          //     {
+          //       key: "qty",
+          //       label: "Qty",
+          //     },
+          //   ],
+          // }}
           actions={{
             view: (order) =>
               navigate(URL_PATH.ReorderEmail, {
@@ -146,7 +158,7 @@ function NewOrderList() {
           navigate(URL_PATH.AddInventoryItem, {
             state: {
               approveMode: true,
-              orderId: order.id,
+              osubrderId: order.id,
               distributorName: order.companyName,
               medicines: medicines.map((m) => ({
                 medicineName: m.medicineName,
