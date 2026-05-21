@@ -10,7 +10,7 @@ import InventoryFormFields from "@/containers/inventory/InventoryFormFields";
 import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import { useAutoSave } from "@/hooks/Useautosave";
-
+ 
 export type InventoryFormData = {
   medicineId?: number;
   medicineName: string;
@@ -34,7 +34,7 @@ export type InventoryFormData = {
   minimumQuantity: number;
   maximumQuantity: number;
 };
-
+ 
 export type InventoryItem = {
   medicineName: string;
   medicineId: number;
@@ -70,20 +70,20 @@ export default function AddInventoryItem() {
     distributorName: string;
     medicines?: ApproveMedicine[];
   };
-
+ 
   const locationState = location.state as
     | MedicineResponse
     | ApproveOrderState
     | ReorderEditState
     | undefined;
-
+ 
   const editData =
     locationState &&
     !("approveMode" in locationState) &&
     !("reorderEditMode" in locationState)
-      ? (locationState as MedicineResponse) 
+      ? (locationState as MedicineResponse)
       : undefined;
-
+ 
   const approveData =
     locationState && "approveMode" in locationState
       ? (locationState as ApproveOrderState)
@@ -93,9 +93,9 @@ export default function AddInventoryItem() {
       ? (locationState as ReorderEditState)
       : undefined;
   const [currentMedicineIndex, setCurrentMedicineIndex] = useState(0);
-
+ 
   const currentMedicine = approveData?.medicines?.[currentMedicineIndex];
-
+ 
   const methods = useForm<InventoryFormData>({
     mode: "onChange",
     defaultValues: {
@@ -115,7 +115,7 @@ export default function AddInventoryItem() {
       purchaseDate: new Date().toISOString().split("T")[0],
     },
   });
-
+ 
   const isEdit = !!editData?.medicineId;
   const navigate = useNavigate();
   const [, setDistributorData] = useState<DistributorResponse[]>([]);
@@ -127,10 +127,10 @@ export default function AddInventoryItem() {
   >([]);
   const { clearData } = useAutoSave({
     storageKey: "add_inventory_form",
-
+ 
     methods,
   });
-
+ 
   useEffect(() => {
     const fetchGroups = async () => {
       try {
@@ -138,7 +138,7 @@ export default function AddInventoryItem() {
         const options = data.map(
           (g: { groupId: number; groupName: string }) => ({
             label: g.groupName,
-
+ 
             value: g.groupId.toString(),
           }),
         );
@@ -149,7 +149,7 @@ export default function AddInventoryItem() {
     };
     fetchGroups();
   }, []);
-
+ 
   useEffect(() => {
     const fetchDistributors = async () => {
       try {
@@ -167,7 +167,7 @@ export default function AddInventoryItem() {
     };
     fetchDistributors();
   }, []);
-
+ 
   const onSubmit = async (data: InventoryFormData) => {
     try {
       const finalData = {
@@ -215,7 +215,7 @@ export default function AddInventoryItem() {
   const { reset } = methods;
   useEffect(() => {
     if (!currentMedicine || supplierOptions.length === 0) return;
-
+ 
     const matchedDistributor = supplierOptions.find(
       (opt) =>
         opt.label.toLowerCase() === approveData?.distributorName?.toLowerCase(),
@@ -239,7 +239,7 @@ export default function AddInventoryItem() {
       distributorId: matchedDistributor?.value || "",
     });
   }, [currentMedicine, supplierOptions, reset, approveData]);
-
+ 
   useEffect(() => {
     const fetchMedicine = async () => {
       if (editData?.medicineId) {
@@ -275,7 +275,7 @@ export default function AddInventoryItem() {
         });
       }
     };
-
+ 
     fetchMedicine();
   }, [editData?.medicineId, reset]);
   useEffect(() => {
@@ -313,7 +313,7 @@ export default function AddInventoryItem() {
           companyName: fullData.companyName || "",
           groupId: String(fullData.groupId),
           distributorId: matchedDist?.value || String(fullData.distributorId),
-          numberOfStrips: (fullData.numberOfStrips ?? 0) + firstMed.qty, 
+          numberOfStrips: (fullData.numberOfStrips ?? 0) + firstMed.qty,
           tabletsPerStrip: fullData.tabletsPerStrip ?? 1,
           looseTablets: fullData.looseTablets ?? 0,
           purchasePricePerStrip: fullData.purchasePricePerStrip || 0,
@@ -350,7 +350,7 @@ export default function AddInventoryItem() {
   const totalPrice = totalStock * purchasePricePerTablet;
   const gstAmount = totalPrice * (gstPercent / 100);
   const finalPrice = totalPrice + gstAmount;
-
+ 
   return (
     <FormProvider {...methods}>
       <Box width="100%" px={{ xs: 1, md: 2 }} mt={4} mb={8}>
@@ -364,7 +364,7 @@ export default function AddInventoryItem() {
                   ? "Approve & Add Medicine"
                   : "Add New Medicine"}
           </Typography>
-
+ 
           <Box
             component="form"
             noValidate
@@ -388,7 +388,7 @@ export default function AddInventoryItem() {
               finalPrice={finalPrice}
               orderedQty={currentMedicine?.qty}
             />
-
+ 
             <Box
               gridColumn="1 / -1"
               display="flex"
@@ -417,7 +417,7 @@ export default function AddInventoryItem() {
               >
                 Cancel
               </Button>
-
+ 
               <Button
                 type="submit"
                 variant="contained"
@@ -443,3 +443,5 @@ export default function AddInventoryItem() {
     </FormProvider>
   );
 }
+ 
+ 

@@ -14,23 +14,12 @@ import phonepeIcon from "@/assets/icons/phonepe.svg";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { showToast } from "@/components/uncontrolled/ToastMessage";
-import { authService } from "@/service/authService";
-//import { createUpiPayment } from "@/service/paymentService";
 
 type UpiFormFields = {
   paymentMethod: "upi";
   UpiId: string;
 };
 
-// Define the error type
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message?: string;
-};
 
 const radioStyle = {
   "& .MuiRadio-root": {
@@ -97,108 +86,29 @@ const UpiPayment: React.FC = () => {
   const { handleSubmit, control } = methods;
   const upiId = useWatch({ control, name: "UpiId" });
   const detectedIcon = getUpiApp(upiId) || "upi";
-  const [upiPaymentStatus, setUpiPaymentStatus] = useState<"default" | "loading" | "success">("default");
+  const [upiPaymentStatus] = useState<"default" | "loading" | "success">("default");
 
-  const onUpiPay = async () => {
-    setUpiPaymentStatus("loading");
+ const onUpiPay = async (data: UpiFormFields) => {
+  try {
+    localStorage.setItem(
+      "upiDetails",
+      JSON.stringify(data)
+    );
 
-    try {
-      const paymentDataStr = localStorage.getItem('paymentData');
-      const userId = localStorage.getItem('userId');
-      
-      if (!paymentDataStr || !userId) {
-        throw new Error("Missing payment information");
-      }
+    showToast("success", "Saved Successfully");
 
-      const paymentData = JSON.parse(paymentDataStr);
-      // const upiIdValue = methods.getValues("UpiId");
+    navigate(URL_PATH.NetPurchaseDetails);
 
-      // Create subscription first
-      const subscriptionResponse = await authService.createSubscription({
-        userId: parseInt(userId),
-        planId: paymentData.planId
-      });
-      console.log("subscriptionId:", subscriptionResponse.subscriptionId);
-console.log("userId:", userId);
+  } catch (error) {
+    console.error(error);
 
-
-      if (!subscriptionResponse.subscriptionId) {
-        throw new Error("Failed to create subscription");
-      }
-
-      
-
-
-const paymentRequest = {
-  userId: parseInt(userId),
-  subscriptionId: subscriptionResponse.subscriptionId,
-  amount: paymentData.amount,
-  paymentMethod: "UPI",
+    showToast(
+      "error",
+      "Something went wrong"
+    );
+  }
 };
-
-// const paymentResponse = await authService.processPayment(
-//   paymentRequest,
-//   "email"
-// );
-
-const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-const registrationData = JSON.parse(localStorage.getItem("registrationData") || "{}");
-
-const email =
-  userData.email ||
-  registrationData.email ||
-  "test@gmail.com";
-
-const paymentResponse = await authService.processPayment(
-  paymentRequest,
-  "email",
-  email
-);
-      
-
-        // if (paymentResponse) {
-        if (paymentResponse && paymentResponse.success === true) {
-  setUpiPaymentStatus("success");
-        // Clear stored data
-       localStorage.removeItem('registrationData');
-  localStorage.removeItem('paymentData');
-  localStorage.removeItem('selectedPlanId');
-
-  showToast("success", "Payment Successful!");
-        
-       setTimeout(() => {
-    navigate(URL_PATH.PaymentSuccess);
-   }, 900);
-} else {
-  throw new Error("Payment failed");
-}
-    } catch (error: unknown) {
-      console.error("Payment error:", error);
-      setUpiPaymentStatus("default");
-      
-      // Safely extract error message
-      let errorMessage = "Payment failed. Please try again.";
-      if (error && typeof error === 'object') {
-        const apiError = error as ApiError;
-        if (apiError.response?.data?.message) {
-          errorMessage = apiError.response.data.message;
-        } else if (apiError.message) {
-          errorMessage = apiError.message;
-        }
-      }
-      
-      showToast("error", errorMessage);
-    }
-  };
-
-  // useEffect(() => {
-  //   if (upiPaymentStatus === "success") {
-  //     const timer = setTimeout(() => {
-  //       navigate(URL_PATH.NetPurchaseDetails);
-  //     }, 900);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [upiPaymentStatus, navigate]);
+  
 
   const showPaymentStatus = (status: "default" | "loading" | "success") => {
     if (status === "loading") {
