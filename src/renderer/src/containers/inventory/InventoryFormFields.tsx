@@ -157,18 +157,12 @@ export default function InventoryFormFields({
       : `Total stock matches ordered qty (${orderedQty})`}
   </Typography>
 )}
-
-   
-
       <TextInputField
         inputType="numbers"
         name="purchasePricePerStrip"
         label="Purchase Price Per Strip"
         required
       />
-
-      
-
       <TextInputField
         inputType="numbers"
         name="mrpPerStrip"
@@ -218,9 +212,7 @@ export default function InventoryFormFields({
         label="Manufacturing Date"
         dateRestriction="past-current-only"
         required
-      />
-
-      
+      />   
     </>
   );
 }

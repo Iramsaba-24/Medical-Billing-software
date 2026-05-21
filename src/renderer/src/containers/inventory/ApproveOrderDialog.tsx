@@ -1,25 +1,8 @@
-import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Button,
-  TextField,
-  InputAdornment,
-} from "@mui/material";
+import {Box,Typography,Table,TableBody,TableCell,TableHead,TableRow,Dialog,DialogActions,DialogContent,DialogTitle,Button,TextField,InputAdornment,} from "@mui/material";
 import { useForm, FormProvider, Controller } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { URL_PATH } from "@/constants/UrlPath";
 import DropdownField from "@/components/controlled/DropdownField";
-
+import {  approveAndDeleteExistingMedicine, approveAndDeleteNewMedicine } from "@/service/reorderService";
 type NewMedicine = {
   id: number;
   medicineName: string;
@@ -50,10 +33,12 @@ type Props = {
   open: boolean;
   order: NewOrderHistory | null;
   onClose: () => void;
+  onSuccess?: () => void; 
+   orderType?: "existing" | "new";
 };
 
-function ApproveOrderDialog({ open, order, onClose }: Props) {
-  const navigate = useNavigate();
+function ApproveOrderDialog({ open, order, onClose, onSuccess,orderType = "existing" }: Props) {
+  // const navigate = useNavigate();
 
   const methods = useForm<FormValues>({
     defaultValues: { paid: "", unpaid: "", paymentMode: "", medicineAmounts: {} },
@@ -82,34 +67,49 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
   const amountMismatch =
     medTotal > 0 && paidUnpaidTotal > 0 && Math.abs(medTotal - paidUnpaidTotal) > 0.01;
 
-  const onSubmit = (data: FormValues) => {
-    if (amountMismatch || !order) return;
+const onSubmit = async (data: FormValues) => {
+  if (amountMismatch || !order) return;
 
-    navigate(URL_PATH.AddInventoryItem, {
-      state: {
-        approveMode: true,
-        orderId: order.id,
-        distributorName: order.distributorName,
-        medicines: order.newMedicines.map((m) => ({
-          medicineName: m.medicineName,
-          strength: m.strength || "",
-          qty: m.qty,
-          amount: data.medicineAmounts?.[String(m.id)] || "0",
-        })),
-        payment: {
-          paid: data.paid,
-          unpaid: data.unpaid,
-          paymentMode: data.paymentMode,
-        },
-      },
-    });
+  try {
+    const medicines = order.newMedicines.map((m) => ({
+      medicineName: m.medicineName,
+      strength: m.strength || "",
+      companyName: order.distributorName,
+      qty: m.qty,
+      paidAmount: parseFloat(data.paid) || 0,
+      unPaidAmount: parseFloat(data.unpaid) || 0,
+      paymentType: data.paymentMode || "",
+    }));
 
+    // Call the appropriate service based on orderType
+    if (orderType === "new") {
+      await approveAndDeleteNewMedicine(order.id, medicines);
+    } else {
+      await approveAndDeleteExistingMedicine(order.id, medicines);
+    }
+
+    onSuccess?.();
     onClose();
-  };
 
+  } catch (error) {
+    console.error("Approve failed:", error);
+  }
+};
   return (
     <FormProvider {...methods}>
-      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+<Dialog
+  open={open}
+  onClose={onClose}
+  maxWidth="md"
+  fullWidth
+  PaperProps={{
+    sx: {
+      mx: { xs: 1, sm: 2 },
+      width: { xs: "95%", sm: "100%" },
+      borderRadius: 2,
+    },
+  }}
+>
         <DialogTitle>New Medicine Details</DialogTitle>
 
         <DialogContent>
@@ -118,8 +118,8 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
               component="form"
               id="approve-form"
               onSubmit={handleSubmit(onSubmit)}
-              px={1}
-              py={0}
+             px={{ xs: 0, sm: 1 }}
+py={0}
               display="flex"
               flexDirection="column"
               gap={2}
@@ -133,7 +133,14 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
                 </Typography>
               </Box>
 
-              <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1.5}>
+          <Box
+  display="grid"
+  gridTemplateColumns={{
+    xs: "1fr",
+    sm: "1fr 1fr 1fr",
+  }}
+  gap={1.5}
+>
                 <TextField
                   label="Paid Amount"
                   size="small"
@@ -166,11 +173,20 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
                 Medicine Details
               </Typography>
 
+
+<Box sx={{ overflowX: "auto" }}>
               <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 700 }}>Medicine Name</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Strength/Type</TableCell>
+<TableCell
+  sx={{
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+  }}
+>
+  Strength/Type
+</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Qty</TableCell>
                     <TableCell sx={{ fontWeight: 700 }}>Amount (₹)</TableCell>
                   </TableRow>
@@ -198,7 +214,9 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
                               size="small"
                               type="number"
                               inputProps={{ min: 0, step: "0.01" }}
-                              sx={{ width: 110 }}
+                              sx={{
+  width: { xs: 90, sm: 110 },
+}}
                               InputProps={{
                                 startAdornment: (
                                   <InputAdornment position="start">₹</InputAdornment>
@@ -211,7 +229,7 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table></Box>
 
               {amountMismatch && (
                 <Typography fontSize={12} color="error">
@@ -222,13 +240,19 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
           )}
         </DialogContent>
 
-        <DialogActions>
+      <DialogActions
+  sx={{
+    flexDirection: { xs: "column", sm: "row" },
+    gap: 1,
+    p: 2,
+  }}
+>
           <Button
             variant="outlined"
             onClick={onClose}
             sx={{
               px: 4,
-              width: "14%",
+             width: { xs: "100%", sm: "14%" },
               textTransform: "none",
               border: "2px solid #1b7f6b",
               color: "#1b7f6b",
@@ -244,7 +268,7 @@ function ApproveOrderDialog({ open, order, onClose }: Props) {
             disabled={amountMismatch}
             sx={{
               px: 4,
-              width: "14%",
+             width: { xs: "100%", sm: "14%" },
               textTransform: "none",
               backgroundColor: "#1b7f6b",
               "&:hover": { backgroundColor: "#fff", color: "#1b7f6b", border: "2px solid #1b7f6b" },

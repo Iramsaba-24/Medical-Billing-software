@@ -79,8 +79,6 @@ const BillingTable = ({
     return true;
   });
 
-  console.log("Filtered Invoices →", filteredInvoices);
-
   const columns: Column<Invoice>[] = [
     {
       key: "srNo",
@@ -91,7 +89,7 @@ const BillingTable = ({
       label: "Invoice",
     },
     {
-      key: "name",
+      key: "customerName", 
       label: "Name",
     },
     {
