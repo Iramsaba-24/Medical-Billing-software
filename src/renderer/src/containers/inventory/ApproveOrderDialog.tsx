@@ -10,25 +10,24 @@ type NewMedicine = {
   strength: string;
   qty: number;
 };
-
+ 
 type NewOrderHistory = {
   id: number;
   companyName: string;
   newMedicines: NewMedicine[];
 };
-
+ 
 type FormValues = {
   paid: string;
   unpaid: string;
   paymentMode: string;
   medicineAmounts: Record<string, string>;
 };
-
+ 
 const PAYMENT_MODE_OPTIONS = [
   { label: "Cash", value: "Cash" },
   { label: "UPI", value: "UPI" },
 ];
-
 type ApprovedMedicine = {
   medicineName: string;
   strength: string;
@@ -36,7 +35,6 @@ type ApprovedMedicine = {
   paidAmount: number;
   unPaidAmount: number;
 };
-
 type Props = {
   open: boolean;
   order: NewOrderHistory | null;
@@ -61,18 +59,17 @@ function ApproveOrderDialog({
       medicineAmounts: {},
     },
   });
-
   const { handleSubmit, watch, reset } = methods;
   const watchedPaid = watch("paid");
   const watchedUnpaid = watch("unpaid");
   const watchedAmounts = watch("medicineAmounts");
-
+ 
   useEffect(() => {
     if (open) {
       reset({ paid: "", unpaid: "", paymentMode: "", medicineAmounts: {} });
     }
   }, [open, reset]);
-
+ 
   const paidVal = parseFloat(watchedPaid) || 0;
   const unpaidVal = parseFloat(watchedUnpaid) || 0;
   const paidUnpaidTotal = paidVal + unpaidVal;
@@ -130,7 +127,7 @@ function ApproveOrderDialog({
         }}
       >
         <DialogTitle>New Medicine Details</DialogTitle>
-
+ 
         <DialogContent>
           {order && (
             <Box
@@ -194,7 +191,7 @@ function ApproveOrderDialog({
                   required={true}
                 />
               </Box>
-
+ 
               <Typography fontWeight={600} fontSize={13}>
                 Medicine Details
               </Typography>
