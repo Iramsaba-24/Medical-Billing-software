@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import {Box, Paper, Typography,} from "@mui/material";
-import { getPurchaseHistory } from "@/service/reorderService";
+import { getPurchaseHistory,deletePurchaseHistory } from "@/service/reorderService";
 import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
- 
+ import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 type StockRow = {
   id: number;
   supplier: string;
@@ -31,6 +31,7 @@ function LastPurchaseList() {
  
   const purchaseActions = {
     view: (row: StockRow) => console.log("View", row),
+    delete: (row: StockRow) => handleDeletePurchase(row),
   };
    
 const fetchLastPurchaseData = async () => {
@@ -57,7 +58,20 @@ const fetchLastPurchaseData = async () => {
   useEffect(() => {
     fetchLastPurchaseData();
   }, []);
- 
+  
+const handleDeletePurchase = async (row: StockRow) => {
+  const ok = await showConfirmation("Delete purchase history?", "Confirm");
+  if (ok) {
+    try {
+      await deletePurchaseHistory(row.id);
+      showSnackbar("success", "Purchase history deleted successfully");
+      await fetchLastPurchaseData();
+    } catch (error) {
+      console.error("Delete failed:", error);
+      showSnackbar("error", "Delete failed");
+    }
+  }
+};
   return (
    <Box
   sx={{

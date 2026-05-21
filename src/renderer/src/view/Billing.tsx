@@ -1,6 +1,6 @@
 import { Box, Button, Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TextInputField from "@/components/controlled/TextInputField";
 import MobileField from "@/components/controlled/MobileField";
 import DropdownField from "@/components/controlled/DropdownField";
@@ -10,7 +10,7 @@ import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import InvoiceTabButtons from "@/containers/billing/InvoiceTabButtons";
-import { useAutoSave } from "@/hooks/Useautosave";
+// import { useAutoSave } from "@/hooks/Useautosave";
 import EmailField from "@/components/controlled/EmailField";
 import { createRetailInvoice } from "@/service/retailInvoiceService";
 import { getAllCustomers } from "@/service/customerService";
@@ -72,17 +72,43 @@ function RetailInvoice() {
   // const isRetail = location.pathname.includes("retail-invoice");
  
   const [customerOptions, setCustomerOptions] = useState<CustomerData[]>([]);
-  const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
+  // const activeInvoice = location.pathname.match(/invoice(\d+)/)?.[1] ?? "1";
+const match = location.pathname.match(/invoice(\d+)/);
+  const urlInvoice = match?.[1] || "1";
+  const [activeInvoice, setActiveInvoice] = useState<string>(urlInvoice);
+
+const defaultFormValues: RetailInvoiceFormValues = {
+  name: "",
+  age: "",
+  mobile: "",
+  email: "",
+  doctor: "",
+  reference: "",
+  addressLeft: "",
+  addressRight: "",
+};
+
+const defaultRow = (): ItemRow => ({
+  retailItemId: Date.now(),
+  medicineId: "",
+  quantity: 1,
+  price: "",
+  amount: 0,
+});
+  
   const [isSubmitted, setIsSubmitted] = useState(false);
  
+  // const [invoiceFormMap, setInvoiceFormMap] = useState<Record<string, RetailInvoiceFormValues>>({});
+
+
  
   const [doctorList, setDoctorList] = useState<DoctorResponse[]>([]);
- 
-const { clearData } = useAutoSave({
-  storageKey: "retail_invoice_form_v2",
-  methods,
-});
- 
+
+// const { clearData } = useAutoSave({
+//   storageKey: "retail_invoice_form_v2",
+//   methods,
+// });
+
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -157,8 +183,8 @@ const { clearData } = useAutoSave({
       const res = await createRetailInvoice(payload);
  
       window.dispatchEvent(new Event("invoiceUpdated"));
- 
-      clearData();
+
+      // clearData();
  
       navigate(URL_PATH.MediPoints, {
         state: {
@@ -173,8 +199,11 @@ const { clearData } = useAutoSave({
       console.error("Create invoice failed", error);
     }
   };
-  const [invoiceDataMap, setInvoiceDataMap] = useState<Record<string, ItemRow[]>>({});
- 
+
+
+// const [invoiceDataMap, setInvoiceDataMap] = useState<Record<string, ItemRow[]>>({});
+  const invoiceDataMapRef = useRef<Record<string, ItemRow[]>>({});
+
   const [rows, setRows] = useState<ItemRow[]>([
     {
       retailItemId: Date.now(),
@@ -184,28 +213,37 @@ const { clearData } = useAutoSave({
       amount: 0,
     },
   ]);
- 
-  const setRowsAndSave = (newRows: ItemRow[]) => {
+  const rowsRef = useRef<ItemRow[]>(rows);
+
+  const invoiceFormMapRef = useRef<Record<string, RetailInvoiceFormValues>>({});
+
+const setRowsAndSave = (newRows: ItemRow[]) => {
     setRows(newRows);
-    setInvoiceDataMap((prev) => ({ ...prev, [activeInvoice]: newRows }));
+    rowsRef.current = newRows;
+    invoiceDataMapRef.current = { ...invoiceDataMapRef.current, [activeInvoice]: newRows };
   };
  
-  useEffect(() => {
-    const savedRows = invoiceDataMap[activeInvoice];
-    if (savedRows && savedRows.length > 0) {
-      setRows(savedRows);
-    } else {
-      setRows([
-        {
-          retailItemId: Date.now(),
-          medicineId: "",
-          quantity: 1,
-          price: "",
-          amount: 0,
-        },
-      ]);
-    }
-  }, [activeInvoice, invoiceDataMap]);
+
+  // useEffect(() => {
+  //   const savedRows = invoiceDataMap[activeInvoice];
+  //   if (savedRows && savedRows.length > 0) {
+  //     setRows(savedRows);
+  //   } else {
+  //     setRows([
+  //       {
+  //         retailItemId: Date.now(),
+  //         medicineId: "",
+  //         quantity: 1,
+  //         price: "",
+  //         amount: 0,
+  //       },
+  //     ]);
+  //   }
+  // }, [activeInvoice, invoiceDataMap]);
+ 
+
+
+
  
  
   const [doctorOptions, setDoctorOptions] = useState<
@@ -337,9 +375,33 @@ const { clearData } = useAutoSave({
                     minWidth: { xs: "unset", md: "19%" },
                     fontSize: { xs: "12px", md: "14px" },
                   }}
-                  onClick={() => {
-                    setInvoiceDataMap((prev) => ({ ...prev, [activeInvoice]: rows }));
-                    navigate(`${URL_PATH.Billing}${invoiceNumber}`);
+               onClick={() => {
+                    const target = String(invoiceNumber);
+                    if (target === activeInvoice) return;
+
+                    // Save current form + rows in refs
+                    invoiceFormMapRef.current = {
+                      ...invoiceFormMapRef.current,
+                      [activeInvoice]: methods.getValues(),
+                    };
+                    invoiceDataMapRef.current = {
+                      ...invoiceDataMapRef.current,
+                      [activeInvoice]: rowsRef.current,
+                    };
+
+                    // Load saved data for new invoice
+                    const savedForm = invoiceFormMapRef.current[target];
+                    methods.reset(savedForm ?? defaultFormValues);
+
+                    const savedRows = invoiceDataMapRef.current[target];
+                    const newRows = savedRows && savedRows.length > 0
+                      ? savedRows
+                      : [defaultRow()];
+                    setRows(newRows);
+                    rowsRef.current = newRows;
+
+                    setActiveInvoice(target);
+                      navigate(`${URL_PATH.Billing}/invoice${target}`);
                   }}>
  
                   Invoice {invoiceNumber}
@@ -475,12 +537,11 @@ const { clearData } = useAutoSave({
             </Box>
           </form>
         </Box>
-     
+      
     </FormProvider>
   );
 }
  
 export default RetailInvoice;
- 
  
  

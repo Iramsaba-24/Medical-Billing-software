@@ -5,7 +5,7 @@ import { URL_PATH } from "@/constants/UrlPath";
 import { getNewReorders } from "@/service/reorderService";
 import ApproveOrderDialog from "./ApproveOrderDialog";
 import { Box, Paper, Typography } from "@mui/material";
-
+ 
 type NewMedicine = {
   id: number;
   medicineName: string;
@@ -49,8 +49,7 @@ setNewOrderData(flatData);
       console.error("New order fetch failed:", error);
     }
   };
-  
-
+ 
   const columns: Column<NewOrderHistory>[] = [
     {
       key: "companyName",
@@ -73,7 +72,7 @@ setNewOrderData(flatData);
       label: "Action",
     },
   ];
-
+ 
   useEffect(() => {
     fetchNewOrders();
   }, []);
@@ -104,7 +103,7 @@ setNewOrderData(flatData);
         >
           <Typography fontWeight={700}>New Order List</Typography>
         </Box>
-
+ 
         <UniversalTable<NewOrderHistory, NewMedicine>
           data={newOrderData}
           columns={columns}
@@ -112,23 +111,6 @@ setNewOrderData(flatData);
           tableSize="small"
           textAlign="center"
           getRowId={(row) => row.id}
-          // Rows={{
-          //   key: "newMedicines",
-          //   columns: [
-          //     {
-          //       key: "medicineName",
-          //       label: "Medicine Name",
-          //     },
-          //     {
-          //       key: "strength",
-          //       label: "Strength/Type",
-          //     },
-          //     {
-          //       key: "qty",
-          //       label: "Qty",
-          //     },
-          //   ],
-          // }}
           actions={{
             view: (order) =>
               navigate(URL_PATH.ReorderEmail, {
@@ -144,7 +126,7 @@ setNewOrderData(flatData);
                   isViewMode: true,
                 },
               }),
-
+ 
             CheckIcon: (order) => setSelectedOrder(order),
           }}
         />
@@ -174,3 +156,5 @@ setNewOrderData(flatData);
   );
 }
 export default NewOrderList;
+ 
+ 

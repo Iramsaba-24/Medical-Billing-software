@@ -22,39 +22,39 @@ import { useMemo, useState, type ReactNode } from "react";
 import { IconTrashX } from "@tabler/icons-react";
 import ExportIcons from "@/utils/ExportIcons";
 import { iconMap } from "@/utils/Icons";
- 
+
 export const ACTION_KEY = "actionbutton" as const;
- 
+
 export type Column<T> = {
   key: keyof T | typeof ACTION_KEY | string;
   label: string;
   render?: (row: T) => ReactNode;
   exportable?: boolean;
 };
- 
+
 export type DropdownOption = {
   value: string;
   label: string;
   bgColor?: string;
   textColor?: string;
 };
- 
+
 export type FooterRow = {
   content: Array<{ value: ReactNode; colSpan?: number }>;
 };
- 
+
 interface TableStyles {
   captionSx?: SxProps;
   headerSx?: SxProps;
   rowHoverSx?: SxProps;
   paperSx?: SxProps;
 }
- 
+
 interface UniversalTableProps<
   T extends Record<string, unknown>,
   S extends Record<string, unknown> = Record<string, never>
 > extends TableStyles {
- 
+
   data: readonly T[];
   columns: readonly Column<T>[];
   caption?: ReactNode;
@@ -68,7 +68,7 @@ interface UniversalTableProps<
   getRowId?: (row: T, index: number) => string | number;
   onSelectionChange?: (rows: T[]) => void;
   onDeleteSelected?: (rows: T[]) => void;
- 
+
   dropdown?: {
     key: keyof T;
     options: readonly DropdownOption[];
@@ -77,24 +77,24 @@ interface UniversalTableProps<
     width?: number;
     sx?: SxProps;
   };
- 
+
   autoUpdateDropdown?: boolean;
   onDataChange?: (rows: T[]) => void;
- 
+
   actions?: Partial<Record<keyof typeof iconMap, (row: T) => void>>;
-footerRows?: readonly FooterRow[];
- 
-subRows?: {
-  key: keyof T;
-  columns: Array<{
-    key: keyof S;
-    label: string;
-    render?: (subRow: S) => ReactNode;
-  }>;
-};
- 
+  footerRows?: readonly FooterRow[];
+
+  subRows?: {
+    key: keyof T;
+    columns: Array<{
+      key: keyof S;
+      label: string;
+      render?: (subRow: S) => ReactNode;
+    }>;
+  };
+
 }
- 
+
 function buildExportData<T extends Record<string, unknown>>(
   rows: readonly T[],
   columns: readonly Column<T>[]
@@ -108,7 +108,7 @@ function buildExportData<T extends Record<string, unknown>>(
     }, {} as Record<string, unknown>)
   );
 }
- 
+
 export function UniversalTable<
   T extends Record<string, unknown>,
   S extends Record<string, unknown> = Record<string, never>
@@ -128,10 +128,10 @@ export function UniversalTable<
   dropdown,
   autoUpdateDropdown,
   onDataChange,
- actions,
-footerRows = [],
-subRows,
-captionSx,
+  actions,
+  footerRows = [],
+  subRows,
+  captionSx,
   headerSx,
   rowHoverSx,
   paperSx,
@@ -142,43 +142,43 @@ captionSx,
   const [selectedIds, setSelectedIds] = useState<Set<string | number>>(
     new Set()
   );
- 
+
   const resolveRowId = (row: T, index: number) =>
     getRowId ? getRowId(row, index) : index;
- 
+
   const highlightText = (text: string | number | null | undefined): ReactNode =>
     !search || text == null
       ? text
       : text
-          .toString()
-          .split(new RegExp(`(${search})`, "gi"))
-          .map((part, i) =>
-            i % 2 ? (
-              <mark key={i} style={{ background: highlightColor }}>
-                {part}
-              </mark>
-            ) : (
-              part
-            )
-          );
- 
+        .toString()
+        .split(new RegExp(`(${search})`, "gi"))
+        .map((part, i) =>
+          i % 2 ? (
+            <mark key={i} style={{ background: highlightColor }}>
+              {part}
+            </mark>
+          ) : (
+            part
+          )
+        );
+
   const DEFAULT_DROPDOWN_SX: SxProps = {
-    width: { xs:110, md:150 },
+    width: { xs: 110, md: 150 },
     bgcolor: "#1f2937",
     color: "#ffffff",
     fontWeight: 600,
-    fontSize: {xs:11, md:13},
+    fontSize: { xs: 11, md: 13 },
     borderRadius: 2,
     "& .MuiSelect-icon": { color: "#a9a2a2ff" },
   };
- 
+
   const filteredData = useMemo(() => {
     if (!search) return data;
- 
+
     return data.filter((row) =>
       columns.some((col) => {
         if (col.key === ACTION_KEY) return false;
- 
+
         const value = row[col.key];
         return String(value ?? "")
           .toLowerCase()
@@ -186,18 +186,18 @@ captionSx,
       })
     );
   }, [data, columns, search]);
- 
+
   const paginatedData = useMemo(
     () =>
       filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [filteredData, page, rowsPerPage]
   );
- 
+
   const exportData = useMemo(
     () => buildExportData(filteredData, columns),
     [filteredData, columns]
   );
- 
+
   const exportColumns = useMemo(
     () =>
       columns
@@ -205,61 +205,61 @@ captionSx,
         .map((c) => ({ key: c.label, label: c.label })),
     [columns]
   );
- 
+
   const selectedRows = data.filter((_, i) =>
     selectedIds.has(resolveRowId(_, i))
   );
- 
+
   const toggleRow = (row: T, index: number) => {
     const id = resolveRowId(row, index);
     const updated = new Set(selectedIds);
- 
+
     updated.has(id) ? updated.delete(id) : updated.add(id);
- 
+
     setSelectedIds(updated);
     onSelectionChange?.(data.filter((r, i) => updated.has(resolveRowId(r, i))));
   };
- 
+
   const toggleAll = (checked: boolean) => {
     const updated = new Set<string | number>();
     if (checked) data.forEach((r, i) => updated.add(resolveRowId(r, i)));
     setSelectedIds(updated);
     onSelectionChange?.(checked ? [...data] : []);
   };
- 
+
   const updateRow = (row: T, patch: Partial<T>) => {
     if (!onDataChange) return;
- 
+
     const targetId = resolveRowId(row, -1);
- 
+
     onDataChange(
       data.map((r, i) =>
         resolveRowId(r, i) === targetId ? { ...r, ...patch } : r
       )
     );
   };
- 
+
   return (
-   <Paper
-  elevation={0}
-  sx={{
-    borderRadius: 0,
-    boxShadow: "none",
-    backgroundColor: "transparent",
-    ...paperSx,
-  }}
->
+    <Paper
+      elevation={0}
+      sx={{
+        borderRadius: 0,
+        boxShadow: "none",
+        backgroundColor: "transparent",
+        ...paperSx,
+      }}
+    >
       {(showSearch || showExport) && (
         <Box
           sx={{
-            px: { xs:1, md:2 },
+            px: { xs: 1, md: 2 },
             py: 2,
             display: "flex",
             justifyContent: {
               xs: "center",
               md: showSearch ? "space-between" : "flex-end",
             },
-            flexDirection: { xs:"column", md:"row" },
+            flexDirection: { xs: "column", md: "row" },
             flexWrap: "wrap",
             gap: 2,
           }}
@@ -274,11 +274,11 @@ captionSx,
                 setPage(0);
               }}
               sx={{
-                minWidth: { xs:"100%", md:220}
-               }}
+                minWidth: { xs: "100%", md: 220 }
+              }}
             />
           )}
- 
+
           {showExport && (
             <ExportIcons
               data={exportData}
@@ -289,14 +289,14 @@ captionSx,
           )}
         </Box>
       )}
- 
+
       {caption && (
         <Box
           sx={{
             bgcolor: "#0ca678",
             color: "#fff",
             fontWeight: 700,
-            fontSize: { xs:14, md:18 },
+            fontSize: { xs: 14, md: 18 },
             borderRadius: showSearch || showExport ? "" : "6px 6px 0 0",
             textAlign: "center",
             py: 1,
@@ -306,10 +306,19 @@ captionSx,
           {caption}
         </Box>
       )}
- 
-      <TableContainer >
-        <Table size={tableSize}
-        sx={{overflowY: "auto"}}
+
+      <TableContainer
+        sx={{
+          width: "100%",
+          overflowX: "auto",
+        }}
+      >
+        <Table
+          size={tableSize}
+          sx={{
+            tableLayout: "fixed",
+            minWidth: "100%",
+          }}
         >
           <TableHead>
             <TableRow>
@@ -327,17 +336,21 @@ captionSx,
                   />
                 </TableCell>
               )}
- 
+
               {columns.map((col) => (
                 <TableCell
                   key={String(col.key)}
-                  align={textAlign}
                   sx={{
                     fontWeight: 700,
                     bgcolor: "#444748ff",
                     color: "#ffffff",
-                    ...headerSx,
                     whiteSpace: "nowrap",
+                    ...(col.key === ACTION_KEY && {
+                      width: 120,
+                      minWidth: 120,
+                      textAlign: "center",
+                    }),
+                    ...headerSx,
                   }}
                 >
                   {col.label}
@@ -345,7 +358,7 @@ captionSx,
               ))}
             </TableRow>
           </TableHead>
- 
+
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
@@ -354,107 +367,116 @@ captionSx,
                 </TableCell>
               </TableRow>
             ) : (
-            paginatedData.flatMap((row, index) => {
-               const rowId = resolveRowId(row, index);
- 
-const childRows: S[] =
-  subRows && Array.isArray(row[subRows.key])
-    ? (row[subRows.key] as S[])
-    : [];
- 
- 
- 
-    if (childRows.length > 0) {
-  return childRows.map((subRow, childIndex) => (
-    <TableRow
-      key={`${rowId}-${childIndex}`}
-      hover
-      sx={{
-        "&:hover": { bgcolor: "#e6f4ea" },
-        ...rowHoverSx,
-      }}
-    >
-      {columns.map((col) => {
- 
-       
-        if (col.key === ACTION_KEY && actions) {
-          return childIndex === 0 ? (
-            <TableCell
-  key={ACTION_KEY}
-  rowSpan={childRows.length}
-  align="center"
-  sx={{
-    verticalAlign: "middle",
-  }}
->
-              <Box
-  display="flex"
-  justifyContent="center"
-  alignItems="center"
-  gap={1}
-  flexWrap="wrap"
->
-                {Object.entries(iconMap).map(([k, cfg]) =>
-                  actions[k as keyof typeof iconMap] ? (
-                    <Tooltip key={k} title={cfg.label}>
-                      <IconButton
-                        size="small"
-                        onClick={() =>
-                          actions[k as keyof typeof iconMap]?.(row)
+              paginatedData.flatMap((row, index) => {
+                const rowId = resolveRowId(row, index);
+
+                const childRows: S[] =
+                  subRows && Array.isArray(row[subRows.key])
+                    ? (row[subRows.key] as S[])
+                    : [];
+
+
+
+                if (childRows.length > 0) {
+                  return childRows.map((subRow, childIndex) => (
+                    <TableRow
+                      key={`${rowId}-${childIndex}`}
+                      hover
+                      sx={{
+                        height: 53,
+                        "&:hover": { bgcolor: "#e6f4ea" },
+                        ...rowHoverSx,
+                      }}
+                    >
+                      {columns.map((col) => {
+
+
+                        if (col.key === ACTION_KEY && actions) {
+                          return childIndex === 0 ? (
+
+
+                            <TableCell
+                              key={ACTION_KEY}
+                              rowSpan={childRows.length}
+                              align="center"
+                              sx={{
+                                verticalAlign: "middle !important",
+                                textAlign: "center",
+                                width: 120,
+                                p: 0,
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  gap: 1,
+                                  py: 1,
+                                }}
+                              >
+                                {Object.entries(iconMap).map(([k, cfg]) =>
+                                  actions[k as keyof typeof iconMap] ? (
+                                    <Tooltip key={k} title={cfg.label}>
+                                      <IconButton
+                                        size="small"
+                                        onClick={() =>
+                                          actions[k as keyof typeof iconMap]?.(row)
+                                        }
+                                        sx={{ color: cfg.color }}
+                                      >
+                                        {cfg.icon}
+                                      </IconButton>
+                                    </Tooltip>
+                                  ) : null
+                                )}
+                              </Box>
+                            </TableCell>
+                          ) : null;
                         }
-                        sx={{ color: cfg.color }}
-                      >
-                        {cfg.icon}
-                      </IconButton>
-                    </Tooltip>
-                  ) : null
-                )}
-              </Box>
-            </TableCell>
-          ) : null;
-        }
- 
-        // SUB ROW COLUMN
-       const subCol = subRows?.columns.find(
-  (s) => String(s.key) === String(col.key)
-);
- 
-        if (subCol) {
-          return (
-            <TableCell
-              key={String(col.key)}
-              align={textAlign}
-            >
-              {subCol.render
-                ? subCol.render(subRow)
-                : String(subRow[subCol.key] ?? "")}
-            </TableCell>
-          );
-        }
- 
-        // PARENT COLUMN
-        return childIndex === 0 ? (
-          <TableCell
-            key={String(col.key)}
-            rowSpan={childRows.length}
-            align={textAlign}
-          >
-            {col.render
-              ? col.render(row)
-              : highlightText(String(row[col.key] ?? ""))}
-          </TableCell>
-        ) : null;
-      })}
-    </TableRow>
-  ));
-}
+
+                        // SUB ROW COLUMN
+                        const subCol = subRows?.columns.find(
+                          (s) => String(s.key) === String(col.key)
+                        );
+
+                        if (subCol) {
+                          return (
+                            <TableCell
+                              key={String(col.key)}
+                              align={textAlign}
+                            >
+                              {subCol.render
+                                ? subCol.render(subRow)
+                                : String(subRow[subCol.key] ?? "")}
+                            </TableCell>
+                          );
+                        }
+
+                        // PARENT COLUMN
+                        return childIndex === 0 ? (
+                          <TableCell
+                            key={String(col.key)}
+                            rowSpan={childRows.length}
+                            align={textAlign}
+                          >
+                            {col.render
+                              ? col.render(row)
+                              : highlightText(String(row[col.key] ?? ""))}
+                          </TableCell>
+                        ) : null;
+                      })}
+                    </TableRow>
+                  ));
+                }
                 return (
                   <TableRow
                     key={rowId}
                     hover
-                    sx={{ "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx,
-                 
-                  }}
+                    sx={{
+                      "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx,
+
+                    }}
                   >
                     {enableCheckbox && (
                       <TableCell padding="checkbox">
@@ -464,10 +486,10 @@ const childRows: S[] =
                         />
                       </TableCell>
                     )}
- 
+
                     {columns.map((col) => {
- 
-                 
+
+
                       /* Dropdown */
                       if (
                         dropdown &&
@@ -507,39 +529,52 @@ const childRows: S[] =
                           </TableCell>
                         );
                       }
- 
+
                       /* Actions */
                       if (col.key === ACTION_KEY && actions) {
                         return (
-                          <TableCell key={ACTION_KEY}>
-                            <Box display="flex" gap={1}>
-                           {Object.keys(actions).map((k) => {
-  const cfg = iconMap[k as keyof typeof iconMap];
- 
-  if (!cfg) return null;
- 
-  return (
-    <Tooltip key={k} title={cfg.label}>
-      <IconButton
-        size="small"
-        onClick={() =>
-          actions[k as keyof typeof iconMap]?.(row)
-        }
-        sx={{ color: cfg.color }}
-      >
-        {cfg.icon}
-      </IconButton>
-    </Tooltip>
-  );
-})}
+                          <TableCell
+                            key={ACTION_KEY}
+                            align="center"
+                            sx={{
+                              width: 120,
+                              minWidth: 120,
+                              verticalAlign: "middle",
+                            }}
+                          >
+                            <Box
+                              display="flex"
+                              justifyContent="center"
+                              alignItems="center"
+                              gap={1}
+                            >
+                              {Object.keys(actions).map((k) => {
+                                const cfg = iconMap[k as keyof typeof iconMap];
+
+                                if (!cfg) return null;
+
+                                return (
+                                  <Tooltip key={k} title={cfg.label}>
+                                    <IconButton
+                                      size="small"
+                                      onClick={() =>
+                                        actions[k as keyof typeof iconMap]?.(row)
+                                      }
+                                      sx={{ color: cfg.color }}
+                                    >
+                                      {cfg.icon}
+                                    </IconButton>
+                                  </Tooltip>
+                                );
+                              })}
                             </Box>
                           </TableCell>
                         );
                       }
- 
+
                       /* Default */
                       if (col.key === ACTION_KEY) return null;
- 
+
                       return (
                         <TableCell key={String(col.key)} align={textAlign}>
                           {col.render
@@ -553,7 +588,7 @@ const childRows: S[] =
               })
             )}
           </TableBody>
- 
+
           {footerRows.length > 0 && (
             <TableFooter>
               {footerRows.map((f, i) => (
@@ -569,7 +604,7 @@ const childRows: S[] =
           )}
         </Table>
       </TableContainer>
- 
+
       <Box
         sx={{
           display: "flex",
@@ -577,6 +612,9 @@ const childRows: S[] =
             enableCheckbox && selectedRows.length > 0
               ? "space-between"
               : "flex-end",
+          alignItems: "center",
+          width: "100%",
+          overflowX: "auto",
           px: 1,
         }}
       >
@@ -585,9 +623,8 @@ const childRows: S[] =
             title={
               selectedRows.length === data.length
                 ? "Delete All Records"
-                : `Delete ${selectedRows.length} record${
-                    selectedRows.length > 1 ? "s" : ""
-                  }`
+                : `Delete ${selectedRows.length} record${selectedRows.length > 1 ? "s" : ""
+                }`
             }
           >
             <IconButton
@@ -601,7 +638,7 @@ const childRows: S[] =
             </IconButton>
           </Tooltip>
         )}
- 
+
         <TablePagination
           component="div"
           count={filteredData.length}
@@ -614,5 +651,4 @@ const childRows: S[] =
     </Paper>
   );
 }
- 
- 
+

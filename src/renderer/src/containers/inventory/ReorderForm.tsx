@@ -136,6 +136,7 @@ const handleReorder = methods.handleSubmit((data) => {
 
   return (
     <FormProvider {...methods}>
+      <form noValidate>
       <Box
         sx={{
           display: "flex",
@@ -271,6 +272,7 @@ const handleReorder = methods.handleSubmit((data) => {
           </Box>
         </Paper>
       </Box>
+      </form>
     </FormProvider>
   );
 }
