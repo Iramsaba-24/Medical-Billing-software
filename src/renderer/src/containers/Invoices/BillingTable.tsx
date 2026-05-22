@@ -1,3 +1,237 @@
+// import { useState } from "react";
+// import { Box, Paper, Typography } from "@mui/material";
+// import { useNavigate } from "react-router-dom";
+// import {
+//   UniversalTable,
+//   Column,
+//   DropdownOption,
+// } from "@/components/uncontrolled/UniversalTable";
+// import { Invoice, InvoiceStatus } from "@/types/invoice";
+// import { FormProvider, useForm } from "react-hook-form";
+// import DropdownField from "@/components/controlled/DropdownField";
+// import { URL_PATH } from "@/constants/UrlPath";
+// import {
+//   showToast,
+//   showConfirmation,
+// } from "@/components/uncontrolled/ToastMessage.tsx";
+// import { deleteRetailInvoice } from "@/service/retailInvoiceService";
+
+// type Props = {
+//   invoices: Invoice[];
+//   setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
+//   refetchInvoices: () => Promise<void>;
+// };
+
+// type FilterType = "all" | "daily" | "monthly" | "yearly";
+
+// const BillingTable = ({
+//   invoices,
+//   setInvoices,
+//   refetchInvoices,
+// }: Props) => {
+//   const navigate = useNavigate();
+
+//   const [filterType, setFilterType] = useState<FilterType>("all");
+
+//   const filterOptions = [
+//     { label: "All", value: "all" },
+//     { label: "Daily", value: "daily" },
+//     { label: "Monthly", value: "monthly" },
+//     { label: "Yearly", value: "yearly" },
+//   ];
+
+//   const filteredInvoices = invoices.filter((invoice) => {
+//     if (!filterType || filterType === "all") return true;
+
+//     const dateStr = invoice.invoiceDate ?? "";
+
+//     if (!dateStr) return false;
+
+//     const parts = dateStr.split("/");
+
+//     const invoiceDate = new Date(
+//       Number(parts[2]),
+//       Number(parts[1]) - 1,
+//       Number(parts[0])
+//     );
+
+//     const today = new Date();
+
+//     if (filterType === "daily") {
+//       return (
+//         invoiceDate.getDate() === today.getDate() &&
+//         invoiceDate.getMonth() === today.getMonth() &&
+//         invoiceDate.getFullYear() === today.getFullYear()
+//       );
+//     }
+
+//     if (filterType === "monthly") {
+//       return (
+//         invoiceDate.getMonth() === today.getMonth() &&
+//         invoiceDate.getFullYear() === today.getFullYear()
+//       );
+//     }
+
+//     if (filterType === "yearly") {
+//       return invoiceDate.getFullYear() === today.getFullYear();
+//     }
+
+//     return true;
+//   });
+
+//   console.log("Filtered Invoices →", filteredInvoices);
+
+//   const columns: Column<Invoice>[] = [
+//     {
+//       key: "srNo",
+//       label: "Sr No",
+//     },
+//     {
+//       key: "invoice",
+//       label: "Invoice",
+//     },
+//     {
+//       key: "name",
+//       label: "Name",
+//     },
+//     {
+//       key: "invoiceDate",
+//       label: "Date",
+//     },
+//     {
+//       key: "price",
+//       label: "Price",
+//       render: (row) => `₹ ${(row.price ?? 0).toLocaleString()}`,
+//     },
+//     {
+//       key: "paymentStatus",
+//       label: "Status",
+//     },
+//     {
+//       key: "actionbutton",
+//       label: "Action",
+//     },
+//   ];
+
+//   const statusOptions: DropdownOption[] = [
+//     { value: "Paid", label: "Paid" },
+//     { value: "Pending", label: "Pending" },
+//     { value: "Overdue", label: "Overdue" },
+//   ];
+
+//   const methods = useForm({
+//     defaultValues: {
+//       filterType: "all",
+//     },
+//   });
+
+//   const handleDelete = async (invoiceNo: string) => {
+//     const confirmed = await showConfirmation(
+//       "Are you sure you want to delete this invoice?",
+//       "Confirm Delete"
+//     );
+
+//     if (!confirmed) return;
+
+//     try {
+//       await deleteRetailInvoice(Number(invoiceNo));
+
+//       await refetchInvoices();
+
+//       window.dispatchEvent(new Event("invoiceUpdated"));
+
+//       showToast("success", "Invoice deleted successfully");
+//     } catch (error) {
+//       console.error("Error deleting invoice", error);
+
+//       showToast("error", "Failed to delete invoice");
+//     }
+//   };
+
+//   return (
+//     <FormProvider {...methods}>
+//       <Paper sx={{ p: 1 }}>
+//         <Box
+//           display="flex"
+//           flexDirection={{ xs: "column", sm: "row" }}
+//           justifyContent="space-between"
+//           alignItems={{ xs: "flex-start", sm: "center" }}
+//           mb={2}
+//           gap={2}
+//         >
+//           <Typography fontSize={{ xs: 18, md: 22 }} fontWeight={600}>
+//             Invoice List
+//           </Typography>
+
+//           <Box
+//             display="flex"
+//             flexDirection={{ xs: "column", sm: "row" }}
+//             gap={{ xs: 0, sm: 2 }}
+//             width={{ xs: "100%", sm: "auto" }}
+//             mt={2}
+//           >
+//             <Box sx={{ width: { xs: "100%", sm: 180 } }}>
+//               <DropdownField
+//                 name="filterType"
+//                 label="Filter"
+//                 options={filterOptions}
+//                 onChangeCallback={(value) =>
+//                   setFilterType(value as FilterType)
+//                 }
+//                 size="small"
+//               />
+//             </Box>
+//           </Box>
+//         </Box>
+
+//         <UniversalTable<Invoice>
+//           data={filteredInvoices}
+//           columns={columns}
+//           showSearch
+//           showExport
+//           getRowId={(row) => row.invoice}
+//           dropdown={{
+//             key: "paymentStatus",
+//             options: statusOptions,
+//             onChange: (row, value) => {
+//               setInvoices((prev) =>
+//                 prev.map((inv) =>
+//                   inv.invoice === row.invoice
+//                     ? {
+//                         ...inv,
+//                         paymentStatus: value as InvoiceStatus,
+//                       }
+//                     : inv
+//                 )
+//               );
+
+//               showToast("success", "Status updated successfully");
+//             },
+//           }}
+//           actions={{
+//             view: (invoice) =>
+//               navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
+//                 state: { invoice },
+//               }),
+
+//             edit: (invoice) =>
+//               navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
+//                 state: { invoice },
+//               }),
+
+//             delete: (invoice) => handleDelete(invoice.invoice),
+//           }}
+//         />
+//       </Paper>
+//     </FormProvider>
+//   );
+// };
+
+// export default BillingTable;
+
+
+
+
 import { useState } from "react";
 import { Box, Paper, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -15,48 +249,48 @@ import {
   showConfirmation,
 } from "@/components/uncontrolled/ToastMessage.tsx";
 import { deleteRetailInvoice } from "@/service/retailInvoiceService";
-
+ 
 type Props = {
   invoices: Invoice[];
   setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
   refetchInvoices: () => Promise<void>;
 };
-
+ 
 type FilterType = "all" | "daily" | "monthly" | "yearly";
-
+ 
 const BillingTable = ({
   invoices,
   setInvoices,
   refetchInvoices,
 }: Props) => {
   const navigate = useNavigate();
-
+ 
   const [filterType, setFilterType] = useState<FilterType>("all");
-
+ 
   const filterOptions = [
     { label: "All", value: "all" },
     { label: "Daily", value: "daily" },
     { label: "Monthly", value: "monthly" },
     { label: "Yearly", value: "yearly" },
   ];
-
+ 
   const filteredInvoices = invoices.filter((invoice) => {
     if (!filterType || filterType === "all") return true;
-
+ 
     const dateStr = invoice.invoiceDate ?? "";
-
+ 
     if (!dateStr) return false;
-
+ 
     const parts = dateStr.split("/");
-
+ 
     const invoiceDate = new Date(
       Number(parts[2]),
       Number(parts[1]) - 1,
       Number(parts[0])
     );
-
+ 
     const today = new Date();
-
+ 
     if (filterType === "daily") {
       return (
         invoiceDate.getDate() === today.getDate() &&
@@ -64,21 +298,21 @@ const BillingTable = ({
         invoiceDate.getFullYear() === today.getFullYear()
       );
     }
-
+ 
     if (filterType === "monthly") {
       return (
         invoiceDate.getMonth() === today.getMonth() &&
         invoiceDate.getFullYear() === today.getFullYear()
       );
     }
-
+ 
     if (filterType === "yearly") {
       return invoiceDate.getFullYear() === today.getFullYear();
     }
-
+ 
     return true;
   });
-
+ 
   const columns: Column<Invoice>[] = [
     {
       key: "srNo",
@@ -89,7 +323,7 @@ const BillingTable = ({
       label: "Invoice",
     },
     {
-      key: "customerName", 
+      key: "customerName",
       label: "Name",
     },
     {
@@ -110,42 +344,42 @@ const BillingTable = ({
       label: "Action",
     },
   ];
-
+ 
   const statusOptions: DropdownOption[] = [
     { value: "Paid", label: "Paid" },
     { value: "Pending", label: "Pending" },
     { value: "Overdue", label: "Overdue" },
   ];
-
+ 
   const methods = useForm({
     defaultValues: {
       filterType: "all",
     },
   });
-
+ 
   const handleDelete = async (invoiceNo: string) => {
     const confirmed = await showConfirmation(
       "Are you sure you want to delete this invoice?",
       "Confirm Delete"
     );
-
+ 
     if (!confirmed) return;
-
+ 
     try {
       await deleteRetailInvoice(Number(invoiceNo));
-
+ 
       await refetchInvoices();
-
+ 
       window.dispatchEvent(new Event("invoiceUpdated"));
-
+ 
       showToast("success", "Invoice deleted successfully");
     } catch (error) {
       console.error("Error deleting invoice", error);
-
+ 
       showToast("error", "Failed to delete invoice");
     }
   };
-
+ 
   return (
     <FormProvider {...methods}>
       <Paper sx={{ p: 1 }}>
@@ -160,7 +394,7 @@ const BillingTable = ({
           <Typography fontSize={{ xs: 18, md: 22 }} fontWeight={600}>
             Invoice List
           </Typography>
-
+ 
           <Box
             display="flex"
             flexDirection={{ xs: "column", sm: "row" }}
@@ -181,7 +415,7 @@ const BillingTable = ({
             </Box>
           </Box>
         </Box>
-
+ 
         <UniversalTable<Invoice>
           data={filteredInvoices}
           columns={columns}
@@ -202,7 +436,7 @@ const BillingTable = ({
                     : inv
                 )
               );
-
+ 
               showToast("success", "Status updated successfully");
             },
           }}
@@ -211,12 +445,12 @@ const BillingTable = ({
               navigate(`${URL_PATH.InvoiceView}/${invoice.invoice}`, {
                 state: { invoice },
               }),
-
+ 
             edit: (invoice) =>
               navigate(`${URL_PATH.EditInvoice}/${invoice.invoice}`, {
                 state: { invoice },
               }),
-
+ 
             delete: (invoice) => handleDelete(invoice.invoice),
           }}
         />
@@ -224,5 +458,6 @@ const BillingTable = ({
     </FormProvider>
   );
 };
-
+ 
 export default BillingTable;
+ 

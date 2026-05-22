@@ -89,6 +89,7 @@ export const getLowStock = async (): Promise<LowStockApiResponse> => {
   return res.data;
 };
  
+ 
 // last purchasehistory
 export type PurchaseHistoryResponse = {
   id: number;
@@ -100,6 +101,32 @@ export type PurchaseHistoryResponse = {
   unPaidAmount: number | null;
   paymentType: string | null;
   medicineType: string;
+};
+// existing reorder
+ export type ExistingReorderResponse = {
+  id: number;
+  createdAt: string;
+  companyName: string;
+  medicineName: string;
+  strength: string;
+  qty: number;
+  existingMedicines: {
+    medicineName: string;
+    strength: string;
+    companyName: string;
+    qty: number;
+  }[];
+};
+// new order
+export type NewOrderResponse = {
+  id: number;
+  companyName: string;
+  newMedicines: {
+    id: number;
+    medicineName: string;
+    strength: string;
+    qty: number;
+  }[];
 };
  
 export const getPurchaseHistory = async (): Promise<PurchaseHistoryResponse[]> => {
@@ -128,44 +155,58 @@ export const sendReorderEmail = async (
     quantity?: string | number;
   }[]
 ): Promise<void> => {
+ 
   const endpoint =
     orderType === "reorder"
       ? API_ENDPOINTS.REORDER_EXISTING
       : API_ENDPOINTS.REORDER_NEW;
  
   const requests = medicines.map((m) => {
-    const payload = {
-      MedicineName: m.medicineName || m.medicineId || "",
-      Strength: m.strengthType || "",
-      CompanyName: distributor,
-      Qty: Number(m.qty || m.quantity || 0),
-      PaidAmount: null,
-      UnPaidAmount: null,
-      PaymentType: null,
-      IsApproved: false,
-    };
  
-    return axios.post(endpoint, payload, getAuthHeaders());
+    const payload =
+      orderType === "neworder"
+        ? {
+            medicineName:
+              m.medicineName || m.medicineId || "",
+ 
+            strength: m.strengthType || "",
+ 
+            companyName: distributor,
+ 
+            qty: Number(
+              m.qty || m.quantity || 0
+            ),
+ 
+            paidAmount: null,
+            unPaidAmount: null,
+            paymentType: null,
+            isApproved: false,
+          }
+        : {
+            medicineName:
+            m.medicineName || m.medicineId || "",
+            strength: m.strengthType || "",
+            companyName: distributor,
+            qty: Number(
+              m.qty || m.quantity || 0
+            ),
+ 
+            paidAmount: null,
+            unPaidAmount: null,
+            paymentType: null,
+            isApproved: false,
+          };
+ 
+    return axios.post(
+      endpoint,
+      payload,
+      getAuthHeaders()
+    );
   });
  
   await Promise.all(requests);
 };
 // existing reorder
-export type ExistingReorderResponse = {
-  id: number;
-  createdAt: string;
-  companyName: string;
-  medicineName: string;
-  strength: string;
-  qty: number;
-  existingMedicines: {
-    medicineName: string;
-    strength: string;
-    companyName: string;
-    qty: number;
-  }[];
-};
- 
 export const getExistingReorders = async (): Promise<ExistingReorderResponse[]> => {
   const res = await axios.get<ExistingReorderResponse[]>(
     API_ENDPOINTS.REORDER_EXISTING,
@@ -199,25 +240,49 @@ export const approveExistingReorder = async (
   );
 };
 //new order
-export type NewOrderResponse = {
-  id: number;
-  distributorName: string;
-  distributorId: number;
-  newMedicines: {
+export const getNewReorders = async (): Promise<NewOrderResponse[]> => {
+  const res = await axios.get<{
     id: number;
     medicineName: string;
     strength: string;
+    companyName: string;
     qty: number;
-  }[];
-};
- 
-export const getNewReorders = async (): Promise<NewOrderResponse[]> => {
-  const res = await axios.get<NewOrderResponse[]>(
+  }[]>(
     API_ENDPOINTS.REORDER_NEW,
     getAuthHeaders()
   );
  
-  return res.data;
+  //  grouped by companyName
+  const grouped = res.data.reduce((acc, item) => {
+   const existing = acc.find(
+  g => g.companyName === item.companyName
+);
+ 
+if (existing) {
+  existing.newMedicines.push({
+    id: item.id,
+    medicineName: item.medicineName,
+    strength: item.strength,
+    qty: item.qty,
+  });
+} else {
+  acc.push({
+    id: item.id,
+    companyName: item.companyName,
+    newMedicines: [
+      {
+        id: item.id,
+        medicineName: item.medicineName,
+        strength: item.strength,
+        qty: item.qty,
+      },
+    ],
+  });
+}
+    return acc;
+  }, [] as NewOrderResponse[]);
+ 
+  return grouped;
 };
 // Approve and delete existing medicines
 export const approveAndDeleteExistingMedicine = async (
@@ -247,7 +312,7 @@ export const approveAndDeleteExistingMedicine = async (
         paidAmount: m.paidAmount,
         unPaidAmount: m.unPaidAmount,
         paymentType: m.paymentType,
-        isApproved: true,  
+        IsApproved: true,  
       },
       { headers }
     );
@@ -286,7 +351,7 @@ export const approveAndDeleteNewMedicine = async (
         paidAmount: m.paidAmount,
         unPaidAmount: m.unPaidAmount,
         paymentType: m.paymentType,
-        isApproved: true,  
+        IsApproved: true,  
       },
       { headers }
     );
@@ -297,4 +362,5 @@ export const approveAndDeleteNewMedicine = async (
     { headers }
   );
 };
+ 
  

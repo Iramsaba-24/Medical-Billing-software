@@ -12,17 +12,24 @@ import {
   getDistributors,
   type DistributorResponse,
 } from "@/service/distributorService";
- 
+
 type OrderRow = {
   rowId: number;
 };
- 
+
 type NewOrderFormValues = {
   distributor: string;
   email: string;
-  [key: string]: string | number;
+  root?: {
+    message?: string;
+  };
+  [key: string]:
+    | string
+    | number
+    | { message?: string }
+    | undefined;
 };
- 
+
 const orderButtonSx = {
   backgroundColor: "#238878",
   color: "#fff",
@@ -36,24 +43,24 @@ const orderButtonSx = {
     border: "2px solid #238878",
   },
 };
- 
+
 function NewOrderForm() {
   const navigate = useNavigate();
- 
+
   const [rows, setRows] = useState<OrderRow[]>([
     {
       rowId: Date.now(),
     },
   ]);
- 
+
   const [distributorOptions, setDistributorOptions] = useState<
     { label: string; value: string }[]
   >([]);
- 
+
   const [distributors, setDistributors] = useState<
     DistributorResponse[]
   >([]);
- 
+
   const methods = useForm<NewOrderFormValues>({
     defaultValues: {
       distributor: "",
@@ -61,21 +68,21 @@ function NewOrderForm() {
     },
     mode: "onChange",
   });
- 
+
   const selectedDistributor =
     methods.watch("distributor");
- 
+
   const fetchDistributorData = async () => {
     try {
       const data = await getDistributors();
- 
+
       setDistributors(data);
- 
+
       const options = data.map((item) => ({
         label: item.companyName,
         value: item.companyName,
       }));
- 
+
       setDistributorOptions(options);
     } catch (error) {
       console.error(
@@ -84,19 +91,19 @@ function NewOrderForm() {
       );
     }
   };
- 
+
   useEffect(() => {
     fetchDistributorData();
   }, []);
- 
+
   useEffect(() => {
     if (!selectedDistributor) return;
- 
+
     const selected = distributors.find(
       (item) =>
         item.companyName === selectedDistributor
     );
- 
+
     if (selected) {
       methods.setValue(
         "email",
@@ -108,7 +115,7 @@ function NewOrderForm() {
     distributors,
     methods,
   ]);
- 
+
   const handleAddRow = () => {
     setRows((prev) => [
       ...prev,
@@ -117,7 +124,7 @@ function NewOrderForm() {
       },
     ]);
   };
- 
+
   const handleRemoveRow = (
     rowId: number
   ) => {
@@ -127,9 +134,35 @@ function NewOrderForm() {
       )
     );
   };
- 
+
   const handleOrder =
     methods.handleSubmit((data) => {
+      methods.clearErrors("root");
+
+      const hasInvalidQty = rows.some(
+        (row) => {
+          const qtyValue =
+            data[`qty_${row.rowId}`];
+
+          const qty =
+            typeof qtyValue === "number"
+              ? qtyValue
+              : Number(qtyValue || 0);
+
+          return qty < 5;
+        }
+      );
+
+      if (hasInvalidQty) {
+        methods.setError("root", {
+          type: "manual",
+          message:
+            "Quantity should be at least 5 for order.",
+        });
+
+        return;
+      }
+
       const medicines = rows.map(
         (row) => ({
           medicineName:
@@ -141,10 +174,12 @@ function NewOrderForm() {
               `strength_${row.rowId}`
             ],
           qty:
-            data[`qty_${row.rowId}`],
-                  })
-                );
- 
+            data[
+              `qty_${row.rowId}`
+            ],
+        })
+      );
+
       navigate(
         URL_PATH.ReorderEmail,
         {
@@ -158,7 +193,7 @@ function NewOrderForm() {
         }
       );
     });
- 
+
   return (
     <FormProvider {...methods}>
       <Box
@@ -195,8 +230,7 @@ function NewOrderForm() {
           >
             New Order
           </Typography>
- 
-          {/* Distributor */}
+
           <Box
             display="flex"
             flexDirection="column"
@@ -225,7 +259,7 @@ function NewOrderForm() {
               >
                 Distributor
               </Typography>
- 
+
               <Box
                 sx={{
                   width: {
@@ -244,7 +278,7 @@ function NewOrderForm() {
                 />
               </Box>
             </Box>
- 
+
             <Box
               display="flex"
               flexDirection={{
@@ -267,7 +301,7 @@ function NewOrderForm() {
               >
                 Email
               </Typography>
- 
+
               <Box
                 sx={{
                   width: {
@@ -283,8 +317,7 @@ function NewOrderForm() {
               </Box>
             </Box>
           </Box>
- 
-          {/* Add Button */}
+
           <Box
             display="flex"
             justifyContent="flex-end"
@@ -301,10 +334,7 @@ function NewOrderForm() {
               ADD ITEM
             </Button>
           </Box>
- 
-       
- 
-          {/* Rows */}
+
           {rows.map((row) => (
             <Box
               key={row.rowId}
@@ -326,81 +356,34 @@ function NewOrderForm() {
                   width: "100%",
                 }}
               >
-                <Box
-                  display={{
-                    xs: "block",
-                    md: "none",
-                  }}
-                  mb={0.5}
-                >
-                  <Typography
-                    fontWeight={600}
-                    fontSize={14}
-                  >
-                    Medicine Name
-                  </Typography>
-                </Box>
- 
                 <TextInputField
                   name={`medicine_${row.rowId}`}
                   label="Medicine Name"
                   required
                   minLength={3}
                   maxLength={9999}
-                 
                 />
               </Box>
- 
+
               <Box
                 sx={{
                   flex: 2,
                   width: "100%",
                 }}
               >
-                <Box
-                  display={{
-                    xs: "block",
-                    md: "none",
-                  }}
-                  mb={0.5}
-                >
-                  <Typography
-                    fontWeight={600}
-                    fontSize={14}
-                  >
-                    Strength / Type
-                  </Typography>
-                </Box>
- 
                 <TextInputField
-             
                   name={`strength_${row.rowId}`}
                   label=" Strength / Type"
                   required
                 />
               </Box>
- 
+
               <Box
                 sx={{
                   flex: 1,
                   width: "100%",
                 }}
               >
-                <Box
-                  display={{
-                    xs: "block",
-                    md: "none",
-                  }}
-                  mb={0.5}
-                >
-                  <Typography
-                    fontWeight={600}
-                    fontSize={14}
-                  >
-                    Qty.
-                  </Typography>
-                </Box>
- 
                 <NumericField
                   name={`qty_${row.rowId}`}
                   label="Quantity"
@@ -409,7 +392,7 @@ function NewOrderForm() {
                   required
                 />
               </Box>
- 
+
               {rows.length > 1 && (
                 <Box
                   display="flex"
@@ -418,10 +401,6 @@ function NewOrderForm() {
                     md: "center",
                   }}
                   alignItems="center"
-                  mt={{
-                    xs: -1,
-                    md: 2,
-                  }}
                 >
                   <IconButton
                     color="error"
@@ -437,42 +416,55 @@ function NewOrderForm() {
               )}
             </Box>
           ))}
- 
-         
-<Box
-  display="flex"
-  justifyContent="flex-end"
-  gap={2}
-  mt={2}
->
- 
-  <Button
-    variant="outlined"
-    sx={{
-      ...orderButtonSx,
-      backgroundColor: "#fff",
-      color: "#238878",
-    }}
-    onClick={() =>
-      navigate(URL_PATH.Reorder)
-    }
-  >
-    Order History
-  </Button>
- 
- 
-  <Button
-    sx={orderButtonSx}
-    onClick={handleOrder}
-  >
-    Order
-  </Button>
-</Box>
+
+          {methods.formState.errors.root
+            ?.message && (
+            <Typography
+              color="error"
+              fontSize={14}
+              mb={2}
+            >
+              {
+                methods.formState
+                  .errors.root.message
+              }
+            </Typography>
+          )}
+
+          <Box
+            display="flex"
+            justifyContent="flex-end"
+            gap={2}
+            mt={2}
+          >
+            <Button
+              variant="outlined"
+              sx={{
+                ...orderButtonSx,
+                backgroundColor:
+                  "#fff",
+                color: "#238878",
+              }}
+              onClick={() =>
+                navigate(
+                  URL_PATH.Reorder
+                )
+              }
+            >
+              Order History
+            </Button>
+
+            <Button
+              sx={orderButtonSx}
+              onClick={handleOrder}
+            >
+              Order
+            </Button>
+          </Box>
         </Paper>
       </Box>
     </FormProvider>
   );
 }
- 
+
 export default NewOrderForm;
- 
