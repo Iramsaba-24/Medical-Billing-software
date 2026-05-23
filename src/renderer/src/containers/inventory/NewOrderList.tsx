@@ -83,21 +83,18 @@ setNewOrderData(flatData);
   }, []);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-        p: { xs: 1, sm: 2 },
-      }}
-    >
+  <>
       <Paper
-        sx={{
-          borderRadius: 2,
-          p: { xs: 1, sm: 2 },
-          overflowX: "auto",
-        }}
-      >
+  sx={{
+    width: "100%",
+    maxWidth: "100%",
+    borderRadius: 2,
+    p: { xs: 1, sm: 2 },
+    overflowX: "auto",
+    boxSizing: "border-box",
+    mx: "auto",
+  }}
+>
         <Box
           display="flex"
           justifyContent="space-between"
@@ -109,7 +106,7 @@ setNewOrderData(flatData);
           <Typography fontWeight={700}>New Order List</Typography>
         </Box>
  
-        <UniversalTable<NewOrderHistory, NewMedicine>
+        <UniversalTable<NewOrderHistory>
           data={newOrderData}
           columns={columns}
           rowsPerPage={5}
@@ -161,9 +158,9 @@ setNewOrderData(flatData);
       },
     },
   });
-}}
+}} 
       />
-    </Box>
+</>
   );
 }
 export default NewOrderList;

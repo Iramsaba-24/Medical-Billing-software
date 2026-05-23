@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {Box, Paper, Typography,} from "@mui/material";
+import { Paper, Typography,} from "@mui/material";
 import { deletePurchaseHistory, getPurchaseHistory } from "@/service/reorderService";
 import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
 import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
@@ -78,29 +78,35 @@ const fetchLastPurchaseData = async () => {
  
  
   return (
-   <Box
-  sx={{
-    display: "flex",
-    flexDirection: "column",
-    gap: 3,
-   p: { xs: 0.5, sm: 2 },
-  }}
->
+//  <Box
+//   sx={{
+//     display: "flex",
+//     flexDirection: "column",
+//     gap: 3,
+//     p: { xs: 1, sm: 2 },
+//     width: "100%",
+//     boxSizing: "border-box",
+//   }}
+// >
  
-      {/* Last Purchase */}
-    <Paper
-  sx={{
-    borderRadius: 2,
-    p: { xs: 1, sm: 2 },
-    overflowX: "auto",
-    boxShadow: 4,
-  }}
->
+      
+  <Paper
+ sx={{
+      width: "100%",
+      borderRadius: 2,
+      p: { xs: 1, sm: 2 },
+      overflowX: "auto",
+      boxSizing: "border-box",
+    }}
+  >
         <Typography
   fontWeight={700}
   mb={1.5}
   fontSize={{ xs: 16, sm: 20 }}
 >Last Purchase</Typography>
+
+
+
        <UniversalTable
   data={lastPurchaseData}
   columns={purchaseColumns}
@@ -112,7 +118,7 @@ const fetchLastPurchaseData = async () => {
 />
       </Paper>
  
-    </Box>
+    // </Box>
   );
 }
 export default LastPurchaseList;
