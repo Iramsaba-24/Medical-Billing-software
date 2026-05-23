@@ -11,7 +11,7 @@ import {
   pharmacySettingsService,
   PharmacySettingsResponse,
 } from "@/service/pharmacySettingsService";
-
+ 
 type MedicineRow = {
   medicineRowId?: number;
   medicineId?: string;
@@ -20,27 +20,27 @@ type MedicineRow = {
   quantity?: string | number;
   strengthType: string;
 };
-
+ 
 type LocationState = {
   distributor: string;
   email: string;
   medicines: MedicineRow[];
   isViewMode?: boolean;
-  orderType?: "reorder" | "neworder"; 
+  orderType?: "reorder" | "neworder";
 };
-
+ 
 export default function ReorderEmail() {
   const location = useLocation();
   const navigate = useNavigate();
   const [pharmacySettings, setPharmacySettings] =
   useState<PharmacySettingsResponse | null>(null);
-
+ 
 const {
   distributor,
   email,
   medicines,
   isViewMode,
-  orderType, 
+  orderType,
 } = (location.state as LocationState) || {
   distributor: "",
   email: "",
@@ -55,7 +55,7 @@ const handleSend = async () => {
       distributor,
       medicines
     );
-
+ 
     showToast("success", "Reorder email sent successfully!");
     navigate(URL_PATH.Reorder);
   } catch (error) {
@@ -67,20 +67,20 @@ const handleSend = async () => {
   const fetchPharmacySettings = async () => {
     try {
       const userId = Number(localStorage.getItem("userId"));
-
+ 
       if (!userId) return;
-
+ 
       const response = await pharmacySettingsService.getSettings(userId);
-
+ 
       setPharmacySettings(response);
     } catch (error) {
       console.error("Failed to fetch pharmacy settings", error);
     }
   };
-
+ 
   fetchPharmacySettings();
 }, []);
-
+ 
   return (
    <Box
   sx={{
@@ -97,7 +97,7 @@ const handleSend = async () => {
 >
         Order Email
       </Typography>
-
+ 
       {/* Distributor + Email */}
       <Box display="flex" flexDirection="column" gap={2} mb={4}>
       <Box
@@ -115,7 +115,7 @@ const handleSend = async () => {
           </Typography>
           <Typography>{distributor}</Typography>
         </Box>
-
+ 
         <Box
   display="flex"
   flexDirection={{ xs: "column", sm: "row" }}
@@ -132,7 +132,7 @@ const handleSend = async () => {
           <Typography>{email}</Typography>
         </Box>
       </Box>
-
+ 
       {/* Mail Preview */}
 <Paper
   elevation={2}
@@ -149,7 +149,7 @@ const handleSend = async () => {
           We would like to place a reorder for the following medicines for our medical store.
         </Typography>
         <Typography fontWeight={600} mb={2}>Order Details:</Typography>
-
+ 
 <Box sx={{ overflowX: "auto" }}>
         <Table size="small">
           <TableHead>
@@ -175,24 +175,24 @@ const handleSend = async () => {
             ))}
           </TableBody>
         </Table></Box>
-
+ 
         <Typography mt={3}>
           Please confirm the availability and expected delivery timeline.
         </Typography>
-
+ 
         <Box mt={4}>
           <Typography>Thank you.</Typography>
           <Typography mt={2}>Best regards,</Typography>
           <Typography>
             {pharmacySettings?.pharmacyName || "Medical Store"}
           </Typography>
-
+ 
           <Typography>
             Contact: {pharmacySettings?.contactNumber || "+91 XXXXXXXXXX"}
           </Typography>
                   </Box>
                 </Paper>
-
+ 
           {!isViewMode && (
             <Box display="flex" justifyContent="flex-end" mt={3}>
               <Button
@@ -207,3 +207,4 @@ const handleSend = async () => {
     </Box>
   );
 }
+ 

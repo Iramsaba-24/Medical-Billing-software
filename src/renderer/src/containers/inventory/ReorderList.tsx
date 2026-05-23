@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
+import {
+  UniversalTable,
+  ACTION_KEY,
+  type Column,
+} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { getExistingReorders } from "@/service/reorderService";
@@ -30,14 +34,14 @@ function ReorderList() {
 
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
 
-const fetchReorderHistory = async () => {
-  try {
-    const data = await getExistingReorders();
-    setReorderHistory(data);
-  } catch (error) {
-    console.error("Reorder history fetch failed:", error);
-  }
-};
+  const fetchReorderHistory = async () => {
+    try {
+      const data = await getExistingReorders();
+      setReorderHistory(data);
+    } catch (error) {
+      console.error("Reorder history fetch failed:", error);
+    }
+  };
   const [refreshKey, setRefreshKey] = useState(0);
 
   const columns: Column<ReorderHistory>[] = [

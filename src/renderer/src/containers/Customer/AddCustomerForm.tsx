@@ -40,12 +40,12 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
     mode: "onChange",
   });
 
-  // AutoSave hook — form data save & restore hoga automatically
+  
   const { clearData } = useAutoSave({
     storageKey: "add_customer_form",
     methods,
   });
-  // end
+  
 
   const handleAgeInput = (event: React.FormEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
