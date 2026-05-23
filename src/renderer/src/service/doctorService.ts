@@ -31,8 +31,8 @@ export interface DoctorResponse {
   email: string;
   registrationNumber: string; 
   hospitalAddress: string;
-   isActive: boolean;
-    IsActive?: boolean;
+ isActive: boolean   
+  IsActive?: boolean
 }
  
 // helpers

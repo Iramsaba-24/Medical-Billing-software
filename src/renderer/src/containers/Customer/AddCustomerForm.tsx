@@ -74,28 +74,30 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
   };
 
   useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        const doctors: DoctorResponse[] = await getDoctors();
 
-        const options = doctors.map((doc) => ({
-          label: doc.doctorName,
-          value: doc.doctorName,
-          address: doc.hospitalAddress,
-        }));
+const fetchDoctors = async () => {
+  try {
+    const doctors: DoctorResponse[] = await getDoctors();
 
-        setDoctorOptions([
-          { label: "+ Add Doctor", value: "add_doctor", address: "" },
-          ...options,
-        ]);
-      } catch (error) {
-        console.error("Failed to fetch doctors", error);
+    const options = doctors
+      .filter((doc) => doc.isActive === true)  
+      .map((doc) => ({
+        label: doc.doctorName,
+        value: doc.doctorName,
+        address: doc.hospitalAddress,
+      }));
 
-        setDoctorOptions([
-          { label: "+ Add Doctor", value: "add_doctor", address: "" },
-        ]);
-      }
-    };
+    setDoctorOptions([
+      { label: "+ Add Doctor", value: "add_doctor", address: "" },
+      ...options,
+    ]);
+  } catch (error) {
+    console.error("Failed to fetch doctors", error);
+    setDoctorOptions([
+      { label: "+ Add Doctor", value: "add_doctor", address: "" },
+    ]);
+  }
+};
 
     fetchDoctors();
   }, []);
@@ -149,7 +151,7 @@ const AddCustomerForm = ({ onBack, onSave, initialData }: Props) => {
       }
 
       onSave?.(savedData);
-      clearData(); // ✅ submit ke baad draft clear karo
+      clearData(); 
 
       if (!initialData) {
         navigate(URL_PATH.Billing);

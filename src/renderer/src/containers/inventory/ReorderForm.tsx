@@ -6,10 +6,7 @@ import EmailField from "@/components/controlled/EmailField";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import {
-  getDistributors,
-  type DistributorResponse,
-} from "@/service/distributorService";
+import {getDistributors,type DistributorResponse,} from "@/service/distributorService";
 
 type MedicineRow = {
   medicineId: string;
@@ -49,16 +46,13 @@ const reorderButtonSx = {
 function ReorderForm() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const incomingMedicines = useMemo<IncomingMedicine[]>(() => {
     const s = location.state as { medicines?: IncomingMedicine[] } | undefined;
     return s?.medicines ?? [];
   }, [location.state]);
-
   const [distributorOptions, setDistributorOptions] = useState<
     { label: string; value: string }[]
   >([]);
-
   const [distributors, setDistributors] = useState<DistributorResponse[]>([]);
   const [medicineRows, setMedicineRows] = useState<MedicineRow[]>([]);
 
@@ -68,7 +62,6 @@ function ReorderForm() {
   });
 
   const selectedDistributor = methods.watch("distributor");
-
   const fetchDistributorData = async () => {
     try {
       const data = await getDistributors();
@@ -182,7 +175,6 @@ const handleReorder = methods.handleSubmit((data) => {
                 />
               </Box>
             </Box>
-
             <Box display="flex" alignItems="center" gap={2}>
               <Typography sx={{ width: 120 }} fontWeight={600} fontSize={15}>
                 Email
@@ -191,24 +183,6 @@ const handleReorder = methods.handleSubmit((data) => {
                 <EmailField name="email" label="" />
               </Box>
             </Box>
-          </Box>
-
-          <Box
-            display="flex"
-            gap={2}
-            mb={1}
-            sx={{ display: { xs: "none", md: "flex" } }}
-          >
-            <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
-              Medicine Name
-            </Typography>
-            <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
-              Strength / Type
-            </Typography>
-            <Typography fontWeight={600} fontSize={15} sx={{ flex: 1 }}>
-              Qty.
-            </Typography>
-            <Box sx={{ minWidth: 88 }} />
           </Box>
 
           {medicineRows.map((row, index) => (
@@ -245,14 +219,13 @@ const handleReorder = methods.handleSubmit((data) => {
               <Box sx={{ flex: 1, minWidth: { xs: "100%", md: "unset" } }}>
                 <NumericField
                   name={`qty_${row.medicineRowId}`}
-                  label=""
+                  label="qty"
                   min={1}
                   max={9999}
                 />
               </Box>
             </Box>
           ))}
-
           <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
             <Button
               variant="outlined"
@@ -265,7 +238,6 @@ const handleReorder = methods.handleSubmit((data) => {
             >
               Order History
             </Button>
-
             <Button sx={reorderButtonSx} onClick={handleReorder}>
               Reorder
             </Button>

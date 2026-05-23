@@ -6,7 +6,12 @@ import DropdownField from "@/components/controlled/DropdownField";
 import React, { useState, useEffect } from "react";
 
 import { DistributorResponse, getDistributors } from "@/service/distributorService";
-import { RetailInvoiceResponse, getAllRetailInvoices } from "@/service/retailInvoiceService";
+import { 
+  RetailInvoiceItemResponse, 
+  RetailInvoiceResponse, 
+  getAllRetailInvoices,
+  getAllRetailInvoiceItems   
+} from "@/service/retailInvoiceService";
 import { getMedicines, MedicineResponse } from "@/service/medicineService";
 function CenterLabel({ children }: { children: React.ReactNode }) {
   const { width, height, left, top } = useDrawingArea();
@@ -55,7 +60,7 @@ const StockDonutChart = ({
 const [suppliers, setSuppliers] = useState<DistributorResponse[]>([]);
 const [invoices, setInvoices] = useState<RetailInvoiceResponse[]>([]);
 const [medicines, setMedicines] = useState<MedicineResponse[]>([]);
-const totalPurchases = medicines.length;
+const [invoiceItems, setInvoiceItems] = useState<RetailInvoiceItemResponse[]>([]);
 // function for date filter dropdown
 const isDateInFilter = (dateString: string, filter: FilterType): boolean => {
   const today = new Date();
@@ -89,26 +94,39 @@ const filteredSuppliers = suppliers.filter((s) =>
 const filteredSales = invoices.filter((inv) =>
   isDateInFilter(inv.invoiceDate, filter)
 );
+// Purchases 
+const totalPurchases = medicines.reduce(
+  (sum, m) => sum + (m.totalStockTablets || 0), 0
+);
 
+// Sales 
+const filteredInvoiceIds = filteredSales.map(inv => inv.retailInvoiceId);
+
+const totalSalesQty = invoiceItems
+  .filter(item => filteredInvoiceIds.includes(item.retailInvoiceId))
+  .reduce((sum, item) => sum + (item.quantity || 0), 0);
+
+// No Sales
+const noSales = Math.max(totalPurchases - totalSalesQty, 0);
 // chartDataMap
 const chartDataMap = {
   Today: [
     { label: "Purchases", value: totalPurchases, color: "#6EE700" },
     { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
-    { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
-    { label: "No Sales", value: 25, color: "#FFD200" },
+    { label: "Sales", value: totalSalesQty, color: "#00F5C8" },
+    { label: "No Sales", value: noSales, color: "#FFD200" },
   ],
   "6 Days": [
     { label: "Purchases", value: totalPurchases, color: "#6EE700" },
     { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
-    { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
-    { label: "No Sales", value: 10, color: "#FFD200" },
+    { label: "Sales", value: totalSalesQty, color: "#00F5C8" },
+    { label: "No Sales", value: noSales, color: "#FFD200" },
   ],
   "This Month": [
     { label: "Purchases", value: totalPurchases, color: "#6EE700" },
     { label: "Suppliers", value: filteredSuppliers.length, color: "#8B5CF6" },
-    { label: "Sales", value: filteredSales.length, color: "#00F5C8" },
-    { label: "No Sales", value: 12, color: "#FFD200" },
+    { label: "Sales", value: totalSalesQty, color: "#00F5C8" },
+    { label: "No Sales", value: noSales, color: "#FFD200" },
   ],
 };
 // fetch data in donut chart
@@ -121,6 +139,8 @@ const chartDataMap = {
       setSuppliers(suppliersData);
       setInvoices(invoicesData);
       setMedicines(medicinesData);
+      const itemsData = await getAllRetailInvoiceItems();
+setInvoiceItems(itemsData);
     } catch (error) {
       console.error("API Error:", error);
     }
@@ -131,6 +151,10 @@ const chartDataMap = {
 
   const total =
   chartDataMap[filter]?.reduce((sum, d) => sum + d.value, 0) || 0;
+const centerPercent = totalPurchases > 0
+  ? Math.min(Math.round((totalSalesQty / totalPurchases) * 100), 100)
+  : 0;
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isSmallMobile = useMediaQuery("(max-width:360px)");
@@ -307,7 +331,7 @@ const chartDataMap = {
             width={chartSize}
             height={chartSize}
           >
-            <CenterLabel>{total}%</CenterLabel>
+            <CenterLabel>{centerPercent}%</CenterLabel>
           </PieChart>
         </Box>
       )}

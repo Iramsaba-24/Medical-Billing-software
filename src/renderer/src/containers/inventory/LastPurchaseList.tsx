@@ -29,10 +29,11 @@ function LastPurchaseList() {
  
   const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
  
-  const purchaseActions = {
+   const purchaseActions = {
     view: (row: StockRow) => console.log("View", row),
     delete: (row: StockRow) => handleDeletePurchase(row),
   };
+ 
    
 const fetchLastPurchaseData = async () => {
   try {

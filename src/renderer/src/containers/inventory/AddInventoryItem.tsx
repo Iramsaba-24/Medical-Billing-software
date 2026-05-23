@@ -58,18 +58,19 @@ type ReorderEditState = {
 };
 export default function AddInventoryItem() {
   const location = useLocation();
-  type ApproveMedicine = {
+ 
+ type ApproveOrderState = {
+  approveMode: true;
+  orderId: number;
+  distributorName: string;
+
+  medicine?: {
     medicineName: string;
     strength: string;
     qty: number;
     amount: string;
   };
-  type ApproveOrderState = {
-    approveMode: true;
-    orderId: number;
-    distributorName: string;
-    medicines?: ApproveMedicine[];
-  };
+};
 
   const locationState = location.state as
     | MedicineResponse
@@ -92,9 +93,7 @@ export default function AddInventoryItem() {
     locationState && "reorderEditMode" in locationState
       ? (locationState as ReorderEditState)
       : undefined;
-  const [currentMedicineIndex, setCurrentMedicineIndex] = useState(0);
-
-  const currentMedicine = approveData?.medicines?.[currentMedicineIndex];
+const currentMedicine = approveData?.medicine;
 
   const methods = useForm<InventoryFormData>({
     mode: "onChange",
@@ -156,11 +155,13 @@ export default function AddInventoryItem() {
         const data = await getDistributors();
         setDistributorData(data);
         console.log("=== DISTRIBUTOR DATA ===", JSON.stringify(data));
-        const options = data.map((d) => ({
-          label: d.companyName,
-          value: d.distributorId.toString(),
-        }));
-        setSupplierOptions(options);
+const options = data
+  .filter((d) => d.isActive === true)  
+  .map((d) => ({
+    label: d.companyName,
+    value: d.distributorId.toString(),
+  }));
+setSupplierOptions(options);
       } catch (error) {
         console.error("Error fetching distributors:", error);
       }
@@ -189,23 +190,24 @@ export default function AddInventoryItem() {
         return;
       }
       await addMedicine(finalData);
-      const totalMedicines = approveData?.medicines?.length || 0;
-      if (currentMedicineIndex < totalMedicines - 1) {
-        setCurrentMedicineIndex((prev) => prev + 1);
-        return;
-      }
+    
       if (approveData?.orderId) {
-        const token = localStorage.getItem("token");
-        await axios.put(
-          `${API_ENDPOINTS.REORDER}/${approveData.orderId}/approve`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-      }
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.put(
+      `${API_ENDPOINTS.REORDER}/approve/${approveData.orderId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+  } catch (err) {
+    console.error("Approve API failed:", err);
+  }
+}
       clearData();
       navigate(URL_PATH.Inventory);
     } catch (error) {
@@ -360,7 +362,7 @@ export default function AddInventoryItem() {
               ? "Edit Medicine"
               : reorderEditData
                 ? "Update Reorder Stock"
-                : approveData?.medicines?.length
+              : approveData?.medicine
                   ? "Approve & Add Medicine"
                   : "Add New Medicine"}
           </Typography>

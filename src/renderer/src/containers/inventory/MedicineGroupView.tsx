@@ -1,65 +1,53 @@
+
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Paper, Typography } from "@mui/material";
 import { UniversalTable, Column } from "@/components/uncontrolled/UniversalTable";
-import { getMedicines } from "@/service/medicineService";
+import { getMedicines, MedicineResponse } from "@/service/medicineService";
 
+type MedicineRow = MedicineResponse & Record<string, unknown>;
 
-
-type InventoryItem = {
-  itemName: string;
-  medicineId: number;
-  medicineGroup: string;
-  groupId: number;
-  quantity: number;
-  pricePerUnit: number;
-  expiryDate: string;
-  supplier: string;
-  status: string;
+const getStatus = (qty: number) => {
+  if (qty === 0) return "Out of Stock";
+  if (qty <= 10) return "Low Stock";
+  return "In Stock";
 };
 
-  // status based on quantity
-  const getStatus = (qty: number) => {
-    if (qty === 0) return "Out of Stock";
-    if (qty <= 10) return "Low Stock";
-    return "In Stock";
-  };
-
-  // status color
-  const getStatusColor = (qty: number) => {
-    if (qty === 0) return "error.main";
-    if (qty <= 10) return "warning.main";
-    return "success.main";
-  };
+const getStatusColor = (qty: number) => {
+  if (qty === 0) return "error.main";
+  if (qty <= 10) return "warning.main";
+  return "success.main";
+};
 
 export default function MedicineGroupDetails() {
-const { groupName } = useParams<{ groupName: string }>();
-  const [items, setItems] = useState<InventoryItem[]>([]);
+const { groupId, groupName } = useParams<{ groupId: string; groupName: string }>();
+  const [items, setItems] = useState<MedicineRow[]>([]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!groupId) return;
+        const all: MedicineRow[] = await getMedicines();
+        const filtered = all.filter((m) => m.groupId === Number(groupId));
+        setItems(filtered);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, [groupId]);
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      if (!groupName) return;
-      const all: InventoryItem[] = await getMedicines();
-      const filtered = all.filter((m: InventoryItem) => m.groupId === Number(groupName));
-      setItems(filtered);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  fetchData();
-}, [groupName]);
-
-  const columns: Column<InventoryItem>[] = [
-    { key: "itemName", label: "Item Name" },
+  const columns: Column<MedicineRow>[] = [
+    { key: "medicineName", label: "Item Name" },
     { key: "medicineId", label: "Item ID" },
-    { key: "quantity", label: "Stock Qty" },
-    { key: "pricePerUnit", label: "Price" },
-    { key: "status", label: "Status",
-       render: (row) => (
-        <Typography fontWeight={500} color={getStatusColor(row.quantity)}>
-          {getStatus(row.quantity)}
+    { key: "totalStockTablets", label: "Qty" },
+    { key: "purchasePricePerStrip", label: "Purchase Price" },
+    {
+      key: "status",
+      label: "Status",
+      render: (row) => (
+        <Typography fontWeight={500} color={getStatusColor(row.totalStockTablets as number)}>
+          {getStatus(row.totalStockTablets as number)}
         </Typography>
       ),
     },
@@ -67,16 +55,14 @@ useEffect(() => {
 
   return (
     <Paper sx={{ p: 3, borderRadius: 2 }}>
-    <Typography fontSize={20} fontWeight={600} mb={2}>
-      {groupName}
-    </Typography>
-
 
       <UniversalTable
         data={items}
         columns={columns}
         tableSize="small"
         rowsPerPage={5}
+        caption={groupName ? decodeURIComponent(groupName) : "Group Details"}
+
       />
     </Paper>
   );
