@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
+import {
+  UniversalTable,
+  ACTION_KEY,
+  type Column,
+} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { getExistingReorders } from "@/service/reorderService";
@@ -31,15 +35,15 @@ function ReorderList() {
   const [approveOrder, setApproveOrder] = useState<ReorderHistory | null>(null);
  
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
- 
-const fetchReorderHistory = async () => {
-  try {
-    const data = await getExistingReorders();
-    setReorderHistory(data);
-  } catch (error) {
-    console.error("Reorder history fetch failed:", error);
-  }
-};
+
+  const fetchReorderHistory = async () => {
+    try {
+      const data = await getExistingReorders();
+      setReorderHistory(data);
+    } catch (error) {
+      console.error("Reorder history fetch failed:", error);
+    }
+  };
   const [refreshKey, setRefreshKey] = useState(0);
  
   const columns: Column<ReorderHistory>[] = [
@@ -70,24 +74,30 @@ const fetchReorderHistory = async () => {
   }, []);
  
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-        p: { xs: 1, sm: 2 },
-      }}
-    >
-      <Paper
-        sx={{
-          borderRadius: 2,
-          p: { xs: 1, sm: 2 },
-          overflowX: "auto",
-        }}
-      >
-     
-
-  
+   <Box
+  sx={{
+    width: "100%",
+    p: { xs: 1, sm: 2 },
+    boxSizing: "border-box",
+  }}
+>
+  <Box
+  sx={{
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  }}
+>
+     <Paper
+    sx={{
+      width: "100%",
+      borderRadius: 2,
+      p: { xs: 1, sm: 2 },
+      overflowX: "auto",
+      boxSizing: "border-box",
+    }} 
+  >
         <Box
           display="flex"
           justifyContent="space-between"
@@ -98,7 +108,11 @@ const fetchReorderHistory = async () => {
         >
 
       
-          <Typography fontWeight={700}>Reorder List</Typography>
+            <Typography
+  fontWeight={700}
+  mb={1.5}
+  fontSize={{ xs: 16, sm: 20 }}
+> Reorder List</Typography>
           <Box display="flex" gap={1}>
             <Button
               variant="contained"
@@ -109,7 +123,7 @@ const fetchReorderHistory = async () => {
             </Button>
           </Box>
         </Box>
- 
+
         <UniversalTable<ReorderHistory>
           data={reorderHistory}
           columns={columns}
@@ -119,29 +133,27 @@ const fetchReorderHistory = async () => {
           getRowId={(row) => row.id}
           actions={{
             view: (order) =>
-  navigate(URL_PATH.ReorderEmail, {
-    state: {
-      distributor: order.companyName,
-      email: "",
-      medicines: [
-        {
-          medicineRowId: 1,
-          medicineName: order.medicineName,  
-          strengthType: order.strength,        
-          quantity: order.qty,                
-        },
-        ...(order.existingMedicines ?? []).map((m, idx) => ({
-          medicineRowId: idx + 2,
-          medicineName: m.medicineName,
-          strengthType: m.strength,
-          quantity: m.qty,
-        })),
-      ],
-      isViewMode: true,
-    },
-  }),
- 
- 
+              navigate(URL_PATH.ReorderEmail, {
+                state: {
+                  distributor: order.companyName,
+                  email: "",
+                  medicines: [
+                    {
+                      medicineRowId: 1,
+                      medicineName: order.medicineName,  
+                      strengthType: order.strength,        
+                      quantity: order.qty,                 
+                    },
+                    ...(order.existingMedicines ?? []).map((m, idx) => ({
+                      medicineRowId: idx + 2,
+                      medicineName: m.medicineName,
+                      strengthType: m.strength,
+                      quantity: m.qty,
+                    })),
+                  ],
+                  isViewMode: true,
+                },
+              }),
             CheckIcon: (order) => {
               setApproveOrder(order);
             },
@@ -192,7 +204,7 @@ const fetchReorderHistory = async () => {
  
       <NewOrderList />
       <LastPurchaseList key={refreshKey} />
-    </Box>
+    </Box> </Box>
   );
 }
  

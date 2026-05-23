@@ -55,7 +55,6 @@ setNewOrderData(flatData);
     }
   };
  
- 
   const columns: Column<NewOrderHistory>[] = [
     {
       key: "companyName",
@@ -84,21 +83,18 @@ setNewOrderData(flatData);
   }, []);
  
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-        p: { xs: 1, sm: 2 },
-      }}
-    >
+  <>
       <Paper
-        sx={{
-          borderRadius: 2,
-          p: { xs: 1, sm: 2 },
-          overflowX: "auto",
-        }}
-      >
+  sx={{
+    width: "100%",
+    maxWidth: "100%",
+    borderRadius: 2,
+    p: { xs: 1, sm: 2 },
+    overflowX: "auto",
+    boxSizing: "border-box",
+    mx: "auto",
+  }}
+>
         <Box
           display="flex"
           justifyContent="space-between"
@@ -162,9 +158,9 @@ setNewOrderData(flatData);
       },
     },
   });
-}}
+}} 
       />
-    </Box>
+</>
   );
 }
 export default NewOrderList;
