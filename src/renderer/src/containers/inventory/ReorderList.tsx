@@ -72,21 +72,30 @@ function ReorderList() {
   }, []);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 3,
-        p: { xs: 1, sm: 2 },
-      }}
-    >
-      <Paper
-        sx={{
-          borderRadius: 2,
-          p: { xs: 1, sm: 2 },
-          overflowX: "auto",
-        }}
-      >
+   <Box
+  sx={{
+    width: "100%",
+    p: { xs: 1, sm: 2 },
+    boxSizing: "border-box",
+  }}
+>
+  <Box
+  sx={{
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+  }}
+>
+     <Paper
+    sx={{
+      width: "100%",
+      borderRadius: 2,
+      p: { xs: 1, sm: 2 },
+      overflowX: "auto",
+      boxSizing: "border-box",
+    }} 
+  >
         <Box
           display="flex"
           justifyContent="space-between"
@@ -107,30 +116,13 @@ function ReorderList() {
           </Box>
         </Box>
 
-        <UniversalTable<ReorderHistory, ReorderMedicine>
+        <UniversalTable<ReorderHistory>
           data={reorderHistory}
           columns={columns}
           rowsPerPage={5}
           tableSize="small"
           textAlign="center"
           getRowId={(row) => row.id}
-          subRows={{
-            key: "existingMedicines",
-            columns: [
-              {
-                key: "medicineName",
-                label: "Medicine Name",
-              },
-              {
-                key: "strength",
-                label: "Strength/Type",
-              },
-              {
-                key: "qty",
-                label: "Qty",
-              },
-            ],
-          }}
           actions={{
             view: (order) =>
               navigate(URL_PATH.ReorderEmail, {
@@ -204,7 +196,7 @@ function ReorderList() {
 
       <NewOrderList />
       <LastPurchaseList key={refreshKey} />
-    </Box>
+    </Box> </Box>
   );
 }
 

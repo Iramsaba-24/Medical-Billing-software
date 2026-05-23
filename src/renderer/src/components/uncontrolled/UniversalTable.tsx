@@ -1,4 +1,3 @@
-
 import {
   Box,
   Checkbox,
@@ -168,7 +167,7 @@ export function UniversalTable<
     bgcolor: "#1f2937",
     color: "#ffffff",
     fontWeight: 600,
-    fontSize: { xs: 11, md: 13 },
+    fontSize: { xs: 13, md: 15 },
     borderRadius: 2,
     "& .MuiSelect-icon": { color: "#a9a2a2ff" },
   };
