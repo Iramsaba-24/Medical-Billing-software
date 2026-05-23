@@ -21,7 +21,10 @@ type MedicineRow = {
 type ReorderFormValues = {
   distributor: string;
   email: string;
-  [key: string]: string | number;
+  root?: {
+    message?: string;
+  };
+  [key: string]: string | number | { message?: string } | undefined;
 };
 
 type IncomingMedicine = {
@@ -86,10 +89,14 @@ function ReorderForm() {
 
   useEffect(() => {
     if (!selectedDistributor) return;
+
     const selected = distributors.find(
       (item) => item.companyName === selectedDistributor,
     );
-    if (selected) methods.setValue("email", selected.email);
+
+    if (selected) {
+      methods.setValue("email", selected.email);
+    }
   }, [selectedDistributor, distributors, methods]);
 
   useEffect(() => {
@@ -104,35 +111,70 @@ function ReorderForm() {
       }));
 
       setMedicineRows(mappedRows);
+
       methods.setValue("distributor", incomingMedicines[0].supplier);
 
       setTimeout(() => {
         mappedRows.forEach((row) => {
-          methods.setValue(`medicine_${row.medicineRowId}`, row.medicineId);
-          methods.setValue(`strength_${row.medicineRowId}`, row.strengthType);
-          methods.setValue(`qty_${row.medicineRowId}`, Number(row.qty));
+          methods.setValue(
+            `medicine_${row.medicineRowId}`,
+            row.medicineId,
+          );
+
+          methods.setValue(
+            `strength_${row.medicineRowId}`,
+            row.strengthType,
+          );
+
+          methods.setValue(
+            `qty_${row.medicineRowId}`,
+            Number(row.qty),
+          );
         });
       }, 0);
     }
-  }, [incomingMedicines]);
+  }, [incomingMedicines, methods]);
 
-const handleReorder = methods.handleSubmit((data) => {
-  const updatedMedicines = medicineRows.map((row) => ({
-    medicineRowId: row.medicineRowId,
-    medicineName: row.medicineId,  
-    strengthType: row.strengthType,
-    qty: String(data[`qty_${row.medicineRowId}`] || row.qty),
-  }));
+  const handleReorder = methods.handleSubmit((data) => {
+    methods.clearErrors("root");
 
-  navigate(URL_PATH.ReorderEmail, {
-    state: {
-      distributor: data.distributor,
-      email: data.email,
-      medicines: updatedMedicines,
-      orderType: "reorder",
-    },
+    const hasInvalidQty = medicineRows.some((row) => {
+      const qtyValue = data[`qty_${row.medicineRowId}`];
+      const qty =
+        typeof qtyValue === "number"
+          ? qtyValue
+          : Number(qtyValue || row.qty);
+
+      return qty < 5;
+    });
+
+    if (hasInvalidQty) {
+      methods.setError("root", {
+        type: "manual",
+        message: "Quantity should be at least 5 for reorder.",
+      });
+
+      return;
+    }
+
+    const updatedMedicines = medicineRows.map((row) => ({
+      medicineRowId: row.medicineRowId,
+      medicineName: row.medicineId,
+      strengthType: row.strengthType,
+      qty: String(
+        data[`qty_${row.medicineRowId}`] || row.qty,
+      ),
+    }));
+
+    navigate(URL_PATH.ReorderEmail, {
+      state: {
+        distributor: data.distributor,
+        email: data.email,
+        medicines: updatedMedicines,
+        orderType: "reorder",
+      },
+    });
   });
-});
 
   return (
     <FormProvider {...methods}>
@@ -172,6 +214,7 @@ const handleReorder = methods.handleSubmit((data) => {
               <Typography sx={{ width: 120 }} fontWeight={600} fontSize={15}>
                 Distributor
               </Typography>
+
               <Box sx={{ width: 260, mt: 3 }}>
                 <DropdownField
                   name="distributor"
@@ -186,6 +229,7 @@ const handleReorder = methods.handleSubmit((data) => {
               <Typography sx={{ width: 120 }} fontWeight={600} fontSize={15}>
                 Email
               </Typography>
+
               <Box sx={{ width: 260, mt: 2 }}>
                 <EmailField name="email" label="" />
               </Box>
@@ -201,12 +245,15 @@ const handleReorder = methods.handleSubmit((data) => {
             <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
               Medicine Name
             </Typography>
+
             <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
               Strength / Type
             </Typography>
+
             <Typography fontWeight={600} fontSize={15} sx={{ flex: 1 }}>
               Qty.
             </Typography>
+
             <Box sx={{ minWidth: 88 }} />
           </Box>
 
@@ -223,9 +270,18 @@ const handleReorder = methods.handleSubmit((data) => {
                 <DropdownField
                   name={`medicine_${row.medicineRowId}`}
                   label={index === 0 ? "" : ""}
-                  options={[{ label: row.medicineId, value: row.medicineId }]}
+                  options={[
+                    {
+                      label: row.medicineId,
+                      value: row.medicineId,
+                    },
+                  ]}
                   placeholder="Select Medicine"
-                  sx={{ "& .MuiFormHelperText-root": { mb: 0 } }}
+                  sx={{
+                    "& .MuiFormHelperText-root": {
+                      mb: 0,
+                    },
+                  }}
                 />
               </Box>
 
@@ -234,10 +290,17 @@ const handleReorder = methods.handleSubmit((data) => {
                   name={`strength_${row.medicineRowId}`}
                   label=""
                   options={[
-                    { label: row.strengthType, value: row.strengthType },
+                    {
+                      label: row.strengthType,
+                      value: row.strengthType,
+                    },
                   ]}
                   placeholder="Select Strength"
-                  sx={{ "& .MuiFormHelperText-root": { mb: 0 } }}
+                  sx={{
+                    "& .MuiFormHelperText-root": {
+                      mb: 0,
+                    },
+                  }}
                 />
               </Box>
 
@@ -251,6 +314,12 @@ const handleReorder = methods.handleSubmit((data) => {
               </Box>
             </Box>
           ))}
+
+          {methods.formState.errors.root?.message && (
+            <Typography color="error" fontSize={14} mb={2}>
+              {methods.formState.errors.root.message}
+            </Typography>
+          )}
 
           <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
             <Button
