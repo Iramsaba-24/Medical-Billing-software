@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Paper, Typography,} from "@mui/material";
 import { getPurchaseHistory,deletePurchaseHistory } from "@/service/reorderService";
@@ -9,7 +10,7 @@ type StockRow = {
   medicineName: string;
   strengthType: string;
   quantity: string;
-    paidAmount: string;   
+    paidAmount: string;  
   unpaidAmount: string;
   [ACTION_KEY]: string;
 };
@@ -38,7 +39,7 @@ function LastPurchaseList() {
 const fetchLastPurchaseData = async () => {
   try {
     const data = await getPurchaseHistory();
-
+ 
     const mapped: StockRow[] = data.map((item, idx) => ({
       id: item.id ?? idx,
       supplier: item.companyName || "-",      
@@ -49,7 +50,7 @@ const fetchLastPurchaseData = async () => {
       unpaidAmount: item.unPaidAmount?.toString() || "0",
       [ACTION_KEY]: "",
     }));
-
+ 
     setLastPurchaseData(mapped);
   } catch (error) {
     console.error("Last purchase fetch failed:", error);
@@ -118,4 +119,5 @@ const handleDeletePurchase = async (row: StockRow) => {
   );
 }
 export default LastPurchaseList;
+ 
  

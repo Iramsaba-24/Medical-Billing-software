@@ -1,4 +1,4 @@
-
+ 
 import {Box,Button,Dialog,DialogActions,DialogContent,DialogTitle,Typography,} from "@mui/material";
 import {ACTION_KEY,Column, UniversalTable,} from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
@@ -17,9 +17,9 @@ export type InventoryItem = {
   type: string;        
   totalStockTablets: number;
   pricePerUnit: number;
-
+ 
   expiryDate: string;
-
+ 
   companyName: string;
   distributorId: number;
   hsnCode: string;
@@ -27,12 +27,12 @@ export type InventoryItem = {
   minimumQuantity: number;
   strength: string;
 };
-
-
+ 
+ 
 type MedicineApi = {
   srNo: number;
   medicineId: number;
-  medicineName: string;       
+  medicineName: string;      
   totalStockTablets: number;
   mrpPerStrip: number;
   expiryDate: string;
@@ -40,66 +40,66 @@ type MedicineApi = {
   groupId: number;
   distributorId: number;
   gstPercent: number;
-  type: string; 
-  hsnCode?: string; 
+  type: string;
+  hsnCode?: string;
     minimumQuantity: number;  
     strength: string;    
 }
-
+ 
 type GroupApi = {
   groupId: number;
   groupName: string;
 };
-
+ 
 type DistributorApi = {
   distributorId: number;
   ownerName: string;
 };
-
-
+ 
+ 
 const InventoryList = () => {
   const [tableData, setTableData] = useState<InventoryItem[]>([]);
   const [viewItem, setViewItem] = useState<InventoryItem | null>(null);
    
   const navigate = useNavigate();
-
+ 
 const fetchInventory = async () => {
   try {
     const token = localStorage.getItem("token");
     const headers = { Authorization: token ? `Bearer ${token}` : "" };
-
+ 
     const [medRes, groupRes, distRes] = await Promise.all([
       axios.get<{ data: MedicineApi[] }>(API_ENDPOINTS.MEDICINE, { headers })
-        .catch(e => axios.isAxiosError(e) && e.response?.status === 404 
-          ? { data: { data: [] as MedicineApi[] } } 
+        .catch(e => axios.isAxiosError(e) && e.response?.status === 404
+          ? { data: { data: [] as MedicineApi[] } }
           : Promise.reject(e)),
-
+ 
       axios.get<{ data: GroupApi[] }>(API_ENDPOINTS.MEDICINE_GROUP, { headers })
-        .catch(e => axios.isAxiosError(e) && e.response?.status === 404 
-          ? { data: { data: [] as GroupApi[] } } 
+        .catch(e => axios.isAxiosError(e) && e.response?.status === 404
+          ? { data: { data: [] as GroupApi[] } }
           : Promise.reject(e)),
-
+ 
      axios.get<{ data: DistributorApi[] }>(API_ENDPOINTS.DISTRIBUTOR, { headers })
   .catch(() => ({ data: { data: [] as DistributorApi[] } })),
     ]);
-
+ 
     const medicines = medRes.data?.data || [];
     const groups = groupRes.data?.data || [];
     const distributorsData = Array.isArray(distRes.data)
       ? distRes.data
       : distRes.data?.data || [];
-
-
+ 
+ 
     const groupMap: Record<number, string> = {};
     groups.forEach((g) => {
       groupMap[g.groupId] = g.groupName;
     });
-
+ 
     const distributorMap: Record<number, string> = {};
     distributorsData.forEach((d: DistributorApi) => {
       distributorMap[Number(d.distributorId)] = d.ownerName;
     });
-
+ 
     const formatted: InventoryItem[] = medicines.map((item) => ({
       srNo: item.srNo,
       medicineName: item.medicineName,
@@ -117,27 +117,27 @@ pricePerUnit: item.mrpPerTablet,
        strength: item.strength || "-",
        minimumQuantity: item.minimumQuantity,
     }));
-
+ 
     setTableData(formatted);
   } catch (error) {
     console.error("Error fetching inventory:", error);
   }
 };
-
+ 
 // useEffect(() => {
 //   fetchInventory();
 // }, []);
-
-
+ 
+ 
 useEffect(() => {
   fetchInventory();
-
+ 
   const handleUpdate = () => {
     fetchInventory();
   };
-
+ 
   window.addEventListener("inventoryUpdated", handleUpdate);
-
+ 
   return () => {
     window.removeEventListener(
       "inventoryUpdated",
@@ -145,8 +145,8 @@ useEffect(() => {
     );
   };
 }, []);
-
-
+ 
+ 
   // DELETE
 const handleDelete = (item: InventoryItem) => {
   showConfirmation("Delete item?", "Confirm").then(async (ok) => {
@@ -165,20 +165,20 @@ const handleDelete = (item: InventoryItem) => {
     }
   });
 };
-
+ 
 const getStatus = (qty: number, minQty: number) => {
   if (qty === 0) return "Out of Stock";
   if (qty <= minQty) return "Low Stock";
   return "In Stock";
 };
-
-
+ 
+ 
  const getStatusColor = (qty: number, minQty: number) => {
   if (qty === 0) return "error.main";
   if (qty <= minQty) return "warning.main";
   return "success.main";
 };
-
+ 
 const columns: Column<InventoryItem>[] = [
   {key:"srNo", label:"Sr.No" },
   { key: "medicineName", label: "Item" },
@@ -215,9 +215,9 @@ const columns: Column<InventoryItem>[] = [
   },
   { key: ACTION_KEY, label: "Action" },
 ];
-
+ 
 //edit function
-
+ 
 const handleEdit = async (item: InventoryItem) => {
   try {
     const token = localStorage.getItem("token");
@@ -225,14 +225,14 @@ const handleEdit = async (item: InventoryItem) => {
       `${API_ENDPOINTS.MEDICINE}/${item.medicineId}`,
       { headers: { Authorization: token ? `Bearer ${token}` : "" } }
     );
-    const fullMedicine = res.data.data; 
+    const fullMedicine = res.data.data;
     navigate(URL_PATH.AddInventoryItem, { state: fullMedicine });
   } catch (error) {
     console.error("Error fetching medicine details:", error);
     showSnackbar("error", "Failed to load medicine details");
   }
 };
-
+ 
   return (
     <>
       <Box sx={{ boxShadow: 3, p: 3, borderRadius: 2 }}>
@@ -246,7 +246,7 @@ const handleEdit = async (item: InventoryItem) => {
 actions={{
   view: setViewItem,
 edit: handleEdit,
-
+ 
   delete: handleDelete,
 }}
         />
@@ -259,7 +259,7 @@ edit: handleEdit,
         fullWidth
       >
         <DialogTitle>View Item</DialogTitle>
-
+ 
         <DialogContent>
           {viewItem && (
             <Box px={3} py={2} display="flex" flexDirection="column" gap={3}>
@@ -283,7 +283,7 @@ edit: handleEdit,
                   <Typography>{viewItem.expiryDate}</Typography>
                 </Box>
               </Box>
-
+ 
               {/* Row 2 */}
               <Box
                 display="flex"
@@ -304,7 +304,7 @@ edit: handleEdit,
                   <Typography>{viewItem.companyName}</Typography>
                 </Box>
               </Box>
-
+ 
               {/* Status */}
               <Box>
                 <Typography fontWeight={600}>Status</Typography>
@@ -323,7 +323,7 @@ edit: handleEdit,
             </Box>
           )}
         </DialogContent>
-
+ 
         <DialogActions>
           <Button
             onClick={() => setViewItem(null)}
@@ -341,5 +341,6 @@ edit: handleEdit,
     </>
   );
 };
-
+ 
 export default InventoryList;
+ 

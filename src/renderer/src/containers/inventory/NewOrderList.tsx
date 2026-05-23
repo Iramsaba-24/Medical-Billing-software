@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,7 @@ type NewMedicine = {
   strength: string;
   qty: number;
 };
-
+ 
 type NewOrderHistory = {
   id: number;
   companyName: string;
@@ -21,7 +22,7 @@ type NewOrderHistory = {
   strength: string;
   qty: number;
 };
-
+ 
 function NewOrderList() {
   const navigate = useNavigate();
   const [newOrderData, setNewOrderData] = useState<NewOrderHistory[]>([]);
@@ -32,17 +33,17 @@ function NewOrderList() {
     try {
       const data = await getNewReorders();
       console.log("NEW ORDER DATA:", JSON.stringify(data, null, 2));
-
+ 
   const flatData = data
   .filter((item) => item.newMedicines && item.newMedicines.length > 0)
   .flatMap((item) =>
     item.newMedicines.map((m) => ({
       id: m.id,
       companyName: item.companyName,
-
+ 
       // IMPORTANT
       newMedicines: [m],
-
+ 
       medicineName: m.medicineName,
       strength: m.strength,
       qty: m.qty,
@@ -80,7 +81,7 @@ setNewOrderData(flatData);
   useEffect(() => {
     fetchNewOrders();
   }, []);
-
+ 
   return (
   <>
       <Paper
@@ -139,13 +140,13 @@ setNewOrderData(flatData);
         orderType="new"
        onSuccess={(order, medicines) => {
   const approvedMedicine = medicines[0];
-
+ 
   navigate(URL_PATH.AddInventoryItem, {
     state: {
       approveMode: true,
       orderId: order.id,
       distributorName: order.companyName,
-
+ 
       medicine: {
         medicineName: approvedMedicine.medicineName,
         strength: approvedMedicine.strength,
@@ -163,5 +164,7 @@ setNewOrderData(flatData);
   );
 }
 export default NewOrderList;
+ 
+ 
  
  

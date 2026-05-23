@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import {
@@ -17,7 +19,7 @@ type ReorderMedicine = {
   companyName: string;
   qty: number;
 };
-
+ 
 type ReorderHistory = {
   id: number;
   createdAt: string;
@@ -27,11 +29,11 @@ type ReorderHistory = {
   qty: number;
   existingMedicines: ReorderMedicine[];
 };
-
+ 
 function ReorderList() {
   const navigate = useNavigate();
   const [approveOrder, setApproveOrder] = useState<ReorderHistory | null>(null);
-
+ 
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
 
   const fetchReorderHistory = async () => {
@@ -43,7 +45,7 @@ function ReorderList() {
     }
   };
   const [refreshKey, setRefreshKey] = useState(0);
-
+ 
   const columns: Column<ReorderHistory>[] = [
     {
       key: "companyName",
@@ -66,11 +68,11 @@ function ReorderList() {
       label: "Action",
     },
   ];
-
+ 
   useEffect(() => {
     fetchReorderHistory();
   }, []);
-
+ 
   return (
    <Box
   sx={{
@@ -104,7 +106,13 @@ function ReorderList() {
           gap={1}
           mb={1.5}
         >
-          <Typography fontWeight={700}>Reorder List</Typography>
+
+      
+            <Typography
+  fontWeight={700}
+  mb={1.5}
+  fontSize={{ xs: 16, sm: 20 }}
+> Reorder List</Typography>
           <Box display="flex" gap={1}>
             <Button
               variant="contained"
@@ -160,7 +168,7 @@ function ReorderList() {
     setRefreshKey((k) => k + 1);
     fetchReorderHistory();
     setApproveOrder(null);
-
+ 
     // Navigate to edit inventory with medicine data
     navigate(URL_PATH.AddInventoryItem, {
       state: {
@@ -193,11 +201,13 @@ function ReorderList() {
             : null
         }
       />
-
+ 
       <NewOrderList />
       <LastPurchaseList key={refreshKey} />
     </Box> </Box>
   );
 }
-
+ 
 export default ReorderList;
+ 
+ 
