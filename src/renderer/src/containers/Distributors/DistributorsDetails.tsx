@@ -1,8 +1,10 @@
 import { useLocation,  } from "react-router-dom";
 import { Box, Typography, Paper,} from "@mui/material";
 import BankInfo from "@/containers/distributors/BankInfo";
-import NewInvoiceList from "@/containers/distributors/NewInvoiceList";
+
 import { useEffect, useState } from "react";
+
+import LastPurchase from "./LastPurchase";
  
 const DistributorDetails = () => {
   const { state } = useLocation();
@@ -54,7 +56,8 @@ const [showBankDetails, setShowBankDetails] = useState(false);
         </Paper>
       )}
       {/* InventoryList call */}
-        <NewInvoiceList/>
+        {/* <NewInvoiceList/> */}
+        <LastPurchase />
      
     </Box>
   );

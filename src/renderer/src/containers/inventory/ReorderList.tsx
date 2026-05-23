@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
@@ -13,7 +15,7 @@ type ReorderMedicine = {
   companyName: string;
   qty: number;
 };
-
+ 
 type ReorderHistory = {
   id: number;
   createdAt: string;
@@ -23,13 +25,13 @@ type ReorderHistory = {
   qty: number;
   existingMedicines: ReorderMedicine[];
 };
-
+ 
 function ReorderList() {
   const navigate = useNavigate();
   const [approveOrder, setApproveOrder] = useState<ReorderHistory | null>(null);
-
+ 
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
-
+ 
 const fetchReorderHistory = async () => {
   try {
     const data = await getExistingReorders();
@@ -39,7 +41,7 @@ const fetchReorderHistory = async () => {
   }
 };
   const [refreshKey, setRefreshKey] = useState(0);
-
+ 
   const columns: Column<ReorderHistory>[] = [
     {
       key: "companyName",
@@ -62,11 +64,11 @@ const fetchReorderHistory = async () => {
       label: "Action",
     },
   ];
-
+ 
   useEffect(() => {
     fetchReorderHistory();
   }, []);
-
+ 
   return (
     <Box
       sx={{
@@ -83,6 +85,9 @@ const fetchReorderHistory = async () => {
           overflowX: "auto",
         }}
       >
+     
+
+  
         <Box
           display="flex"
           justifyContent="space-between"
@@ -91,6 +96,8 @@ const fetchReorderHistory = async () => {
           gap={1}
           mb={1.5}
         >
+
+      
           <Typography fontWeight={700}>Reorder List</Typography>
           <Box display="flex" gap={1}>
             <Button
@@ -102,47 +109,39 @@ const fetchReorderHistory = async () => {
             </Button>
           </Box>
         </Box>
-
-        <UniversalTable<ReorderHistory, ReorderMedicine>
+ 
+        <UniversalTable<ReorderHistory>
           data={reorderHistory}
           columns={columns}
           rowsPerPage={5}
           tableSize="small"
           textAlign="center"
           getRowId={(row) => row.id}
-          subRows={{
-            key: "existingMedicines",
-            columns: [
-              {
-                key: "medicineName",
-                label: "Medicine Name",
-              },
-              {
-                key: "strength",
-                label: "Strength/Type",
-              },
-              {
-                key: "qty",
-                label: "Qty",
-              },
-            ],
-          }}
           actions={{
             view: (order) =>
-              navigate(URL_PATH.ReorderEmail, {
-                state: {
-                  distributor: order.companyName,
-                  email: "",
-                  medicines: (order.existingMedicines ?? []).map((m, idx) => ({
-                    medicineRowId: idx + 1,
-                    medicineName: m.medicineName,
-                    strengthType: m.strength,
-                    quantity: m.qty,
-                  })),
-                  isViewMode: true,
-                },
-              }),
-
+  navigate(URL_PATH.ReorderEmail, {
+    state: {
+      distributor: order.companyName,
+      email: "",
+      medicines: [
+        {
+          medicineRowId: 1,
+          medicineName: order.medicineName,  
+          strengthType: order.strength,        
+          quantity: order.qty,                
+        },
+        ...(order.existingMedicines ?? []).map((m, idx) => ({
+          medicineRowId: idx + 2,
+          medicineName: m.medicineName,
+          strengthType: m.strength,
+          quantity: m.qty,
+        })),
+      ],
+      isViewMode: true,
+    },
+  }),
+ 
+ 
             CheckIcon: (order) => {
               setApproveOrder(order);
             },
@@ -157,7 +156,7 @@ const fetchReorderHistory = async () => {
     setRefreshKey((k) => k + 1);
     fetchReorderHistory();
     setApproveOrder(null);
-
+ 
     // Navigate to edit inventory with medicine data
     navigate(URL_PATH.AddInventoryItem, {
       state: {
@@ -190,11 +189,13 @@ const fetchReorderHistory = async () => {
             : null
         }
       />
-
+ 
       <NewOrderList />
       <LastPurchaseList key={refreshKey} />
     </Box>
   );
 }
-
+ 
 export default ReorderList;
+ 
+ 

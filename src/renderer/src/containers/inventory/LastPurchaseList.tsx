@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from "react";
 import {Box, Paper, Typography,} from "@mui/material";
-import { getPurchaseHistory } from "@/service/reorderService";
+import { deletePurchaseHistory, getPurchaseHistory } from "@/service/reorderService";
 import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
+import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
  
 type StockRow = {
   id: number;
@@ -9,7 +11,7 @@ type StockRow = {
   medicineName: string;
   strengthType: string;
   quantity: string;
-    paidAmount: string;   
+    paidAmount: string;  
   unpaidAmount: string;
   [ACTION_KEY]: string;
 };
@@ -29,14 +31,16 @@ function LastPurchaseList() {
  
   const [lastPurchaseData, setLastPurchaseData] = useState<StockRow[]>([]);
  
-  const purchaseActions = {
+   const purchaseActions = {
     view: (row: StockRow) => console.log("View", row),
+    delete: (row: StockRow) => handleDeletePurchase(row),
   };
+ 
    
 const fetchLastPurchaseData = async () => {
   try {
     const data = await getPurchaseHistory();
-
+ 
     const mapped: StockRow[] = data.map((item, idx) => ({
       id: item.id ?? idx,
       supplier: item.companyName || "-",      
@@ -47,7 +51,7 @@ const fetchLastPurchaseData = async () => {
       unpaidAmount: item.unPaidAmount?.toString() || "0",
       [ACTION_KEY]: "",
     }));
-
+ 
     setLastPurchaseData(mapped);
   } catch (error) {
     console.error("Last purchase fetch failed:", error);
@@ -57,6 +61,22 @@ const fetchLastPurchaseData = async () => {
   useEffect(() => {
     fetchLastPurchaseData();
   }, []);
+ 
+ 
+  const handleDeletePurchase = async (row: StockRow) => {
+  const ok = await showConfirmation("Delete purchase history?", "Confirm");
+  if (ok) {
+    try {
+      await deletePurchaseHistory(row.id);
+      showSnackbar("success", "Purchase history deleted successfully");
+      await fetchLastPurchaseData();
+    } catch (error) {
+      console.error("Delete failed:", error);
+      showSnackbar("error", "Delete failed");
+    }
+  }
+};
+ 
  
   return (
    <Box
@@ -82,6 +102,9 @@ const fetchLastPurchaseData = async () => {
   mb={1.5}
   fontSize={{ xs: 16, sm: 20 }}
 >Last Purchase</Typography>
+ 
+ 
+ 
        <UniversalTable
   data={lastPurchaseData}
   columns={purchaseColumns}
@@ -97,4 +120,5 @@ const fetchLastPurchaseData = async () => {
   );
 }
 export default LastPurchaseList;
+ 
  

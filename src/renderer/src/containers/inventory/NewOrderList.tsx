@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
@@ -32,13 +33,17 @@ function NewOrderList() {
     try {
       const data = await getNewReorders();
       console.log("NEW ORDER DATA:", JSON.stringify(data, null, 2));
-const flatData = data
+ 
+  const flatData = data
   .filter((item) => item.newMedicines && item.newMedicines.length > 0)
   .flatMap((item) =>
     item.newMedicines.map((m) => ({
       id: m.id,
       companyName: item.companyName,
-      newMedicines: item.newMedicines,
+ 
+      // IMPORTANT
+      newMedicines: [m],
+ 
       medicineName: m.medicineName,
       strength: m.strength,
       qty: m.qty,
@@ -105,30 +110,13 @@ setNewOrderData(flatData);
           <Typography fontWeight={700}>New Order List</Typography>
         </Box>
  
-        <UniversalTable<NewOrderHistory, NewMedicine>
+        <UniversalTable<NewOrderHistory>
           data={newOrderData}
           columns={columns}
           rowsPerPage={5}
           tableSize="small"
           textAlign="center"
           getRowId={(row) => row.id}
-          // Rows={{
-          //   key: "newMedicines",
-          //   columns: [
-          //     {
-          //       key: "medicineName",
-          //       label: "Medicine Name",
-          //     },
-          //     {
-          //       key: "strength",
-          //       label: "Strength/Type",
-          //     },
-          //     {
-          //       key: "qty",
-          //       label: "Qty",
-          //     },
-          //   ],
-          // }}
           actions={{
             view: (order) =>
               navigate(URL_PATH.ReorderEmail, {
@@ -154,25 +142,33 @@ setNewOrderData(flatData);
         order={selectedOrder}
         onClose={() => setSelectedOrder(null)}
         orderType="new"
-        onSuccess={(order, medicines) => {
-          navigate(URL_PATH.AddInventoryItem, {
-            state: {
-              approveMode: true,
-              osubrderId: order.id,
-              distributorName: order.companyName,
-              medicines: medicines.map((m) => ({
-                medicineName: m.medicineName,
-                strength: m.strength,
-                qty: m.qty,
-                amount: String(m.paidAmount + m.unPaidAmount),
-              })),
-            },
-          });
-        }}
+       onSuccess={(order, medicines) => {
+  const approvedMedicine = medicines[0];
+ 
+  navigate(URL_PATH.AddInventoryItem, {
+    state: {
+      approveMode: true,
+      orderId: order.id,
+      distributorName: order.companyName,
+ 
+      medicine: {
+        medicineName: approvedMedicine.medicineName,
+        strength: approvedMedicine.strength,
+        qty: approvedMedicine.qty,
+        amount: String(
+          approvedMedicine.paidAmount +
+            approvedMedicine.unPaidAmount
+        ),
+      },
+    },
+  });
+}}
       />
     </Box>
   );
 }
 export default NewOrderList;
+ 
+ 
  
  
