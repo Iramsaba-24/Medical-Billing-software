@@ -6,10 +6,7 @@ import EmailField from "@/components/controlled/EmailField";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import {
-  getDistributors,
-  type DistributorResponse,
-} from "@/service/distributorService";
+import {getDistributors,type DistributorResponse,} from "@/service/distributorService";
 
 type MedicineRow = {
   medicineId: string;
@@ -52,16 +49,13 @@ const reorderButtonSx = {
 function ReorderForm() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const incomingMedicines = useMemo<IncomingMedicine[]>(() => {
     const s = location.state as { medicines?: IncomingMedicine[] } | undefined;
     return s?.medicines ?? [];
   }, [location.state]);
-
   const [distributorOptions, setDistributorOptions] = useState<
     { label: string; value: string }[]
   >([]);
-
   const [distributors, setDistributors] = useState<DistributorResponse[]>([]);
   const [medicineRows, setMedicineRows] = useState<MedicineRow[]>([]);
 
@@ -71,7 +65,6 @@ function ReorderForm() {
   });
 
   const selectedDistributor = methods.watch("distributor");
-
   const fetchDistributorData = async () => {
     try {
       const data = await getDistributors();
@@ -178,6 +171,7 @@ function ReorderForm() {
 
   return (
     <FormProvider {...methods}>
+      <form noValidate>
       <Box
         sx={{
           display: "flex",
@@ -224,7 +218,6 @@ function ReorderForm() {
                 />
               </Box>
             </Box>
-
             <Box display="flex" alignItems="center" gap={2}>
               <Typography sx={{ width: 120 }} fontWeight={600} fontSize={15}>
                 Email
@@ -307,7 +300,7 @@ function ReorderForm() {
               <Box sx={{ flex: 1, minWidth: { xs: "100%", md: "unset" } }}>
                 <NumericField
                   name={`qty_${row.medicineRowId}`}
-                  label=""
+                  label="qty"
                   min={1}
                   max={9999}
                 />
@@ -333,13 +326,13 @@ function ReorderForm() {
             >
               Order History
             </Button>
-
             <Button sx={reorderButtonSx} onClick={handleReorder}>
               Reorder
             </Button>
           </Box>
         </Paper>
       </Box>
+      </form>
     </FormProvider>
   );
 }

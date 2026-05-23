@@ -1,3 +1,4 @@
+
 import {
   Box,
   Checkbox,
@@ -22,39 +23,37 @@ import { useMemo, useState, type ReactNode } from "react";
 import { IconTrashX } from "@tabler/icons-react";
 import ExportIcons from "@/utils/ExportIcons";
 import { iconMap } from "@/utils/Icons";
-
+ 
 export const ACTION_KEY = "actionbutton" as const;
-
+ 
 export type Column<T> = {
   key: keyof T | typeof ACTION_KEY | string;
   label: string;
   render?: (row: T) => ReactNode;
   exportable?: boolean;
 };
-
+ 
 export type DropdownOption = {
   value: string;
   label: string;
   bgColor?: string;
   textColor?: string;
 };
-
+ 
 export type FooterRow = {
   content: Array<{ value: ReactNode; colSpan?: number }>;
 };
-
+ 
 interface TableStyles {
   captionSx?: SxProps;
   headerSx?: SxProps;
   rowHoverSx?: SxProps;
   paperSx?: SxProps;
 }
-
+ 
 interface UniversalTableProps<
-  T extends Record<string, unknown>,
-  S extends Record<string, unknown> = Record<string, never>
+  T extends Record<string, unknown>
 > extends TableStyles {
-
   data: readonly T[];
   columns: readonly Column<T>[];
   caption?: ReactNode;
@@ -68,7 +67,7 @@ interface UniversalTableProps<
   getRowId?: (row: T, index: number) => string | number;
   onSelectionChange?: (rows: T[]) => void;
   onDeleteSelected?: (rows: T[]) => void;
-
+ 
   dropdown?: {
     key: keyof T;
     options: readonly DropdownOption[];
@@ -77,24 +76,24 @@ interface UniversalTableProps<
     width?: number;
     sx?: SxProps;
   };
-
+ 
   autoUpdateDropdown?: boolean;
   onDataChange?: (rows: T[]) => void;
-
+ 
   actions?: Partial<Record<keyof typeof iconMap, (row: T) => void>>;
   footerRows?: readonly FooterRow[];
-
-  subRows?: {
-    key: keyof T;
-    columns: Array<{
-      key: keyof S;
-      label: string;
-      render?: (subRow: S) => ReactNode;
-    }>;
-  };
-
+ 
+  // subRows?: {
+  //   key: keyof T;
+  //   columns: Array<{
+  //     key: keyof S;
+  //     label: string;
+  //     render?: (subRow: S) => ReactNode;
+  //   }>;
+  // };
+ 
 }
-
+ 
 function buildExportData<T extends Record<string, unknown>>(
   rows: readonly T[],
   columns: readonly Column<T>[]
@@ -108,10 +107,13 @@ function buildExportData<T extends Record<string, unknown>>(
     }, {} as Record<string, unknown>)
   );
 }
-
+ 
+// export function UniversalTable<
+//   T extends Record<string, unknown>,
+//   S extends Record<string, unknown> = Record<string, never>
+// >
 export function UniversalTable<
-  T extends Record<string, unknown>,
-  S extends Record<string, unknown> = Record<string, never>
+  T extends Record<string, unknown>
 >({
   data,
   columns,
@@ -130,22 +132,21 @@ export function UniversalTable<
   onDataChange,
   actions,
   footerRows = [],
-  subRows,
   captionSx,
   headerSx,
   rowHoverSx,
   paperSx,
   highlightColor = "#ffff00",
-}: UniversalTableProps<T, S>) {
+}: UniversalTableProps<T>) {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string | number>>(
     new Set()
   );
-
+ 
   const resolveRowId = (row: T, index: number) =>
     getRowId ? getRowId(row, index) : index;
-
+ 
   const highlightText = (text: string | number | null | undefined): ReactNode =>
     !search || text == null
       ? text
@@ -161,7 +162,7 @@ export function UniversalTable<
             part
           )
         );
-
+ 
   const DEFAULT_DROPDOWN_SX: SxProps = {
     width: { xs: 110, md: 150 },
     bgcolor: "#1f2937",
@@ -171,14 +172,14 @@ export function UniversalTable<
     borderRadius: 2,
     "& .MuiSelect-icon": { color: "#a9a2a2ff" },
   };
-
+ 
   const filteredData = useMemo(() => {
     if (!search) return data;
-
+ 
     return data.filter((row) =>
       columns.some((col) => {
         if (col.key === ACTION_KEY) return false;
-
+ 
         const value = row[col.key];
         return String(value ?? "")
           .toLowerCase()
@@ -186,18 +187,18 @@ export function UniversalTable<
       })
     );
   }, [data, columns, search]);
-
+ 
   const paginatedData = useMemo(
     () =>
       filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
     [filteredData, page, rowsPerPage]
   );
-
+ 
   const exportData = useMemo(
     () => buildExportData(filteredData, columns),
     [filteredData, columns]
   );
-
+ 
   const exportColumns = useMemo(
     () =>
       columns
@@ -205,40 +206,40 @@ export function UniversalTable<
         .map((c) => ({ key: c.label, label: c.label })),
     [columns]
   );
-
+ 
   const selectedRows = data.filter((_, i) =>
     selectedIds.has(resolveRowId(_, i))
   );
-
+ 
   const toggleRow = (row: T, index: number) => {
     const id = resolveRowId(row, index);
     const updated = new Set(selectedIds);
-
+ 
     updated.has(id) ? updated.delete(id) : updated.add(id);
-
+ 
     setSelectedIds(updated);
     onSelectionChange?.(data.filter((r, i) => updated.has(resolveRowId(r, i))));
   };
-
+ 
   const toggleAll = (checked: boolean) => {
     const updated = new Set<string | number>();
     if (checked) data.forEach((r, i) => updated.add(resolveRowId(r, i)));
     setSelectedIds(updated);
     onSelectionChange?.(checked ? [...data] : []);
   };
-
+ 
   const updateRow = (row: T, patch: Partial<T>) => {
     if (!onDataChange) return;
-
+ 
     const targetId = resolveRowId(row, -1);
-
+ 
     onDataChange(
       data.map((r, i) =>
         resolveRowId(r, i) === targetId ? { ...r, ...patch } : r
       )
     );
   };
-
+ 
   return (
     <Paper
       elevation={0}
@@ -278,7 +279,7 @@ export function UniversalTable<
               }}
             />
           )}
-
+ 
           {showExport && (
             <ExportIcons
               data={exportData}
@@ -289,7 +290,7 @@ export function UniversalTable<
           )}
         </Box>
       )}
-
+ 
       {caption && (
         <Box
           sx={{
@@ -306,19 +307,33 @@ export function UniversalTable<
           {caption}
         </Box>
       )}
-
       <TableContainer
         sx={{
           width: "100%",
           overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+ 
+          "&::-webkit-scrollbar": {
+            height: 6,
+          },
+ 
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#bdbdbd",
+            borderRadius: 10,
+          },
         }}
       >
-        <Table
-          size={tableSize}
-          sx={{
-            tableLayout: "fixed",
-            minWidth: "100%",
-          }}
+ 
+ 
+       <Table
+  size={tableSize}
+  sx={{
+    // tableLayout: "fixed",
+    tableLayout: "auto",
+    width: "100%",
+    bgcolor: "#ffffff",
+    borderCollapse: "collapse",
+  }}
         >
           <TableHead>
             <TableRow>
@@ -336,20 +351,33 @@ export function UniversalTable<
                   />
                 </TableCell>
               )}
-
+ 
               {columns.map((col) => (
+ 
+ 
                 <TableCell
                   key={String(col.key)}
                   sx={{
                     fontWeight: 700,
                     bgcolor: "#444748ff",
                     color: "#ffffff",
-                    whiteSpace: "nowrap",
+                  whiteSpace: "nowrap",
+wordBreak: "break-word",
+ 
+textAlign: textAlign,
+verticalAlign: "middle",
+ 
+                    fontSize: { xs: 11, sm: 12, md: 14 },
+                    px: { xs: 1, md: 2 },
+                    py: { xs: 1, md: 1.5 },
+                    borderBottom: "1px solid #5c5f61ff",
+ 
                     ...(col.key === ACTION_KEY && {
                       width: 120,
                       minWidth: 120,
                       textAlign: "center",
                     }),
+ 
                     ...headerSx,
                   }}
                 >
@@ -358,7 +386,7 @@ export function UniversalTable<
               ))}
             </TableRow>
           </TableHead>
-
+ 
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
@@ -369,127 +397,45 @@ export function UniversalTable<
             ) : (
               paginatedData.flatMap((row, index) => {
                 const rowId = resolveRowId(row, index);
-
-                const childRows: S[] =
-                  subRows && Array.isArray(row[subRows.key])
-                    ? (row[subRows.key] as S[])
-                    : [];
-
-
-
-                if (childRows.length > 0) {
-                  return childRows.map((subRow, childIndex) => (
-                    <TableRow
-                      key={`${rowId}-${childIndex}`}
-                      hover
-                      sx={{
-                        height: 53,
-                        "&:hover": { bgcolor: "#e6f4ea" },
-                        ...rowHoverSx,
-                      }}
-                    >
-                      {columns.map((col) => {
-
-
-                        if (col.key === ACTION_KEY && actions) {
-                          return childIndex === 0 ? (
-
-
-                            <TableCell
-                              key={ACTION_KEY}
-                              rowSpan={childRows.length}
-                              align="center"
-                              sx={{
-                                verticalAlign: "middle !important",
-                                textAlign: "center",
-                                width: 120,
-                                p: 0,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  justifyContent: "center",
-                                  alignItems: "center",
-                                  gap: 1,
-                                  py: 1,
-                                }}
-                              >
-                                {Object.entries(iconMap).map(([k, cfg]) =>
-                                  actions[k as keyof typeof iconMap] ? (
-                                    <Tooltip key={k} title={cfg.label}>
-                                      <IconButton
-                                        size="small"
-                                        onClick={() =>
-                                          actions[k as keyof typeof iconMap]?.(row)
-                                        }
-                                        sx={{ color: cfg.color }}
-                                      >
-                                        {cfg.icon}
-                                      </IconButton>
-                                    </Tooltip>
-                                  ) : null
-                                )}
-                              </Box>
-                            </TableCell>
-                          ) : null;
-                        }
-
-                        // SUB ROW COLUMN
-                        const subCol = subRows?.columns.find(
-                          (s) => String(s.key) === String(col.key)
-                        );
-
-                        if (subCol) {
-                          return (
-                            <TableCell
-                              key={String(col.key)}
-                              align={textAlign}
-                            >
-                              {subCol.render
-                                ? subCol.render(subRow)
-                                : String(subRow[subCol.key] ?? "")}
-                            </TableCell>
-                          );
-                        }
-
-                        // PARENT COLUMN
-                        return childIndex === 0 ? (
-                          <TableCell
-                            key={String(col.key)}
-                            rowSpan={childRows.length}
-                            align={textAlign}
-                          >
-                            {col.render
-                              ? col.render(row)
-                              : highlightText(String(row[col.key] ?? ""))}
-                          </TableCell>
-                        ) : null;
-                      })}
-                    </TableRow>
-                  ));
-                }
+ 
+ 
                 return (
+ 
                   <TableRow
                     key={rowId}
                     hover
                     sx={{
-                      "&:hover": { bgcolor: "#e6f4ea" }, ...rowHoverSx,
-
+                      bgcolor: index % 2 === 0 ? "#ffffff" : "#fafafa",
+ 
+                      "&:hover": {
+                        bgcolor: "#f1fdf5",
+                        transition: "0.2s ease",
+                      },
+ 
+                      ...rowHoverSx,
                     }}
                   >
                     {enableCheckbox && (
-                      <TableCell padding="checkbox">
+ 
+ 
+                      <TableCell
+                        padding="checkbox"
+                        sx={{
+                          bgcolor: "inherit",
+                          px: { xs: 0.5, md: 1 },
+                          borderBottom: "1px solid #edf0f2",
+                        }}
+                      >
                         <Checkbox
                           checked={selectedIds.has(rowId)}
                           onChange={() => toggleRow(row, index)}
                         />
                       </TableCell>
                     )}
-
+ 
                     {columns.map((col) => {
-
-
+ 
+ 
                       /* Dropdown */
                       if (
                         dropdown &&
@@ -497,7 +443,25 @@ export function UniversalTable<
                         col.key !== ACTION_KEY
                       ) {
                         return (
-                          <TableCell key={String(col.key)} align={textAlign}>
+ 
+ 
+                          <TableCell
+                            key={String(col.key)}
+                            align={textAlign}
+                            sx={{
+                              bgcolor: "inherit",
+ 
+                              fontSize: { xs: 11, sm: 12, md: 14 },
+ 
+                              px: { xs: 1, md: 2 },
+                              py: { xs: 1, md: 1.5 },
+ 
+                            whiteSpace: "normal",
+wordBreak: "break-word",
+ 
+                              borderBottom: "1px solid #edf0f2",
+                            }}
+                          >
                             <Select
                               size="small"
                               value={row[col.key] as string}
@@ -529,10 +493,12 @@ export function UniversalTable<
                           </TableCell>
                         );
                       }
-
+ 
                       /* Actions */
                       if (col.key === ACTION_KEY && actions) {
                         return (
+ 
+ 
                           <TableCell
                             key={ACTION_KEY}
                             align="center"
@@ -540,6 +506,10 @@ export function UniversalTable<
                               width: 120,
                               minWidth: 120,
                               verticalAlign: "middle",
+ 
+                              bgcolor: "inherit",
+ 
+                              borderBottom: "1px solid #edf0f2",
                             }}
                           >
                             <Box
@@ -550,9 +520,9 @@ export function UniversalTable<
                             >
                               {Object.keys(actions).map((k) => {
                                 const cfg = iconMap[k as keyof typeof iconMap];
-
+ 
                                 if (!cfg) return null;
-
+ 
                                 return (
                                   <Tooltip key={k} title={cfg.label}>
                                     <IconButton
@@ -571,12 +541,24 @@ export function UniversalTable<
                           </TableCell>
                         );
                       }
-
+ 
                       /* Default */
                       if (col.key === ACTION_KEY) return null;
-
+ 
                       return (
-                        <TableCell key={String(col.key)} align={textAlign}>
+                        <TableCell
+                          key={String(col.key)}
+                          align={textAlign}
+                          sx={{
+                            bgcolor: "inherit",
+                            fontSize: { xs: 11, sm: 12, md: 14 },
+                            px: { xs: 1, md: 2 },
+                            py: { xs: 1, md: 1.5 },
+                            borderBottom: "1px solid #edf0f2",
+                            whiteSpace: "normal",
+wordBreak: "break-word",
+                          }}
+                        >
                           {col.render
                             ? col.render(row)
                             : highlightText(String(row[col.key] ?? ""))}
@@ -588,7 +570,7 @@ export function UniversalTable<
               })
             )}
           </TableBody>
-
+ 
           {footerRows.length > 0 && (
             <TableFooter>
               {footerRows.map((f, i) => (
@@ -604,10 +586,14 @@ export function UniversalTable<
           )}
         </Table>
       </TableContainer>
-
+ 
       <Box
         sx={{
           display: "flex",
+ 
+          bgcolor: "#ffffff",
+ 
+          borderTop: "1px solid #e5e7eb",
           justifyContent:
             enableCheckbox && selectedRows.length > 0
               ? "space-between"
@@ -638,7 +624,7 @@ export function UniversalTable<
             </IconButton>
           </Tooltip>
         )}
-
+ 
         <TablePagination
           component="div"
           count={filteredData.length}
@@ -646,9 +632,26 @@ export function UniversalTable<
           onPageChange={(_, p) => setPage(p)}
           rowsPerPage={rowsPerPage}
           rowsPerPageOptions={[]}
+          sx={{
+            bgcolor: "transparent",
+ 
+            "& .MuiTablePagination-toolbar": {
+              bgcolor: "transparent",
+              minHeight: 48,
+            },
+ 
+            "& .MuiTablePagination-selectLabel, \
+       & .MuiTablePagination-displayedRows": {
+              mb: 0,
+            },
+          }}
         />
       </Box>
     </Paper>
   );
 }
-
+ 
+ 
+ 
+ 
+ 

@@ -379,7 +379,6 @@ const setRowsAndSave = (newRows: ItemRow[]) => {
                     const target = String(invoiceNumber);
                     if (target === activeInvoice) return;
 
-                    // Save current form + rows in refs
                     invoiceFormMapRef.current = {
                       ...invoiceFormMapRef.current,
                       [activeInvoice]: methods.getValues(),
@@ -388,8 +387,6 @@ const setRowsAndSave = (newRows: ItemRow[]) => {
                       ...invoiceDataMapRef.current,
                       [activeInvoice]: rowsRef.current,
                     };
-
-                    // Load saved data for new invoice
                     const savedForm = invoiceFormMapRef.current[target];
                     methods.reset(savedForm ?? defaultFormValues);
 

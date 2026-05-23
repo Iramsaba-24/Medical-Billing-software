@@ -206,3 +206,18 @@ export const deleteRetailInvoiceItemsByInvoiceId = async (
   return res.data;
 };
  
+export interface RetailInvoiceItemResponse {
+  retailInvoiceItemId: number;
+  retailInvoiceId: number;
+  medicineId: number;
+  quantity: number;
+  price: number;
+}
+
+export const getAllRetailInvoiceItems = async (): Promise<RetailInvoiceItemResponse[]> => {
+  const res = await axios.get(
+    `${API_ENDPOINTS.RETAIL_INVOICE_ITEMS}`,
+    getAuthHeaders()
+  );
+  return res.data?.data || res.data || [];
+};

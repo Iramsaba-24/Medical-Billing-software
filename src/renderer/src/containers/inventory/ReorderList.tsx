@@ -133,29 +133,27 @@ function ReorderList() {
           }}
           actions={{
             view: (order) =>
-  navigate(URL_PATH.ReorderEmail, {
-    state: {
-      distributor: order.companyName,
-      email: "",
-      medicines: [
-        {
-          medicineRowId: 1,
-          medicineName: order.medicineName,  
-          strengthType: order.strength,        
-          quantity: order.qty,                
-        },
-        ...(order.existingMedicines ?? []).map((m, idx) => ({
-          medicineRowId: idx + 2,
-          medicineName: m.medicineName,
-          strengthType: m.strength,
-          quantity: m.qty,
-        })),
-      ],
-      isViewMode: true,
-    },
-  }),
- 
-
+              navigate(URL_PATH.ReorderEmail, {
+                state: {
+                  distributor: order.companyName,
+                  email: "",
+                  medicines: [
+                    {
+                      medicineRowId: 1,
+                      medicineName: order.medicineName,  
+                      strengthType: order.strength,        
+                      quantity: order.qty,                 
+                    },
+                    ...(order.existingMedicines ?? []).map((m, idx) => ({
+                      medicineRowId: idx + 2,
+                      medicineName: m.medicineName,
+                      strengthType: m.strength,
+                      quantity: m.qty,
+                    })),
+                  ],
+                  isViewMode: true,
+                },
+              }),
             CheckIcon: (order) => {
               setApproveOrder(order);
             },
