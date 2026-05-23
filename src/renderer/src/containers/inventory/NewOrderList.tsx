@@ -54,7 +54,6 @@ setNewOrderData(flatData);
     }
   };
  
- 
   const columns: Column<NewOrderHistory>[] = [
     {
       key: "companyName",

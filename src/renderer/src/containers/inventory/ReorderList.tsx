@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
-import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
+import {
+  UniversalTable,
+  ACTION_KEY,
+  type Column,
+} from "@/components/uncontrolled/UniversalTable";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
 import { getExistingReorders } from "@/service/reorderService";
@@ -30,14 +34,14 @@ function ReorderList() {
 
   const [reorderHistory, setReorderHistory] = useState<ReorderHistory[]>([]);
 
-const fetchReorderHistory = async () => {
-  try {
-    const data = await getExistingReorders();
-    setReorderHistory(data);
-  } catch (error) {
-    console.error("Reorder history fetch failed:", error);
-  }
-};
+  const fetchReorderHistory = async () => {
+    try {
+      const data = await getExistingReorders();
+      setReorderHistory(data);
+    } catch (error) {
+      console.error("Reorder history fetch failed:", error);
+    }
+  };
   const [refreshKey, setRefreshKey] = useState(0);
 
   const columns: Column<ReorderHistory>[] = [
@@ -121,29 +125,27 @@ const fetchReorderHistory = async () => {
           getRowId={(row) => row.id}
           actions={{
             view: (order) =>
-  navigate(URL_PATH.ReorderEmail, {
-    state: {
-      distributor: order.companyName,
-      email: "",
-      medicines: [
-        {
-          medicineRowId: 1,
-          medicineName: order.medicineName,  
-          strengthType: order.strength,         
-          quantity: order.qty,                
-        },
-        ...(order.existingMedicines ?? []).map((m, idx) => ({
-          medicineRowId: idx + 2,
-          medicineName: m.medicineName,
-          strengthType: m.strength,
-          quantity: m.qty,
-        })),
-      ],
-      isViewMode: true,
-    },
-  }),
- 
-
+              navigate(URL_PATH.ReorderEmail, {
+                state: {
+                  distributor: order.companyName,
+                  email: "",
+                  medicines: [
+                    {
+                      medicineRowId: 1,
+                      medicineName: order.medicineName,  
+                      strengthType: order.strength,        
+                      quantity: order.qty,                 
+                    },
+                    ...(order.existingMedicines ?? []).map((m, idx) => ({
+                      medicineRowId: idx + 2,
+                      medicineName: m.medicineName,
+                      strengthType: m.strength,
+                      quantity: m.qty,
+                    })),
+                  ],
+                  isViewMode: true,
+                },
+              }),
             CheckIcon: (order) => {
               setApproveOrder(order);
             },

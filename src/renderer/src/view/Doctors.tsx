@@ -334,8 +334,6 @@ const Doctors = () => {
             </Button>
           </DialogActions>
         </Dialog>
-
-        {/* edit doctor  */}
         
       </Box>
     </>

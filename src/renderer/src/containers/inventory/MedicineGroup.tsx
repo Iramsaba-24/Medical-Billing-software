@@ -56,7 +56,6 @@ const handleUpdate = async () => {
       category: editGroup.category,
     });
 
-    // 🔥 backend मधून fresh data घे
     const res = await getMedicineGroups();
 
     const formatted = res.map((g) => ({
@@ -132,7 +131,7 @@ const handleUpdate = async () => {
               },
             }}
           >
-            + Add New Group
+            + Add New Group 
           </Button>
         </Box>
 
@@ -143,7 +142,7 @@ const handleUpdate = async () => {
           rowsPerPage={5}
           actions={{
             view: (row) =>
-                navigate(`/medicine-groups/${row.groupId}`),  
+                navigate(`/medicine-groups/${row.groupId}/${encodeURIComponent(row.groupName)}`),  
 
             edit: (row) => setEditGroup(row),
 

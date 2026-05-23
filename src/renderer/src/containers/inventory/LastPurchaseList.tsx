@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Paper, Typography,} from "@mui/material";
-import { deletePurchaseHistory, getPurchaseHistory } from "@/service/reorderService";
+import { getPurchaseHistory,deletePurchaseHistory } from "@/service/reorderService";
 import {UniversalTable,ACTION_KEY,type Column,} from "@/components/uncontrolled/UniversalTable";
-import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
- 
+ import { showConfirmation, showSnackbar } from "@/components/uncontrolled/ToastMessage";
 type StockRow = {
   id: number;
   supplier: string;
@@ -60,9 +59,8 @@ const fetchLastPurchaseData = async () => {
   useEffect(() => {
     fetchLastPurchaseData();
   }, []);
-
-
-  const handleDeletePurchase = async (row: StockRow) => {
+  
+const handleDeletePurchase = async (row: StockRow) => {
   const ok = await showConfirmation("Delete purchase history?", "Confirm");
   if (ok) {
     try {
@@ -75,8 +73,6 @@ const fetchLastPurchaseData = async () => {
     }
   }
 };
- 
- 
   return (
 //  <Box
 //   sx={{
