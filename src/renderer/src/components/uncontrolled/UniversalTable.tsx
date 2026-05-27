@@ -84,15 +84,7 @@ interface UniversalTableProps<
   actions?: Partial<Record<keyof typeof iconMap, (row: T) => void>>;
   footerRows?: readonly FooterRow[];
  
-  // subRows?: {
-  //   key: keyof T;
-  //   columns: Array<{
-  //     key: keyof S;
-  //     label: string;
-  //     render?: (subRow: S) => ReactNode;
-  //   }>;
-  // };
- 
+  
 }
  
 function buildExportData<T extends Record<string, unknown>>(
@@ -109,10 +101,7 @@ function buildExportData<T extends Record<string, unknown>>(
   );
 }
  
-// export function UniversalTable<
-//   T extends Record<string, unknown>,
-//   S extends Record<string, unknown> = Record<string, never>
-// >
+
 export function UniversalTable<
   T extends Record<string, unknown>
 >({

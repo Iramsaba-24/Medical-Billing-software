@@ -137,10 +137,7 @@ export default function InventoryFormFields({
 
       <TextInputField inputType="numbers" name="invoiceNumber" label="Invoice Number" />
 
-      {/* <TextInputField inputType="numbers" name="looseTablets" label="Extra Medicine (Loose)" 
-      rules={{
-        min: { value: 0, message: "Loose tablets cannot be negative" },
-      }}/> */}
+
 
       {/* Ordered Qty Warning */}
       {showWarning && (
@@ -178,9 +175,7 @@ export default function InventoryFormFields({
         }}
       />
 
-      {/* <TextInputField inputType="numbers" name="mrpPerTablet" label="MRP Per Tablet" value={mrpPerTablet}
-        disabled
-      /> */}
+   
 
       <TextInputField
         inputType="numbers"
@@ -188,7 +183,7 @@ export default function InventoryFormFields({
         label="GST Percentage"
       />
 
-      {/* <TextInputField name="finalPrice" label="Final Amount (With GST)" value={finalPrice} disabled/> */}
+     
 
       <DropdownField
         name="distributorId"

@@ -20,7 +20,7 @@ const BankInfo = ({
     </Typography>
      {/* for displaying details in card */}
     <Box sx={{ display: "flex", flexWrap: "wrap", width: "100%",
-      // justifyContent: { xs: "center", sm: "flex-start" },textAlign: { xs: "center", sm: "left" }// for center align on small screens and left align on larger screens
+     
      }}>
       {details.map((item, index) => (
         <Box 

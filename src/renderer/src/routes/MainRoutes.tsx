@@ -81,18 +81,12 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.Doctors,
         element: <DoctorTable />,
       },
-      //  {
-      //   path: URL_PATH.NewInvoiceBill,
-      //   element: <NewInvoiceBill />,
-      // },
+      
       {
         path: URL_PATH.AddDoctor,
         element: <AddDoctor />,
       },
-      // {
-      //   path: URL_PATH.CreateInvoice,
-      //   element: <CreateInvoice />,
-      // },
+      
       {
   path: "/edit-invoice/:invoiceNo",
   element: <EditInvoice />,
@@ -110,10 +104,7 @@ export const mainRoutes: RouteObject[] = [
         path: URL_PATH.Inventory,
         element: <Inventory />,
       },
-      // {
-      //   path: URL_PATH.NewInvoice,
-      //   element: <NewInvoice />,
-      // },
+     
       {
         path: URL_PATH.Reorder,
         element: <Reorder />,

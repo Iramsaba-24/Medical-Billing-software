@@ -109,7 +109,7 @@ const handleStatusChange = async (
       upiId: distributor.bankDetails?.upiId || "",
     });
 
-    // frontend update
+    // frontend Update
     const updated = distributors.map((d) =>
       d.id === id ? { ...d, status } : d
     );
@@ -288,14 +288,6 @@ const handleStatusChange = async (
             showExport={true}
             showSearch={true}
             getRowId={(row) => row.id}
-            // actions={{
-            //   view: (distributor) =>
-            //     navigate(URL_PATH.DistributorDetails, {
-            //       state: { distributor },
-            //     }),
-            //   edit: (distributor) => setEditingRow(distributor),
-            //   delete: (distributor) => handleDelete(distributor),
-            // }}
 
             actions={{
   view: (distributor) =>

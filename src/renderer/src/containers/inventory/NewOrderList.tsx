@@ -103,7 +103,11 @@ setNewOrderData(flatData);
           gap={1}
           mb={1.5}
         >
-          <Typography fontWeight={700}>New Order List</Typography>
+          <Typography
+           fontWeight={700}
+           mb={1.5}
+           fontSize={{ xs: 16, sm: 20 }}
+         > New Order List</Typography>
         </Box>
  
         <UniversalTable<NewOrderHistory>
