@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from "react";
 import { Box, Button, Paper, Typography } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
@@ -6,32 +7,36 @@ import EmailField from "@/components/controlled/EmailField";
 import NumericField from "@/components/controlled/NumericField";
 import { useNavigate, useLocation } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
-import {
-  getDistributors,
-  type DistributorResponse,
-} from "@/service/distributorService";
-
+import {getDistributors,type DistributorResponse,} from "@/service/distributorService";
+ 
 type MedicineRow = {
   medicineId: string;
   medicineRowId: number;
   strengthType: string;
   qty: string;
+  minimumQuantity: number;  
+  maximumQuantity: number;
 };
-
+ 
 type ReorderFormValues = {
   distributor: string;
   email: string;
-  [key: string]: string | number;
+  root?: {
+    message?: string;
+  };
+  [key: string]: string | number | { message?: string } | undefined;
 };
-
+ 
 type IncomingMedicine = {
   id: number;
   supplier: string;
   medicineName: string;
   strengthType: string;
   quantity: string;
+    minimumQuantity: number;  
+  maximumQuantity: number;
 };
-
+ 
 const reorderButtonSx = {
   backgroundColor: "#238878",
   color: "#fff",
@@ -45,30 +50,26 @@ const reorderButtonSx = {
     border: "2px solid #238878",
   },
 };
-
+ 
 function ReorderForm() {
   const location = useLocation();
   const navigate = useNavigate();
-
   const incomingMedicines = useMemo<IncomingMedicine[]>(() => {
     const s = location.state as { medicines?: IncomingMedicine[] } | undefined;
     return s?.medicines ?? [];
   }, [location.state]);
-
   const [distributorOptions, setDistributorOptions] = useState<
     { label: string; value: string }[]
   >([]);
-
   const [distributors, setDistributors] = useState<DistributorResponse[]>([]);
   const [medicineRows, setMedicineRows] = useState<MedicineRow[]>([]);
-
+ 
   const methods = useForm<ReorderFormValues>({
     defaultValues: { distributor: "", email: "" },
     mode: "onChange",
   });
-
+ 
   const selectedDistributor = methods.watch("distributor");
-
   const fetchDistributorData = async () => {
     try {
       const data = await getDistributors();
@@ -83,47 +84,112 @@ function ReorderForm() {
       console.error("Distributor fetch failed:", error);
     }
   };
-
-  useEffect(() => {
-    if (!selectedDistributor) return;
-    const selected = distributors.find(
-      (item) => item.companyName === selectedDistributor,
-    );
-    if (selected) methods.setValue("email", selected.email);
-  }, [selectedDistributor, distributors, methods]);
-
+ 
+useEffect(() => {
+  if (!selectedDistributor) return;
+ 
+  const selected = distributors.find(
+    (item) => item.companyName === selectedDistributor,
+  );
+ 
+  if (selected) {
+    if (!selected.isActive) {
+      methods.setError("distributor", {
+        type: "manual",
+        message: "This distributor is currently inactive. Please select another.",
+      });
+      methods.setValue("email", "");
+      return;
+    }
+ 
+    methods.clearErrors("distributor");
+    methods.setValue("email", selected.email);
+  }
+}, [selectedDistributor, distributors, methods]);
+ 
   useEffect(() => {
     fetchDistributorData();
-
+ 
     if (incomingMedicines.length > 0) {
       const mappedRows: MedicineRow[] = incomingMedicines.map((item) => ({
         medicineRowId: item.id,
         medicineId: item.medicineName,
         strengthType: item.strengthType,
         qty: item.quantity,
+        minimumQuantity: item.minimumQuantity,
+        maximumQuantity: item.maximumQuantity,
       }));
-
+ 
       setMedicineRows(mappedRows);
+ 
       methods.setValue("distributor", incomingMedicines[0].supplier);
-
+ 
       setTimeout(() => {
         mappedRows.forEach((row) => {
-          methods.setValue(`medicine_${row.medicineRowId}`, row.medicineId);
-          methods.setValue(`strength_${row.medicineRowId}`, row.strengthType);
-          methods.setValue(`qty_${row.medicineRowId}`, Number(row.qty));
+          methods.setValue(
+            `medicine_${row.medicineRowId}`,
+            row.medicineId,
+          );
+ 
+          methods.setValue(
+            `strength_${row.medicineRowId}`,
+            row.strengthType,
+          );
+ 
+          methods.setValue(
+            `qty_${row.medicineRowId}`,
+            Number(row.qty),
+          );
         });
       }, 0);
     }
-  }, [incomingMedicines]);
-
+  }, [incomingMedicines, methods]);
+ 
+  
 const handleReorder = methods.handleSubmit((data) => {
+  methods.clearErrors("root");
+ 
+  const selectedDist = distributors.find(
+    (item) => item.companyName === data.distributor,
+  );
+ 
+  if (selectedDist && !selectedDist.isActive) {
+    methods.setError("distributor", {
+      type: "manual",
+      message: "This distributor is currently inactive. Please select another.",
+    });
+    return;
+  }
+ 
+  for (const row of medicineRows) {
+    const qtyValue = data[`qty_${row.medicineRowId}`];
+    const qty =
+      typeof qtyValue === "number" ? qtyValue : Number(qtyValue || row.qty);
+ 
+    if (qty <= row.minimumQuantity) {
+      methods.setError("root", {
+        type: "manual",
+        message: `"${row.medicineId}" quantity (${qty}) must be greater than minimum stock level (${row.minimumQuantity}).`,
+      });
+      return;
+    }
+ 
+    if (qty >= row.maximumQuantity) {
+      methods.setError("root", {
+        type: "manual",
+        message: `"${row.medicineId}" quantity (${qty}) must be less than maximum stock limit (${row.maximumQuantity}).`,
+      });
+      return;
+    }
+  }
+ 
   const updatedMedicines = medicineRows.map((row) => ({
     medicineRowId: row.medicineRowId,
-    medicineName: row.medicineId,  
+    medicineName: row.medicineId,
     strengthType: row.strengthType,
     qty: String(data[`qty_${row.medicineRowId}`] || row.qty),
   }));
-
+ 
   navigate(URL_PATH.ReorderEmail, {
     state: {
       distributor: data.distributor,
@@ -133,9 +199,9 @@ const handleReorder = methods.handleSubmit((data) => {
     },
   });
 });
-
   return (
     <FormProvider {...methods}>
+      <form noValidate>
       <Box
         sx={{
           display: "flex",
@@ -166,12 +232,13 @@ const handleReorder = methods.handleSubmit((data) => {
               Reorder
             </Typography>
           </Box>
-
+ 
           <Box display="flex" flexDirection="column" gap={2} mb={2}>
             <Box display="flex" alignItems="center" gap={2}>
               <Typography sx={{ width: 120 }} fontWeight={600} fontSize={15}>
                 Distributor
               </Typography>
+ 
               <Box sx={{ width: 260, mt: 3 }}>
                 <DropdownField
                   name="distributor"
@@ -181,17 +248,17 @@ const handleReorder = methods.handleSubmit((data) => {
                 />
               </Box>
             </Box>
-
             <Box display="flex" alignItems="center" gap={2}>
               <Typography sx={{ width: 120 }} fontWeight={600} fontSize={15}>
                 Email
               </Typography>
+ 
               <Box sx={{ width: 260, mt: 2 }}>
                 <EmailField name="email" label="" />
               </Box>
             </Box>
           </Box>
-
+ 
           <Box
             display="flex"
             gap={2}
@@ -201,15 +268,18 @@ const handleReorder = methods.handleSubmit((data) => {
             <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
               Medicine Name
             </Typography>
+ 
             <Typography fontWeight={600} fontSize={15} sx={{ flex: 2 }}>
               Strength / Type
             </Typography>
+ 
             <Typography fontWeight={600} fontSize={15} sx={{ flex: 1 }}>
               Qty.
             </Typography>
+ 
             <Box sx={{ minWidth: 88 }} />
           </Box>
-
+ 
           {medicineRows.map((row, index) => (
             <Box
               key={row.medicineRowId}
@@ -223,35 +293,57 @@ const handleReorder = methods.handleSubmit((data) => {
                 <DropdownField
                   name={`medicine_${row.medicineRowId}`}
                   label={index === 0 ? "" : ""}
-                  options={[{ label: row.medicineId, value: row.medicineId }]}
+                  options={[
+                    {
+                      label: row.medicineId,
+                      value: row.medicineId,
+                    },
+                  ]}
                   placeholder="Select Medicine"
-                  sx={{ "& .MuiFormHelperText-root": { mb: 0 } }}
+                  sx={{
+                    "& .MuiFormHelperText-root": {
+                      mb: 0,
+                    },
+                  }}
                 />
               </Box>
-
+ 
               <Box sx={{ flex: 2, minWidth: { xs: "100%", md: "unset" } }}>
                 <DropdownField
                   name={`strength_${row.medicineRowId}`}
                   label=""
                   options={[
-                    { label: row.strengthType, value: row.strengthType },
+                    {
+                      label: row.strengthType,
+                      value: row.strengthType,
+                    },
                   ]}
                   placeholder="Select Strength"
-                  sx={{ "& .MuiFormHelperText-root": { mb: 0 } }}
+                  sx={{
+                    "& .MuiFormHelperText-root": {
+                      mb: 0,
+                    },
+                  }}
                 />
               </Box>
-
+ 
               <Box sx={{ flex: 1, minWidth: { xs: "100%", md: "unset" } }}>
                 <NumericField
                   name={`qty_${row.medicineRowId}`}
-                  label=""
+                  label="qty"
                   min={1}
                   max={9999}
                 />
               </Box>
             </Box>
           ))}
-
+ 
+          {methods.formState.errors.root?.message && (
+            <Typography color="error" fontSize={14} mb={2}>
+              {methods.formState.errors.root.message}
+            </Typography>
+          )}
+ 
           <Box display="flex" justifyContent="flex-end" gap={2} mt={2}>
             <Button
               variant="outlined"
@@ -264,15 +356,16 @@ const handleReorder = methods.handleSubmit((data) => {
             >
               Order History
             </Button>
-
             <Button sx={reorderButtonSx} onClick={handleReorder}>
               Reorder
             </Button>
           </Box>
         </Paper>
       </Box>
+      </form>
     </FormProvider>
   );
 }
-
+ 
 export default ReorderForm;
+ 

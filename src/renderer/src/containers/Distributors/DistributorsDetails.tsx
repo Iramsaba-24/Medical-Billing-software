@@ -55,8 +55,8 @@ const [showBankDetails, setShowBankDetails] = useState(false);
           <BankInfo title="Bank Details" details={bankFields} />
         </Paper>
       )}
-      {/* InventoryList call */}
-        {/* <NewInvoiceList/> */}
+      {/* LastPurchase call */}
+      
         <LastPurchase />
      
     </Box>

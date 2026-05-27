@@ -17,33 +17,7 @@ type DashboardSettingsForm = {
   autoRefreshInterval: string;
 };
  
-// type InventoryItem = {
-//   itemName: string;
-// };
- 
-// type MedicineOption = {
-//   label: string;
-//   value: string;
-// };
- 
- 
-// const getMedicineOptions = (): MedicineOption[] => {
-//   try {
-//     const stored = localStorage.getItem("inventory");
-//     if (!stored) return [];
- 
-//     const parsed: InventoryItem[] = JSON.parse(stored);
- 
-//     return parsed.map((item) => ({
-//       label: item.itemName,
-//       value: item.itemName,
-//     }));
-//   } catch (e) {
-//     console.error("Inventory parse error", e);
-//     return [];
-//   }
-// };
- 
+
  
 const kpiOptions = [
   { label: "Total Revenue", value: "totalRevenue" },
@@ -125,21 +99,6 @@ const DashboardSettings = () => {
  
   const { handleSubmit, reset } = methods;
  
-  // auto update medicines
-  // useEffect(() => {
-  //   const loadMedicines = () => {
-  //     const data = getMedicineOptions();
-  //     setMedicineDropdownOptions(data);
-  //   };
- 
-  //   loadMedicines();
- 
-  //   window.addEventListener("inventoryUpdated", loadMedicines);
- 
-  //   return () => {
-  //     window.removeEventListener("inventoryUpdated", loadMedicines);
-  //   };
-  // }, []);
  
   const onSubmit = (data: DashboardSettingsForm) => {
     console.log("Submitted", data);
@@ -156,8 +115,6 @@ localStorage.setItem("dashboardSettings", JSON.stringify(data));
   );
  
  
-    //  correct (same as first code)
-//localStorage.setItem("dashboardSettings", JSON.stringify(data.visibleKpis));
  
     // IMPORTANT: Top Selling Medicine separate save
     localStorage.setItem("topSellingMedicine", data.topSellingMedicine);
@@ -222,26 +179,7 @@ localStorage.setItem("chartPreferences", JSON.stringify(data.chartPreferences));
             />
           </Paper>
  
-          {/* Top Selling Medicines */}
-          {/* <Paper sx={cardStyle}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Typography fontSize={16} fontWeight={500}>
-                Top Selling Medicines
-              </Typography>
- 
-              <DropdownField
-                name="topSellingMedicine"
-                options={medicineDropdownOptions}
-                placeholder="Select Medicine"
-                freeSolo={false}
-                sx={{ width: 150, minWidth: 150 }}
-              />
-            </Box>
-          </Paper> */}
+        
  
           {/* Chart Preferences */}
           <Paper sx={cardStyle}>

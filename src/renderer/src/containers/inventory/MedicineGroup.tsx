@@ -1,13 +1,31 @@
-import { Box, Button, Paper, Typography, Dialog,DialogTitle, DialogContent,DialogActions,TextField,MenuItem,
+import {
+  Box,
+  Button,
+  Paper,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { UniversalTable, Column, ACTION_KEY,
+import {
+  UniversalTable,
+  Column,
+  ACTION_KEY,
 } from "@/components/uncontrolled/UniversalTable";
 import { useEffect, useState } from "react";
-import { showConfirmation, showSnackbar,
+import {
+  showConfirmation,
+  showSnackbar,
 } from "@/components/uncontrolled/ToastMessage";
 import { URL_PATH } from "@/constants/UrlPath";
-  import { getMedicineGroups, deleteMedicineGroup  } from "@/service/medicineGroupService";
+import {
+  getMedicineGroups,
+  deleteMedicineGroup,
+} from "@/service/medicineGroupService";
 import { updateMedicineGroup } from "@/service/medicineGroupService";
 
 type MedicineGroupRow = {
@@ -23,91 +41,89 @@ const MedicineGroup = () => {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const res = await getMedicineGroups();
 
+        const formatted = res.map((g) => ({
+          groupId: g.groupId,
+          groupName: g.groupName,
+          category: g.category,
+          count: g.medicineCount.toString(),
+        }));
 
-useEffect(() => {
-  const fetchGroups = async () => {
+        setMedicineGroups(formatted);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
+  const handleUpdate = async () => {
+    if (!editGroup) return;
+
     try {
+      await updateMedicineGroup(editGroup.groupId, {
+        groupName: editGroup.groupName,
+        category: editGroup.category,
+      });
+
       const res = await getMedicineGroups();
 
       const formatted = res.map((g) => ({
         groupId: g.groupId,
         groupName: g.groupName,
         category: g.category,
-        count:g.medicineCount.toString(),
+        count: g.medicineCount.toString(),
       }));
 
       setMedicineGroups(formatted);
+
+      showSnackbar("success", "Group updated successfully");
+      setEditGroup(null);
     } catch (err) {
       console.error(err);
+      showSnackbar("error", "Update failed");
     }
   };
-
-  fetchGroups();
-}, []);
-
-  
-const handleUpdate = async () => {
-  if (!editGroup) return;
-
-  try {
-    await updateMedicineGroup(editGroup.groupId, {
-      groupName: editGroup.groupName,
-      category: editGroup.category,
-    });
-
-    // 🔥 backend मधून fresh data घे
-    const res = await getMedicineGroups();
-
-    const formatted = res.map((g) => ({
-      groupId: g.groupId,
-      groupName: g.groupName,
-      category: g.category,
-      count: g.medicineCount.toString(),
-    }));
-
-    setMedicineGroups(formatted);
-
-    showSnackbar("success", "Group updated successfully");
-    setEditGroup(null);
-  } catch (err) {
-    console.error(err);
-    showSnackbar("error", "Update failed");
-  }
-};
 
   const columns: Column<MedicineGroupRow>[] = [
     { key: "groupName", label: "Group Name" },
     { key: "category", label: "Category" },
-    { key: "count", label: "No of items",
+    {
+      key: "count",
+      label: "No of items",
       render: (row) => <Typography>{row.count}</Typography>,
     },
-    { key: ACTION_KEY, label: "Action", },
+    { key: ACTION_KEY, label: "Action" },
   ];
 
   return (
     <>
       {/*  Back to Home Button  */}
       <Box display="flex" justifyContent="flex-end" mb={2}>
-  <Button
-    variant="contained"
-    onClick={() => navigate(URL_PATH.Inventory)}
-    sx={{
-      mr: 5,   
-      backgroundColor: "#238878",
-      color: "#fff",
-      textTransform: "none",
-      border: "2px solid #238878",
-      "&:hover": {
-        backgroundColor: "#fff",
-        color: "#238878",
-        border: "2px solid #238878",
-      },
-    }}
-  >
-     Back to Home
-  </Button>
-</Box>
+        <Button
+          variant="contained"
+          onClick={() => navigate(URL_PATH.Inventory)}
+          sx={{
+            mr: 5,
+            backgroundColor: "#238878",
+            color: "#fff",
+            textTransform: "none",
+            border: "2px solid #238878",
+            "&:hover": {
+              backgroundColor: "#fff",
+              color: "#238878",
+              border: "2px solid #238878",
+            },
+          }}
+        >
+          Back to Home
+        </Button>
+      </Box>
 
       <Paper sx={{ p: 3, borderRadius: 2 }}>
         <Box
@@ -116,9 +132,7 @@ const handleUpdate = async () => {
           alignItems="center"
           mb={2}
         >
-          <Typography fontWeight={600}>
-            Medicine Groups
-          </Typography>
+          <Typography fontWeight={600}>Medicine Groups</Typography>
 
           <Button
             onClick={() => navigate(URL_PATH.AddMedicineGroup)}
@@ -143,23 +157,30 @@ const handleUpdate = async () => {
           rowsPerPage={5}
           actions={{
             view: (row) =>
-                navigate(`/medicine-groups/${row.groupId}`),  
+              navigate(
+                `/medicine-groups/${row.groupId}/${encodeURIComponent(row.groupName)}`,
+              ),
 
             edit: (row) => setEditGroup(row),
 
             delete: async (row) => {
-  const ok = await showConfirmation("Delete this group?", "Confirm");
-  if (ok) {
-    try {
-      await deleteMedicineGroup(row.groupId);
-      setMedicineGroups(prev => prev.filter((g) => g.groupId !== row.groupId));
-      showSnackbar("success", "Group deleted successfully");
-    } catch (err) {
-      console.error(err);
-      showSnackbar("error", "Delete failed");
-    }
-  }
-},
+              const ok = await showConfirmation(
+                "Delete this group?",
+                "Confirm",
+              );
+              if (ok) {
+                try {
+                  await deleteMedicineGroup(row.groupId);
+                  setMedicineGroups((prev) =>
+                    prev.filter((g) => g.groupId !== row.groupId),
+                  );
+                  showSnackbar("success", "Group deleted successfully");
+                } catch (err) {
+                  console.error(err);
+                  showSnackbar("error", "Delete failed");
+                }
+              }
+            },
           }}
         />
       </Paper>

@@ -9,13 +9,7 @@ import { useEffect, useState } from "react";
 import { DashboardCardsResponse, getDashboardCards } from "@/service/dashboardService";
 const Dashboard: React.FC = () => {
 const [data, setData] = useState<DashboardCardsResponse | null>(null);
-// useEffect(() => {
-//   const fetchData = async () => {
-//     const res = await getDashboardCards();
-//     setData(res);
-//   };
-//   fetchData();
-// }, []);
+
 useEffect(() => {
   const fetchData = async () => {
     const res = await getDashboardCards();
@@ -24,7 +18,7 @@ useEffect(() => {
   };
   fetchData();
 }, []);
-// fetch visible kpis-settings
+
 const getVisibleKpis = (): string[] => {
   const defaultKpis = [
     "totalRevenue",

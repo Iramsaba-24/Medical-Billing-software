@@ -155,11 +155,13 @@ const currentMedicine = approveData?.medicine;
         const data = await getDistributors();
         setDistributorData(data);
         console.log("=== DISTRIBUTOR DATA ===", JSON.stringify(data));
-        const options = data.map((d) => ({
-          label: d.companyName,
-          value: d.distributorId.toString(),
-        }));
-        setSupplierOptions(options);
+const options = data
+  .filter((d) => d.isActive === true)  
+  .map((d) => ({
+    label: d.companyName,
+    value: d.distributorId.toString(),
+  }));
+setSupplierOptions(options);
       } catch (error) {
         console.error("Error fetching distributors:", error);
       }

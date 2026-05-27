@@ -176,31 +176,18 @@ const Sidebar = ({ open }: { open: boolean }) => {
 
 const Header: React.FC = () => {
   const location = useLocation();
-
   const theme = useTheme();
-
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const navigate = useNavigate();
-
   const isSettingsPage = location.pathname.startsWith(URL_PATH.Setting);
-
   const [open, setOpen] = React.useState(false);
-
   const [showSearch, setShowSearch] = React.useState(false);
-
   const email = localStorage.getItem("userEmail") || "";
-
   const firstLetter = email ? email[0].toUpperCase() : "U";
-
   const [pharmacyName, setPharmacyName] = useState<string | null>("");
-
   const [pharmacyLogo, setPharmacyLogo] = React.useState<string | null>(null);
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
   const openMenu = Boolean(anchorEl);
-
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };

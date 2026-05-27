@@ -84,15 +84,7 @@ interface UniversalTableProps<
   actions?: Partial<Record<keyof typeof iconMap, (row: T) => void>>;
   footerRows?: readonly FooterRow[];
  
-  // subRows?: {
-  //   key: keyof T;
-  //   columns: Array<{
-  //     key: keyof S;
-  //     label: string;
-  //     render?: (subRow: S) => ReactNode;
-  //   }>;
-  // };
- 
+  
 }
  
 function buildExportData<T extends Record<string, unknown>>(
@@ -109,10 +101,7 @@ function buildExportData<T extends Record<string, unknown>>(
   );
 }
  
-// export function UniversalTable<
-//   T extends Record<string, unknown>,
-//   S extends Record<string, unknown> = Record<string, never>
-// >
+
 export function UniversalTable<
   T extends Record<string, unknown>
 >({
@@ -169,7 +158,7 @@ export function UniversalTable<
     bgcolor: "#1f2937",
     color: "#ffffff",
     fontWeight: 600,
-    fontSize: { xs: 11, md: 13 },
+    fontSize: { xs: 13, md: 15 },
     borderRadius: 2,
     "& .MuiSelect-icon": { color: "#a9a2a2ff" },
   };
@@ -364,7 +353,7 @@ export function UniversalTable<
                     color: "#ffffff",
                   whiteSpace: "nowrap",
 wordBreak: "break-word",
-
+ 
 textAlign: textAlign,
 verticalAlign: "middle",
  
@@ -399,122 +388,6 @@ verticalAlign: "middle",
               paginatedData.flatMap((row, index) => {
                 const rowId = resolveRowId(row, index);
  
-                // const childRows: S[] =
-                //   subRows && Array.isArray(row[subRows.key])
-                //     ? (row[subRows.key] as S[])
-                //     : [];
- 
- 
- 
-                // if (childRows.length > 0) {
-                //   return childRows.map((subRow, childIndex) => (
-                //     <TableRow
-                //       key={`${rowId}-${childIndex}`}
-                //       hover
-                //       sx={{
- 
-                //         height: { xs: 42, md: 53 },
- 
-                //         bgcolor: childIndex % 2 === 0 ? "#ffffff" : "#fafafa",
- 
-                //         "&:hover": {
-                //           bgcolor: "#f1fdf5",
-                //           transition: "0.2s ease",
-                //         },
-                //         ...rowHoverSx,
-                //       }}
-                //     >
-                //       {columns.map((col) => {
- 
- 
-                //         if (col.key === ACTION_KEY && actions) {
-                //           return childIndex === 0 ? (
- 
- 
-                //             <TableCell
-                //               key={ACTION_KEY}
-                //               rowSpan={childRows.length}
-                //               align="center"
-                //               sx={{
-                //                 verticalAlign: "middle !important",
-                //                 textAlign: "center",
-                //                 width: 120,
-                //                 p: 0,
-                //               }}
-                //             >
-                //               <Box
-                //                 sx={{
-                //                   display: "flex",
-                //                   justifyContent: "center",
-                //                   alignItems: "center",
-                //                   gap: 1,
-                //                   py: 1,
-                //                 }}
-                //               >
-                //                 {Object.entries(iconMap).map(([k, cfg]) =>
-                //                   actions[k as keyof typeof iconMap] ? (
-                //                     <Tooltip key={k} title={cfg.label}>
-                //                       <IconButton
-                //                         size="small"
-                //                         onClick={() =>
-                //                           actions[k as keyof typeof iconMap]?.(row)
-                //                         }
-                //                         sx={{ color: cfg.color }}
-                //                       >
-                //                         {cfg.icon}
-                //                       </IconButton>
-                //                     </Tooltip>
-                //                   ) : null
-                //                 )}
-                //               </Box>
-                //             </TableCell>
-                //           ) : null;
-                //         }
- 
-                //         // SUB ROW COLUMN
-                //         const subCol = subRows?.columns.find(
-                //           (s) => String(s.key) === String(col.key)
-                //         );
- 
-                //         if (subCol) {
-                //           return (
- 
- 
-                //             <TableCell
-                //               key={String(col.key)}
-                //               align={textAlign}
-                //               sx={{
-                //                 bgcolor: "inherit",
-                //                 fontSize: { xs: 11, sm: 12, md: 14 },
-                //                 px: { xs: 1, md: 2 },
-                //                 py: { xs: 1, md: 1.5 },
-                //                 borderBottom: "1px solid #edf0f2",
-                //                 whiteSpace: "nowrap",
-                //               }}
-                //             >
-                //               {subCol.render
-                //                 ? subCol.render(subRow)
-                //                 : String(subRow[subCol.key] ?? "")}
-                //             </TableCell>
-                //           );
-                //         }
- 
-                //         // PARENT COLUMN
-                //         return childIndex === 0 ? (
-                //           <TableCell
-                //             key={String(col.key)}
-                //             rowSpan={childRows.length}
-                //             align={textAlign}
-                //           >
-                //             {col.render
-                //               ? col.render(row)
-                //               : highlightText(String(row[col.key] ?? ""))}
-                //           </TableCell>
-                //         ) : null;
-                //       })}
-                //     </TableRow>
-                //   ));
-                // }
  
                 return (
  
@@ -767,6 +640,8 @@ wordBreak: "break-word",
     </Paper>
   );
 }
+ 
+ 
  
  
  

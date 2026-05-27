@@ -14,9 +14,7 @@ const isRetailPage =
   location.pathname.startsWith(URL_PATH.Billing) ||
   location.pathname === URL_PATH.MediPoints;
 
-// const isNewInvoicePage =
-//   flow === "new" ||
-//   location.pathname === URL_PATH.NewInvoice;
+
 
   const buttonStyle = (active: boolean) => ({
     textTransform: "none",
@@ -42,13 +40,7 @@ const isRetailPage =
         Retail Invoice
       </Button>
 
-      {/* <Button
-        type="button"
-        sx={buttonStyle(isNewInvoicePage)}
-        onClick={() => navigate(URL_PATH.NewInvoice)}
-      >
-        New Invoice
-      </Button> */}
+  
     </Box>
   );
 }

@@ -30,7 +30,7 @@ type MedicineApi = {
   strength: string;
   distributorId: number;
 
-  // optional (if backend sends)
+  
   purchasePricePerStrip?: number;
   mrpPerStrip?: number;
 };

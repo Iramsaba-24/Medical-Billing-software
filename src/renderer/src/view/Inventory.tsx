@@ -1,3 +1,4 @@
+
 import { Box, Paper, Typography, Button, Divider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { URL_PATH } from "@/constants/UrlPath";
@@ -10,17 +11,17 @@ import axios from "axios";
 import { API_ENDPOINTS } from "@/constants/ApiEndpoints";
 import { useState, useEffect } from "react";
 import type { MedicineResponse } from "@/service/medicineService"
-
+ 
 export default function InventoryPage() {
   const navigate = useNavigate();
-
+ 
   const [stats, setStats] = useState({
     totalItems: 0,
     lowStockItems: 0,
     totalValue: 0,
   });
   const [medicineList, setMedicineList] = useState<MedicineResponse[]>([]);
-
+ 
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -28,9 +29,9 @@ export default function InventoryPage() {
         const res = await axios.get(API_ENDPOINTS.MEDICINE, {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
         });
-
+ 
         const medicines: MedicineResponse[] = res.data.data;
-
+ 
         console.log(
           "medicine values:",
           JSON.stringify(
@@ -42,7 +43,7 @@ export default function InventoryPage() {
             })),
           ),
         );
-
+ 
         console.log(
           "isLowStock check:",
           JSON.stringify(
@@ -52,20 +53,20 @@ export default function InventoryPage() {
             })),
           ),
         );
-
+ 
         const totalItems = medicines.length;
-
+ 
         const lowStockItems = medicines.filter(
           (m) =>
             m.totalStockTablets <
             (m.minimumQuantity > 0 ? m.minimumQuantity : 10),
         ).length;
-
+ 
         const totalValue = medicines.reduce(
           (sum, m) => sum + m.mrpPerTablet * m.totalStockTablets,
           0,
         );
-
+ 
         setMedicineList(medicines);
         setStats({ totalItems, lowStockItems, totalValue });
       } catch (error) {
@@ -90,7 +91,7 @@ export default function InventoryPage() {
         </Typography>
         <Divider sx={{ mb: 3 }} />
       </Box>
-
+ 
       <Box
         display="grid"
         gridTemplateColumns={{ xs: "1fr", md: "repeat(3, 1fr)" }}
@@ -132,7 +133,7 @@ export default function InventoryPage() {
               </Typography>
               <Typography color="text.secondary">{card.label}</Typography>
             </Box>
-
+ 
             <Box
               component="img"
               src={card.img}
@@ -150,29 +151,29 @@ export default function InventoryPage() {
         <Paper sx={{ p: 2 }}>
           <Box display="flex" justifyContent="space-between" mb={2}>
             <Typography fontWeight={600}>Medicine Groups</Typography>
-
+ 
             <Button
               size="small"
               variant="contained"
               sx={{
                 px: { xs: 1.5, sm: 2, md: 2.5 },
                 py: { xs: 0.7, sm: 0.8, md: 1 },
-
+ 
                 minWidth: { xs: 80, sm: 100, md: 120 },
-
+ 
                 fontSize: {
                   xs: "0.75rem",
                   sm: "0.85rem",
                   md: "0.95rem",
                 },
-
+ 
                 whiteSpace: "nowrap",
-
+ 
                 backgroundColor: "#238878",
                 color: "#fff",
                 border: "2px solid #238878",
                 textTransform: "none",
-
+ 
                 "&:hover": {
                   backgroundColor: "#fff",
                   color: "#238878",
@@ -184,10 +185,10 @@ export default function InventoryPage() {
               View Details
             </Button>
           </Box>
-
+ 
           <GroupSummary />
         </Paper>
-
+ 
         <Box display="flex" flexDirection="column" gap={2}>
           <Button
             fullWidth
@@ -210,7 +211,7 @@ export default function InventoryPage() {
           >
             + Add New Group
           </Button>
-
+ 
           <Button
             fullWidth
             sx={{
@@ -232,7 +233,7 @@ export default function InventoryPage() {
           >
             + Add New Medicine
           </Button>
-
+ 
           <Box display="flex" gap={2}>
             <Button
               fullWidth
@@ -260,8 +261,10 @@ export default function InventoryPage() {
                     medicineName: m.medicineName,
                     strengthType: m.strength || "-",
                     quantity: m.totalStockTablets.toString(),
+                        minimumQuantity: m.minimumQuantity,
+    maximumQuantity: m.maximumQuantity,
                   }));
-
+ 
                 navigate(URL_PATH.ReorderForm, {
                   state: { medicines: lowStockMedicines },
                 });
@@ -269,7 +272,7 @@ export default function InventoryPage() {
             >
               Reorder
             </Button>
-
+ 
             <Button
               fullWidth
               sx={{
@@ -294,8 +297,10 @@ export default function InventoryPage() {
           </Box>
         </Box>
       </Box>
-
+ 
       <InventoryList />
     </Box>
   );
 }
+ 
+ 
